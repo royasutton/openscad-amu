@@ -1,0 +1,27 @@
+#!@BASH_PATH@
+# convert.bash
+
+__VERBOSE__=true
+__LIBPATH__="@top_srcdir@/share"
+source "${__LIBPATH__}/lib/bootloader.bash"
+
+views   Name "image_view" Translate "0,0,12" Distance "200" Views "all"
+
+images  Name "image_size" Types "pdf html" \
+                          Aspect  "4:3" Hsizes "480 768" \
+                          Aspect "16:9" Wsizes "640 1280"
+
+variables \
+  set_Source "source.scad" \
+  set_Makefile "convert.makefile" add_Depend "convert.makefile" \
+  set_Prefix "build" \
+  set_Ext "png" \
+  set_Convert_Exts "png eps jpeg tiff" set_Convert_Opts "-verbose" \
+  set_Opts "--preview --projection=o --viewall --colorscheme=Cornfield" \
+  set_Opts_Combine "image_view image_size"
+
+script \
+  Begin_Makefile \
+    Summary   Tables   Targets \
+    Menu_Ext  Menu_Src Menu_All \
+  End_Makefile

@@ -1,0 +1,37 @@
+# share/Doxyfile
+PROJECT_NAME           = "@PACKAGE_NAME@"
+PROJECT_NUMBER         = "@PACKAGE_VERSION@"
+PROJECT_BRIEF          =
+OUTPUT_DIRECTORY       = doxygen
+STRIP_FROM_PATH        = "@abs_top_builddir@"
+STRIP_FROM_INC_PATH    =
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTENSION_MAPPING      = bash=C
+DISTRIBUTE_GROUP_DOC   = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_PACKAGE        = NO
+INTERNAL_DOCS          = NO
+GENERATE_TODOLIST      = YES
+GENERATE_TESTLIST      = YES
+GENERATE_BUGLIST       = YES
+GENERATE_DEPRECATEDLIST= YES
+WARN_LOGFILE           = doxygen.warn
+INPUT                  =
+FILE_PATTERNS          = *.bash
+RECURSIVE              = NO
+EXAMPLE_PATH           = "@top_builddir@/share/examples" \
+                         "@top_srcdir@/share/examples"
+EXAMPLE_RECURSIVE      = NO
+IMAGE_PATH             =
+FILTER_PATTERNS        = *.bash="@top_builddir@/src/bash-dif"
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = YES
+LATEX_OUTPUT           = latex
+COMPACT_LATEX          = NO
+PAPER_TYPE             = letter
+GENERATE_MAN           = YES
+MAN_OUTPUT             = man
+GENERATE_TAGFILE       = doxygen.tagfile
+TAGFILES               =
+DOTFILE_DIRS           = "@top_srcdir@/share/examples"

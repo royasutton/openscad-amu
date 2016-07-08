@@ -1,0 +1,206 @@
+#!@BASH_PATH@
+
+## Script that separate text files into segregated record files.
+#/##############################################################################
+#
+#   \file   segregate.bash
+#
+#   \author Roy Allen Sutton <royasutton@hotmail.com>.
+#   \date   2016
+#
+#   \copyright
+#
+#     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#     (https://github.com/royasutton/openscad-amu)).
+#
+#     openscad-amu is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     openscad-amu is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+###############################################################################/
+
+## Script that separate text files into segregated record files.
+#/##############################################################################
+# \afn segregate
+#
+# \aparam <string> \--file    input file to segregate
+# \aparam <string> \--begin   new record start string
+# \aparam <string> \--end     record end string
+#
+# \aparam <string> \--path    path to write output records
+# \aparam <string> \--rs      record filename seperator
+#
+# \aparam <bool>   \--number  number output files
+# \aparam <bool>   \--ignore  ignore missing input file
+# \aparam <bool>   \--list    list output file names
+#
+# \aparam <bool>   \--help    display help.
+#
+# \retval 0 for normal exit
+# \retval 1 for exit on a failure
+#
+# \details
+#
+#   Separate an input file into zero or more individual files according to
+#   a begin- and end-record text search string. All text between the begin
+#   and end search string is segregated to separate output files. The
+#   output file name is formed by by appending the record identifier to
+#   the input file name. The record identifiers are sequentially numbered
+#    or may be individually named by the text that follows the begin text
+#   for each record.
+#
+# \publicsection
+###############################################################################/
+
+
+help(){
+echo $0:
+cat << EOF
+
+segreate file records according to a start and end record string.
+
+  --file  <arg>   input file to segregate
+  --begin <arg>   new record start string
+  --end   <arg>   record end string
+
+  --path  <arg>   path to write output records
+  --rs    <arg>   record filename seperator
+
+  --number        number output files
+  --ignore        ignore missing input file
+  --list          list output file names
+
+  --help
+
+EOF
+}
+
+if [ $# -eq 0 ] ; then
+  help
+  exit 0
+fi
+
+declare local file
+declare local path
+declare local begin
+declare local end
+declare local rs="-"
+declare local number=0
+declare local ignore=0
+declare local list=0
+
+# part command line arguments
+while [ $# -gt 0 ] ; do
+  case ${1,,} in
+  --file)     file="$2"   ; shift 2 ;;
+  --path)     path="$2"   ; shift 2 ;;
+  --begin)    begin="$2"  ; shift 2 ;;
+  --end)      end="$2"    ; shift 2 ;;
+  --rs)       rs="$2"     ; shift 2 ;;
+  --number)   number=1    ; shift 1 ;;
+  --ignore)   ignore=1    ; shift 1 ;;
+  --list)     list=1      ; shift 1 ;;
+  --help)
+    help
+    exit 0
+  ;;
+  *)
+    echo "invalid argument $1, aboarting..."
+    exit 1
+  ;;
+  esac
+done
+
+# check if file is readable
+if [[ ! -r "$file" ]] ; then
+  if [[ "$ignore" -eq 1 ]] ; then
+    exit 0
+  else
+    echo "unable to read file: $file"
+    echo "aborting..."
+    exit 1
+  fi
+fi
+
+declare local flist
+declare local output
+declare local rname
+declare local flag=0
+declare -i local fcnt=0
+declare -a local argv
+
+cat "$file" | \
+sed 's/ECHO: //' | \
+sed 's/"//g' | \
+{
+  while read line
+  do
+    argv=( $line )
+    case ${argv[0]} in
+      ${begin})
+        ((fcnt++))
+
+        # record name
+        if [[ (-z "${argv[1]}") || ("$number" -eq 1) ]] ; then
+          rname=${fcnt}
+        else
+          rname=${argv[1]}
+        fi
+
+        # new output
+        if [[ -z "$path" ]] ; then
+          output="${file}${rs}${rname}"
+        else
+          output="${path}/${file##*/}${rs}${rname}"
+        fi
+
+        if [[ "$list" -eq 0 ]] ; then
+          # create and verify output
+          echo -n "" > $output
+          if [[ ! -w "$output" ]] ; then
+            echo "unable to write file: $output"
+            echo "aborting..."
+            exit 1
+          fi
+
+          # turn on output
+          flag=1
+
+          echo new record [$rname], writing to: $output
+        else
+          # add to file list
+          flist+=" ${output}"
+        fi
+
+        continue
+      ;;
+      ${end})
+        # turn off output
+        flag=0
+
+        continue
+      ;;
+    esac
+
+    [[ "$flag" -eq 1 ]] && echo >> $output "$line"
+  done
+
+  [[ "$list" -eq 1 ]] && echo $flist
+}
+
+exit 0
+
+
+#==============================================================================
+# eof
+#==============================================================================

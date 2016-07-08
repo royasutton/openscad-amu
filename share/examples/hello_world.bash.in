@@ -1,0 +1,28 @@
+#!@BASH_PATH@
+# hello_world.bash
+
+__VERBOSE__=true
+__LIBPATH__="@top_srcdir@/share"
+source "${__LIBPATH__}/lib/bootloader.bash"
+
+translate="0,0,0"
+distance="200"
+
+table_set "view" "_top"     "--camera=${translate},0,0,0,${distance}"
+table_set "view" "_bottom"  "--camera=${translate},180,0,0,${distance}"
+
+table_set "size" "_640x480" "--imgsize=640,480"
+table_set "size" "_320x240" "--imgsize=320,240"
+
+variables \
+  set_Source "source.scad" \
+  set_Makefile "hello_world.makefile" \
+  set_Prefix "build" \
+  set_Ext "png" \
+  set_Opts "--preview --projection=o --viewall" \
+  set_Opts_Combine "view size"
+
+script \
+  Begin_Makefile \
+    Summary  Tables  Targets  Menu \
+  End_Makefile

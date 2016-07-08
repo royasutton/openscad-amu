@@ -1,0 +1,186 @@
+##############################################################################
+#
+# Process this file with autoconf to produce a configure script.
+#
+##############################################################################
+AC_PREREQ(2.50)
+
+AC_INIT([openscad-amu],[1.0],[royasutton@hotmail.com],
+        [openscad-amu],[https://github.com/royasutton/openscad-amu])
+AC_CONFIG_AUX_DIR([scripts])
+AC_CONFIG_MACRO_DIR([m4])
+
+# omitting files: AUTHORS, ChangeLog, NEWS, and README
+# therefore does not conform to the typical gnu standards
+# using the [foreign] option
+AM_INIT_AUTOMAKE([foreign])
+
+##############################################################################
+# Default install directory
+##############################################################################
+#AC_PREFIX_DEFAULT($HOME/projects/cnc)
+
+##############################################################################
+# Checking for required programs
+##############################################################################
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_LIBTOOL
+
+# flex
+AC_MSG_CHECKING([fast lexical analyser generator (flex)])
+AC_PROG_LEX
+if test "x$LEX" != xflex; then
+	LEX="$SHELL $missing_dir/missing flex"
+	AC_SUBST([LEX_OUTPUT_ROOT], [lex.yy])
+	AC_SUBST([LEXLIB], [''])
+fi
+
+# gnu make command name
+AC_MSG_CHECKING([GNU Make])
+AX_CHECK_GNU_MAKE()
+if test "x$_cv_gnu_make_command" = "x" ; then
+  MAKE_COMMAND="make"
+  AC_MSG_WARN([gnumake not found, using ${MAKE_COMMAND}... no])
+else
+  MAKE_COMMAND="$_cv_gnu_make_command"
+  AC_MSG_CHECKING([GNUMake found, as ${MAKE_COMMAND}])
+  AC_MSG_RESULT([version ${ax_check_gnu_make_version}... yes])
+fi
+
+# gnu make path
+AC_MSG_CHECKING([GNU Make path])
+AC_PATH_PROG(MAKE_PATH, ${MAKE_COMMAND}, false)
+if test "$MAKE_PATH" = false ; then
+  MAKE_PATH="${MAKE_COMMAND}"
+  AC_MSG_WARN([make not found, using ${MAKE_PATH}... no])
+  AM_CONDITIONAL(MAKE_PATH_FOUND, false)
+else
+  AM_CONDITIONAL(MAKE_PATH_FOUND, true)
+fi
+
+# bash path
+AC_MSG_CHECKING([GNU Bourne-Again SHell])
+AC_PATH_PROG(BASH_PATH, bash, false)
+if test "$BASH_PATH" = false ; then
+  BASH_PATH="/usr/bin/env bash"
+  AC_MSG_WARN([bash not found, using ${BASH_PATH}... no])
+  AM_CONDITIONAL(BASH_PATH_FOUND, false)
+else
+  AM_CONDITIONAL(BASH_PATH_FOUND, true)
+fi
+
+# openscad path
+AC_MSG_CHECKING([OpenSCAD])
+AC_PATH_PROG(OPENSCAD_PATH, openscad, false)
+if test "$OPENSCAD_PATH" = false ; then
+  OPENSCAD_PATH="openscad"
+  AC_MSG_WARN([openscad not found, using ${OPENSCAD_PATH}... no])
+  AM_CONDITIONAL(OPENSCAD_PATH_FOUND, false)
+else
+  AM_CONDITIONAL(OPENSCAD_PATH_FOUND, true)
+fi
+
+# doxygen path
+AC_MSG_CHECKING([doxygen])
+AC_PATH_PROG(DOXYGEN_PATH, doxygen, false)
+if test "$DOXYGEN_PATH" = false ; then
+  DOXYGEN_PATH="doxygen"
+  AC_MSG_WARN([doxygen not found, using ${DOXYGEN_PATH}... no])
+  AM_CONDITIONAL(DOXYGEN_PATH_FOUND, false)
+else
+  AM_CONDITIONAL(DOXYGEN_PATH_FOUND, true)
+fi
+
+# pdflatex path
+AC_MSG_CHECKING([pdflatex])
+AC_PATH_PROG(PDFLATEX_PATH, pdflatex, false)
+if test "$PDFLATEX_PATH" = false ; then
+  PDFLATEX_PATH="pdflatex"
+  AC_MSG_WARN([pdflatex not found, using ${PDFLATEX_PATH}... no])
+  AM_CONDITIONAL(PDFLATEX_PATH_FOUND, false)
+else
+  AM_CONDITIONAL(PDFLATEX_PATH_FOUND, true)
+fi
+
+##############################################################################
+# Checking for required libraries
+##############################################################################
+AC_MSG_CHECKING([for required boost libraries])
+BOOST_REQUIRE([1.35.0])
+BOOST_SYSTEM
+BOOST_FILESYSTEM
+BOOST_PROGRAM_OPTIONS
+
+##############################################################################
+# Create config.h
+##############################################################################
+AC_CONFIG_HEADERS([config.h])
+
+##############################################################################
+# Create Makefiles
+##############################################################################
+AM_EXTRA_RECURSIVE_TARGETS([
+docs
+tests
+])
+
+AC_CONFIG_FILES([
+Makefile
+
+share/examples/Makefile
+share/examples/convert.bash
+share/examples/hello_world.bash
+share/examples/log_segregate.bash
+share/examples/vehicle.doxyfile
+
+share/lib/Makefile
+share/lib/Doxyfile
+
+share/mk/Makefile
+
+share/scripts/Makefile
+share/scripts/Doxyfile
+share/scripts/doxygen_mainpage.bash
+share/scripts/segregate.bash
+
+src/Makefile
+src/Doxyfile
+
+tests/Makefile
+])
+
+AC_OUTPUT
+
+##############################################################################
+# Show configuration
+##############################################################################
+AC_MSG_NOTICE([
+**************************************************************************
+configuration:
+
+  C++ compiler:             $CXX
+  Lexical analyser          $LEX
+
+  installation prefix:      $prefix
+
+  make path:                $MAKE_PATH
+  bash path:                $BASH_PATH
+  openscad path:            $OPENSCAD_PATH
+  doxygen path:             $DOXYGEN_PATH
+  pdflatex path:            $PDFLATEX_PATH
+
+  run 'make' to build.
+
+  make targets:
+
+    'all'     build all programs and scripts
+    'docs'    build the documentation.
+    'tests'   build the tests.
+
+**************************************************************************
+])
+
+##############################################################################
+# eof
+##############################################################################

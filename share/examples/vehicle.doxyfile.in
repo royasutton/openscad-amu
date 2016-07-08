@@ -1,0 +1,27 @@
+# share/examples/vehicle.doxyfile
+PROJECT_NAME           = "LuxuryVehicleLibrary"
+PROJECT_NUMBER         = "1.0"
+PROJECT_BRIEF          = "An Example of OpenSCAD Automake Utilties in Action"
+OUTPUT_DIRECTORY       = build
+STRIP_FROM_PATH        = "@top_srcdir@"
+STRIP_FROM_INC_PATH    =
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTENSION_MAPPING      = scad=C
+WARN_LOGFILE           = doxygen.warn
+INPUT                  = @srcdir@/vehicle.scad
+FILE_PATTERNS          =
+RECURSIVE              = NO
+EXAMPLE_PATH           = "@builddir@"
+EXAMPLE_RECURSIVE      = NO
+IMAGE_PATH             = "@builddir@/build/png" \
+                         "@builddir@/build/png2eps"
+FILTER_PATTERNS        = *.scad="@top_builddir@/src/openscad-dif"
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = YES
+LATEX_OUTPUT           = latex
+COMPACT_LATEX          = YES
+PAPER_TYPE             = letter
+GENERATE_MAN           = YES
+MAN_OUTPUT             = man
+GENERATE_TAGFILE       = doxygen.tagfile

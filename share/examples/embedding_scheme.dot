@@ -1,0 +1,48 @@
+#
+# embedding scheme diagram
+#
+
+graph g {
+  graph[ranksep=.1];
+  node [fontname=Helvetica, fontsize=10];
+  n1 [shape=component, label="model use\nscripts\n(OpenSCAD)"];
+  n2 [shape=note, label="build invocation\nscripts\n(MFScript)"];
+  n1--n2 [style=invis];
+
+  subgraph cluster_model {
+    graph[fontname=Helvetica, fontsize=10, style=solid];
+    node [fontname=Helvetica, fontsize=10];
+    label="Design Model";
+
+    subgraph cluster_example {
+    graph[fontname=Helvetica, fontsize=10, style=dashed];
+    node [fontname=Helvetica, fontsize=10];
+      label="example";
+
+      n3 [shape=component, label=""];
+      n4 [shape=note, label=""];
+      n3--n4 [style=invis];
+    }
+
+    subgraph cluster_document {
+    graph[fontname=Helvetica, fontsize=10, style=dashed];
+    node [fontname=Helvetica, fontsize=10];
+      label="document";
+
+      n5 [shape=component, label=""];
+      n6 [shape=note, label=""];
+      n5--n6 [style=invis];
+
+      subgraph cluster_internal {
+      graph[fontname=Helvetica, fontsize=10, style=dashed];
+      node [fontname=Helvetica, fontsize=10];
+        label="internal";
+
+        n7 [shape=component, label=""];
+        n8 [shape=note, label=""];
+        n7--n8 [style=invis];
+      }
+    }
+
+  }
+}

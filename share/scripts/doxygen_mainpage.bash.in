@@ -1,0 +1,29 @@
+#/#
+
+  \mainpage Support Scripts Documentation
+
+  \dot
+    digraph example {
+      node [shape=Mrecord, fontname=Helvetica, fontsize=10];
+      a [label="openscad-amu" URL="../../../lib/doxygen/html/index.html"];
+      b [label="C++ Programs" URL="../../../../src/doxygen/html/index.html"];
+      c [label="Makefile Script Library" URL="../../../lib/doxygen/html/index.html#library"];
+      d [label="Support Scripts" URL="index.html" style="filled"];
+      a->b; a->c; a->d;
+    }
+  \enddot
+
+  Here you will find documentation for the support scripts that are used
+  by the OpenSCAD Automake Utilities Makefile Script library.
+
+  \section scripts Scripts
+
+  \subsection support_segregate segregate.bash
+    \copydetails segregate
+
+#/
+
+
+#
+# eof
+#
