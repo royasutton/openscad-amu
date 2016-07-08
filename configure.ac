@@ -5,7 +5,12 @@
 ##############################################################################
 AC_PREREQ(2.50)
 
-AC_INIT([openscad-amu],[1.0],[royasutton@hotmail.com],
+# obtain the configure script version tags from git
+AC_REVISION([m4_esyscmd_s([git describe --tags --long --always])])
+
+AC_INIT([openscad-amu],
+        [m4_esyscmd_s([git describe --tags --long --always])],
+        [royasutton@hotmail.com],
         [openscad-amu],[https://github.com/royasutton/openscad-amu])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
