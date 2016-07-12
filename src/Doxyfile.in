@@ -27,6 +27,7 @@ IMAGE_PATH             =
 FILTER_PATTERNS        =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
+GENERATE_TREEVIEW      = YES
 GENERATE_LATEX         = YES
 LATEX_OUTPUT           = latex
 COMPACT_LATEX          = NO
