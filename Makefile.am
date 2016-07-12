@@ -7,11 +7,11 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = \
+	src \
+	share/scripts \
+	share/mk \
 	share/examples \
 	share/lib \
-	share/mk \
-	share/scripts \
-	src \
 	tests
 
 ##############################################################################
