@@ -6,10 +6,10 @@
 AC_PREREQ(2.50)
 
 # obtain the configure script version tags from git
-AC_REVISION([m4_esyscmd_s([git describe --tags --long --always])])
+AC_REVISION([m4_esyscmd_s([git describe --tags --always])])
 
 AC_INIT([openscad-amu],
-        [m4_esyscmd_s([git describe --tags --long --always])],
+        [m4_esyscmd_s([git describe --tags --always])],
         [royasutton@hotmail.com],
         [openscad-amu],[https://github.com/royasutton/openscad-amu])
 AC_CONFIG_AUX_DIR([scripts])
@@ -169,7 +169,7 @@ configuration:
 
   installation prefix:      $prefix
 
-  make path:                $MAKE_PATH
+  gnu make path:            $MAKE_PATH
   bash path:                $BASH_PATH
   openscad path:            $OPENSCAD_PATH
   doxygen path:             $DOXYGEN_PATH
