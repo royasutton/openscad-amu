@@ -183,6 +183,7 @@
   \todo work on an example that demonstrates dimensioning.
   \todo create includable mk for creating videos (export stem name to makefile)
   \todo work on an example that demonstrates animation creation.
+  \todo debug missing double dash on cygwin doxygen builds
 
 #/
 
