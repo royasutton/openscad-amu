@@ -18,8 +18,8 @@
 
   \section scripts Scripts
 
-  \subsection support_segregate segregate.bash
-    \copydetails segregate
+  \subsection segregate_bash segregate.bash
+    \include segregate.help
 
 #/
 

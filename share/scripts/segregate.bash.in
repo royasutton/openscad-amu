@@ -1,5 +1,9 @@
 #!@BASH_PATH@
 
+basepath="${0%/*}"
+basename="${0##*/}"
+rootname="${basename%.*}"
+
 ## Script that separate text files into segregated record files.
 #/##############################################################################
 #
@@ -29,46 +33,30 @@
 #
 ###############################################################################/
 
-## Script that separate text files into segregated record files.
-#/##############################################################################
-# \afn segregate
-#
-# \aparam <string> \--file    input file to segregate
-# \aparam <string> \--begin   new record start string
-# \aparam <string> \--end     record end string
-#
-# \aparam <string> \--path    path to write output records
-# \aparam <string> \--rs      record filename seperator
-#
-# \aparam <bool>   \--number  number output files
-# \aparam <bool>   \--ignore  ignore missing input file
-# \aparam <bool>   \--list    list output file names
-#
-# \aparam <bool>   \--help    display help.
-#
-# \retval 0 for normal exit
-# \retval 1 for exit on a failure
-#
-# \details
-#
-#   Separate an input file into zero or more individual files according to
-#   a begin- and end-record text search string. All text between the begin
-#   and end search string is segregated to separate output files. The
-#   output file name is formed by by appending the record identifier to
-#   the input file name. The record identifiers are sequentially numbered
-#    or may be individually named by the text that follows the begin text
-#   for each record.
-#
-# \publicsection
-###############################################################################/
 
-
-help(){
-echo $0:
+function help()
+{
+echo ${basename}:
 cat << EOF
 
-segreate file records according to a start and end record string.
+Separate an input file into zero or more individual files according to
+a begin-record and end-record text search string. All text between the
+begin and end search string is segregated to separate output files. The
+output file name is formed by by appending the record identifier to
+the input file name. The record identifiers are sequentially numbered
+or may be individually named by the text that follows the begin text
+for each record.
 
+Returns:
+  0 for normal exit
+  1 for exit on a failure
+
+Example:
+  ${0} \\
+    --file build/stl/source_base_mode1_10.log \\
+    --begin "BEGIN_RECORD" --end "END_RECORD"
+
+Options:
   --file  <arg>   input file to segregate
   --begin <arg>   new record start string
   --end   <arg>   record end string

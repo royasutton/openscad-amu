@@ -20,7 +20,8 @@ INPUT                  =
 FILE_PATTERNS          = *.bash
 RECURSIVE              = NO
 EXAMPLE_PATH           = "@top_builddir@/share/examples" \
-                         "@top_srcdir@/share/examples"
+                         "@top_srcdir@/share/examples" \
+                         "@builddir@"
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
 FILTER_PATTERNS        = *.bash="@top_builddir@/src/bash-dif"
