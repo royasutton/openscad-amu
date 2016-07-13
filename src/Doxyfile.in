@@ -6,7 +6,7 @@ OUTPUT_DIRECTORY       = doxygen
 STRIP_FROM_PATH        = "@abs_top_srcdir@"
 STRIP_FROM_INC_PATH    = "@abs_top_srcdir@"
 OPTIMIZE_OUTPUT_FOR_C  = NO
-EXTENSION_MAPPING      =
+EXTENSION_MAPPING      = ll=c
 DISTRIBUTE_GROUP_DOC   = NO
 EXTRACT_PRIVATE        = NO
 EXTRACT_PACKAGE        = NO
