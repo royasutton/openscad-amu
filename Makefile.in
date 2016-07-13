@@ -362,11 +362,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = \
+	src \
+	share/scripts \
+	share/mk \
 	share/examples \
 	share/lib \
-	share/mk \
-	share/scripts \
-	src \
 	tests
 
 all: config.h

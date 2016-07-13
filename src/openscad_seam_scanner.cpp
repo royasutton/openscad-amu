@@ -1,4 +1,3 @@
-/// This is the brief.
 /***************************************************************************//**
 
   \file   openscad_seam_scanner.cpp
@@ -25,8 +24,10 @@
     You should have received a copy of the GNU General Public License
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
-  \details
+  \brief
+    Script extractor scanner source.
 
+  \ingroup src_openscad_seam
 *******************************************************************************/
 
 using namespace std;

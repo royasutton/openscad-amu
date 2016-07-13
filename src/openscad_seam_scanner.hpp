@@ -1,4 +1,3 @@
-/// This is the brief.
 /***************************************************************************//**
 
   \file   openscad_seam_scanner.hpp
@@ -25,8 +24,10 @@
     You should have received a copy of the GNU General Public License
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
-  \details
+  \brief
+    Script extractor scanner and scope class header.
 
+  \ingroup src_openscad_seam
 *******************************************************************************/
 
 #ifndef __SEAM_SCANNER_HPP__
@@ -47,9 +48,7 @@
 
 namespace SEAM{
 
-/***************************************************************************//**
-  \breif scope class.
-*******************************************************************************/
+//! Class that tracts scope hierarchy.
 class SEAM_Scope {
   public:
     // constructor - root
@@ -91,9 +90,7 @@ class SEAM_Scope {
 };
 
 
-/***************************************************************************//**
-  \breif scanner class.
-*******************************************************************************/
+//! Class that implements script extractor scanner.
 class SEAM_Scanner : public yyFlexLexer{
   public:
     using FlexLexer::yylex;

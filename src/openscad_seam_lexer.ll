@@ -25,10 +25,9 @@
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
   \brief
-    This is the brief.
+    Lexical analyzer for script extraction source.
 
-  \details
-
+  \ingroup src_openscad_seam
 *******************************************************************************/
 
 %{
@@ -38,7 +37,9 @@
 #undef  YY_DECL
 #define YY_DECL int SEAM::SEAM_Scanner::scan(void)
 
-bool need_sp=false;       /* state variable - space needed before next output */
+bool need_sp=false;       //!< state variable - space needed before next output
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 %}
 
@@ -130,17 +131,26 @@ eopenscad                         (?i:end_openscad){eol}
 
 %%
 
-int yyFlexLexer::yywrap(void)
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+//! \ingroup src_openscad_seam
+//! @{
+
+//! Lexer end-of-file handler.
+int
+yyFlexLexer::yywrap(void)
 {
   if (need_sp)
     std::cerr
         << std::endl
-        << "# WARNING: mfscript ended with unterminated line." << std::endl
+        << "# WARNING: Script ended with unterminated line." << std::endl
         << "# WARNING: check for missing ';' at end of script." << std::endl
         << std::endl;
 
   return 1;
 }
+
+//! @}
+
 
 /*******************************************************************************
 // eof
