@@ -1,4 +1,3 @@
-/// This is the brief.
 /***************************************************************************//**
 
   \file   openscad_seam_main.cpp
@@ -25,18 +24,20 @@
     You should have received a copy of the GNU General Public License
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
-  \details
+  \brief
+    Script extractor main source.
 
   \todo add command line option to extract scripts that match specific
         scope name and script type: {MFScript and/or Openscad}.
 
+  \ingroup src_openscad_seam
 *******************************************************************************/
 
-#include "boost/program_options.hpp"
-#include "boost/filesystem.hpp"
-
 #include "openscad_seam_scanner.hpp"
+#include "boost/program_options.hpp"
 
+
+//! return value constants.
 namespace
 {
   const size_t SUCCESS = 0;
@@ -46,14 +47,13 @@ namespace
   const size_t ERROR_UNHANDLED_EXCEPTION = 4;
 }
 
+
 using namespace std;
 
 
-/***************************************************************************//**
-  \breif check if an option is set and throws exception if so.
-  \private
-*******************************************************************************/
-void option_set_conflict(
+//! check if an option is set and throws exception if so.
+void
+option_set_conflict(
   const boost::program_options::variables_map& vm,
   const char* opt,
   const char* msg)
@@ -64,11 +64,9 @@ void option_set_conflict(
 }
 
 
-/***************************************************************************//**
-  \breif check if both options are set and throws exception if so.
-  \private
-*******************************************************************************/
-void option_conflict(
+//! check if both options are set and throws exception if so.
+void
+option_conflict(
   const boost::program_options::variables_map& vm,
   const char* opt1,
   const char* opt2)
@@ -80,11 +78,9 @@ void option_conflict(
 }
 
 
-/***************************************************************************//**
-  \breif check for opt2 if opt1 is set and throws exception if not.
-  \private
-*******************************************************************************/
-void option_depend(
+//! check for opt2 if opt1 is set and throws exception if not.
+void
+option_depend(
   const boost::program_options::variables_map& vm,
   const char* opt1,
   const char* opt2)
@@ -95,11 +91,10 @@ void option_depend(
             + "' requires option '--" + opt2 + "'" );
 }
 
-/***************************************************************************//**
-  \breif main program.
-  \public
-*******************************************************************************/
-int main(int argc, char** argv)
+
+//! program main.
+int
+main(int argc, char** argv)
 {
   try
   {

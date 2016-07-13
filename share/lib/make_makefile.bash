@@ -256,7 +256,7 @@ function show_opts_set_tables()
   done
 
   print_textbox \
-    -lt " $tcmtstr" -ct "$octotal total combination" -rt "$tcmtstr " \
+    -lt " $tcmtstr" -ct "$octotal total combinations" -rt "$tcmtstr " \
     $mfs -bt -pl -bb
 
   return

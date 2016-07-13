@@ -5,10 +5,11 @@ PROJECT_BRIEF          =
 OUTPUT_DIRECTORY       = doxygen
 STRIP_FROM_PATH        = "@abs_top_srcdir@"
 STRIP_FROM_INC_PATH    = "@abs_top_srcdir@"
+JAVADOC_AUTOBRIEF      = NO
 OPTIMIZE_OUTPUT_FOR_C  = NO
-EXTENSION_MAPPING      = ll=c
+EXTENSION_MAPPING      = ll=c++
 DISTRIBUTE_GROUP_DOC   = NO
-EXTRACT_PRIVATE        = NO
+EXTRACT_PRIVATE        = YES
 EXTRACT_PACKAGE        = NO
 INTERNAL_DOCS          = NO
 GENERATE_TODOLIST      = YES
@@ -24,6 +25,7 @@ EXAMPLE_PATH           = "@top_builddir@/share/examples" \
                          "@builddir@"
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
+INCLUDE_PATH           = "@top_builddir@"
 FILTER_PATTERNS        =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
@@ -34,6 +36,7 @@ COMPACT_LATEX          = NO
 PAPER_TYPE             = letter
 GENERATE_MAN           = YES
 MAN_OUTPUT             = man
+PREDEFINED             = DOXYGEN_SHOULD_SKIP_THIS
 GENERATE_TAGFILE       = doxygen.tagfile
 TAGFILES               =
 DOTFILE_DIRS           = "@top_srcdir@/share/examples"
