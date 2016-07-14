@@ -25,7 +25,7 @@
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
   \brief
-    Script extractor scanner and scope class header.
+    Script extractor scanner class header.
 
   \ingroup src_openscad_seam
 *******************************************************************************/
@@ -37,6 +37,8 @@
 #include <FlexLexer.h>
 #endif
 
+#include "openscad_seam_scope.hpp"
+
 #include "boost/filesystem.hpp"
 
 #include <string>
@@ -47,48 +49,6 @@
 #include "config.h"
 
 namespace SEAM{
-
-//! Class that tracts scope hierarchy.
-class SEAM_Scope {
-  public:
-    // constructor - root
-    SEAM_Scope(const std::string& cs)
-    {
-      mode = 'r';
-      cur_scope = cs;
-      new_scope.clear();
-    }
-    // constructor - children
-    SEAM_Scope(const std::string& cs,
-               const std::string& ns,
-               const char m)
-    {
-      mode = m;
-      cur_scope = cs;
-      new_scope = ns;
-    }
-    // desctructor
-    ~SEAM_Scope() {}
-
-    // return name
-    std::string name(void)
-    {
-      if ( new_scope.empty() || (mode=='r') )
-        return cur_scope;
-
-      if (mode == 'p')
-        return new_scope+cur_scope;
-      else
-        return cur_scope+new_scope;
-    }
-
-  private:
-    // state
-    char mode;
-    std::string cur_scope;
-    std::string new_scope;
-};
-
 
 //! Class that implements script extractor scanner.
 class SEAM_Scanner : public yyFlexLexer{
