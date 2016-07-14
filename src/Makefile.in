@@ -384,6 +384,7 @@ openscad_dif_LDFLAGS =
 # openscad-seam
 openscad_seam_SOURCES = \
 	openscad_seam_lexer.cc \
+	openscad_seam_scope.hpp \
 	openscad_seam_scanner.hpp \
 	openscad_seam_scanner.cpp \
 	openscad_seam_main.cpp
