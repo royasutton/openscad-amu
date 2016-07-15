@@ -25,9 +25,9 @@
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
   \brief
-    Lexical analyzer for script extraction source.
+    Lexical analyzer source for script extraction scanner.
 
-  \ingroup src_openscad_seam
+  \ingroup openscad_seam_src
 *******************************************************************************/
 
 %{
@@ -132,7 +132,7 @@ eopenscad                         (?i:end_openscad){eol}
 %%
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-//! \ingroup src_openscad_seam
+//! \ingroup openscad_seam_src
 //! @{
 
 //! Lexer end-of-file handler.

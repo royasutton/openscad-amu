@@ -27,7 +27,7 @@
   \brief
     Script extractor scope class header.
 
-  \ingroup src_openscad_seam
+  \ingroup openscad_seam_src
 *******************************************************************************/
 
 #ifndef __SEAM_SCOPE_HPP__
@@ -40,14 +40,20 @@ namespace SEAM{
 //! Class that tracts scope hierarchy.
 class SEAM_Scope {
   public:
-    // constructor - root
+    //! \brief constructor for root scope.
+    //! \param cs root scope name.
     SEAM_Scope(const std::string& cs)
     {
       mode = 'r';
       cur_scope = cs;
       new_scope.clear();
     }
-    // constructor - children
+    //! \brief constructor for non-root scope with existing parent scope.
+    //! \param cs parent scope name.
+    //! \param ns new scope member name.
+    //! \param m  scope naming mode.
+    //! \todo the mode character should be converted to lower case and be
+    //!       validated to be one of the possible values [r,a,p].
     SEAM_Scope(const std::string& cs,
                const std::string& ns,
                const char m)
@@ -56,10 +62,10 @@ class SEAM_Scope {
       cur_scope = cs;
       new_scope = ns;
     }
-    // desctructor
+    //! destructor.
     ~SEAM_Scope() {}
 
-    // return name
+    //! return current scope name.
     std::string name(void)
     {
       if ( new_scope.empty() || (mode=='r') )
@@ -72,10 +78,10 @@ class SEAM_Scope {
     }
 
   private:
-    // state
-    char mode;
-    std::string cur_scope;
-    std::string new_scope;
+    // state variables
+    char mode;                //!< scope mode; one of [r,a,p] : Root, Append, Prepend.
+    std::string cur_scope;    //!< parent scope.
+    std::string new_scope;    //!< this scope.
 };
 
 

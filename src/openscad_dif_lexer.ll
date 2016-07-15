@@ -25,9 +25,9 @@
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
   \brief
-    Lexical analyzer for OpenSCAD script Doxygen input filter source.
+    Doxygen input filter lexical analyzer source for OpenSCAD script.
 
-  \ingroup src_openscad_dif
+  \ingroup openscad_dif_src
 *******************************************************************************/
 
 %{
@@ -78,7 +78,7 @@ comment_close                     "*"+"/"
 %%
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-//! \ingroup src_openscad_dif
+//! \ingroup openscad_dif_src
 //! @{
 
 //! program main.
