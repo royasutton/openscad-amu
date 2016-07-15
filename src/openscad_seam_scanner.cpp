@@ -27,7 +27,7 @@
   \brief
     Script extractor scanner source.
 
-  \ingroup src_openscad_seam
+  \ingroup openscad_seam_src
 *******************************************************************************/
 
 using namespace std;

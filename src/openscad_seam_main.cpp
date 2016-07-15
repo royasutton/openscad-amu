@@ -29,15 +29,16 @@
 
   \todo add command line option to extract scripts that match specific
         scope name and script type: {MFScript and/or Openscad}.
+  \todo filter the openscad-seam run summary info based on the run mode.
 
-  \ingroup src_openscad_seam
+  \ingroup openscad_seam_src
 *******************************************************************************/
 
 #include "openscad_seam_scanner.hpp"
 #include "boost/program_options.hpp"
 
 
-//! return value constants.
+// return value constants.
 namespace
 {
   const size_t SUCCESS = 0;

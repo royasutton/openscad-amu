@@ -25,12 +25,13 @@
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
   \brief
-    Lexical analyzer for Bourne Again SHell scripts Doxygen input filter source.
+    Doxygen input filter lexical analyzer source for Bourne Again SHell scripts.
 
-  \todo consider bash declared variable support: string, integer, array, etc.
-        need to know function context.
+  \todo consider bash global declared variable support: string, integer,
+        array, etc. need to know function context.
+  \test does the function prototype need to be written after the comment?
 
-  \ingroup src_bash_dif
+  \ingroup bash_dif_src
 *******************************************************************************/
 
 %{
@@ -43,13 +44,14 @@
 
 using namespace std;
 
-//! \ingroup src_bash_dif
+//! \ingroup bash_dif_src
 //! @{
 
-//! class to create function prototypes documented in bash script comment blocks.
+//! class to create function prototypes for documented bash scripts.
 class Block
 {
   public:
+    //! end of comment block text formatting. create function prototype.
     string format( void );
 
     //! append text t to comment block text.
@@ -97,6 +99,7 @@ class Block
     void clear_cp( void ) { cpn.clear(); cpt.clear(); cpd.clear(); }
 
   private:
+    //! remove all characters in c from from string s.
     string remove_chars( const string &s, const string &c );
 
     string            text;     //!< text of current comment block.
@@ -110,7 +113,6 @@ class Block
     string            cpd;      //!< current parameter i/o direction.
 };
 
-//! remove all characters in c from from string s.
 string
 Block::remove_chars( const string &s, const string &c ) {
   string r;
@@ -127,7 +129,6 @@ Block::remove_chars( const string &s, const string &c ) {
   return( r );
 }
 
-//! end of comment block text formatting. create function prototype.
 string
 Block::format( void ) {
   if ( empty() ) return( "" );
@@ -282,7 +283,7 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
 %%
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-//! \ingroup src_bash_dif
+//! \ingroup bash_dif_src
 //! @{
 
 //! program main.

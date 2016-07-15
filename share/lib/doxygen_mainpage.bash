@@ -106,7 +106,7 @@
 
     Here are the resulting \link embedding_scheme.scripts script file
     names\endlink extracted from the above embedding example using
-    \ref openscad-seam.
+    \ref openscad_seam.
 
   \section example Complete Example
 
@@ -120,7 +120,7 @@
 
     Embedded within comments toward the end of the design file are two auxiliary
     script scopes: \b test and \b document. These scopes become part of the
-    extracted script names. The utility \ref openscad-seam
+    extracted script names. The utility \ref openscad_seam
     extracts these OpenSCAD auxiliary scripts in both scopes
     (\link vehicle_document.scad document\endlink and
      \link vehicle_test.scad test\endlink)
@@ -148,7 +148,7 @@
     \endverbatim
 
     To produce the design documentation, the Doxygen input filter,
-    \ref openscad-dif, is used to pre-process the Doxygen documentation
+    \ref openscad_dif, is used to pre-process the Doxygen documentation
     embedded in the design model. See the \c FILTER_* setting in the
     example Doxygen \link vehicle.doxyfile configuration file\endlink.
 
@@ -181,9 +181,11 @@
     - make_makefile.bash
 
   \todo work on an example that demonstrates dimensioning.
-  \todo create includable mk for creating videos (export stem name to makefile)
+  \todo create include mk for creating videos (export stem name to makefile)
   \todo work on an example that demonstrates animation creation.
   \todo debug missing double dash on cygwin doxygen builds
+  \todo incorporate support for web-based stl viewer like
+        [thingiview.js] (https://github.com/tbuser/thingiview.js)
 
 #/
 
@@ -261,7 +263,7 @@
     smaller lines and continued using the '\' character at the end of each
     preceding line. When writing scripts directly this must be done
     explicitly. When writing embedded scripts that will be extracted using
-    \ref openscad-seam, long lines are explicitly terminated using the ';'
+    \ref openscad_seam, long lines are explicitly terminated using the ';'
     character. Therefore this is no need to use the continuation character.
     Long lines will be joined together and written to a single line when
     the line termination character is encountered.

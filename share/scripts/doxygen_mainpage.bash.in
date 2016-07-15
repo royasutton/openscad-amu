@@ -19,7 +19,8 @@
   \section scripts Scripts
 
   \subsection segregate_bash segregate.bash
-    \include segregate.help
+    \subsubsection segregate_bash_help Help Text:
+      \include segregate.help
 
 #/
 
