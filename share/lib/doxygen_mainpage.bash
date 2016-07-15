@@ -1,4 +1,4 @@
-#/#
+#/##############################################################################
 
   \mainpage OpenSCAD Automake Utilities Documentation
 
@@ -187,10 +187,10 @@
   \todo incorporate support for web-based stl viewer like
         [thingiview.js] (https://github.com/tbuser/thingiview.js)
 
-#/
+###############################################################################/
 
 
-#/#
+#/##############################################################################
 
   \defgroup library_arguments Argument Naming Convention
 
@@ -240,10 +240,10 @@
     To assign a list of words to a parameter value, the list must be
     enclosed in single or double quotation marks.
 
-#/
+###############################################################################/
 
 
-#/#
+#/##############################################################################
 
   \defgroup library_core Makefile Script Library Core
 
@@ -277,10 +277,10 @@
     All script function names are case sensitive. The function argument
     keywords are case insensitive.
 
-#/
+###############################################################################/
 
 
-#/#
+#/##############################################################################
 
   \defgroup library_support Makefile Script Library Support
 
@@ -292,10 +292,10 @@
 
     here is an example:
 
-#/
+###############################################################################/
 
 
-#/#
+#/##############################################################################
 
   \example convert.bash
     An example script that uses target output conversion.
@@ -337,7 +337,7 @@
   \example vehicle_test.makefile
     Makefile created by extracted MFSript vehicle_test.bash
 
-#/
+###############################################################################/
 
 
 #

@@ -1,4 +1,4 @@
-#/#
+#/##############################################################################
 
   \mainpage Support Scripts Documentation
 
@@ -22,7 +22,7 @@
     \subsubsection segregate_bash_help Help Text:
       \include segregate.help
 
-#/
+###############################################################################/
 
 
 #

@@ -1,4 +1,4 @@
-/**
+/***************************************************************************//**
 
   \mainpage C++ Programs Documentation
 
@@ -40,30 +40,37 @@
     \subsubsection openscad_seam_help Help Text:
       \include openscad-seam.help
 
-*/
+  \todo create a test suite that compares output from each program to
+        known good results.
 
-/**
+*******************************************************************************/
+
+
+/***************************************************************************//**
   \defgroup bash_dif_src Source Documentation: bash-dif
 
   \brief
     Doxygen input filter for Bourne Again SHell (Bash) scripts.
-*/
+*******************************************************************************/
 
-/**
+
+/***************************************************************************//**
   \defgroup openscad_dif_src Source Documentation: openscad-dif
 
   \brief
     Doxygen input filter for OpenSCAD scripts.
-*/
+*******************************************************************************/
 
-/**
+
+/***************************************************************************//**
   \defgroup openscad_seam_src Source Documentation: openscad-seam
 
   \brief
     OpenSCAD and Makefile script extractor and make utility.
-*/
+*******************************************************************************/
 
-/**
+
+/***************************************************************************//**
   \page bash_dif_dtc Documenting bash scripts
 
   This filter may be used to document bash scripts using Doygen.
@@ -103,9 +110,10 @@
 
   ## @}
   \endverbatim
-*/
+*******************************************************************************/
 
-/**
+
+/***************************************************************************//**
   \page openscad_dif_dtc Documenting OpenSCAD Scripts
 
     This filter may be used to document OpenSCAD scripts using Doygen.
@@ -142,7 +150,8 @@
 
     //! @}
     \endverbatim
-*/
+*******************************************************************************/
+
 
 //
 // eof
