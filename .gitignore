@@ -1,5 +1,5 @@
-build/
 bs/
+build/
 
 Makefile.in
 aclocal.m4

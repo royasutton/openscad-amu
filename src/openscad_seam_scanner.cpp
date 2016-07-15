@@ -39,7 +39,7 @@ SEAM::SEAM_Scanner::SEAM_Scanner(const string& f, const bool& m, const string& s
   input_name = f;
 
   // initialize output prefix string
-  ops = s;
+  set_ops( s );
 
   if ( m ) {
     // count mode scanner

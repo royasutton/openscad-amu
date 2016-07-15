@@ -7,8 +7,9 @@ rootname="${basename%.*}"
 echo "${rootname} begin"
 
 # auto-configure if needed
-[ ! -x configure ] \
-  && autoreconf --force --install -I m4 || exit 1
+if [ ! -x configure ] ; then
+  autoreconf --force --install -I m4 || exit 1
+fi
 
 echo "${rootname} end"
 
