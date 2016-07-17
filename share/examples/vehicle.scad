@@ -26,15 +26,14 @@
 
   \brief
 
-    Parameterizable high-tech luxury vehicle model.
+    Simple vehicle library to demonstrate model design with embedded documentation.
 
   \details
 
-    This Parameterized vehicle model will change the way you acquire
-    vehicles. No longer will you need to spend countless hours visiting
-    vehicle exchanges or scouring the Internet. Now you can simply
-    instantiate your favorite vehicle type, color, and wheel size, from
-    the comfort of your personal computing device.
+    This Parameterized model consists of three simple OpenSCAD modules
+    that generate very basic blocks that resemble cars, trucks, and vans.
+    The library consists of a vehicle module, a cabin module, and a wheel
+    module. Each module supports basic parameterization and is documented.
 
 *******************************************************************************/
 
@@ -42,37 +41,46 @@
 
   \mainpage Library Documentation
 
+  \tableofcontents
+
   \section overview Overview
 
     \dot
       graph g { subgraph cluster_model { graph[style=solid];
-          label="Luxury Vehicle Library Components";
-          node [shape=Mrecord]; wheel; vehicle;
+          label="Example Vehicle Library\n(select a module)";
+          node [shape=Mrecord];
+          a [label="wheel" URL="\ref wheel"];
+          b [label="cabin" URL="\ref cabin"];
+          c [label="vehicle" URL="\ref vehicle"];
       } }
      \enddot
 
-    With this library you will be able to make the vehicle of your dreams.
-    It does not matter if you prefer cars, trucks, or vans, you are now
-    empowered to instantiate whichever you prefer. You can even choose
-    to enlarge your rims and change your vehicles body color.
+    With this library you will be able to make simple models that almost
+    resemble vehicles. It does not matter if you prefer cars, trucks, or
+    vans, you can instantiate whichever you prefer. You can even choose
+    your wheel size and change your vehicles color.
 
-    \warning Vehicles constructed with this library __may not be street legal!__
+    \warning  Vehicles constructed with this library __should not be
+              constructed without additional design refinement!__
 
-  \section modules Library Modules
+  \section modules OpenSCAD Library Modules
 
-    - module \link wheel() \endlink
-    - module \link cabin() \endlink
-    - module \link vehicle() \endlink
+    - \ref wheel "Wheel Module Documentation".
+    - \ref cabin "Cabin Module Documentation".
+    - \ref vehicle "Vehicle Module Documentation".
 
   \section using Using the Library
 
-    To demystify the use of this all inclusive library, please see the
-    following exemplary use case on how to incorporate these library modules
-    into your dream design.
+    The basic vehicle is constructed with seven parameters as shown
+    in the script segment below. Please review the \ref vehicle module
+    documentation for more details on each configuration option.
 
     \dontinclude vehicle_test.scad
     \skip use
     \until vehicle_wheels );
+
+    \note This library does not use global variables and therefore may be
+          included using the \c use OpenSCAD command.
 
   \section views Vehicle Views
 
@@ -98,7 +106,11 @@
 
   \section examples Examples
 
-    Here are a few examples to stimulate your imagination.
+    Here are a few examples. All of these images are rendered from the
+    design library scripts in the same file that also created this
+    documentation. The images and Stereo Lithography (STL) models have been
+    generated using OpenSCAD via the auxiliary scripts at the end of
+    this file.
 
   \subsection example_12 Vehicles with 12in Wheels
 
@@ -150,7 +162,7 @@
 
   \section downloads Downloads
 
-  \subsection models STL Models Ready for Manufacture
+  \subsection models STL Models
 
     - <a href="../stl/vehicle_test_car_12.stl">Car with 12in wheels</a>
     - <a href="../stl/vehicle_test_car_17.stl">Car with 17in wheels</a>
@@ -161,28 +173,33 @@
 
   \subsection refman  PDF Reference Manual
 
-    If you are kind or generous, you will <a href="../latex/refman.pdf">
-    download the printable PDF version</a> of the library documentation and pass it
-    out to all of your family, friends, and acquaintances.
+    Doxygen generates documentation if numerous formats. The Doxygen
+    configuration file for this example has been setup to generate this
+    HTML output as well as Latex generated PDF reference manual.
+
+    Here is the Doxygen/Latex generated <a href="../latex/refman.pdf">
+    PDF version</a> of this library documentation.
 
     \latexonly
-      Congratulations, you have found me. This is the PDF Reference manual. No need
-      to search any further. Simply print me and follow the above directions.
+      This is the PDF Reference manual.
     \endlatexonly
 
-  \todo This library is absolutely perfect and has zero bugs. Just use me and relax.
-  \todo Spread the word. Everything is better now.
+  \note There are also UNIX man page documentation that has been generated
+        via Doxygen. It can be found at: <tt>@builddir@/share/examples/build/man</tt>.
+
+  \todo Improve the window detail.
+  \todo Fix all the typos and spelling mistakes.
 
 *******************************************************************************/
 
 /***************************************************************************//**
 
-  \example vehicle_document.scad using the wheel library module
-  \example vehicle_test.scad using the vehicle library module
+  \example vehicle_document.scad using the wheel library module.
+  \example vehicle_test.scad using the vehicle library module.
 
 *******************************************************************************/
 
-//! Top quality high speed wheel model.
+//! Parameterized wheel model.
 /***************************************************************************//**
 
   \param diameter   <integer> wheel rim diameter size in inches.
@@ -226,7 +243,7 @@ module wheel( diameter=15, width=7, wallheight=6, tirecolor="black", rimcolor="w
   cylinder(h=width/10, d=(diameter+wallheight*2)*98/100, center=true);
 }
 
-//! Flexible vehicle cabin design module.
+//! Parameterized vehicle cabin design module.
 /***************************************************************************//**
 
   \param size       <integer[x, y, z]> Overall size of cabin
@@ -245,7 +262,7 @@ module cabin( size, cabcolor ) {
   color( "whitesmoke" ) cube([1/2, size[1]*90/100, size[2]*90/100], center=true);
 }
 
-//! Versatile all-inclusive computer aided vehicle design.
+//! Parameterized vehicle design module.
 /***************************************************************************//**
 
   \param type       <string>  Type of vehicle desired. One of {car, truck, van}.
@@ -265,6 +282,9 @@ module cabin( size, cabcolor ) {
     \dontinclude vehicle_test.scad
     \skip use
     \until vehicle_wheels );
+
+  \test Determine the minimum and maximum wheel size that work for each
+        vehicle and add to this documentation.
 
   \public
 

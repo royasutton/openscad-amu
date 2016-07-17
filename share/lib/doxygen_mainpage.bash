@@ -185,7 +185,7 @@
   \todo work on an example that demonstrates animation creation.
   \todo debug missing double dash on cygwin doxygen builds
   \todo incorporate support for web-based stl viewer like
-        [thingiview.js] (https://github.com/tbuser/thingiview.js)
+        [JavaScript 3D library] (https://github.com/mrdoob/three.js)
 
 ###############################################################################/
 
