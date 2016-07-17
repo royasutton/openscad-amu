@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# top_builddir/src
+# top_srcdir/src
 #
 ##############################################################################
 
@@ -72,7 +72,7 @@ docs-local: doxygen.stamp
 doxygen.stamp: Doxyfile Makefile $(doxygen_stamp_other_dependacies)
 	( cat Doxyfile ; \
 		echo "INPUT=$(srcdir)" ; \
-		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: Support Scripts\"" ; \
+		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: C++ Programs\"" ; \
 	) | $(DOXYGEN_PATH) - \
 	&& touch doxygen.stamp
 #	&& ( cd doxygen/latex && make )
