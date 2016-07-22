@@ -42,10 +42,12 @@
 namespace
 {
   const size_t SUCCESS = 0;
-  const size_t ERROR_SCRIPT_COUNT_ZERO = 1;
+
+  const size_t ERROR_UNHANDLED_EXCEPTION = 1;
   const size_t ERROR_IN_COMMAND_LINE = 2;
   const size_t ERROR_UNABLE_TO_OPEN_FILE = 3;
-  const size_t ERROR_UNHANDLED_EXCEPTION = 4;
+
+  const size_t ERROR_SCRIPT_COUNT_ZERO = 4;
 }
 
 

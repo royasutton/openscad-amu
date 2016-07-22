@@ -28,7 +28,8 @@
     Doxygen input filter lexical analyzer source for Bourne Again SHell scripts.
 
   \todo consider bash global declared variable support: string, integer,
-        array, etc. need to know function context.
+        array, etc. need to know function context. pattern to match
+        multi-line function arguments: \([^\)]+\)
   \test does the function prototype need to be written after the comment?
 
   \ingroup bash_dif_src
