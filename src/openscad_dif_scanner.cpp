@@ -34,6 +34,7 @@ using namespace std;
 
 #include "openscad_dif_scanner.hpp"
 
+
 ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
 {
   // initialize output prefix string
@@ -75,7 +76,7 @@ ODIF::ODIF_Scanner::init(void)
 
   // initialize function argument positional prefix
   fx_argv.clear();
-  fx_argv.set_pos_prefix("arg");
+  fx_argv.set_prefix("arg");
 }
 
 void

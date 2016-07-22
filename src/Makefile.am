@@ -25,6 +25,8 @@ openscad_dif_SOURCES = \
 	openscad_dif_lexer.cc \
 	openscad_dif_scanner.hpp \
 	openscad_dif_scanner.cpp \
+	openscad_dif_util.hpp \
+	openscad_dif_util.cpp \
 	openscad_dif_main.cpp
 
 openscad_dif_CXXFLAGS = -W -Wall -Wextra -ansi
