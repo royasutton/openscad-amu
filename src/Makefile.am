@@ -21,10 +21,24 @@ bash_dif_CPPFLAGS =
 bash_dif_LDFLAGS =
 
 # openscad-dif
-openscad_dif_SOURCES = openscad_dif_lexer.cc
+openscad_dif_SOURCES = \
+	openscad_dif_lexer.cc \
+	openscad_dif_scanner.hpp \
+	openscad_dif_scanner.cpp \
+	openscad_dif_main.cpp
+
 openscad_dif_CXXFLAGS = -W -Wall -Wextra -ansi
-openscad_dif_CPPFLAGS =
-openscad_dif_LDFLAGS =
+openscad_dif_CPPFLAGS = \
+	$(BOOST_CPPFLAGS) \
+	-D__BASH_PATH__=\"$(BASH_PATH)\" \
+	-D__MAKE_PATH__=\"$(MAKE_PATH)\" \
+	-D__LIB_PATH__=\"$(pkgdatadir)/$(PACKAGE_VERSION)\" \
+	-D__OPENSCAD_PATH__=\"$(OPENSCAD_PATH)\"
+
+openscad_dif_LDFLAGS = \
+	$(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_FILESYSTEM_LIBS) \
+	$(BOOST_SYSTEM_LDFLAGS) $(BOOST_SYSTEM_LIBS) \
+	$(BOOST_PROGRAM_OPTIONS_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIBS)
 
 # openscad-seam
 openscad_seam_SOURCES = \

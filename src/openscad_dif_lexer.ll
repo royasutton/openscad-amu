@@ -32,11 +32,10 @@
 
 %{
 
-#include <string>
-#include <iostream>
-#include <fstream>
+#include "openscad_dif_scanner.hpp"
 
-#include "config.h"
+#undef  YY_DECL
+#define YY_DECL int ODIF::ODIF_Scanner::scan(void)
 
 using namespace std;
 
@@ -45,35 +44,100 @@ using namespace std;
 %}
 
 %option c++
-%option prefix="openscad_dif"
+%option yyclass="ODIF::ODIF_Scanner"
 %option stack
-%option noyywrap
+%option yywrap
 %option nounput
-/* %option nodefault */
+%option default
+%option yylineno
 %option debug
 
-%s COMMENT
+%s COMMENT AMUFUNC FUNCARG FUNCARGDQ FUNCARGSQ AMUMDEFINE DEFINEARG
 
 comment_line                      "//"[/!]?
 comment_open                      "/*"[*!]?
 comment_close                     "*"+"/"
 
+ws                                [ \t]
+nr                                [\n\r]
+
+id                                [-_[:alnum:]]+
+id_var                            "${"[-_[:alnum:]]+"}"
+id_path                           [-_[:alnum:]/\\]+
+
+amu_func                          [\\@](?i:amu)_{id}
+amu_define                        [\\@](?i:amu_define)
+
 %%
 
-  /* outside comments: replace OpenSCAD commands with C equivalents,
-                       output everything unchanged */
+  /* outside comments:
+      (1) replace OpenSCAD commands with C equivalents,
+      (2) output everything else unchanged */
 
-<INITIAL>{comment_open}           { ECHO; yy_push_state(COMMENT); }
-<INITIAL>{comment_line}           { ECHO; }
-<INITIAL>include                  { LexerOutput( "#include", 8 ); }
-<INITIAL>use                      { LexerOutput( "#include", 8 ); }
-<INITIAL>.                        { ECHO; }
+<INITIAL>{comment_open}           { scanner_echo(); yy_push_state(COMMENT); }
+<INITIAL>{comment_line}           { scanner_echo(); }
+<INITIAL>include                  { scanner_output( "#include", 8 ); }
+<INITIAL>use                      { scanner_output( "#include", 8 ); }
+<INITIAL>{nr}                     { scanner_echo(); }
+<INITIAL>.                        { scanner_echo(); }
 
-  /*  inside comments: output everything unchanged */
+  /* inside comments:
+      (1) match and handle amu functions
+      (2) output everything else unchanged */
 
-<COMMENT>{comment_close}          { ECHO; yy_pop_state(); }
-<COMMENT><<EOF>>                  { LexerError("ERROR: unterminated comment."); }
-<COMMENT>.                        { ECHO; }
+<COMMENT>{comment_close}          { scanner_echo(); yy_pop_state(); }
+<COMMENT><<EOF>>                  { abort("unterminated comment"); }
+<COMMENT>{amu_define}             { def_init(); yy_push_state(AMUMDEFINE); }
+<COMMENT>{amu_func}               { fx_init(); yy_push_state(AMUFUNC); }
+<COMMENT>{nr}                     { scanner_echo(); }
+<COMMENT>.                        { scanner_echo(); }
+
+  /* parse amu function:
+      \amu_func1 | var path ( a1 a2 'a3' "a 4" file="all" ) */
+
+<AMUFUNC>\|{ws}*{id}              { apt(); fx_set_tovar(); }
+<AMUFUNC>{id_path}                { apt(); fx_set_path(); }
+<AMUFUNC>\(                       { apt(); BEGIN(FUNCARG); }
+<AMUFUNC>{ws}+                    { apt(); }
+<AMUFUNC>.                        { abort("in function name", lineno(), YYText()); }
+
+  /* parse arguments */
+
+<FUNCARG>{id}                     { apt(); fx_store_arg(); }
+<FUNCARG>\\{id_var}               { apt(); fx_store_arg_escaped(); }
+<FUNCARG>{id_var}                 { apt(); fx_store_arg_expanded(); }
+<FUNCARG>{id}=                    { apt(); fx_set_arg_name(); }
+<FUNCARG>\'                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGSQ); }
+<FUNCARG>\"                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGDQ); }
+<FUNCARG>\)                       { apt(); fx_eval(); yy_pop_state(); }
+<FUNCARG>{ws}+                    { apt(); }
+<FUNCARG>{nr}                     { apt(); }
+<FUNCARG>.                        { abort("in function arguments", lineno(), YYText()); }
+<FUNCARG><<EOF>>                  { abort("unterminated function arguments", fi_bline); }
+
+  /* parse single and double quoted argument */
+
+<FUNCARGSQ>\'                     { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
+<FUNCARGDQ>\"                     { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
+<FUNCARGSQ,FUNCARGDQ>\\{id_var}   { apt(); fx_app_qarg_escaped(); }
+<FUNCARGSQ,FUNCARGDQ>{id_var}     { apt(); fx_app_qarg_expanded(); }
+<FUNCARGSQ,FUNCARGDQ>.            { apt(); fx_app_qarg(); }
+<FUNCARGSQ><<EOF>>                { abort("unterminated single quote", fi_bline); }
+<FUNCARGDQ><<EOF>>                { abort("unterminated double quote", fi_bline); }
+
+  /* parse amu define:
+      \amu_define var ( text of definition with ${variables} ) */
+
+<AMUMDEFINE>{id}                  { apt(); def_set_name(); }
+<AMUMDEFINE>\(                    { apt(); BEGIN(DEFINEARG); }
+<AMUMDEFINE>{ws}+                 { apt(); }
+<AMUMDEFINE>.                     { abort("in define", lineno(), YYText()); }
+
+<DEFINEARG>\)                     { apt(); def_store(); yy_pop_state(); }
+<DEFINEARG>{ws}+                  { apt(); def_app(" "); }
+<DEFINEARG>{nr}+                  { apt(); def_app(" "); }
+<DEFINEARG>.                      { apt(); def_app(); }
+<DEFINEARG><<EOF>>                { abort("unterminated define arguments", fi_bline); }
 
 %%
 
@@ -81,63 +145,8 @@ comment_close                     "*"+"/"
 //! \ingroup openscad_dif_src
 //! @{
 
-//! program main.
-int
-main( int argc, char** argv ) {
-  string  arg1;
-  bool    help    = false;
-  bool    version = false;
-
-  if ( argc == 2 ) {
-    arg1 = argv[1];
-    help    = !arg1.compare("-h") || !arg1.compare("--help");
-    version = !arg1.compare("-v") || !arg1.compare("--version");
-  }
-
-  if ( help || argc != 2 ) {
-    cout << argv[0] << " v" << PACKAGE_VERSION << endl
-         << endl
-         << "Doxygen input filter for OpenSCAD source files. Can be used in\n"
-            "conjunction with doxygen tags INPUT_FILTER and FILTER_*." << endl
-         << endl
-         << "Example:" << endl
-         << "  FILTER_PATTERNS = *.scad=<prefix>/bin/" << argv[0] << endl
-         << endl
-         << "Usage: " << endl
-         << "  " << argv[0] << " ifile" << endl
-         << endl
-         << "Options: " << endl
-         << "  -h [ --help]     Print this message." << endl
-         << "  -v [ --version]  Report tool version." << endl
-         << endl;
-
-    if ( help ) exit( EXIT_SUCCESS );
-    else        exit( EXIT_FAILURE );
-  }
-
-  if ( version ) {
-    cout << PACKAGE_VERSION << endl;
-    exit( EXIT_SUCCESS );
-  }
-
-  ifstream infile ( arg1.c_str() );
-
-  if ( infile.good() ) {
-    openscad_difFlexLexer* lexer = new openscad_difFlexLexer( &infile , &cout);
-
-    while( lexer->yylex() != 0 )
-      ;
-
-  } else {
-
-    cerr << "ERROR: unable to open file [" << arg1 << "]" << endl;
-    exit( EXIT_FAILURE );
-
-  }
-
-  infile.close();
-  exit( EXIT_SUCCESS );
-}
+//! Lexer end-of-file handler.
+int yyFlexLexer::yywrap(void) { return 1; }
 
 //! @}
 
