@@ -108,11 +108,12 @@ class func_args {
     bool empty(void) { return( argV.empty() ); }
 
     size_t size(void) { return( argV.size() ); }
-    size_t size(bool n=true, bool p=true);
+    size_t size(bool n, bool p=false);
 
     bool exists(const std::string& n);
 
-    std::string value(const std::string& n);
+    std::string arg(const size_t n);
+    std::string arg(const std::string& n);
 
     std::vector<std::string> values_v(bool n=false, bool p=true);
     std::string values_str(bool n=false, bool p=true);

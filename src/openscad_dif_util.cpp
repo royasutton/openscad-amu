@@ -53,17 +53,17 @@ ODIF::env_var::~env_var( void )
   clear();
 }
 
-std::string
-ODIF::env_var::expand(const std::string& v, bool r, const std::string& rm)
+string
+ODIF::env_var::expand(const string& v, bool r, const string& rm)
 {
-  std::string mn;
+  string mn;
 
   // remove prefix and suffix strings from named variable:
   // ${VAR} --> VAR
   mn = v.substr( prefix.length()
                , v.length()-(prefix.length()+suffix.length()) );
 
-  std::string rs;
+  string rs;
 
   if ( map.find( mn ) != map.end() ) {
     rs = map[ mn ];
@@ -76,17 +76,16 @@ ODIF::env_var::expand(const std::string& v, bool r, const std::string& rm)
 
 void
 ODIF::env_var::dump(void) {
-  std::cout << "(var map begin)" << std::endl;
+  cout << "(var map begin)" << endl;
 
-  for ( std::map<std::string, std::string>::iterator
-        it=map.begin();
-        it!=map.end();
-        ++it )
+  for ( std::map<string, string>::iterator  it=map.begin();
+                                            it!=map.end();
+                                          ++it )
   {
-    std::cout << it->first << "=" << it->second << std::endl;
+    cout << it->first << "=" << it->second << endl;
   }
 
-  std::cout << "(var map begin)" << std::endl;
+  cout << "(var map begin)" << endl;
 }
 
 
@@ -94,7 +93,7 @@ ODIF::env_var::dump(void) {
 // func_args
 ////////////////////////////////////////////////////////////////////////////////
 
-ODIF::func_args::func_args(const std::string& p)
+ODIF::func_args::func_args(const string& p)
 {
   clear();
   set_prefix( p );
@@ -106,7 +105,7 @@ ODIF::func_args::~func_args(void)
 }
 
 void
-ODIF::func_args::store(const std::string& v)
+ODIF::func_args::store(const string& v)
 {
   bool p;
 
@@ -136,9 +135,9 @@ ODIF::func_args::size(bool n, bool p)
 {
   size_t tc=0, nc=0, pc=0;
 
-  for ( std::vector<arg_term>::iterator it=argV.begin();
-                                      it!=argV.end();
-                                      ++it )
+  for ( vector<arg_term>::iterator  it=argV.begin();
+                                    it!=argV.end();
+                                  ++it )
   {
     if ( it->positional ) pc++;
     else                  nc++;
@@ -151,13 +150,13 @@ ODIF::func_args::size(bool n, bool p)
 }
 
 bool
-ODIF::func_args::exists(const std::string& n)
+ODIF::func_args::exists(const string& n)
 {
   bool found = false;
 
-  for ( std::vector<arg_term>::iterator it=argV.begin();
-                                      it!=argV.end() && !found;
-                                      ++it )
+  for ( vector<arg_term>::iterator  it=argV.begin();
+                                    it!=argV.end() && !found;
+                                  ++it )
   {
     if ( it->name.compare( n )==0 )
       found = true;
@@ -166,15 +165,26 @@ ODIF::func_args::exists(const std::string& n)
   return ( found );
 }
 
-std::string
-ODIF::func_args::value(const std::string& n)
+string
+ODIF::func_args::arg(const size_t n)
+{
+  string rs;
+
+  if ( n < size() )
+    rs = argV[ n ].value;
+
+  return ( rs );
+}
+
+string
+ODIF::func_args::arg(const string& n)
 {
   bool found = false;
-  std::string rs;
+  string rs;
 
-  for ( std::vector<arg_term>::iterator it=argV.begin();
-                                      it!=argV.end() && !found;
-                                      ++it )
+  for ( vector<arg_term>::iterator  it=argV.begin();
+                                    it!=argV.end() && !found;
+                                  ++it )
   {
     if ( it->name.compare( n )==0 )
       rs = it->value;
@@ -183,14 +193,14 @@ ODIF::func_args::value(const std::string& n)
   return ( rs );
 }
 
-std::vector<std::string>
+vector<string>
 ODIF::func_args::values_v(bool n, bool p)
 {
-  std::vector<std::string> rv;
+  vector<string> rv;
 
-  for ( std::vector<arg_term>::iterator it=argV.begin();
-                                      it!=argV.end();
-                                      ++it )
+  for ( vector<arg_term>::iterator  it=argV.begin();
+                                    it!=argV.end();
+                                  ++it )
   {
     if (   it->positional && p )  rv.push_back( it->value );
     if ( ! it->positional && n )  rv.push_back( it->value );
@@ -199,14 +209,14 @@ ODIF::func_args::values_v(bool n, bool p)
   return ( rv );
 }
 
-std::string
+string
 ODIF::func_args::values_str(bool n, bool p)
 {
-  std::string rv;
+  string rv;
 
-  for ( std::vector<arg_term>::iterator it=argV.begin();
-                                      it!=argV.end();
-                                      ++it )
+  for ( vector<arg_term>::iterator  it=argV.begin();
+                                    it!=argV.end();
+                                  ++it )
   {
     if (   it->positional && p ) {
       if ( rv.length() ) rv += " ";
@@ -221,14 +231,14 @@ ODIF::func_args::values_str(bool n, bool p)
   return ( rv );
 }
 
-std::vector<std::string>
+vector<string>
 ODIF::func_args::names_v(bool n, bool p)
 {
-  std::vector<std::string> rv;
+  vector<string> rv;
 
-  for ( std::vector<arg_term>::iterator it=argV.begin();
-                                      it!=argV.end();
-                                      ++it )
+  for ( vector<arg_term>::iterator  it=argV.begin();
+                                    it!=argV.end();
+                                  ++it )
   {
     if (   it->positional && p )  rv.push_back( it->name );
     if ( ! it->positional && n )  rv.push_back( it->name );
@@ -237,14 +247,14 @@ ODIF::func_args::names_v(bool n, bool p)
   return ( rv );
 }
 
-std::string
+string
 ODIF::func_args::names_str(bool n, bool p)
 {
-  std::string rv;
+  string rv;
 
-  for ( std::vector<arg_term>::iterator it=argV.begin();
-                                      it!=argV.end();
-                                      ++it )
+  for ( vector<arg_term>::iterator  it=argV.begin();
+                                    it!=argV.end();
+                                  ++it )
   {
     if (   it->positional && p ) {
       if ( rv.length() ) rv += " ";
@@ -259,14 +269,14 @@ ODIF::func_args::names_str(bool n, bool p)
   return ( rv );
 }
 
-std::string
-ODIF::func_args::pairs_str(bool n, bool p, std::string a)
+string
+ODIF::func_args::pairs_str(bool n, bool p, string a)
 {
-  std::string rv;
+  string rv;
 
-  for ( std::vector<arg_term>::iterator it=argV.begin();
-                                      it!=argV.end();
-                                      ++it )
+  for ( vector<arg_term>::iterator  it=argV.begin();
+                                    it!=argV.end();
+                                  ++it )
   {
     if (   it->positional && p ) {
       if ( rv.length() ) rv += " ";
@@ -285,16 +295,19 @@ ODIF::func_args::pairs_str(bool n, bool p, std::string a)
 void
 ODIF::func_args::dump(void)
 {
-  std::cout << "(";
+  cout << "(";
 
-  for ( std::vector<arg_term>::iterator it=argV.begin(); it!=argV.end(); ) {
-    std::cout << it->name << "=" << it->value;
+  for ( vector<arg_term>::iterator  it=argV.begin();
+                                    it!=argV.end();
+                                        )
+  {
+    cout << it->name << "=" << it->value;
 
     ++it;
-    if ( it!=argV.end() ) std::cout << " ";
+    if ( it!=argV.end() ) cout << " ";
   }
 
-  std::cout << ")";
+  cout << ")";
 }
 
 
