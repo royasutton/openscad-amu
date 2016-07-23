@@ -21,11 +21,11 @@ ep = 0.02;
   \note data not available for {b, w, and d1} for bearings lm{3|4}uu.
         Their values were extrapolated.
 
-  \amu_define file1 (file1 file2 file3)
-  \amu_define files (im1 im2 im3 im4)
+  \amu_define files1 (file1 file2 file3)
+  \amu_define files2 (im1 im2 im3 im4)
 
   \amu_define newf ( type=html sizex=320 sizey=240 cols=3
-                     files="${files}"
+                     files="${files1} ${files2}"
                      titles="title1 title2 title3" )
 
   \amu_func1             (args)
@@ -36,10 +36,11 @@ ep = 0.02;
 
   @amu_eval                     ( \${files} )
 
-  \amu_eval  | files            ( '_op1 _op1' "_m1 _m2" "_x1, _x2")
-  \amu_shell | files /path/func ( "base" "_op1 _op1" "_m1 _m2" "_x1, _x2" )
-  \amu_shell                 ls ( "base" "_op1 _op1" "_m1 _m2" "_x1, _x2" )
-  \amu_enum  | files            ( --base='base' "_op1 _op1" "_m1 _m2" "_x1, _x2" )
+  \amu_eval     | files            ( '_op1 _op2' "_m1 _m2" "_x1, _x2")
+  \amu_shell    | files /path/func ( "base" "_op1 _op2" "_m1 _m2" "_x1, _x2" )
+  \amu_shell                    ls ( "base" "_op1 _op2" "_m1 _m2" "_x1, _x2" )
+  \amu_combine                     (    'base1' "_op1 _op2" "_m1 _m2" "_x1 _x2" ".jpg" --separator=", ")
+  \amu_combine  | files            ( -p='base1' -s=".jpg" "_op1 _op2" "_m1 _m2" "_x1 _x2" -f=" ")
 
   \amu_image_table html ( sizex=320 sizey=240 cols=3
                           files="${files}"

@@ -34,6 +34,8 @@ using namespace std;
 
 #include "openscad_dif_scanner.hpp"
 
+#include <boost/foreach.hpp>
+#include <boost/tokenizer.hpp>
 
 ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
 {
@@ -146,6 +148,7 @@ ODIF::ODIF_Scanner::fx_init(void) {
   fi_bline = lineno();
 
   // remove '\amu_' from function name in matched text
+  // XXX: might be good to convert name to all lower case.
   string mt = YYText();
   fx_name = mt.substr(5,mt.length());
 
@@ -164,7 +167,7 @@ ODIF::ODIF_Scanner::fx_eval(void) {
 
   if      (fx_name.compare("eval")==0)    { found=true; bif_eval(); }
   else if (fx_name.compare("shell")==0)   { found=true; bif_shell(); }
-  else if (fx_name.compare("enum")==0)    { found=true; bif_enum(); }
+  else if (fx_name.compare("combine")==0) { found=true; bif_combine(); }
   else
   {
     // search scripts
@@ -180,7 +183,7 @@ ODIF::ODIF_Scanner::fx_eval(void) {
   // output blank lines to maintain file length when functions are
   // broken across multiple lines (don't begin and end on the same line).
   for(size_t i=fi_bline; i<fi_eline; i++)
-    scanner_output("\n");  // XXX make output more portable
+    scanner_output("\n");  // XXX: make output more portable: (cr, lf, cr+lf)
 }
 
 void
@@ -245,7 +248,7 @@ ODIF::ODIF_Scanner::def_store(void) {
   // output blank lines to maintain file length when definitions are
   // broken across multiple lines (don't begin and end on the same line).
   for(size_t i=def_bline; i<def_eline; i++)
-    scanner_output("\n");  // XXX make output more portable
+    scanner_output("\n");  // XXX: make output more portable: (cr, lf, cr+lf)
 }
 
 void
@@ -267,11 +270,89 @@ ODIF::ODIF_Scanner::bif_shell(void) {
 }
 
 void
-ODIF::ODIF_Scanner::bif_enum(void) {
-  scanner_output( "enum" );
-  fx_argv.dump();
+ODIF::ODIF_Scanner::bif_combine(void) {
+  // get the positional arguments
+  vector<string> pa = fx_argv.values_v(false, true);
 
-  cout << "[" << fx_argv.pairs_str(true, true) << "]";
+  // check for named arguments
+  string prefix = remove_chars( fx_argv.arg_firstof("--prefix", "-p"), "\"\'" );
+  string suffix = remove_chars( fx_argv.arg_firstof("--suffix", "-s"), "\"\'" );
+  string separator = remove_chars( fx_argv.arg_firstof("--separator", "-f"), "\"\'" );
+
+  // validate arguments:
+  // enforce three argument minimum: 0:<function> 1:<base> 2:<opt1>
+  if ( prefix.length()==0 ) {
+    if ( pa.size() < 3 )
+      return;
+
+    prefix = remove_chars( pa[ 1 ], "\"\'" );
+
+    pa.erase( pa.begin() ); // arg0 function
+    pa.erase( pa.begin() ); // arg1 opt1
+  } else {
+    if ( pa.size() < 2 )
+      return;
+
+    pa.erase( pa.begin() ); // arg0 function
+  }
+
+  vector<string> sv;
+  for ( vector<string>::iterator it=pa.begin(); it!=pa.end(); ++it )
+    sv.push_back( remove_chars( *it, "\"\'" ) );
+
+  // if named suffix, add to end of set vector
+  if ( suffix.length()!=0 ) {
+    sv.push_back( remove_chars( suffix, "\"\'" ) );
+  }
+
+  // default separator
+  if ( separator.length()==0 ) {
+    separator = ",";
+  }
+
+  string result;
+  bif_combineR( prefix, sv, result, separator );
+
+  // output to scanner or store to variable
+  if ( fx_tovar.length() == 0 )
+    scanner_output( result );
+  else
+    varm.store(fx_tovar, result);
+}
+
+void
+ODIF::ODIF_Scanner::bif_combineR( const string &s, vector<string> sv,
+                                        string &r, const string &rs)
+{
+  if ( sv.size()== 0 )
+  {
+    if( r.length() !=0 ) r+= rs;
+
+    r+=s;
+  }
+  else
+  {
+    // separate member words of first set of 'sv' and store in 'sm'
+    string          fs = sv.front();
+    vector<string>  sm;
+
+    boost::char_separator<char> sep(", ");
+    boost::tokenizer< boost::char_separator<char> > tokens(fs, sep);
+
+    for( boost::tokenizer< boost::char_separator<char> >::iterator
+          it=tokens.begin();
+          it!=tokens.end();
+        ++it )
+    {
+      sm.push_back( *it );
+    }
+
+    // for each word in 'sm' combine with words of remaining sets
+    sv.erase( sv.begin() );
+    for ( vector<string>::iterator it=sm.begin(); it!=sm.end(); ++it ) {
+      bif_combineR(s + *it, sv, r, rs);
+    }
+  }
 }
 
 

@@ -167,7 +167,10 @@ class ODIF_Scanner : public yyFlexLexer{
     // built-in functions
     void bif_eval(void);
     void bif_shell(void);
-    void bif_enum(void);
+    void bif_combine(void);
+    void bif_combineR(const std::string &s, std::vector<std::string> sv,
+                            std::string &r, const std::string &rs=",");
+
 };
 
 } /* end namespace ODIF */
