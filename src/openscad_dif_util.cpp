@@ -193,6 +193,22 @@ ODIF::func_args::arg(const string& n)
   return ( rs );
 }
 
+string
+ODIF::func_args::arg_firstof(const string& n1, const string& n2, const string& n3,
+                             const string& n4, const string& n5, const string& n6)
+{
+  string rs = arg( n1 );
+
+  if ( (rs.length() == 0) && (n2.length() != 0) ) { rs = arg( n2 );
+  if ( (rs.length() == 0) && (n3.length() != 0) ) { rs = arg( n3 );
+  if ( (rs.length() == 0) && (n4.length() != 0) ) { rs = arg( n4 );
+  if ( (rs.length() == 0) && (n5.length() != 0) ) { rs = arg( n5 );
+  if ( (rs.length() == 0) && (n6.length() != 0) ) { rs = arg( n6 );
+  }}}}}
+
+  return( rs );
+}
+
 vector<string>
 ODIF::func_args::values_v(bool n, bool p)
 {

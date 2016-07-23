@@ -115,6 +115,13 @@ class func_args {
     std::string arg(const size_t n);
     std::string arg(const std::string& n);
 
+    std::string arg_firstof(const std::string& n1,
+                            const std::string& n2="",
+                            const std::string& n3="",
+                            const std::string& n4="",
+                            const std::string& n5="",
+                            const std::string& n6="");
+
     std::vector<std::string> values_v(bool n=false, bool p=true);
     std::string values_str(bool n=false, bool p=true);
 
