@@ -76,7 +76,6 @@ ODIF::env_var::expand(const std::string& v, bool r, const std::string& rm)
 
 void
 ODIF::env_var::dump(void) {
-  // replace cout with scanner_output(buf, size)
   std::cout << "(var map begin)" << std::endl;
 
   for ( std::map<std::string, std::string>::iterator
@@ -286,7 +285,6 @@ ODIF::func_args::pairs_str(bool n, bool p, std::string a)
 void
 ODIF::func_args::dump(void)
 {
-  // replace cout with scanner_output(buf, size)
   std::cout << "(";
 
   for ( std::vector<arg_term>::iterator it=argV.begin(); it!=argV.end(); ) {

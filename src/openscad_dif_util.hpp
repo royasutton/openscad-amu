@@ -84,7 +84,13 @@ class env_var {
 //! Class that .
 class func_args {
   public:
-    class arg_term { public: std::string name, value; bool positional; };
+
+    class arg_term {
+      public:
+        std::string name;
+        std::string value;
+        bool positional;
+    };
 
     //! constructor.
     func_args(const std::string& p="arg");

@@ -184,22 +184,43 @@ ODIF::ODIF_Scanner::fx_eval(void) {
 }
 
 void
-ODIF::ODIF_Scanner::bif_eval(void) {
-  scanner_output( "eval" );
+ODIF::ODIF_Scanner::fx_set_tovar(void)
+{
+  if ( fx_tovar.length() ) abort("previously defined var: " + fx_tovar);
+  fx_tovar = remove_chars(YYText(), "| \t");
 }
 
 void
-ODIF::ODIF_Scanner::bif_shell(void) {
-  scanner_output( "shell" );
+ODIF::ODIF_Scanner::fx_set_path(void)
+{
+  if ( fx_path.length() ) abort("previously defined opt: " + fx_path);
+  fx_path = YYText();
 }
 
 void
-ODIF::ODIF_Scanner::bif_enum(void) {
-  scanner_output( "enum" );
-  fx_argv.dump();
-
-  cout << "[" << fx_argv.pairs_str(true, true) << "]";
+ODIF::ODIF_Scanner::fx_set_arg_name(void)
+{
+  // remove '=' from argument name in matched text (last character)
+  std::string mt = YYText();
+  fx_argv.set_next_name( mt.substr(0,mt.length()-1) );
 }
+
+void
+ODIF::ODIF_Scanner::fx_store_arg_escaped(void)
+{
+  // remove '\' from variable name in matched text (first character)
+  std::string mt = YYText();
+  fx_argv.set_next_name( mt.substr(1,mt.length()) );
+}
+
+void
+ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
+{
+  // remove '\' from variable name in matched text (first character)
+  std::string mt = YYText();
+  fx_qarg+=mt.substr(1,mt.length());
+}
+
 
 void
 ODIF::ODIF_Scanner::def_init(void) {
@@ -225,6 +246,32 @@ ODIF::ODIF_Scanner::def_store(void) {
   // broken across multiple lines (don't begin and end on the same line).
   for(size_t i=def_bline; i<def_eline; i++)
     scanner_output("\n");  // XXX make output more portable
+}
+
+void
+ODIF::ODIF_Scanner::def_set_name(void)
+{
+  if ( def_name.length() ) abort("previously defined var: " + def_name);
+  def_name=YYText();
+}
+
+
+void
+ODIF::ODIF_Scanner::bif_eval(void) {
+  scanner_output( "eval" );
+}
+
+void
+ODIF::ODIF_Scanner::bif_shell(void) {
+  scanner_output( "shell" );
+}
+
+void
+ODIF::ODIF_Scanner::bif_enum(void) {
+  scanner_output( "enum" );
+  fx_argv.dump();
+
+  cout << "[" << fx_argv.pairs_str(true, true) << "]";
 }
 
 

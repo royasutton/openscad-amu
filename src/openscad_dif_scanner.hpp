@@ -112,11 +112,14 @@ class ODIF_Scanner : public yyFlexLexer{
 
     env_var     varm;
 
+
     // amu parsed text
     std::string amu_parsed_text;
     size_t      amu_parsed_leng;
+
     void apt_clear(void) { amu_parsed_text.clear(); amu_parsed_leng=0; }
     void apt(void) { amu_parsed_text+=YYText(); amu_parsed_leng+=YYLeng(); }
+
 
     // amu function
     std::string fx_name;
@@ -132,38 +135,20 @@ class ODIF_Scanner : public yyFlexLexer{
     void fx_init(void);
     void fx_eval(void);
 
-    void fx_set_tovar(void) {
-      if ( fx_tovar.length() ) abort("previously defined: " + fx_tovar);
-      fx_tovar = remove_chars(YYText(), "| \t");
-    }
-    void fx_set_path(void) {
-      if ( fx_path.length() ) abort("previously defined: " + fx_path);
-      fx_path = YYText();
-    }
+    void fx_set_tovar(void);
+    void fx_set_path(void);
+    void fx_set_arg_name(void);
 
-    void fx_set_arg_name(void) {
-      // remove '=' from argument name in matched text (last character)
-      std::string mt = YYText();
-      fx_argv.set_next_name( mt.substr(0,mt.length()-1) );
-    }
     void fx_store_arg(const std::string &s) { fx_argv.store( s ); }
     void fx_store_arg(void) { fx_argv.store( YYText() ); }
     void fx_store_arg_expanded(void) { fx_argv.store( varm.expand( YYText() ) ); }
-    void fx_store_arg_escaped(void) {
-      // remove '\' from variable name in matched text (first character)
-      std::string mt = YYText();
-      fx_argv.set_next_name( mt.substr(1,mt.length()) );
-    }
-
+    void fx_store_arg_escaped(void);
 
     void fx_store_qarg(void) { fx_argv.store( fx_qarg ); fx_qarg.clear(); }
     void fx_app_qarg(void) { fx_qarg+=YYText(); }
     void fx_app_qarg_expanded(void) { fx_qarg+=varm.expand( YYText() ); }
-    void fx_app_qarg_escaped(void) {
-      // remove '\' from variable name in matched text (first character)
-      std::string mt = YYText();
-      fx_qarg+=mt.substr(1,mt.length());
-    }
+    void fx_app_qarg_escaped(void);
+
 
     // amu define
     std::string def_name;
@@ -174,15 +159,12 @@ class ODIF_Scanner : public yyFlexLexer{
 
     void def_init(void);
     void def_store(void);
-
-    void def_set_name(void) {
-      if ( def_name.length() ) abort("previously defined: " + def_name);
-      def_name=YYText();
-    }
+    void def_set_name(void);
     void def_app(const std::string &s) { def_text+=s; }
     void def_app(void) { def_text+=YYText(); }
 
-    // buildin functions
+
+    // built-in functions
     void bif_eval(void);
     void bif_shell(void);
     void bif_enum(void);
