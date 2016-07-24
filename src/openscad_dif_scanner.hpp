@@ -124,7 +124,6 @@ class ODIF_Scanner : public yyFlexLexer{
     // amu function
     std::string fx_name;
     std::string fx_tovar;
-    std::string fx_path;
     func_args   fx_argv;
 
     std::string fx_qarg;
@@ -136,7 +135,6 @@ class ODIF_Scanner : public yyFlexLexer{
     void fx_eval(void);
 
     void fx_set_tovar(void);
-    void fx_set_path(void);
     void fx_set_arg_name(void);
 
     void fx_store_arg(const std::string &s) { fx_argv.store( s ); }

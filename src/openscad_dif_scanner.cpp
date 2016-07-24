@@ -127,20 +127,62 @@ ODIF::ODIF_Scanner::remove_chars( const string &s, const string &c ) {
     for ( string::const_iterator itc=c.begin(); itc!=c.end(); ++itc )
       if ( *its == *itc ) { append = false; break; }
 
-    if (append) r += *its;
+    if ( append )       result += *its;
+    else if (r != '\0') result += r;
+  }
+
+  return( result );
+}
+
+string
+ODIF::ODIF_Scanner::unquote(const string &s)
+{
+  string r = s;
+
+  /*
+  // check if string has at least two characters
+  if ( s.length()>1 ) {
+    // check if first character is ['] or ["]
+    if ( s.at(0) == '\'' || s.at(s.length()-1) == '\"' ) {
+      // now check if first and last characters match
+      if ( s.at(0) == s.at(s.length()-1) ) {
+        // check for quoted NULL ""
+        if ( s.length() == 2 )
+          r.clear();
+        else
+          // update 'r' with removed the first and last characters
+          r = s.substr( 1, s.length()-2 );
+      }
+    }
+  }
+  */
+
+  size_t fp = s.find_first_of("\"\'");
+  size_t lp = s.find_last_of("\"\'");
+
+  // make sure different character pointers
+  if ( fp != lp ) {
+    // make sure the characters match: ie '' or ""
+    if ( s.at(fp) == s.at(lp) ) {
+      // check for quoted NULL ""
+      if ( (lp-fp) < 2 )
+        r.clear();
+      else
+        r = s.substr( fp+1, lp-1 );
+    }
   }
 
   return( r );
 }
 
 void
-ODIF::ODIF_Scanner::fx_init(void) {
+ODIF::ODIF_Scanner::fx_init(void)
+{
   apt_clear();
   apt();
 
   fx_name.clear();
   fx_tovar.clear();
-  fx_path.clear();
   fx_argv.clear();
 
   fx_qarg.clear();

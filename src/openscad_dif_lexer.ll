@@ -63,7 +63,6 @@ nr                                [\n\r]
 
 id                                [-_[:alnum:]]+
 id_var                            "${"[-_[:alnum:]]+"}"
-id_path                           [-_[:alnum:]/\\]+
 
 amu_func                          [\\@](?i:amu)_{id}
 amu_define                        [\\@](?i:amu_define)
@@ -93,10 +92,9 @@ amu_define                        [\\@](?i:amu_define)
 <COMMENT>.                        { scanner_echo(); }
 
   /* parse amu function:
-      \amu_func1 | var path ( a1 a2 'a3' "a 4" file="all" ) */
+      \amu_func1 var ( a1 a2 'a3' "a 4" file="all" ) */
 
-<AMUFUNC>\|{ws}*{id}              { apt(); fx_set_tovar(); }
-<AMUFUNC>{id_path}                { apt(); fx_set_path(); }
+<AMUFUNC>{id}                     { apt(); fx_set_tovar(); }
 <AMUFUNC>\(                       { apt(); BEGIN(FUNCARG); }
 <AMUFUNC>{ws}+                    { apt(); }
 <AMUFUNC>.                        { abort("in function name", lineno(), YYText()); }
