@@ -102,8 +102,9 @@ amu_define                        [\\@](?i:amu_define)
   /* parse arguments */
 
 <FUNCARG>{id}                     { apt(); fx_store_arg(); }
-<FUNCARG>\\{id_var}               { apt(); fx_store_arg_escaped(); }
 <FUNCARG>{id_var}                 { apt(); fx_store_arg_expanded(); }
+<FUNCARG>\\{id_var}               { apt(); fx_store_arg_escaped(); }
+<FUNCARG>\\.                      { apt(); fx_store_arg_escaped(); }
 <FUNCARG>{id}=                    { apt(); fx_set_arg_name(); }
 <FUNCARG>\'                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGSQ); }
 <FUNCARG>\"                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGDQ); }
