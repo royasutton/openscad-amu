@@ -39,7 +39,6 @@
 #include <vector>
 #include <string>
 
-#include "config.h"
 
 namespace ODIF{
 

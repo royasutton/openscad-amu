@@ -30,12 +30,15 @@
   \ingroup openscad_dif_src
 *******************************************************************************/
 
-using namespace std;
-
 #include "openscad_dif_scanner.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
+
+#include "config.h"
+
+using namespace std;
+
 
 ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
 {

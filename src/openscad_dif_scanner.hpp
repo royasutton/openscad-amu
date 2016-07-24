@@ -37,16 +37,13 @@
 #include <FlexLexer.h>
 #endif
 
-#include "boost/filesystem.hpp"
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 
-#include "config.h"
-
 #include "openscad_dif_util.hpp"
+
 
 namespace ODIF{
 

@@ -30,9 +30,11 @@
   \ingroup openscad_dif_src
 *******************************************************************************/
 
-using namespace std;
-
 #include "openscad_dif_util.hpp"
+
+#include "config.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////////////

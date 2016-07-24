@@ -37,7 +37,13 @@
 *******************************************************************************/
 
 #include "openscad_dif_scanner.hpp"
+
 #include "boost/program_options.hpp"
+#include "boost/filesystem.hpp"
+
+#include "config.h"
+
+using namespace std;
 
 
 // return value constants.
@@ -49,9 +55,6 @@ namespace
   const size_t ERROR_IN_COMMAND_LINE = 2;
   const size_t ERROR_UNABLE_TO_OPEN_FILE = 3;
 }
-
-
-using namespace std;
 
 
 //! program main.
