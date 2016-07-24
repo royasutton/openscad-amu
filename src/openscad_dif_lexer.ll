@@ -118,6 +118,8 @@ amu_define                        [\\@](?i:amu_define)
 
 <FUNCARGSQ>\'                     { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
 <FUNCARGDQ>\"                     { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
+<FUNCARGSQ,FUNCARGDQ>\\\'         { apt(); fx_app_qarg_escaped(); }
+<FUNCARGSQ,FUNCARGDQ>\\\"         { apt(); fx_app_qarg_escaped(); }
 <FUNCARGSQ,FUNCARGDQ>\\{id_var}   { apt(); fx_app_qarg_escaped(); }
 <FUNCARGSQ,FUNCARGDQ>{id_var}     { apt(); fx_app_qarg_expanded(); }
 <FUNCARGSQ,FUNCARGDQ>.            { apt(); fx_app_qarg(); }
