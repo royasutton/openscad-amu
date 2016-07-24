@@ -76,7 +76,8 @@ ODIF::env_var::expand(const string& v, bool r, const string& rm)
 
 void
 ODIF::env_var::dump(void) {
-  cout << "(var map begin)" << endl;
+  cout << endl
+       << "(var map begin)" << endl;
 
   for ( std::map<string, string>::iterator  it=map.begin();
                                             it!=map.end();
@@ -85,7 +86,7 @@ ODIF::env_var::dump(void) {
     cout << it->first << "=" << it->second << endl;
   }
 
-  cout << "(var map begin)" << endl;
+  cout << "(var map end)" << endl;
 }
 
 
