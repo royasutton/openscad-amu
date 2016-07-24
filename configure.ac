@@ -116,6 +116,7 @@ BOOST_REQUIRE([1.35.0])
 BOOST_SYSTEM
 BOOST_FILESYSTEM
 BOOST_PROGRAM_OPTIONS
+BOOST_REGEX
 
 ##############################################################################
 # Create config.h
