@@ -101,11 +101,17 @@ class ODIF_Scanner : public yyFlexLexer{
     //! output the error message m and abort the scanner.
     void abort(const std::string& m, const int &n = 0, const std::string &t = "");
 
+    std::string amu_error_msg(const std::string& m);
+
     //! return word number n from string w.
     std::string get_word(const std::string& w, const int n);
 
     //! remove all characters in c from from string s.
     std::string remove_chars(const std::string &s, const std::string &c);
+
+    std::string replace_chars(const std::string &s, const std::string &c, const char r='\0');
+
+    std::string unquote(const std::string &s);
 
     env_var     varm;
 
@@ -160,11 +166,13 @@ class ODIF_Scanner : public yyFlexLexer{
 
 
     // built-in functions
-    void bif_eval(void);
-    void bif_shell(void);
-    void bif_combine(void);
+    std::string bif_eval(void);
+    std::string bif_shell(void);
+    std::string bif_combine(void);
     void bif_combineR(const std::string &s, std::vector<std::string> sv,
                             std::string &r, const std::string &rs=",");
+    std::string bif_image_table(void);
+    std::string bif_html_viewer(void);
 
 };
 

@@ -77,6 +77,13 @@ ODIF::ODIF_Scanner::init(void)
 
   // initialize variable map
   varm.clear();
+
+  // must match equivalent definition for {id_var} in openscad_dif_lexer.ll
+  // lexer use flex while varm uses <boost/regex.hpp>
+  varm.set_prefix( "${" );
+  varm.set_suffix( "}" );
+  varm.set_regexp( "[-_[:alnum:]]+" );
+
   varm.set_report_message("<tt><UNDEFINED></tt>");
 
   // initialize function argument positional prefix
@@ -95,7 +102,7 @@ ODIF::ODIF_Scanner::scanner_output( const char* buf, int size )
 void
 ODIF::ODIF_Scanner::abort(const string& m, const int &n, const string &t)
 {
-  cerr << "ERROR: " << m;
+  cerr << endl << ops << m;
 
   if( n )           cerr << ", at line " << n;
   if( t.length() )  cerr << ", near [" << t << "]";
@@ -103,6 +110,22 @@ ODIF::ODIF_Scanner::abort(const string& m, const int &n, const string &t)
   cerr << ", aborting..." << endl;
 
   exit( EXIT_FAILURE );
+}
+
+string
+ODIF::ODIF_Scanner::amu_error_msg(const string& m)
+{
+  std::ostringstream os;
+
+  os << "<tt>"
+     << ops
+     << input_name
+     << ", line " << std::dec << lineno() << ", "
+     << get_word(amu_parsed_text, 1)
+     << " " << m
+     << "</tt>";
+
+  return ( os.str() );
 }
 
 string
@@ -121,8 +144,15 @@ ODIF::ODIF_Scanner::get_word(const string& w, const int n)
 }
 
 string
-ODIF::ODIF_Scanner::remove_chars( const string &s, const string &c ) {
-  string r;
+ODIF::ODIF_Scanner::remove_chars(const string &s, const string &c)
+{
+  return ( replace_chars(s, c, '\0') );
+}
+
+string
+ODIF::ODIF_Scanner::replace_chars(const string &s, const string &c, const char r)
+{
+  string result;
 
   for ( string::const_iterator its=s.begin(); its!=s.end(); ++its ) {
     bool append = true;
@@ -202,25 +232,32 @@ ODIF::ODIF_Scanner::fx_init(void)
 }
 
 void
-ODIF::ODIF_Scanner::fx_eval(void) {
+ODIF::ODIF_Scanner::fx_eval(void)
+{
   fi_eline = lineno();
 
   bool found = false;
 
-  /* string     fx_name, fx_tovar, fx_path
-     func_args  fx_argv */
+  string result;
 
-  if      (fx_name.compare("eval")==0)    { found=true; bif_eval(); }
-  else if (fx_name.compare("shell")==0)   { found=true; bif_shell(); }
-  else if (fx_name.compare("combine")==0) { found=true; bif_combine(); }
+  if      (fx_name.compare("eval")==0)    { found=true; result=bif_eval(); }
+  else if (fx_name.compare("shell")==0)   { found=true; result=bif_shell(); }
+  else if (fx_name.compare("combine")==0) { found=true; result=bif_combine(); }
+  else if (fx_name.compare("image_table")==0) { found=true; result=bif_image_table(); }
+  else if (fx_name.compare("html_viewer")==0) { found=true; result=bif_html_viewer(); }
+  else                                    { found = false; }
+
+  if ( found )
+  {
+    // output to scanner or store to variable map
+    if ( fx_tovar.length() == 0 )
+      scanner_output( result );
+    else
+      varm.store(fx_tovar, result);
+  }
   else
   {
-    // search scripts
-
-  }
-
-  if ( !found ) {
-    string et = "<tt>" + ops + get_word(amu_parsed_text, 1) + " unknown</tt>";
+    string et = amu_error_msg("unknown function.");
 
     scanner_output( et );
   }
@@ -234,15 +271,9 @@ ODIF::ODIF_Scanner::fx_eval(void) {
 void
 ODIF::ODIF_Scanner::fx_set_tovar(void)
 {
-  if ( fx_tovar.length() ) abort("previously defined var: " + fx_tovar);
-  fx_tovar = remove_chars(YYText(), "| \t");
-}
-
-void
-ODIF::ODIF_Scanner::fx_set_path(void)
-{
-  if ( fx_path.length() ) abort("previously defined opt: " + fx_path);
-  fx_path = YYText();
+  if ( fx_tovar.length() )
+    abort("previously defined var: " + fx_tovar, lineno(), YYText());
+  fx_tovar = YYText();
 }
 
 void
@@ -258,7 +289,7 @@ ODIF::ODIF_Scanner::fx_store_arg_escaped(void)
 {
   // remove '\' from variable name in matched text (first character)
   std::string mt = YYText();
-  fx_argv.set_next_name( mt.substr(1,mt.length()) );
+  fx_argv.store( mt.substr(1,mt.length()) );
 }
 
 void
@@ -271,7 +302,8 @@ ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
 
 
 void
-ODIF::ODIF_Scanner::def_init(void) {
+ODIF::ODIF_Scanner::def_init(void)
+{
   apt_clear();
   apt();
 
@@ -282,10 +314,16 @@ ODIF::ODIF_Scanner::def_init(void) {
 }
 
 void
-ODIF::ODIF_Scanner::def_store(void) {
+ODIF::ODIF_Scanner::def_store(void)
+{
   def_eline = lineno();
 
-  varm.store( def_name, def_text );
+  // if variable name not specified, copy definition to output
+  // otherwise store in variable map.
+  if ( def_name.length() == 0 )
+    scanner_output( def_text );
+  else
+    varm.store( def_name, def_text );
 
   def_name.clear();
   def_text.clear();
@@ -299,55 +337,122 @@ ODIF::ODIF_Scanner::def_store(void) {
 void
 ODIF::ODIF_Scanner::def_set_name(void)
 {
-  if ( def_name.length() ) abort("previously defined var: " + def_name);
+  if ( def_name.length() )
+    abort("previously defined var: " + def_name, lineno(), YYText());
   def_name=YYText();
 }
 
 
-void
-ODIF::ODIF_Scanner::bif_eval(void) {
-  scanner_output( "eval" );
+string
+ODIF::ODIF_Scanner::bif_eval(void)
+{
+  // create local variable scope map
+  env_var vm = varm;
+
+  // add all argument name=value pairs to local variable scope
+  vector<string> nv = fx_argv.names_v(true, false);
+  for ( vector<string>::iterator it=nv.begin(); it!=nv.end(); ++it )
+    vm.store( *it, fx_argv.arg( *it ) );
+
+  string result;
+
+  // process each positional argument value, skip function name (position zero)
+  vector<string> pv = fx_argv.values_v(false, true);
+  for ( vector<string>::iterator it=pv.begin()+1; it!=pv.end(); ++it ) {
+    // expand variables in the positional argument value text
+    string epat = vm.expand_text( *it );
+
+    if ( result.length() != 0 ) result.append(" ");
+
+    result.append( epat );
+  }
+
+  return( result );
 }
 
-void
-ODIF::ODIF_Scanner::bif_shell(void) {
-  scanner_output( "shell" );
+string
+ODIF::ODIF_Scanner::bif_shell(void)
+{
+  // validate arguments:
+  // enforce single positional argument (two with arg0)
+  if ( fx_argv.size(false, true) != 2 || fx_argv.size(true, false) != 0 ) {
+    string et = amu_error_msg("requires a single positional argument.");
+
+    return( et );
+  }
+
+  string scmd = unquote( fx_argv.arg( 1 ) );
+
+  // make sure to capture stderr and stdout
+  scmd.append(" 2>&1");
+
+  FILE* pipe;
+  char buffer[128];
+
+  // XXX replace popen _popen for windows.
+  pipe = popen( scmd.c_str(), "r" );
+
+  if (!pipe) {
+    string et = amu_error_msg("popen() failed.");
+
+    return( et );
+  }
+
+  string result;
+  while ( !feof(pipe) )
+  {
+    if ( fgets(buffer, 128, pipe) != NULL )
+        result.append( buffer );
+  }
+
+  // XXX replace pclose with _pclose for windows.
+  pclose(pipe);
+
+  // replace all <cr> and <lf> with <space> in result and return
+  return( replace_chars(result, "\n\r", ' ') );
 }
 
-void
-ODIF::ODIF_Scanner::bif_combine(void) {
+string
+ODIF::ODIF_Scanner::bif_combine(void)
+{
   // get the positional arguments
   vector<string> pa = fx_argv.values_v(false, true);
 
   // check for named arguments
-  string prefix = remove_chars( fx_argv.arg_firstof("--prefix", "-p"), "\"\'" );
-  string suffix = remove_chars( fx_argv.arg_firstof("--suffix", "-s"), "\"\'" );
-  string separator = remove_chars( fx_argv.arg_firstof("--separator", "-f"), "\"\'" );
+  string prefix = unquote( fx_argv.arg_firstof("--prefix", "-p") );
+  string suffix = unquote( fx_argv.arg_firstof("--suffix", "-s") );
+  string separator = unquote( fx_argv.arg_firstof("--separator", "-f") );
 
   // validate arguments:
   // enforce three argument minimum: 0:<function> 1:<base> 2:<opt1>
   if ( prefix.length()==0 ) {
-    if ( pa.size() < 3 )
-      return;
+    if ( pa.size() < 3 ) {
+      string et = amu_error_msg("requires at least two positional arguments.");
 
-    prefix = remove_chars( pa[ 1 ], "\"\'" );
+      return( et );
+    }
+
+    prefix = unquote( pa[ 1 ] );
 
     pa.erase( pa.begin() ); // arg0 function
     pa.erase( pa.begin() ); // arg1 opt1
   } else {
-    if ( pa.size() < 2 )
-      return;
+    if ( pa.size() < 2 ) {
+      string et = amu_error_msg("requires at least one positional argument.");
+
+      return( et );
+    }
 
     pa.erase( pa.begin() ); // arg0 function
   }
 
   vector<string> sv;
   for ( vector<string>::iterator it=pa.begin(); it!=pa.end(); ++it )
-    sv.push_back( remove_chars( *it, "\"\'" ) );
+    sv.push_back( unquote( *it ) );
 
   // if named suffix, add to end of set vector
   if ( suffix.length()!=0 ) {
-    sv.push_back( remove_chars( suffix, "\"\'" ) );
+    sv.push_back( unquote( suffix ) );
   }
 
   // default separator
@@ -358,11 +463,7 @@ ODIF::ODIF_Scanner::bif_combine(void) {
   string result;
   bif_combineR( prefix, sv, result, separator );
 
-  // output to scanner or store to variable
-  if ( fx_tovar.length() == 0 )
-    scanner_output( result );
-  else
-    varm.store(fx_tovar, result);
+  return( result );
 }
 
 void
@@ -398,6 +499,26 @@ ODIF::ODIF_Scanner::bif_combineR( const string &s, vector<string> sv,
       bif_combineR(s + *it, sv, r, rs);
     }
   }
+}
+
+string
+ODIF::ODIF_Scanner::bif_image_table(void)
+{
+  string result;
+
+  result = amu_error_msg("unimplemented.");
+
+  return( result );
+}
+
+string
+ODIF::ODIF_Scanner::bif_html_viewer(void)
+{
+  string result;
+
+  result = amu_error_msg("unimplemented.");
+
+  return( result );
 }
 
 
