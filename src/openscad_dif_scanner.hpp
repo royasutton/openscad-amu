@@ -95,8 +95,7 @@ class ODIF_Scanner : public yyFlexLexer{
     //! write the first size characters of buf to the scanner output.
     void scanner_output(const char* buf, int size);
     //! copy to entire lexed text (yytext) to the scanner output.
-    void scanner_echo(void) { scanner_output( yytext, yyleng ); }
-  //void scanner_echo(void) { scanner_output( YYText(), YYLeng(); }
+    void scanner_echo(void) { scanner_output( YYText(), YYLeng() ); }
 
     //! output the error message m and abort the scanner.
     void abort(const std::string& m, const int &n = 0, const std::string &t = "");
