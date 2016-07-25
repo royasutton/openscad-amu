@@ -45,6 +45,8 @@
 
 using namespace std;
 
+//! \ingroup openscad_dif_src
+//! @{
 
 // return value constants.
 namespace
@@ -180,6 +182,8 @@ main(int argc, char** argv)
 
   exit( SUCCESS );
 }
+
+//! @}
 
 
 /*******************************************************************************

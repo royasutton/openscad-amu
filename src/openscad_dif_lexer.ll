@@ -27,6 +27,11 @@
   \brief
     Doxygen input filter lexical analyzer source for OpenSCAD script.
 
+  \todo consider adding the ability to parse named variables without an
+        assignment (such as --myoption). The variable would be stored as
+        named but with a null value. useful for named switches in parsed
+        amu function arguments.
+
   \ingroup openscad_dif_src
 *******************************************************************************/
 
@@ -108,7 +113,7 @@ amu_define                        [\\@](?i:amu_define)
 <FUNCARG>{id}=                    { apt(); fx_set_arg_name(); }
 <FUNCARG>\'                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGSQ); }
 <FUNCARG>\"                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGDQ); }
-<FUNCARG>\)                       { apt(); fx_eval(); yy_pop_state(); }
+<FUNCARG>\)                       { apt(); fx_pend(); yy_pop_state(); }
 <FUNCARG>{ws}+                    { apt(); }
 <FUNCARG>{nr}                     { apt(); }
 <FUNCARG>.                        { abort("in function arguments", lineno(), YYText()); }
@@ -134,7 +139,7 @@ amu_define                        [\\@](?i:amu_define)
 <AMUMDEFINE>{ws}+                 { apt(); }
 <AMUMDEFINE>.                     { abort("in define", lineno(), YYText()); }
 
-<DEFINEARG>\)                     { apt(); def_store(); yy_pop_state(); }
+<DEFINEARG>\)                     { apt(); def_pend(); yy_pop_state(); }
 <DEFINEARG>{ws}+                  { apt(); def_app(" "); }
 <DEFINEARG>{nr}+                  { apt(); def_app(" "); }
 <DEFINEARG>.                      { apt(); def_app(); }

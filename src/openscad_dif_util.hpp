@@ -39,93 +39,165 @@
 #include <vector>
 #include <string>
 
+//! \ingroup openscad_dif_src
+//! @{
 
 namespace ODIF{
 
-//! Class that .
+//! Class to manage environment variables.
 class env_var {
   public:
-    //! constructor.
+    //! \brief environment variable class constructor.
+    //! \param p  variable prefix.
+    //! \param s  variable suffix.
+    //! \param e  variable matching regular expression.
+    //! \param ep variable matching escape prefix.
+    //! \param es variable matching escape suffix.
+    //! \param r  report non-existent variables.
+    //! \param rm report message for non-existent variables.
     env_var(const std::string& p="${", const std::string& s="}",
             const std::string& e="\\${[_[:alnum:]]+}",
             const std::string& ep="\\\\", const std::string& es="",
             bool r=true, const std::string& rm="<UNDEFINED>");
-    //! destructor.
+    //! environment variable class destructor.
     ~env_var(void);
 
+    //! clear all stored environment variables.
     void clear(void) { map.clear(); }
 
+    //! set variable prefix.
     void set_prefix(const std::string& s) { prefix=s; }
+    //! get variable prefix.
+    std::string get_prefix(void) { return ( prefix ); }
+    //! set variable suffix.
     void set_suffix(const std::string& s) { suffix=s; }
+    //! get variable suffix.
+    std::string get_suffix(void) { return ( suffix ); }
+    //! set variable matching regular expression.
     void set_regexp(const std::string& s) { regexp=s; }
+    //! get variable matching regular expression.
+    std::string get_regexp(void) { return ( regexp ); }
+    //! set variable matching escape prefix.
     void set_escape_prefix(const std::string& s) { escape_prefix=s; }
+    //! get variable matching escape prefix.
+    std::string get_escape_prefix(void) { return ( escape_prefix ); }
+    //! set variable matching escape suffix.
     void set_escape_suffix(const std::string& s) { escape_suffix=s; }
+    //! get variable matching escape suffix.
+    std::string get_escape_suffix(void) { return ( escape_suffix ); }
 
+    //! set report non-existent variables.
     void set_report(bool s) { report=s; }
+    //! get report non-existent variables.
+    bool get_report(void) { return ( report ); }
+    //! set report message for non-existent variables.
     void set_report_message(const std::string& s) { report_message=s; }
+    //! get report message for non-existent variables.
+    std::string get_report_message(void) { return ( report_message ); }
 
+    //! store a variable name and value pair.
     void store(const std::string& n, const std::string& v) { map[ n ] = v; }
 
-    std::string expand(const std::string& v);
-    std::string expand(const std::string& v, bool r);
+    //! \brief expand a variable.
+    //! \param v  formatted variable name (prefix+name+suffix).
+    //! \param r  report if non-existent.
+    //! \param rm report message.
+    //! \returns the value of the variable or the report message.
     std::string expand(const std::string& v, bool r, const std::string& rm);
+    //! \copybrief expand
+    //! \details \see expand. default is used for parameter \p rm.
+    std::string expand(const std::string& v, bool r);
+    //! \copybrief expand
+    //! \details \see expand. default is used for parameters \p r and \p rm.
+    std::string expand(const std::string& v);
 
-    std::string expand_text(const std::string& t);
-    std::string expand_text(const std::string& t, bool r);
+    //! \brief expand all variables in the text string.
+    //! \param t  text string to expand.
+    //! \param r  report all non-existent variables.
+    //! \param rm non-existent variables report message.
+    //! \returns a text string with all variables replaced by their value or the report message.
     std::string expand_text(const std::string& t, bool r, const std::string& rm);
+    //! \copybrief expand_text
+    //! \details \see expand_text. default is used for parameter \p rm.
+    std::string expand_text(const std::string& t, bool r);
+    //! \copybrief expand_text
+    //! \details \see expand_text. default is used for parameters \p r and \p rm.
+    std::string expand_text(const std::string& t);
+    //! helper function for expand_text that performs each expansion pass.
     size_t expand_textP(const std::string& t, bool r, const std::string& rm,
                         std::string& et);
 
+    //! simple dump of all variables to standard out.
     void dump(void);
 
   private:
-    std::string                         prefix;
-    std::string                         suffix;
-    std::string                         regexp;
-    std::string                         escape_prefix;
-    std::string                         escape_suffix;
+    std::string           prefix;         //!< variable prefix.
+    std::string           suffix;         //!< variable suffix.
+    std::string           regexp;         //!< variable match regular expression.
+    std::string           escape_prefix;  //!< variable matching escape prefix.
+    std::string           escape_suffix;  //!< variable matching escape suffix.
 
-    bool                                report;
-    std::string                         report_message;
+    bool                  report;         //!< report non-existent variables.
+    std::string           report_message; //!< report message for non-existent variables.
 
-    std::map<std::string, std::string>  map;
+    std::map<std::string,
+             std::string> map;            //!< variable storage map.
 };
 
 
-//! Class that .
+//! Class that manages both named and positional arguments.
 class func_args {
   public:
 
+    //! Class that records each argument.
     class arg_term {
       public:
-        std::string name;
-        std::string value;
-        bool positional;
+        std::string name;               //!< argument name.
+        std::string value;              //!< argument value.
+        bool positional;                //!< argument type.
     };
 
-    //! constructor.
+    //! \brief environment variable class constructor.
+    //! \param p  positional argument name prefix.
     func_args(const std::string& p="arg");
-    //! destructor.
+    //! environment variable class destructor.
     ~func_args(void);
 
-    void clear(void) { argV.clear(); next_name.clear(); pos_count=0; }
+    //! clears all stored arguments.
+    void clear(void) { argv.clear(); next_name.clear(); pos_count=0; }
 
+    //! set the positional argument name prefix.
     void set_prefix(const std::string& s) { pos_prefix = s; }
+    //! get the positional argument name prefix.
+    std::string get_prefix(void) { return ( pos_prefix ); }
 
+    //! set the name for the next argument.
     void set_next_name(const std::string& n) { next_name = n; }
 
+    //! store a positional (or named) argument value.
     void store(const std::string& v);
+    //! store a named argument name-value pair.
+    void store(const std::string& n, const std::string& v);
 
-    bool empty(void) { return( argV.empty() ); }
+    //! test if the argument vector contains zero arguments.
+    bool empty(void) { return( argv.empty() ); }
 
-    size_t size(void) { return( argV.size() ); }
+    //! return the number of all arguments stored.
+    size_t size(void) { return( argv.size() ); }
+    //! \brief return the number of named and/or positional arguments stored.
+    //! \param n  include named arguments.
+    //! \param p  include positional arguments.
     size_t size(bool n, bool p=false);
 
+    //! test for the existence of the named argument n.
     bool exists(const std::string& n);
 
+    //! return the named or positional argument value at location n.
     std::string arg(const size_t n);
+    //! return the value for the argument named n.
     std::string arg(const std::string& n);
 
+    //! return the value of the first argument that exists of n1, n2, ..., n6.
     std::string arg_firstof(const std::string& n1,
                             const std::string& n2="",
                             const std::string& n3="",
@@ -133,24 +205,42 @@ class func_args {
                             const std::string& n5="",
                             const std::string& n6="");
 
+    //! \brief return the vector of the values for all arguments.
+    //! \param n  include named arguments.
+    //! \param p  include positional arguments.
     std::vector<std::string> values_v(bool n=false, bool p=true);
+    //! \brief return a string of the values for all arguments.
+    //! \param n  include named arguments.
+    //! \param p  include positional arguments.
     std::string values_str(bool n=false, bool p=true);
 
+    //! \brief return the vector of the names for all arguments.
+    //! \param n  include named arguments.
+    //! \param p  include positional arguments.
     std::vector<std::string> names_v(bool n=true, bool p=false);
+    //! \brief return a string of the names for all arguments.
+    //! \param n  include named arguments.
+    //! \param p  include positional arguments.
     std::string names_str(bool n=false, bool p=true);
 
+    //! \brief return a string of the names-value pairs for all arguments.
+    //! \param n  include named arguments.
+    //! \param p  include positional arguments.
+    //! \param a  name-value pair relation string.
     std::string pairs_str(bool n=true, bool p=false, std::string a="=");
 
+    //! simple dump of all arguments to standard out.
     void dump(void);
 
-    std::vector<arg_term>   argV;
+    std::vector<arg_term> argv;         //!< vector of argument terms.
 
   private:
-    std::string             pos_prefix;
-    size_t                  pos_count;
+    std::string           pos_prefix;   //!< positional argument name prefix.
+    size_t                pos_count;    //!< positional argument count.
 
-    std::string             next_name;
+    std::string           next_name;    //!< next argument name string.
 
+    //! convert an integer to a string.
     std::string to_string(const unsigned v) {
       std::ostringstream os;
       os << std::dec << v;
@@ -162,6 +252,8 @@ class func_args {
 } /* end namespace ODIF */
 
 #endif /* END __ODIF_UTIL_HPP__ */
+
+//! @}
 
 
 /*******************************************************************************

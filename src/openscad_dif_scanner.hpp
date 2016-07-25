@@ -44,6 +44,8 @@
 
 #include "openscad_dif_util.hpp"
 
+//! \ingroup openscad_dif_src
+//! @{
 
 namespace ODIF{
 
@@ -100,6 +102,7 @@ class ODIF_Scanner : public yyFlexLexer{
     //! output the error message m and abort the scanner.
     void abort(const std::string& m, const int &n = 0, const std::string &t = "");
 
+    //! generate standard error message string with message m.
     std::string amu_error_msg(const std::string& m);
 
     //! return word number n from string w.
@@ -108,76 +111,105 @@ class ODIF_Scanner : public yyFlexLexer{
     //! remove all characters in c from from string s.
     std::string remove_chars(const std::string &s, const std::string &c);
 
+    //! replace all characters in c in string s with replacement character r.
     std::string replace_chars(const std::string &s, const std::string &c, const char r='\0');
 
+    //! unquote outermost matching quotation characters, '' or "", from string.
     std::string unquote(const std::string &s);
 
-    env_var     varm;
+    env_var     varm;                   //!< scanner environment variable map.
 
 
     // amu parsed text
-    std::string amu_parsed_text;
-    size_t      amu_parsed_leng;
+    std::string amu_parsed_text;        //!< complete text of parsed amu commands.
+    size_t      amu_parsed_leng;        //!< character count parsed for 'amu_parsed_text'.
 
+    //! clear the complete text of parsed amu commands.
     void apt_clear(void) { amu_parsed_text.clear(); amu_parsed_leng=0; }
+    //! append the current match text to complete text of parsed amu commands.
     void apt(void) { amu_parsed_text+=YYText(); amu_parsed_leng+=YYLeng(); }
 
 
     // amu function
-    std::string fx_name;
-    std::string fx_tovar;
-    func_args   fx_argv;
+    std::string fx_name;                //!< parsed amu function name.
+    std::string fx_tovar;               //!< parsed amu function output variable name.
+    func_args   fx_argv;                //!< parsed amu function arguments class.
 
-    std::string fx_qarg;
+    std::string fx_qarg;                //!< parsed amu quoted argument string.
 
-    size_t      fi_bline;
-    size_t      fi_eline;
+    size_t      fi_bline;               //!< beginning line of parsed amu function.
+    size_t      fi_eline;               //!< ending line of parsed amu function.
 
+    //! store parsed function name, reset related state, and begin parsing amu function.
     void fx_init(void);
-    void fx_eval(void);
+    //! end of parsed amu function definition handler.
+    void fx_pend(void);
 
+    //! store parsed function output variable name.
     void fx_set_tovar(void);
+    //! store parsed variable name for argument form name=<value>.
     void fx_set_arg_name(void);
 
+    //! store the string s to the function argument.
     void fx_store_arg(const std::string &s) { fx_argv.store( s ); }
+    //! store the current parsed text the function argument.
     void fx_store_arg(void) { fx_argv.store( YYText() ); }
+    //! expand parsed variable and store to the function argument.
     void fx_store_arg_expanded(void) { fx_argv.store( varm.expand( YYText() ) ); }
+    //! remove escaping in the escaped-parsed variable and store to the function argument.
     void fx_store_arg_escaped(void);
 
+    //! store and clear the current quoted argument string.
     void fx_store_qarg(void) { fx_argv.store( fx_qarg ); fx_qarg.clear(); }
+    //! append the current matched text to the quoted argument string.
     void fx_app_qarg(void) { fx_qarg+=YYText(); }
+    //! expand parsed variable and append to the quoted argument string.
     void fx_app_qarg_expanded(void) { fx_qarg+=varm.expand( YYText() ); }
+    //! remove escaping in the escaped-parsed variable and append to the quoted argument string.
     void fx_app_qarg_escaped(void);
 
 
     // amu define
-    std::string def_name;
-    std::string def_text;
+    std::string def_name;               //!< parsed amu definition name.
+    std::string def_text;               //!< parsed amu definition text.
 
-    size_t      def_bline;
-    size_t      def_eline;
+    size_t      def_bline;              //!< beginning line of parsed amu definition.
+    size_t      def_eline;              //!< ending line of parsed amu definition.
 
+    //! store parsed function name, reset related state, and begin parsing amu function.
     void def_init(void);
-    void def_store(void);
+    //! end of parsed amu function definition handler.
+    void def_pend(void);
+
+    //! store parsed definition variable name.
     void def_set_name(void);
+    //! append the string s to the definition text.
     void def_app(const std::string &s) { def_text+=s; }
+    //! append the current parsed text to the definition text.
     void def_app(void) { def_text+=YYText(); }
 
 
-    // built-in functions
+    // built-in amu functions
+    //! evaluate and output the function arguments.
     std::string bif_eval(void);
+    //! execute a shell command and output its results.
     std::string bif_shell(void);
+    //! combine each element from each set to form all possible word combinations.
     std::string bif_combine(void);
+    //! recursive helper function for bif_combine(void).
     void bif_combineR(const std::string &s, std::vector<std::string> sv,
                             std::string &r, const std::string &rs=",");
+    //! generate a html or latex image table for a list of images.
     std::string bif_image_table(void);
+    //! generate a html viewer for various file formates (png, svg, and stl).
     std::string bif_html_viewer(void);
-
 };
 
 } /* end namespace ODIF */
 
 #endif /* END __ODIF_SCANNER_HPP__ */
+
+//! @}
 
 
 /*******************************************************************************

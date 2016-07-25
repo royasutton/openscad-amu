@@ -34,7 +34,7 @@ ep = 0.02;
 
   \amu_eval      files3   ( '_op1 _op2' "_m1 _m2" "_x1, _x2" )
   \amu_shell     files4   ( "echo ${files1} 's d d'" )
-  \amu_shell     date     ( "date" )
+  \amu_shell     date     ( "date" --stderr )
   \amu_combine   files5   (   'base1' "_op1 _op2" "_m1 _m2" "_x1 _x2" ".jpg" --separator=" " )
   \amu_combine   files6   ( -p='base1' -s=".jpg" "_op1 _op2" "_m1 _m2" "_x1 _x2" -f=" " )
 
