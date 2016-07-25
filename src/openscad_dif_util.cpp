@@ -32,6 +32,8 @@
 
 #include "openscad_dif_util.hpp"
 
+#include <boost/regex.hpp>
+
 #include "config.h"
 
 using namespace std;
@@ -41,11 +43,12 @@ using namespace std;
 // env_var
 ////////////////////////////////////////////////////////////////////////////////
 
-ODIF::env_var::env_var( const string& p, const string& s,
+ODIF::env_var::env_var( const string& p, const string& s, const string& e,
                         bool r, const string& rm)
 {
   set_prefix( p );
   set_suffix( s );
+  set_regexp( e );
   set_report( r );
   set_report_message( rm );
 }
@@ -56,12 +59,24 @@ ODIF::env_var::~env_var( void )
 }
 
 string
+ODIF::env_var::expand(const string& v)
+{
+  return ( expand(v, report, report_message) );
+}
+
+string
+ODIF::env_var::expand(const string& v, bool r)
+{
+  return ( expand(v, r, report_message) );
+}
+
+string
 ODIF::env_var::expand(const string& v, bool r, const string& rm)
 {
   string mn;
 
   // remove prefix and suffix strings from named variable:
-  // ${VAR} --> VAR
+  // example: "${" + VAR + "}" --> VAR
   mn = v.substr( prefix.length()
                , v.length()-(prefix.length()+suffix.length()) );
 
@@ -70,10 +85,78 @@ ODIF::env_var::expand(const string& v, bool r, const string& rm)
   if ( map.find( mn ) != map.end() ) {
     rs = map[ mn ];
   } else {
-    if ( r ) rs = v + "=" + rm;
+    // avoid future expansion, use 'mn' rather than 'v'
+    if ( r ) rs = mn + "=" + rm;
   }
 
   return( rs );
+}
+
+string
+ODIF::env_var::expand_text(const string& t)
+{
+  return ( expand_text(t, report, report_message) );
+}
+
+string
+ODIF::env_var::expand_text(const string& t, bool r)
+{
+  return ( expand_text(t, r, report_message) );
+}
+
+//
+// XXX COMPLETE CODE XXX
+//
+// use recursion + regular expression matching
+// return r=(replace + reduce) count
+// recursively expand until r==0
+//
+string
+ODIF::env_var::expand_text(const string& t, bool r, const string& rm)
+{
+  string result;
+
+  size_t c = expand_textP(t, r, rm, result);
+
+  return( result );
+}
+
+size_t
+ODIF::env_var::expand_textP(const string& t, bool r, const string& rm, string& et)
+{
+  using namespace boost;
+
+  string escaped_prefix = "\\\\";
+
+  size_t match_count = 0;
+
+  string::const_iterator start = t.begin();
+  string::const_iterator end = t.end();
+  match_results<string::const_iterator> match;
+  regex expression( regexp, regex::normal );
+  match_flag_type flags = match_posix;
+
+  while( regex_search(start, end, match, expression, flags) )
+  {
+    const string vn( match[0].first, match[0].second );
+    const string vv( expand(vn, r, rm) );
+
+    // text to match
+    et.append(start, match[0].first);
+
+    // variable value
+    et.append( vv );
+
+    // update search start position
+    start = match[0].second;
+
+    match_count++;
+  }
+
+  // last match position to end of text
+  et.append(start, end);
+
+  return( match_count );
 }
 
 void

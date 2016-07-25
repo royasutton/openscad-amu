@@ -82,7 +82,7 @@ ODIF::ODIF_Scanner::init(void)
   // lexer use flex while varm uses <boost/regex.hpp>
   varm.set_prefix( "${" );
   varm.set_suffix( "}" );
-  varm.set_regexp( "[-_[:alnum:]]+" );
+  varm.set_regexp( "\\${[-_[:alnum:]]+}" );
 
   varm.set_report_message("<tt><UNDEFINED></tt>");
 
@@ -173,6 +173,8 @@ ODIF::ODIF_Scanner::unquote(const string &s)
   string r = s;
 
   /*
+  // assumes quotes exists as first and last characters if any
+
   // check if string has at least two characters
   if ( s.length()>1 ) {
     // check if first character is ['] or ["]
@@ -189,6 +191,8 @@ ODIF::ODIF_Scanner::unquote(const string &s)
     }
   }
   */
+
+  // search substring for first and last quote characters if any
 
   size_t fp = s.find_first_of("\"\'");
   size_t lp = s.find_last_of("\"\'");

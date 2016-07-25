@@ -47,6 +47,7 @@ class env_var {
   public:
     //! constructor.
     env_var(const std::string& p="${", const std::string& s="}",
+            const std::string& e="\\${[_[:alnum:]]+}",
             bool r=true, const std::string& rm="<UNDEFINED>");
     //! destructor.
     ~env_var(void);
@@ -55,23 +56,29 @@ class env_var {
 
     void set_prefix(const std::string& s) { prefix=s; }
     void set_suffix(const std::string& s) { suffix=s; }
+    void set_regexp(const std::string& s) { regexp=s; }
 
     void set_report(bool s) { report=s; }
     void set_report_message(const std::string& s) { report_message=s; }
 
     void store(const std::string& n, const std::string& v) { map[ n ] = v; }
 
-    std::string expand(const std::string& v) {
-      return (expand(v, report, report_message) ); }
-    std::string expand(const std::string& v, bool r) {
-      return (expand(v, r, report_message) ); }
+    std::string expand(const std::string& v);
+    std::string expand(const std::string& v, bool r);
     std::string expand(const std::string& v, bool r, const std::string& rm);
+
+    std::string expand_text(const std::string& t);
+    std::string expand_text(const std::string& t, bool r);
+    std::string expand_text(const std::string& t, bool r, const std::string& rm);
+    size_t expand_textP(const std::string& t, bool r, const std::string& rm,
+                        std::string& et);
 
     void dump(void);
 
   private:
     std::string                         prefix;
     std::string                         suffix;
+    std::string                         regexp;
 
     bool                                report;
     std::string                         report_message;
