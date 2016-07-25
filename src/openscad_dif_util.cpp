@@ -43,12 +43,15 @@ using namespace std;
 // env_var
 ////////////////////////////////////////////////////////////////////////////////
 
-ODIF::env_var::env_var( const string& p, const string& s, const string& e,
+ODIF::env_var::env_var( const string& p, const string& s,
+                        const string& e, const string& ep, const string& es,
                         bool r, const string& rm)
 {
   set_prefix( p );
   set_suffix( s );
   set_regexp( e );
+  set_escape_prefix( ep );
+  set_escape_suffix( es );
   set_report( r );
   set_report_message( rm );
 }
@@ -104,19 +107,17 @@ ODIF::env_var::expand_text(const string& t, bool r)
   return ( expand_text(t, r, report_message) );
 }
 
-//
-// XXX COMPLETE CODE XXX
-//
-// use recursion + regular expression matching
-// return r=(replace + reduce) count
-// recursively expand until r==0
-//
 string
 ODIF::env_var::expand_text(const string& t, bool r, const string& rm)
 {
+  string text = t;
   string result;
 
-  size_t c = expand_textP(t, r, rm, result);
+  while ( expand_textP( text, r, rm, result) )
+  {
+    text = result;
+    result.clear();
+  }
 
   return( result );
 }
@@ -126,31 +127,54 @@ ODIF::env_var::expand_textP(const string& t, bool r, const string& rm, string& e
 {
   using namespace boost;
 
-  string escaped_prefix = "\\\\";
+  //              :---------------------------[0]------------------------------:
+  //                   [1]             [2]            [3]             [4]
+  string re_mp = "("+regexp+")|("+escape_prefix+")("+regexp+")("+escape_suffix+")";
 
   size_t match_count = 0;
 
   string::const_iterator start = t.begin();
   string::const_iterator end = t.end();
   match_results<string::const_iterator> match;
-  regex expression( regexp, regex::normal );
+  regex expression( re_mp, regex::normal );
   match_flag_type flags = match_posix;
 
   while( regex_search(start, end, match, expression, flags) )
   {
-    const string vn( match[0].first, match[0].second );
-    const string vv( expand(vn, r, rm) );
+    // unescaped: replace variable with its value
+    if ( match[1].matched ) {
+      const string vn( match[1].first, match[1].second );
+      const string vv( expand(vn, r, rm) );
 
-    // text to match
-    et.append(start, match[0].first);
+      // text to match
+      et.append(start, match[1].first);
 
-    // variable value
-    et.append( vv );
+      // variable value
+      et.append( vv );
+
+      match_count++;
+    }
+
+    // escaped: remove matched prefix, copy variable, remove matched suffix
+    if ( match[3].matched ) {
+      if ( match[2].matched ) {
+        // prefix matched: text to start of prefix (skipping prefix)
+        et.append(start, match[2].first);
+      } else {
+        // prefix not matched: text to start of escaped variable
+        et.append(start, match[3].first);
+      }
+
+      // copy variable (now unescaped)
+      et.append(match[3].first, match[3].second);
+
+      // skip suffix (matched or not)
+
+      match_count++;
+    }
 
     // update search start position
     start = match[0].second;
-
-    match_count++;
   }
 
   // last match position to end of text

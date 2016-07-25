@@ -21,34 +21,49 @@ ep = 0.02;
   \note data not available for {b, w, and d1} for bearings lm{3|4}uu.
         Their values were extrapolated.
 
-  \amu_define files1 (file1 file2 file3)
-  \amu_define files2 (im1 im2 im3 im4)
+  \amu_define files1 ( file1
+                       file2
+                       file3 )
+  \amu_define files2 ( im1 im2 im3 im4 ${files3} )
 
-  \amu_define newf ( type=html sizex=320 sizey=240 cols=3
-                     files="${files1} ${files2}"
-                     titles="title1 title2 title3" )
+  \amu_define textf  ( type=html sizex=320 sizey=240 cols=3
+                      files="${files1} ${files2}"
+                      titles="title1 title2 title3" )
 
-  \amu_func1             (args)
-  \amu_func2 |var2       (args x=7 --roy=yes)
-  \amu_func3 |var3       (a1 a2 a3 a 4)
-  \amu_func4 |var4 func6 (a1 a2 a3 "a 4")
-  \amu_func5 |var5 func7 (a1 a2 a3 "a 4")
+  @amu_eval          ( -x=2 -y=3 z="s" \${files} )
 
-  @amu_eval                     ( \${files} )
+  \amu_eval      files3   ( '_op1 _op2' "_m1 _m2" "_x1, _x2" )
+  \amu_shell     files4   ( "echo ${files1} 's d d'" )
+  \amu_shell     date     ( "date" )
+  \amu_combine   files5   (   'base1' "_op1 _op2" "_m1 _m2" "_x1 _x2" ".jpg" --separator=" " )
+  \amu_combine   files6   ( -p='base1' -s=".jpg" "_op1 _op2" "_m1 _m2" "_x1 _x2" -f=" " )
 
-  \amu_eval     | files            ( '_op1 _op2' "_m1 _m2" "_x1, _x2")
-  \amu_shell    | files /path/func ( "base" "_op1 _op2" "_m1 _m2" "_x1, _x2" )
-  \amu_shell                    ls ( "base" "_op1 _op2" "_m1 _m2" "_x1, _x2" )
-  \amu_combine                     (    'base1' "_op1 _op2" "_m1 _m2" "_x1 _x2" ".jpg" --separator=", ")
-  \amu_combine  | files            ( -p='base1' -s=".jpg" "_op1 _op2" "_m1 _m2" "_x1 _x2" -f=" ")
+  \amu_image_table ( type=html sizex=320 sizey=240 cols=3
+                     files="${files}"
+                     titles="${title1} ${title2} \${title3}" )
 
-  \amu_image_table html ( sizex=320 sizey=240 cols=3
-                          files="${files}"
-                          titles="${title1} ${title2} \${title3}" )
+  \amu_html_viewer ( type="png, svg, stl" )
 
-  \amu_html_viewer png ( type=png )
+  here are the files: \amu_eval ( f1=2
+                                  f2="${files5}"
+                                  a b c \${f1} \${f2}
+                                )
+  \amu_define a1 ( "a1" )
+  \amu_define a2 ( "a2" and ${a1}} )
+  \amu_define a3 ( ${a1} "${a1}" ${a2} "${a2}" )
+  \amu_define a4 ( ${a3} '${a3}' \${a-3} \${_a3} )
 
-  here are the files: \amu_eval (${files})
+  \amu_eval   a5 ( a4 \= \[${a4}\] )
+  \amu_eval      ( a4 \= \[${a4}\] now ${a5} "\"\${xx}\'")
+
+  \amu_eval (files1 \= \[${files1}\])
+  \amu_eval (files2 \= \[${files2}\])
+  \amu_eval (files3 \= \[${files3}\])
+  \amu_eval (files4 \= \[${files4}\])
+  \amu_eval (files5 \= \[${files5}\])
+  \amu_eval (files6 \= \[${files6}\])
+  \amu_eval (textf  \= \[${textf}\])
+  \amu_eval (date   \= \[${date}\])
 
   \public
 *******************************************************************************/

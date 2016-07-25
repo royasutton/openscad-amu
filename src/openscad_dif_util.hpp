@@ -48,6 +48,7 @@ class env_var {
     //! constructor.
     env_var(const std::string& p="${", const std::string& s="}",
             const std::string& e="\\${[_[:alnum:]]+}",
+            const std::string& ep="\\\\", const std::string& es="",
             bool r=true, const std::string& rm="<UNDEFINED>");
     //! destructor.
     ~env_var(void);
@@ -57,6 +58,8 @@ class env_var {
     void set_prefix(const std::string& s) { prefix=s; }
     void set_suffix(const std::string& s) { suffix=s; }
     void set_regexp(const std::string& s) { regexp=s; }
+    void set_escape_prefix(const std::string& s) { escape_prefix=s; }
+    void set_escape_suffix(const std::string& s) { escape_suffix=s; }
 
     void set_report(bool s) { report=s; }
     void set_report_message(const std::string& s) { report_message=s; }
@@ -79,6 +82,8 @@ class env_var {
     std::string                         prefix;
     std::string                         suffix;
     std::string                         regexp;
+    std::string                         escape_prefix;
+    std::string                         escape_suffix;
 
     bool                                report;
     std::string                         report_message;

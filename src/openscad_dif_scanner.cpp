@@ -83,7 +83,12 @@ ODIF::ODIF_Scanner::init(void)
   varm.set_prefix( "${" );
   varm.set_suffix( "}" );
   varm.set_regexp( "\\${[-_[:alnum:]]+}" );
+  varm.set_escape_prefix( "\\\\" );
+  varm.set_escape_suffix( "" );
 
+  // report options could be passed to the command line interface
+  // for run-time configuration.
+  varm.set_report( true );
   varm.set_report_message("<tt><UNDEFINED></tt>");
 
   // initialize function argument positional prefix
