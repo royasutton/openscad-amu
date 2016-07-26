@@ -85,6 +85,8 @@ ODIF::ODIF_Scanner::init(void)
   varm.set_regexp( "\\${[-_[:alnum:]]+}" );
   varm.set_escape_prefix( "\\\\" );
   varm.set_escape_suffix( "" );
+  varm.set_escape_prefix_length( 1 );
+  varm.set_escape_suffix_length( 0 );
 
   // report options could be passed to the command line interface
   // for run-time configuration.
@@ -298,7 +300,7 @@ ODIF::ODIF_Scanner::fx_store_arg_escaped(void)
 {
   // remove 'escape-prefix' from variable name in matched text.
   string mt = YYText();
-  fx_argv.store( mt.substr(varm.get_escape_prefix().length(),mt.length()) );
+  fx_argv.store( mt.substr(varm.get_escape_prefix_length(),mt.length()) );
 }
 
 void
@@ -306,7 +308,7 @@ ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
 {
   // remove 'escape-prefix' from variable name in matched text (first character)
   string mt = YYText();
-  fx_qarg+=mt.substr(varm.get_escape_prefix().length(),mt.length());
+  fx_qarg+=mt.substr(varm.get_escape_prefix_length(),mt.length());
 }
 
 

@@ -44,7 +44,9 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 
 ODIF::env_var::env_var( const string& p, const string& s,
-                        const string& e, const string& ep, const string& es,
+                        const string& e, const string& ep,
+                        const string& es,
+                        const size_t& epl, const size_t& esl,
                         bool r, const string& rm)
 {
   set_prefix( p );
@@ -52,6 +54,8 @@ ODIF::env_var::env_var( const string& p, const string& s,
   set_regexp( e );
   set_escape_prefix( ep );
   set_escape_suffix( es );
+  set_escape_prefix_length( epl );
+  set_escape_suffix_length( esl );
   set_report( r );
   set_report_message( rm );
 }

@@ -48,16 +48,19 @@ namespace ODIF{
 class env_var {
   public:
     //! \brief environment variable class constructor.
-    //! \param p  variable prefix.
-    //! \param s  variable suffix.
-    //! \param e  variable matching regular expression.
-    //! \param ep variable matching escape prefix.
-    //! \param es variable matching escape suffix.
-    //! \param r  report non-existent variables.
-    //! \param rm report message for non-existent variables.
+    //! \param p    variable prefix.
+    //! \param s    variable suffix.
+    //! \param e    variable matching regular expression.
+    //! \param ep   variable matching escape prefix.
+    //! \param es   variable matching escape suffix.
+    //! \param epl  variable matching escape prefix string length.
+    //! \param esl  variable matching escape suffix string length.
+    //! \param r    report non-existent variables.
+    //! \param rm   report message for non-existent variables.
     env_var(const std::string& p="${", const std::string& s="}",
             const std::string& e="\\${[_[:alnum:]]+}",
             const std::string& ep="\\\\", const std::string& es="",
+            const size_t& epl=1, const size_t& esl=0,
             bool r=true, const std::string& rm="<UNDEFINED>");
     //! environment variable class destructor.
     ~env_var(void);
@@ -85,6 +88,14 @@ class env_var {
     void set_escape_suffix(const std::string& s) { escape_suffix=s; }
     //! get variable matching escape suffix.
     std::string get_escape_suffix(void) { return ( escape_suffix ); }
+    //! set variable matching escape prefix string length.
+    void set_escape_prefix_length(const size_t& s) { escape_prefix_length=s; }
+    //! get variable matching escape prefix string length.
+    size_t get_escape_prefix_length(void) { return ( escape_prefix_length ); }
+    //! set variable matching escape suffix string length.
+    void set_escape_suffix_length(const size_t& s) { escape_suffix_length=s; }
+    //! get variable matching escape suffix string length.
+    size_t get_escape_suffix_length(void) { return ( escape_suffix_length ); }
 
     //! set report non-existent variables.
     void set_report(bool s) { report=s; }
@@ -136,14 +147,16 @@ class env_var {
     void dump(void);
 
   private:
-    std::string           prefix;         //!< variable prefix.
-    std::string           suffix;         //!< variable suffix.
-    std::string           regexp;         //!< variable match regular expression.
-    std::string           escape_prefix;  //!< variable matching escape prefix.
-    std::string           escape_suffix;  //!< variable matching escape suffix.
+    std::string     prefix;               //!< variable prefix.
+    std::string     suffix;               //!< variable suffix.
+    std::string     regexp;               //!< variable match regular expression.
+    std::string     escape_prefix;        //!< variable matching escape prefix.
+    std::string     escape_suffix;        //!< variable matching escape suffix.
+    size_t          escape_prefix_length; //!< variable matching escape prefix string length.
+    size_t          escape_suffix_length; //!< variable matching escape suffix string length.
 
-    bool                  report;         //!< report non-existent variables.
-    std::string           report_message; //!< report message for non-existent variables.
+    bool            report;               //!< report non-existent variables.
+    std::string     report_message;       //!< report message for non-existent variables.
 
     std::map<std::string,
              std::string> map;            //!< variable storage map.
