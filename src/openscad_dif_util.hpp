@@ -106,9 +106,11 @@ class env_var {
     std::string expand(const std::string& v, bool r, const std::string& rm);
     //! \copybrief expand
     //! \details \see expand. default is used for parameter \p rm.
+    //! \overload
     std::string expand(const std::string& v, bool r);
     //! \copybrief expand
     //! \details \see expand. default is used for parameters \p r and \p rm.
+    //! \overload
     std::string expand(const std::string& v);
 
     //! \brief expand all variables in the text string.
@@ -119,10 +121,13 @@ class env_var {
     std::string expand_text(const std::string& t, bool r, const std::string& rm);
     //! \copybrief expand_text
     //! \details \see expand_text. default is used for parameter \p rm.
+    //! \overload
     std::string expand_text(const std::string& t, bool r);
     //! \copybrief expand_text
     //! \details \see expand_text. default is used for parameters \p r and \p rm.
+    //! \overload
     std::string expand_text(const std::string& t);
+
     //! helper function for expand_text that performs each expansion pass.
     size_t expand_textP(const std::string& t, bool r, const std::string& rm,
                         std::string& et);
@@ -177,6 +182,7 @@ class func_args {
     //! store a positional (or named) argument value.
     void store(const std::string& v);
     //! store a named argument name-value pair.
+    //! \overload
     void store(const std::string& n, const std::string& v);
 
     //! test if the argument vector contains zero arguments.
