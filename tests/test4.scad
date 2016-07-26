@@ -30,17 +30,14 @@ ep = 0.02;
                       files="${files1} ${files2}"
                       titles="title1 title2 title3" )
 
-  @amu_eval          ( -x=2 -y=3 z="s" \${files} )
+  @amu_eval          ( y-- --y x=--x h=y++ ++xyz qq-- g++ z="s"
+                       \${files} \${x} \${h} \${y}  ${y} )
 
   \amu_eval      files3   ( '_op1 _op2' "_m1 _m2" "_x1, _x2" )
   \amu_shell     files4   ( "echo ${files1} 's d d'" )
-  \amu_shell     date     ( "date" --stderr )
-  \amu_combine   files5   (   'base1' "_op1 _op2" "_m1 _m2" "_x1 _x2" ".jpg" --separator=" " )
-  \amu_combine   files6   ( -p='base1' -s=".jpg" "_op1 _op2" "_m1 _m2" "_x1 _x2" -f=" " )
-
-  \amu_image_table ( type=html sizex=320 sizey=240 cols=3
-                     files="${files}"
-                     titles="${title1} ${title2} \${title3}" )
+  \amu_shell     date     ( "date" stderr )
+  \amu_combine   files5   (   'base1' "_op1 _op2" "_m1 _m2" "_x1 _x2" ".jpg" separator=" " )
+  \amu_combine   files6   ( p='base1' s=".jpg" "_op1 _op2" "_m1 _m2" "_x1 _x2" f=" " )
 
   \amu_html_viewer ( type="png, svg, stl" )
 
@@ -64,6 +61,18 @@ ep = 0.02;
   \amu_eval (files6 \= \[${files6}\])
   \amu_eval (textf  \= \[${textf}\])
   \amu_eval (date   \= \[${date}\])
+
+  \amu_image_table (
+    type=html
+    table_width="75%"
+    table_title="Know is the time."
+    columns=3
+    column_titles="one : two : three : four"
+    image_width=200p
+    image_height=100p
+    image_files="file1 file2 file3"
+    image_titles="a title 1 : a title 2 : a title 3"
+  )
 
   \public
 *******************************************************************************/

@@ -82,7 +82,7 @@ ODIF::ODIF_Scanner::init(void)
   // lexer use flex while varm uses <boost/regex.hpp>
   varm.set_prefix( "${" );
   varm.set_suffix( "}" );
-  varm.set_regexp( "\\${[-_[:alnum:]]+}" );
+  varm.set_regexp( "\\${[_[:alnum:]]+}" );
   varm.set_escape_prefix( "\\\\" );
   varm.set_escape_suffix( "" );
   varm.set_escape_prefix_length( 1 );
@@ -311,6 +311,70 @@ ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
   fx_qarg+=mt.substr(varm.get_escape_prefix_length(),mt.length());
 }
 
+/***************************************************************************//**
+
+  \details
+
+    For the current text returned by the lexer matching
+    <tt>("++"|"--"){id}</tt> or <tt>{id}("++"|"--")</tt>, such as
+    <tt>var++</tt> or <tt>--var</tt>, get the operator and variable name. Then
+    lookup the current value of the variable from the environment variable map
+    and update its value based on the operation. If a named function argument
+    has been specified using \ref ODIF::func_args::set_next_name, then assign
+    the pre or post operation value to a function argument with this name.
+    Finally, store the updated value. Variables with trailing operators are stored
+    in the environment variable map, while variable with preceding operators are
+    stored as a named function argument in the form of
+    <tt>(variable-name)=(post-operation-value)</tt>.
+
+   operation | behavior
+  :---------:|:----------------------------------------------
+    x++      | store increment as environment variable
+    ++x      | store increment as function argument (x=${x})
+    y=x++    | store function argument (y=(${x}))
+    y=++x    | store function argument (y=(${x}+1))
+
+*******************************************************************************/
+void
+ODIF::ODIF_Scanner::fx_incr_arg(bool post)
+{
+  string mt = YYText();
+
+  // get operator and variable name
+  string vn, op;
+  if ( post )
+  {
+     vn=mt.substr(0, mt.length()-2);
+     op=mt.substr(mt.length()-2,2);
+  } else {
+     vn=mt.substr(2, mt.length()-2);
+     op=mt.substr(0, 2);
+  }
+
+  // get the current value of the variable from the environment variable map
+  long old_val;
+  if ( varm.exists( vn ) )      old_val = atoi( varm.expand("${" + vn + "}").c_str() );
+  else                          old_val = 0;
+
+  // update the variable value
+  long new_val;
+  if ( op.compare("++") == 0 )  new_val = old_val + 1;
+  else                          new_val = old_val - 1;
+
+  // conditionally assign value the named function argument?
+  if ( fx_argv.get_next_name().length() )
+  {
+    if ( post )                 fx_argv.store( to_string(old_val) );      // var++
+    else                        fx_argv.store( to_string(new_val) );      // ++var
+  }
+
+  // store variable:
+  // var++ : as named function argument (name=count)
+  // ++var : in the environment variable map
+  if ( post )                   varm.store( vn, to_string(new_val) );     // var++
+  else                          fx_argv.store( vn, to_string(new_val) );  // ++var
+}
+
 
 void
 ODIF::ODIF_Scanner::def_init(void)
@@ -405,9 +469,9 @@ ODIF::ODIF_Scanner::bif_eval(void)
     and returned.
 
     \todo consider supporting an option to keep the return and linefeed
-          characters (--keeplb).
+          characters (keeplb).
     \todo consider supporting an option to evaluate the text prior to
-          its return and output (--eval).
+          its return and output (eval).
 
 *******************************************************************************/
 string
@@ -417,21 +481,13 @@ ODIF::ODIF_Scanner::bif_shell(void)
 
   // validate arguments:
   // enforce one or two positional argument (three with arg0).
-  if ( fx_argv.size(false, true) > 3 || fx_argv.size(true, false) != 0 ) {
-    string et = amu_error_msg("requires a single positional argument"
-                              " and optionally --stderr.");
-
-    return( et );
-  }
+  if ( fx_argv.size(false, true) > 3 || fx_argv.size(true, false) != 0 )
+    return(amu_error_msg("requires a single positional argument and optionally stderr."));
 
   // validate optional positional argument three's name.
   if ( fx_argv.size(false, true) == 3 ) {
-    if ( fx_argv.arg( 2 ).compare("--stderr") ) {
-      string et = amu_error_msg( fx_argv.arg( 2 ) +
-                                " invalid; may optionally be --stderr.");
-
-      return( et );
-    }
+    if ( fx_argv.arg( 2 ).compare("stderr") )
+      return(amu_error_msg( fx_argv.arg( 2 ) + " invalid; may optionally be stderr."));
   } else {
     redirect_stderr = true;
   }
@@ -488,29 +544,23 @@ ODIF::ODIF_Scanner::bif_combine(void)
   vector<string> pa = fx_argv.values_v(false, true);
 
   // check for named arguments
-  string prefix = unquote( fx_argv.arg_firstof("--prefix", "-p") );
-  string suffix = unquote( fx_argv.arg_firstof("--suffix", "-s") );
-  string separator = unquote( fx_argv.arg_firstof("--separator", "-f") );
+  string prefix = unquote( fx_argv.arg_firstof("prefix", "p") );
+  string suffix = unquote( fx_argv.arg_firstof("suffix", "s") );
+  string separator = unquote( fx_argv.arg_firstof("separator", "f") );
 
   // validate arguments:
   // enforce three argument minimum: 0:<function> 1:<base> 2:<opt1>
   if ( prefix.length()==0 ) {
-    if ( pa.size() < 3 ) {
-      string et = amu_error_msg("requires at least two positional arguments.");
-
-      return( et );
-    }
+    if ( pa.size() < 3 )
+      return(amu_error_msg("requires at least two positional arguments."));
 
     prefix = unquote( pa[ 1 ] );
 
     pa.erase( pa.begin() ); // arg0 function
     pa.erase( pa.begin() ); // arg1 opt1
   } else {
-    if ( pa.size() < 2 ) {
-      string et = amu_error_msg("requires at least one positional argument.");
-
-      return( et );
-    }
+    if ( pa.size() < 2 )
+      return(amu_error_msg("requires at least one positional argument."));
 
     pa.erase( pa.begin() ); // arg0 function
   }
@@ -576,9 +626,37 @@ ODIF::ODIF_Scanner::bif_combineR( const string &s, vector<string> sv,
 string
 ODIF::ODIF_Scanner::bif_image_table(void)
 {
-  string result;
+  string type           = unquote( fx_argv.arg_firstof("type",          "t") );
+  string table_width    = unquote( fx_argv.arg_firstof("table_width",   "tw") );
+  string table_title    = unquote( fx_argv.arg_firstof("table_title",   "tt") );
+  string columns        = unquote( fx_argv.arg_firstof("columns",       "c" ) );
+  string column_titles  = unquote( fx_argv.arg_firstof("column_titles", "ct") );
+  string image_width    = unquote( fx_argv.arg_firstof("image_width",   "iw") );
+  string image_height   = unquote( fx_argv.arg_firstof("image_height",  "ih") );
+  string image_files    = unquote( fx_argv.arg_firstof("image_files",   "if") );
+  string image_titles   = unquote( fx_argv.arg_firstof("image_titles",  "it") );
 
-  result = amu_error_msg("unimplemented.");
+  // validate arguments:
+  // required arguments: type must exists and be one of (html | latex)
+  if ( ! fx_argv.exists("type") )
+    return( amu_error_msg("table type must be specified.") );
+  else if ( type.compare("html") && type.compare("latex") )
+    return( amu_error_msg( "type " + type + " is invalid. may be (html|latex).") );
+
+
+  cout  << endl
+        << "type = [" << type << "]" << endl
+        << "table_width = [" << table_width << "]" << endl
+        << "table_title = [" << table_title << "]" << endl
+        << "columns = [" << columns << "]" << endl
+        << "column_titles = [" << column_titles << "]" << endl
+        << "image_width = [" << image_width << "]" << endl
+        << "image_height = [" << image_height << "]" << endl
+        << "image_files = [" << image_files << "]" << endl
+        << "image_titles = [" << image_titles << "]" << endl;
+
+  string result = replace_chars(amu_parsed_text, "\n\r", ' ');
+  result = "<under development>";
 
   return( result );
 }

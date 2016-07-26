@@ -117,6 +117,13 @@ class ODIF_Scanner : public yyFlexLexer{
     //! unquote outermost matching quotation characters, '' or "", from string.
     std::string unquote(const std::string &s);
 
+    //! convert a long integer to a string.
+    std::string to_string(const long v) {
+      std::ostringstream os;
+      os << std::dec << v;
+      return ( os.str() );
+    }
+
     env_var     varm;                   //!< scanner environment variable map.
 
 
@@ -167,6 +174,9 @@ class ODIF_Scanner : public yyFlexLexer{
     void fx_app_qarg_expanded(void) { fx_qarg+=varm.expand( YYText() ); }
     //! remove escaping in the escaped-parsed variable and append to the quoted argument string.
     void fx_app_qarg_escaped(void);
+
+    //! increment or decrement variable with post or pre assignment.
+    void fx_incr_arg(bool post=true);
 
 
     // amu define

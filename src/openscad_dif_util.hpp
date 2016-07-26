@@ -106,6 +106,9 @@ class env_var {
     //! get report message for non-existent variables.
     std::string get_report_message(void) { return ( report_message ); }
 
+    //! test for the existence of variable name n
+    bool exists(const std::string& n) { return( map.find( n ) != map.end() ); }
+
     //! store a variable name and value pair.
     void store(const std::string& n, const std::string& v) { map[ n ] = v; }
 
@@ -191,6 +194,8 @@ class func_args {
 
     //! set the name for the next argument.
     void set_next_name(const std::string& n) { next_name = n; }
+    //! get the name for the next argument.
+    std::string get_next_name(void) { return ( next_name ); }
 
     //! store a positional (or named) argument value.
     void store(const std::string& v);
@@ -259,7 +264,7 @@ class func_args {
 
     std::string           next_name;    //!< next argument name string.
 
-    //! convert an integer to a string.
+    //! convert an unsigned integer to a string.
     std::string to_string(const unsigned v) {
       std::ostringstream os;
       os << std::dec << v;

@@ -89,11 +89,12 @@ ODIF::env_var::expand(const string& v, bool r, const string& rm)
 
   string rs;
 
-  if ( map.find( mn ) != map.end() ) {
+  if ( exists( mn ) ) {
     rs = map[ mn ];
   } else {
     // avoid future expansion, use 'mn' rather than 'v'
-    if ( r ) rs = mn + "=" + rm;
+    // if ( r ) rs = mn + "=" + rm;
+    if ( r ) rs = rm;
   }
 
   return( rs );

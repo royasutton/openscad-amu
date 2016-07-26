@@ -27,11 +27,6 @@
   \brief
     Doxygen input filter lexical analyzer source for OpenSCAD script.
 
-  \todo consider adding the ability to parse named variables without an
-        assignment (such as --myoption). The variable would be stored as
-        named but with a null value. useful for named switches in parsed
-        amu function arguments.
-
   \ingroup openscad_dif_src
 *******************************************************************************/
 
@@ -66,8 +61,11 @@ comment_close                     "*"+"/"
 ws                                [ \t]
 nr                                [\n\r]
 
-id                                [-_[:alnum:]]+
-id_var                            "${"[-_[:alnum:]]+"}"
+id                                [_[:alnum:]]+
+id_var                            "${"{id}"}"
+
+incr_var_pre                      ("++"|"--"){id}
+incr_var_post                     {id}("++"|"--")
 
 amu_func                          [\\@](?i:amu)_{id}
 amu_define                        [\\@](?i:amu_define)
@@ -111,6 +109,8 @@ amu_define                        [\\@](?i:amu_define)
 <FUNCARG>\\{id_var}               { apt(); fx_store_arg_escaped(); }
 <FUNCARG>\\.                      { apt(); fx_store_arg_escaped(); }
 <FUNCARG>{id}=                    { apt(); fx_set_arg_name(); }
+<FUNCARG>{incr_var_pre}           { apt(); fx_incr_arg(false); }
+<FUNCARG>{incr_var_post}          { apt(); fx_incr_arg(true); }
 <FUNCARG>\'                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGSQ); }
 <FUNCARG>\"                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGDQ); }
 <FUNCARG>\)                       { apt(); fx_pend(); yy_pop_state(); }
