@@ -327,12 +327,12 @@ ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
     stored as a named function argument in the form of
     <tt>(variable-name)=(post-operation-value)</tt>.
 
-   operation | behavior
-  :---------:|:----------------------------------------------
-    x++      | store increment as environment variable
-    ++x      | store increment as function argument (x=${x})
-    y=x++    | store function argument (y=(${x}))
-    y=++x    | store function argument (y=(${x}+1))
+     operation | behavior
+    :---------:|:----------------------------------------------
+      x++      | store increment as environment variable
+      ++x      | store increment as function argument (x=${x})
+      y=x++    | store function argument (y=(${x}))
+      y=++x    | store function argument (y=(${x}+1))
 
 *******************************************************************************/
 void
@@ -468,35 +468,44 @@ ODIF::ODIF_Scanner::bif_eval(void)
     captured to a string, striped of all return and linefeed characters
     and returned.
 
-    \todo consider supporting an option to keep the return and linefeed
-          characters (keeplb).
-    \todo consider supporting an option to evaluate the text prior to
-          its return and output (eval).
+    Prefix the option with \c ++ to enable and \c \-- to disable. For example
+    <tt>++eval</tt> will turn on variable expansion.
+
+     option  | default | description
+    :-------:|:-------:|:---------------------------------------
+      stderr | false   | capture standard error output,
+      rmnl   | true    | remove line-feeds / carriage returns.
+      eval   | false   | expand variables in text prior to return.
 
 *******************************************************************************/
 string
 ODIF::ODIF_Scanner::bif_shell(void)
 {
-  bool redirect_stderr = false;
+  bool opt_stde = false;
+  bool opt_rmnl = true;
+  bool opt_eval = false;
 
   // validate arguments:
-  // enforce one or two positional argument (three with arg0).
-  if ( fx_argv.size(false, true) > 3 || fx_argv.size(true, false) != 0 )
-    return(amu_error_msg("requires a single positional argument and optionally stderr."));
+  // enforce one positional argument (plus arg0),
+  if ( fx_argv.size(false, true) != 2 )
+    return(amu_error_msg("requires a single positional argument."));
 
-  // validate optional positional argument three's name.
-  if ( fx_argv.size(false, true) == 3 ) {
-    if ( fx_argv.arg( 2 ).compare("stderr") )
-      return(amu_error_msg( fx_argv.arg( 2 ) + " invalid; may optionally be stderr."));
-  } else {
-    redirect_stderr = true;
+  // process named arguments.
+  vector<string> av = fx_argv.names_v(true, false);
+  for ( vector<string>::iterator it=av.begin(); it!=av.end(); ++it )
+  {
+    if      (it->compare("stderr")==0) opt_stde=( atoi(fx_argv.arg(*it).c_str()) > 0 );
+    else if (it->compare("rmnl")==0)   opt_rmnl=( atoi(fx_argv.arg(*it).c_str()) > 0 );
+    else if (it->compare("eval")==0)   opt_eval=( atoi(fx_argv.arg(*it).c_str()) > 0 );
+    else
+      return( amu_error_msg(*it + " invalid. options are (++|--)(stderr|rmnl|eval)") );
   }
 
+  // unquote the command string
   string scmd = unquote( fx_argv.arg( 1 ) );
 
-  if ( redirect_stderr ) {
+  if ( opt_stde )
     scmd.append(" 2>&1");
-  }
 
   FILE* pipe;
   char buffer[128];
@@ -504,11 +513,8 @@ ODIF::ODIF_Scanner::bif_shell(void)
   // XXX replace popen _popen for windows.
   pipe = popen( scmd.c_str(), "r" );
 
-  if (!pipe) {
-    string et = amu_error_msg("popen() failed.");
-
-    return( et );
-  }
+  if (!pipe)
+    return( amu_error_msg("popen() failed for " + scmd) );
 
   string result;
   while ( !feof(pipe) )
@@ -520,8 +526,13 @@ ODIF::ODIF_Scanner::bif_shell(void)
   // XXX replace pclose with _pclose for windows.
   pclose(pipe);
 
-  // replace all <cr> and <lf> with <space> in result and return
-  return( replace_chars(result, "\n\r", ' ') );
+  if (opt_rmnl)
+    result = replace_chars(result, "\n\r", ' ');
+
+  if (opt_eval)
+    result = varm.expand_text(result);
+
+  return( result );
 }
 
 /***************************************************************************//**
