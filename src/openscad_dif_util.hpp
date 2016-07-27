@@ -142,7 +142,7 @@ class env_var {
     //! \overload
     std::string expand_text(const std::string& t);
 
-    //! helper function for expand_text that performs each expansion pass.
+    //! helper function for \ref expand_text that performs each expansion pass.
     size_t expand_textP(const std::string& t, bool r, const std::string& rm,
                         std::string& et);
 

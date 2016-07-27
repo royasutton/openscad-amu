@@ -486,10 +486,10 @@ ODIF::ODIF_Scanner::bif_eval(void)
     <tt>++eval</tt> will turn on variable expansion.
 
      flags       | default | description
-    :-----------:|:-------:|:---------------------------------------
-      stderr (s) | false   | capture standard error output,
-      rmnl   (r) | true    | remove line-feeds / carriage returns.
-      eval   (e) | false   | expand variables in text prior to return.
+    :-----------:|:-------:|:-----------------------------------------
+      stderr (s) | false   | capture standard error output
+      rmnl   (r) | true    | remove line-feeds / carriage returns
+      eval   (e) | false   | expand variables in text prior to return
 
 *******************************************************************************/
 string
@@ -591,17 +591,13 @@ ODIF::ODIF_Scanner::bif_shell(void)
 
      options        | default | description
     :--------------:|:-------:|:---------------------------------------
-      prefix    (s) |         | word prefix.
-      suffix    (r) |         | word suffix.
+      prefix    (s) |         | word prefix
+      suffix    (r) |         | word suffix
       joiner    (e) | "_"     | set member joiner
       separator (e) | ","     | word separator
+      tokenizer (t) | [\|, ]  | set member tokenizer characters
 
-    The tokenizer character that separates the lists of set members are
-    summarized in the following table.
-
-     type        | any of
-    :-----------:|:------:
-     set members | [\|, ]
+    The tokenizer character are used to separate the lists of set members.
 
 *******************************************************************************/
 string
@@ -615,6 +611,7 @@ ODIF::ODIF_Scanner::bif_combine(void)
   "suffix",     "s",
   "joiner",     "j",
   "separator",  "f",
+  "tokenizer",  "t",
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
@@ -624,6 +621,7 @@ ODIF::ODIF_Scanner::bif_combine(void)
   string suffix     = unquote(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
   string joiner     = unquote(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
   string separator  = unquote(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string tokenizer  = unquote(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -651,6 +649,10 @@ ODIF::ODIF_Scanner::bif_combine(void)
   if ( ! fx_argv.exists( vana[6] ) && ! fx_argv.exists( vana[7] ) )
     separator = ",";
 
+  // assign default tokenizer when not specified.
+  if ( ! fx_argv.exists( vana[8] ) && ! fx_argv.exists( vana[9] ) )
+    tokenizer = "|, ";
+
   // get the positional arguments as vector (less the function name arg0).
   vector<string> pa = fx_argv.values_v(false, true);
   pa.erase( pa.begin() );
@@ -661,7 +663,7 @@ ODIF::ODIF_Scanner::bif_combine(void)
     sv.push_back( unquote( *it ) );
 
   string result;
-  bif_combineR( result, sv, prefix, suffix, joiner, separator);
+  bif_combineR( result, sv, prefix, suffix, joiner, separator, tokenizer);
 
   return( result );
 }
@@ -669,7 +671,8 @@ ODIF::ODIF_Scanner::bif_combine(void)
 void
 ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
                                   const string &p, const string &s,
-                                  const string &j, const string &ws )
+                                  const string &j, const string &ws,
+                                  const string &t )
 {
   if ( sv.size()== 0 )
   {
@@ -688,7 +691,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
 
     typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
 
-    boost::char_separator<char> sep("|, ");
+    boost::char_separator<char> sep( t.c_str() );
     tokenizer tokens(fs, sep);
 
     for ( tokenizer::iterator it=tokens.begin(); it!=tokens.end(); ++it )
@@ -697,7 +700,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
     // for each word in 'sm' combine with words of remaining sets
     sv.erase( sv.begin() );
     for ( vector<string>::iterator it=sm.begin(); it!=sm.end(); ++it )
-      bif_combineR(r, sv, p + *it, s, j, ws);
+      bif_combineR(r, sv, p + *it, s, j, ws, t);
   }
 }
 
@@ -735,6 +738,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
         scanners environment variable map (varm).
   \todo improve individual image header text.
   \todo make option names consistent with html and latex naming schemes.
+  \todo support table/caption id for cross referencing.
 
 *******************************************************************************/
 string
