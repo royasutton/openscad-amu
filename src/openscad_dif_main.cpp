@@ -1,4 +1,4 @@
-/***************************************************************************//**
+/**************************************************************************//**
 
   \file   openscad_dif_main.cpp
 
@@ -32,6 +32,8 @@
   \test make sure the filter can be defined in the doxygen input file with
         the --lip-path option specified. If this does not work, will need
         to turn to environment variable definition (OPENSCAD_AMU_LIB).
+  \todo add option to create a histogram/map of amu command that exists
+        in the input file.
 
   \ingroup openscad_dif_src
 *******************************************************************************/

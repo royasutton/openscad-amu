@@ -207,8 +207,9 @@ class ODIF_Scanner : public yyFlexLexer{
     //! combine each element from each set to form all possible word combinations.
     std::string bif_combine(void);
     //! recursive helper function for bif_combine(void).
-    void bif_combineR(const std::string &s, std::vector<std::string> sv,
-                            std::string &r, const std::string &rs=",");
+    void bif_combineR( std::string &r, std::vector<std::string> sv,
+                       const std::string &p, const std::string &s,
+                       const std::string &j, const std::string &ws );
     //! generate a html or latex image table for a list of images.
     std::string bif_image_table(void);
     //! generate a html viewer for various file formates (png, svg, and stl).
