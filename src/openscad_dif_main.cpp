@@ -34,6 +34,8 @@
         to turn to environment variable definition (OPENSCAD_AMU_LIB).
   \todo add option to create a histogram/map of amu command that exists
         in the input file.
+  \todo add an option that echos macro to-variables and macro definitions
+        to the scanner output file to help with macro definition coding.
 
   \ingroup openscad_dif_src
 *******************************************************************************/

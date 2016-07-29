@@ -186,6 +186,9 @@
   \todo debug missing double dash on cygwin doxygen builds
   \todo incorporate support for web-based stl viewer like
         [JavaScript 3D library] (https://github.com/mrdoob/three.js)
+  \todo a syntax highlighter extension would be nice: Doxygen with
+        amu extensions and amu auxilary script scopes for OpenSCAD and
+        MFScript (extended BASH).
 
 ###############################################################################/
 

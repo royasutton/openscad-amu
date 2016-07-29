@@ -42,6 +42,8 @@
 #include <sstream>
 #include <string>
 
+#include <boost/algorithm/string.hpp>
+
 #include "openscad_dif_util.hpp"
 
 //! \ingroup openscad_dif_src
@@ -116,6 +118,9 @@ class ODIF_Scanner : public yyFlexLexer{
 
     //! unquote outermost matching quotation characters, '' or "", from string.
     std::string unquote(const std::string &s);
+
+    //! unquote outermost matching quotation characters and trim whitespace.
+    std::string unquote_trim(const std::string &s) { return ( boost::trim_copy(unquote(s)) ); }
 
     //! convert a long integer to a string.
     std::string to_string(const long v) {
