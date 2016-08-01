@@ -484,16 +484,17 @@ ODIF::ODIF_Scanner::bif_image_table(void)
                           " URLs for " + to_string(if_v.size()) + " files.") );
 
 
-  // embedded newline output control for debugging
+  // embedded newline output control for debugging.
+  // when set to true, while useful for visually debugging the output
+  // of this filter, may cause Doxygen to produce erroneous results.
+  #define IDINL if(_NLE_) result.append("\n")
   bool _NLE_ = false;
 
   string result;
 
-  //
-  //
-  // html table
-  //
-  //
+  // ----------------------------------------------------------------- //
+  //                            html table
+  // ----------------------------------------------------------------- //
   if ( type.compare("html")==0 ) {
 
     string table_attr           = " border=\"0\"";
@@ -504,17 +505,16 @@ ODIF::ODIF_Scanner::bif_image_table(void)
     if ( table_width.length() ) result.append(" style=\"width:" + table_width + "\"");
     result.append( table_attr );
     result.append(">");
-
-    if(_NLE_) result.append("\n");
+    IDINL;
 
     // table heading and id
     if( table_heading.length() ) {
       result.append("<caption");
       if ( id.length() ) result.append(" id=\"" + id + "\"");
       result.append(">" + table_heading + "</caption>");
+      IDINL;
     }
 
-    if(_NLE_) result.append("\n");
 
     // column headings
     if( column_headings.length() ) {
@@ -522,8 +522,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       for( size_t i=0; i<columns_cnt; ++i )
         result.append("<th" + column_heading_attr + ">" + ct_v[i] + "</th>");
       result.append("</tr>");
-
-      if(_NLE_) result.append("\n");
+      IDINL;
     }
 
     // iterate over image list
@@ -532,24 +531,22 @@ ODIF::ODIF_Scanner::bif_image_table(void)
     {
       const string file = *it;
 
-      // check for new row
+      // check new row
       if ( (if_num%columns_cnt) == 0 ) {
 
         // image headings
         if( image_headings.length() ) {
           result.append("<tr>");
-
           for( size_t i=0; i<columns_cnt; ++i )
             if( (if_num + i) < if_v.size() )
               result.append("<th>" + ih_v[if_num + i] + "</th>");
-
           result.append("</tr>");
-
-          if(_NLE_) result.append("\n");
+          IDINL;
         }
 
         // begin row
         result.append("<tr>");
+        IDINL;
       }
 
       // begin cell
@@ -557,7 +554,6 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
       // begin image
       if ( image_urls.length() ) result.append("<a href=\"" + iu_v[if_num] + "\">");
-
       result.append("<img src=\"" + file + "\"");
 
       if ( image_titles.length() ) {
@@ -570,18 +566,16 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
       // end image
       result.append(">");
-
       if ( image_urls.length() ) result.append("</a>");
-
-      if(_NLE_) result.append("\n");
 
       // end cell
       result.append("</td>");
+      IDINL;
 
       // end row
       if ( (if_num%columns_cnt) == (columns_cnt-1) ) {
         result.append("</tr>");
-        if(_NLE_) result.append("\n");
+        IDINL;
       }
 
       if_num++;
@@ -589,16 +583,156 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
     // end table
     result.append("</table>");
-    if(_NLE_) result.append("\n");
   }
 
-  //
-  //
-  // latex table
-  //
-  //
+  // ----------------------------------------------------------------- //
+  //                            latex table
+  // ----------------------------------------------------------------- //
   if ( type.compare("latex")==0 ) {
-    result="latex table";
+
+    // begin table
+    result.append("\\begin{table}[h]");
+    IDINL;
+
+    // SKIPPING: table width.
+    // if ( table_width.length() ) result.append("" + table_width + "");
+    // IDINL;
+
+    // table heading
+    if( table_heading.length() ) {
+      result.append("\\caption{" + table_heading + "}" );
+      IDINL;
+    }
+
+    // table id
+    if ( id.length() ) {
+      result.append("\\label{" + id + "}");
+      IDINL;
+    }
+
+    result.append("\\begin{center}");
+    IDINL;
+
+    result.append("\\begin{tabular}{");
+    for( size_t i=0; i<columns_cnt; ++i ) result.append("c");
+    result.append("}");
+    IDINL;
+
+    // column headings
+    if( column_headings.length() ) {
+      result.append("\\hline ");
+      IDINL;
+      for( size_t i=0; i<columns_cnt; ++i ) {
+        result.append( ct_v[i] );
+        if ( i < (columns_cnt-1) ) result.append( "&" );
+        else                       result.append( "\\\\" );
+        IDINL;
+      }
+      result.append("\\hline");
+      result.append("\\\\[2pt]");
+      IDINL;
+    }
+
+    // iterate over image list
+    int if_num = 0;
+    for ( vector<string>::const_iterator it=if_v.begin(); it!=if_v.end(); ++it )
+    {
+      const string file = *it;
+
+      // check new row
+      if ( (if_num%columns_cnt) == 0 ) {
+        // image headings
+        if( image_headings.length() ) {
+          for( size_t i=0; i<columns_cnt; ++i ) {
+            if( (if_num + i) < if_v.size() )  result.append( ih_v[if_num + i] );
+            else                              result.append( "~" );
+
+            if ( i < (columns_cnt-1) )        result.append( "&" );
+            else                              result.append( "\\\\" );
+            IDINL;
+          }
+        }
+        // begin row
+      }
+
+      // begin cell
+
+      // begin image
+      if ( image_urls.length() ) result.append( "\\href{" + iu_v[if_num] + "}{");
+      result.append("\\includegraphics");
+
+      // assemble attributes
+      string attr;
+      if ( image_width.length() ) {
+        if ( attr.length() )          attr.append(",");
+                                      attr.append("width=" + image_width); }
+      if ( image_height.length() ) {
+        if ( attr.length() )          attr.append(",");
+                                      attr.append("height=" + image_height); }
+
+      if ( attr.length() )            result.append( "[" + attr + "]" );
+
+      result.append("{" + file + "}");
+      if ( image_urls.length() ) result.append( "}");
+
+      // end image
+      // end cell
+
+      // check end row
+      if ( (if_num%columns_cnt) == (columns_cnt-1) ) {
+        result.append("\\\\");
+        IDINL;
+
+        if( image_titles.length() ) {
+          for( size_t i=0; i<columns_cnt; ++i ) {
+            int os=1 - columns_cnt;
+            if( (if_num + i + os) < if_v.size() ) result.append( it_v[if_num + i + os] );
+            else                                  result.append( "~" );
+
+            if ( i < (columns_cnt-1) )            result.append( "&" );
+            else                                  result.append( "\\\\[2pt]" );
+
+            IDINL;
+          }
+        }
+      } else {
+        result.append("&");
+        IDINL;
+      }
+
+      if_num++;
+    }
+
+    // final partial row
+    if ( (if_num%columns_cnt) != 0 ) {
+      // fill any remaining cells with "~" to complete the partial row
+      for( size_t i=( (if_num%columns_cnt) ) ; i<(columns_cnt-1); ++i ) {
+        result.append("~&");
+        IDINL;
+      }
+      // end
+      result.append("~\\\\");
+      IDINL;
+
+      // partial row titles
+      if( image_titles.length() ) {
+        for( size_t i=0; i<columns_cnt; ++i ) {
+          int os=0 - if_num%columns_cnt;
+          if( (if_num + i + os) < if_v.size() ) result.append( it_v[if_num + i + os] );
+          else                                  result.append( "~" );
+
+          if ( i < (columns_cnt-1) )            result.append( "&" );
+          else                                  result.append( "\\\\" );
+
+          IDINL;
+        }
+      }
+    }
+
+    // end table
+    result.append("\\end{tabular}"); IDINL;
+    result.append("\\end{center}"); IDINL;
+    result.append("\\end{table}");
   }
 
 
@@ -607,6 +741,9 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
 /***************************************************************************//**
   \details
+
+  potential javascript viewers: png, stl, svg, movie...
+
 *******************************************************************************/
 string
 ODIF::ODIF_Scanner::bif_file_viewer(void)
