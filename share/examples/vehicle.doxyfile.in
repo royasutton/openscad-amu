@@ -19,10 +19,13 @@ FILTER_PATTERNS        = *.scad="@top_builddir@/src/openscad-dif"
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 GENERATE_TREEVIEW      = YES
+SOURCE_BROWSER         = YES
+STRIP_CODE_COMMENTS    = NO
 GENERATE_LATEX         = YES
 LATEX_OUTPUT           = latex
 COMPACT_LATEX          = YES
 PAPER_TYPE             = letter
+LATEX_SOURCE_CODE      = YES
 GENERATE_MAN           = YES
 MAN_OUTPUT             = man
 GENERATE_TAGFILE       = doxygen.tagfile

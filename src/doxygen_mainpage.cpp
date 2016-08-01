@@ -150,6 +150,16 @@
 
     //! @}
     \endverbatim
+
+    List of additional functions that can be used in the script
+    documentation.
+
+    \verbatim
+    \amu_eval <var> ( arg1 arg2 .. argn )
+    \amu_shell <var> ( "command string" <--stderr> )
+    \amu_combine <var> ( --prefix(-p)="text" --suffix(-s)="text" --separator(-f)="text" "set1" "set2" ... "setn" )
+    \endverbatim
+
 *******************************************************************************/
 
 

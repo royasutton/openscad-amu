@@ -30,6 +30,8 @@
   \todo add command line option to extract scripts that match specific
         scope name and script type: {MFScript and/or Openscad}.
   \todo filter the openscad-seam run summary info based on the run mode.
+  \todo cleanup the header files. remove external dependencies from class
+        headers and place in the source where they are needed.
 
   \ingroup openscad_seam_src
 *******************************************************************************/
@@ -42,10 +44,12 @@
 namespace
 {
   const size_t SUCCESS = 0;
-  const size_t ERROR_SCRIPT_COUNT_ZERO = 1;
+
+  const size_t ERROR_UNHANDLED_EXCEPTION = 1;
   const size_t ERROR_IN_COMMAND_LINE = 2;
   const size_t ERROR_UNABLE_TO_OPEN_FILE = 3;
-  const size_t ERROR_UNHANDLED_EXCEPTION = 4;
+
+  const size_t ERROR_SCRIPT_COUNT_ZERO = 4;
 }
 
 

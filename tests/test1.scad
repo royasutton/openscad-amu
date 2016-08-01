@@ -5,7 +5,7 @@
 *******************************************************************************/
 
 
-//! (decimal) Epsilon, small distance to deal with overlaping shapes
+//! (decimal) Epsilon, small distance to deal with overlapping shapes.
 ep = 0.02;
 
 

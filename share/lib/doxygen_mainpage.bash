@@ -15,6 +15,11 @@
 
   Here you will find documentation for the OpenSCAD Automake Utilities.
 
+  If you prefer to begin with an example result, see this \ref vehicle.scad
+  "simple design" that has been processed to produce documentation in
+  <a href="../../../examples/build/html/index.html">HTML format</a> and
+  <a href="../../../examples/build/latex/refman.pdf">PDF format</a>.
+
   \section introduction Introduction
 
     OpenSCAD Automake Utilities ([openscad-amu]
@@ -186,6 +191,9 @@
   \todo debug missing double dash on cygwin doxygen builds
   \todo incorporate support for web-based stl viewer like
         [JavaScript 3D library] (https://github.com/mrdoob/three.js)
+  \todo a syntax highlighter extension would be nice: Doxygen with
+        amu extensions and amu auxilary script scopes for OpenSCAD and
+        MFScript (extended BASH).
 
 ###############################################################################/
 
