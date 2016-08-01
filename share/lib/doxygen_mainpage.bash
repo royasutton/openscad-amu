@@ -1,4 +1,4 @@
-#/#
+#/##############################################################################
 
   \mainpage OpenSCAD Automake Utilities Documentation
 
@@ -14,6 +14,11 @@
    \enddot
 
   Here you will find documentation for the OpenSCAD Automake Utilities.
+
+  If you prefer to begin with an example result, see this \ref vehicle.scad
+  "simple design" that has been processed to produce documentation in
+  <a href="../../../examples/build/html/index.html">HTML format</a> and
+  <a href="../../../examples/build/latex/refman.pdf">PDF format</a>.
 
   \section introduction Introduction
 
@@ -106,7 +111,7 @@
 
     Here are the resulting \link embedding_scheme.scripts script file
     names\endlink extracted from the above embedding example using
-    \ref openscad-seam.
+    \ref openscad_seam.
 
   \section example Complete Example
 
@@ -120,7 +125,7 @@
 
     Embedded within comments toward the end of the design file are two auxiliary
     script scopes: \b test and \b document. These scopes become part of the
-    extracted script names. The utility \ref openscad-seam
+    extracted script names. The utility \ref openscad_seam
     extracts these OpenSCAD auxiliary scripts in both scopes
     (\link vehicle_document.scad document\endlink and
      \link vehicle_test.scad test\endlink)
@@ -148,7 +153,7 @@
     \endverbatim
 
     To produce the design documentation, the Doxygen input filter,
-    \ref openscad-dif, is used to pre-process the Doxygen documentation
+    \ref openscad_dif, is used to pre-process the Doxygen documentation
     embedded in the design model. See the \c FILTER_* setting in the
     example Doxygen \link vehicle.doxyfile configuration file\endlink.
 
@@ -181,13 +186,19 @@
     - make_makefile.bash
 
   \todo work on an example that demonstrates dimensioning.
-  \todo create includable mk for creating videos (export stem name to makefile)
+  \todo create include mk for creating videos (export stem name to makefile)
   \todo work on an example that demonstrates animation creation.
+  \todo debug missing double dash on cygwin doxygen builds
+  \todo incorporate support for web-based stl viewer like
+        [JavaScript 3D library] (https://github.com/mrdoob/three.js)
+  \todo a syntax highlighter extension would be nice: Doxygen with
+        amu extensions and amu auxilary script scopes for OpenSCAD and
+        MFScript (extended BASH).
 
-#/
+###############################################################################/
 
 
-#/#
+#/##############################################################################
 
   \defgroup library_arguments Argument Naming Convention
 
@@ -237,10 +248,10 @@
     To assign a list of words to a parameter value, the list must be
     enclosed in single or double quotation marks.
 
-#/
+###############################################################################/
 
 
-#/#
+#/##############################################################################
 
   \defgroup library_core Makefile Script Library Core
 
@@ -260,7 +271,7 @@
     smaller lines and continued using the '\' character at the end of each
     preceding line. When writing scripts directly this must be done
     explicitly. When writing embedded scripts that will be extracted using
-    \ref openscad-seam, long lines are explicitly terminated using the ';'
+    \ref openscad_seam, long lines are explicitly terminated using the ';'
     character. Therefore this is no need to use the continuation character.
     Long lines will be joined together and written to a single line when
     the line termination character is encountered.
@@ -274,10 +285,10 @@
     All script function names are case sensitive. The function argument
     keywords are case insensitive.
 
-#/
+###############################################################################/
 
 
-#/#
+#/##############################################################################
 
   \defgroup library_support Makefile Script Library Support
 
@@ -289,10 +300,10 @@
 
     here is an example:
 
-#/
+###############################################################################/
 
 
-#/#
+#/##############################################################################
 
   \example convert.bash
     An example script that uses target output conversion.
@@ -334,7 +345,7 @@
   \example vehicle_test.makefile
     Makefile created by extracted MFSript vehicle_test.bash
 
-#/
+###############################################################################/
 
 
 #

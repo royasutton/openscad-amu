@@ -1,4 +1,4 @@
-/**
+/***************************************************************************//**
 
   \mainpage C++ Programs Documentation
 
@@ -18,19 +18,150 @@
 
   \section programs Programs
 
-  \subsection bash-dif bash-dif
-    \include bash-dif.help
+  \subsection bash_dif bash-dif
+    \subpage bash_dif_dtc
 
-  \subsection openscad-dif openscad-dif
-    \include openscad-dif.help
+    \ref bash_dif_src "Program Source Documentation"
 
-  \subsection openscad-seam openscad-seam
-    \include openscad-seam.help
+    \subsubsection bash_dif_help Help Text:
+      \include bash-dif.help
 
-  \todo complete base documentation for the C++ programs.
-  \todo filter the openscad-seam run summary info based on the run mode.
+  \subsection openscad_dif openscad-dif
+    \subpage openscad_dif_dtc
 
-*/
+    \ref openscad_dif_src "Program Source Documentation"
+
+    \subsubsection openscad_dif_help Help Text:
+      \include openscad-dif.help
+
+  \subsection openscad_seam openscad-seam
+    \ref openscad_seam_src "Source Documentation"
+
+    \subsubsection openscad_seam_help Help Text:
+      \include openscad-seam.help
+
+  \todo create a test suite that compares output from each program to
+        known good results.
+
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  \defgroup bash_dif_src Source Documentation: bash-dif
+
+  \brief
+    Doxygen input filter for Bourne Again SHell (Bash) scripts.
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  \defgroup openscad_dif_src Source Documentation: openscad-dif
+
+  \brief
+    Doxygen input filter for OpenSCAD scripts.
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  \defgroup openscad_seam_src Source Documentation: openscad-seam
+
+  \brief
+    OpenSCAD and Makefile script extractor and make utility.
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  \page bash_dif_dtc Documenting bash scripts
+
+  This filter may be used to document bash scripts using Doygen.
+
+  Comment patters are identified according to the rules in the
+  following table. See the flex documentation on [patterns]
+  (http://flex.sourceforge.net/manual/Patterns.html)
+  for more information on how to interpret the patterns.
+
+   patterns   | behavior
+  :----------:|:-----------------------------------------
+   "#"        | comment. ignored by filter.
+   "##"[#]*   | documentation pass to Doxygen.
+   "#/"[#!/]+ | open a comment block.
+   "#"+"/"    | close comment block.
+   "#"[#]*    | comment line while in open comment block.
+
+  Documenting the code:
+  \verbatim
+  # This comment will not be passed to Doxygen.
+  ## \ingroup the_group_name
+  ## @{
+
+  ## Create a camera view option set table from predefined names.
+  #/##################################################################
+  # \afn function
+  #
+  # \aparami <required named string> name       Set table name.
+  # \aparami <named string>          translate  String of integers.
+  #
+  # \returns void
+  #
+  # \details
+  #   This function provides an abstracted way to create option
+  #    set tables for predefined views.
+  ###################################################################/
+
+  ## @}
+  \endverbatim
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  \page openscad_dif_dtc Documenting OpenSCAD Scripts
+
+    This filter may be used to document OpenSCAD scripts using Doygen.
+
+    Comment patters are identified according to the rules in the
+    following table. See the flex documentation on [patterns]
+    (http://flex.sourceforge.net/manual/Patterns.html)
+    for more information on how to interpret the patterns.
+
+
+     patterns   | behavior
+    :----------:|:--------------------------------
+     "//"       | comment. ignored by filter.
+     "//"[/!]?  | documentation pass to Doxygen.
+     "/*"[*!]?  | open a comment block.
+     "*"+"/"    | close comment block.
+
+    Documenting the code:
+    \verbatim
+    // This comment will not be passed to Doxygen.
+    //! \ingroup the_group_name
+    //! @{
+
+    //! Versatile all-inclusive computer aided vehicle design.
+    /***************************************************************//**
+     * \param <string> name       Table name.
+     * \param <string> translate  String of integers.
+     *
+     * \details
+     *   For a complete list of color names see the World Wide Web
+     *   consortium's
+     ******************************************************************/
+     module example()
+
+    //! @}
+    \endverbatim
+
+    List of additional functions that can be used in the script
+    documentation.
+
+    \verbatim
+    \amu_eval <var> ( arg1 arg2 .. argn )
+    \amu_shell <var> ( "command string" <--stderr> )
+    \amu_combine <var> ( --prefix(-p)="text" --suffix(-s)="text" --separator(-f)="text" "set1" "set2" ... "setn" )
+    \endverbatim
+
+*******************************************************************************/
+
 
 //
 // eof

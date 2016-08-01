@@ -5,7 +5,12 @@
 ##############################################################################
 AC_PREREQ(2.50)
 
-AC_INIT([openscad-amu],[1.0],[royasutton@hotmail.com],
+# obtain the configure script version tags from git
+AC_REVISION([m4_esyscmd_s([git describe --tags --dirty --always])])
+
+AC_INIT([openscad-amu],
+        [m4_esyscmd_s([git describe --tags --dirty --always])],
+        [royasutton@hotmail.com],
         [openscad-amu],[https://github.com/royasutton/openscad-amu])
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
@@ -111,6 +116,7 @@ BOOST_REQUIRE([1.35.0])
 BOOST_SYSTEM
 BOOST_FILESYSTEM
 BOOST_PROGRAM_OPTIONS
+BOOST_REGEX
 
 ##############################################################################
 # Create config.h
@@ -164,7 +170,7 @@ configuration:
 
   installation prefix:      $prefix
 
-  make path:                $MAKE_PATH
+  gnu make path:            $MAKE_PATH
   bash path:                $BASH_PATH
   openscad path:            $OPENSCAD_PATH
   doxygen path:             $DOXYGEN_PATH

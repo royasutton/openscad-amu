@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# top_builddir/share
+# top_srcdir/share
 #
 ##############################################################################
 
@@ -8,10 +8,15 @@ files_am = \
 	doxygen_mainpage.bash \
 	segregate.bash
 
+scripts_help = \
+	segregate.help
+
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
 
 install_path = $(version_path)/scripts
+
+SUFFIXES = .bash .help
 
 ##############################################################################
 # targets
@@ -20,13 +25,16 @@ install_path = $(version_path)/scripts
 docs-local: doxygen.stamp
 
 # run doxygen and update timestamp
-doxygen.stamp: Doxyfile Makefile $(files_am)
+doxygen.stamp: Doxyfile Makefile $(files_am) $(scripts_help)
 	( cat Doxyfile ; \
 		echo "INPUT=$(builddir)" ; \
 		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: Support Scripts\"" ; \
 	) | $(DOXYGEN_PATH) - \
 	&& touch doxygen.stamp
 #	&& ( cd doxygen/latex && make )
+
+.bash.help:
+	$(BASH_PATH) --norc --noprofile $< --help > $@
 
 '$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
 
@@ -48,7 +56,8 @@ uninstall-local:
 CLEANFILES = \
 	doxygen.stamp \
 	doxygen.tagfile \
-	doxygen.warn
+	doxygen.warn \
+	$(scripts_help)
 
 clean-local:
 	-test -d doxygen \

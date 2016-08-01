@@ -1,5 +1,4 @@
-/// This is the brief.
-/*******************************************************************************
+/***************************************************************************//**
 
   \file   openscad_seam_scanner.cpp
 
@@ -25,8 +24,10 @@
     You should have received a copy of the GNU General Public License
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
-  \details
+  \brief
+    Script extractor scanner source.
 
+  \ingroup openscad_seam_src
 *******************************************************************************/
 
 using namespace std;
@@ -35,10 +36,8 @@ using namespace std;
 
 SEAM::SEAM_Scanner::SEAM_Scanner(const string& f, const bool& m, const string& s)
 {
-  input_name = f;
-
   // initialize output prefix string
-  ops = s;
+  set_ops( s );
 
   if ( m ) {
     // count mode scanner
@@ -50,8 +49,8 @@ SEAM::SEAM_Scanner::SEAM_Scanner(const string& f, const bool& m, const string& s
     scanner_output_on = true;
   }
 
+  input_name = f;
   scanner_script_count = 0;
-
   prefix_scripts = true;
 
   init();
@@ -106,7 +105,7 @@ SEAM::SEAM_Scanner::init(void)
   if ( !scanner_count_mode )
     cout << ops << "reading from file " << input_name << ";" << endl;
 
-  // set scanner input to opened input file
+  // set lexer input to opened input file
   switch_streams( &input_file );
 }
 

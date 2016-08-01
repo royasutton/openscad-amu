@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #/
-#  \file       test.bash
+#  \file       test1.bash
 #/
 
 ########## \mainpage My Personal Index Page

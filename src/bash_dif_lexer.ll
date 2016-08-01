@@ -1,5 +1,5 @@
-/*******************************************************************************
-
+/******************************************************************************/
+/**
   \file   bash_dif_lexer.ll
 
   \author Roy Allen Sutton
@@ -25,13 +25,14 @@
     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
 
   \brief
-    This is the brief.
+    Doxygen input filter lexical analyzer source for Bourne Again SHell scripts.
 
-  \details
+  \todo consider bash global declared variable support: string, integer,
+        array, etc. need to know function context. pattern to match
+        multi-line function arguments: \([^\)]+\)
+  \test does the function prototype need to be written after the comment?
 
-  \todo consider bash declared variable support
-  \todo consider function and general script code support
-
+  \ingroup bash_dif_src
 *******************************************************************************/
 
 %{
@@ -44,59 +45,77 @@
 
 using namespace std;
 
-// comment text block class
-class block
+//! \ingroup bash_dif_src
+//! @{
+
+//! class to create function prototypes for documented bash scripts.
+class Block
 {
   public:
+    //! end of comment block text formatting. create function prototype.
     string format( void );
 
-    // comment block text
+    //! append text t to comment block text.
     void app_text( const string& t ) { text += t; }
+    //! return stored comment block text.
     string get_text( void ) { return text; }
 
+    //! test if comment block text is empty.
     bool empty ( void ) { return (text.length() == 0); }
+    //! clear comment block text and function name.
     void clear( void ) { text.clear(); fn.clear(); }
 
-    // function
+    //! set block function name.
     void set_fn( const string& t ) { fn = t; }
+    //! return block function name.
     string get_fn( void ) { return fn; }
+    //! test if current block has function name stored.
     bool has_fn( void ) { return fn.size(); }
 
-    // function parameters
+    //! read the front parameter on the function parameter queue.
     void read_fp( string& p, string& t ) { p = pn.front(); t = pt.front(); }
+    //! removes a parameter from the front the function parameter queue.
     int pop_fp( void ) { pn.pop(); pt.pop(); return pn.size(); }
+    //! return the number of elements in the the function parameter queue.
     int fp_cnt( void ) { return pn.size(); }
 
-    // current parsed parameters
+    //! set the current parsed parameter name.
     void set_cpn( const string& t ) { cpn = t; }
+    //! get the current parsed parameter name.
     string get_cpn( void ) { return cpn; }
 
+    //! set the current parsed parameter type.
     void set_cpt( const string& t ) { cpt = t; }
+    //! get the current parsed parameter type.
     string get_cpt( void ) { return cpt; }
 
+    //! set the current parsed parameter i/o direction.
     void set_cpd( const string& t ) { cpd = t; }
+    //! get the current parsed parameter i/o direction.
     string get_cpd( void ) { return cpd; }
 
+    //! push the current parameter to the back of the function parameter queue.
     void push_cp( void ) { pn.push(cpn); pt.push(cpt); }
+    //! clear the current parameter name, type, and i/o direction.
     void clear_cp( void ) { cpn.clear(); cpt.clear(); cpd.clear(); }
 
   private:
+    //! remove all characters in c from from string s.
     string remove_chars( const string &s, const string &c );
 
-    string            text;     // comment block text
+    string            text;     //!< text of current comment block.
 
-    string            fn;       // function name if any
-    queue<string>     pn;       // function parameter names
-    queue<string>     pt;       // function parameter types
+    string            fn;       //!< function name for current comment block if any.
+    queue<string>     pn;       //!< function parameter names.
+    queue<string>     pt;       //!< function parameter types.
 
-    string            cpn;      // current parameter type
-    string            cpt;      // current parameter type
-    string            cpd;      // current parameter direction
+    string            cpn;      //!< current parameter type.
+    string            cpt;      //!< current parameter type.
+    string            cpd;      //!< current parameter i/o direction.
 };
 
-// remove characters in list from string
 string
-block::remove_chars( const string &s, const string &c ) {
+Block::remove_chars( const string &s, const string &c ) {
   string r;
 
   for ( string::const_iterator its=s.begin(); its!=s.end(); ++its ) {
@@ -111,9 +130,8 @@ block::remove_chars( const string &s, const string &c ) {
   return( r );
 }
 
-// end of comment block text formatting
 string
-block::format( void ) {
+Block::format( void ) {
   if ( empty() ) return( "" );
 
   string formated_text;
@@ -152,7 +170,7 @@ block::format( void ) {
   return( formated_text );
 }
 
-// error handler
+//! report error message m and abort. report line number n and context t if provided.
 void
 abort( const string& m, const int &n = 0, const string &t = "" ) {
   cerr << "ERROR: " << m;
@@ -165,8 +183,11 @@ abort( const string& m, const int &n = 0, const string &t = "" ) {
   exit( EXIT_FAILURE );
 }
 
-// comment block global variable allocation
-block cb;
+//! comment block global variable allocation.
+Block cb;
+
+//! @}
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 %}
 
@@ -262,8 +283,13 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
 
 %%
 
-// main
-int main( int argc, char** argv ) {
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+//! \ingroup bash_dif_src
+//! @{
+
+//! program main.
+int
+main( int argc, char** argv ) {
   string  arg1;
   bool    help    = false;
   bool    version = false;
@@ -319,7 +345,9 @@ int main( int argc, char** argv ) {
   exit( EXIT_SUCCESS );
 }
 
+//! @}
+
 
 /*******************************************************************************
- eof
+// eof
 *******************************************************************************/

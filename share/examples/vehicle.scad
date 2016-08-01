@@ -26,131 +26,128 @@
 
   \brief
 
-    Parameterizable high-tech luxury vehicle model.
+    Simple vehicle library to demonstrate model design with embedded documentation.
 
   \details
 
-    This Parameterized vehicle model will change the way you acquire
-    vehicles. No longer will you need to spend countless hours visiting
-    vehicle exchanges or scouring the Internet. Now you can simply
-    instantiate your favorite vehicle type, color, and wheel size, from
-    the comfort of your personal computing device.
+    This Parameterized model consists of three simple OpenSCAD modules
+    that generate very basic blocks that resemble cars, trucks, and vans.
+    The library consists of a vehicle module, a cabin module, and a wheel
+    module. Each module supports basic parameterization and is documented.
 
 *******************************************************************************/
 
 /***************************************************************************//**
 
-  \mainpage Library Documentation
+  \mainpage Example Library Documentation
+
+  \tableofcontents
 
   \section overview Overview
 
+    The primary purpose of this example is to demonstrate how these
+    utilities ([openscad-amu] (https://github.com/royasutton/openscad-amu))
+    may be used to script target generation, such as configured
+    implementations, rendered examples, or test cases, and
+    extract documentation from commented OpenSCAD designs. The file
+    \ref vehicle.scad contains the entire design, auxiliary scripts,
+    and documentation used in this simple example.
+
+  \section introduction Introduction
+
     \dot
       graph g { subgraph cluster_model { graph[style=solid];
-          label="Luxury Vehicle Library Components";
-          node [shape=Mrecord]; wheel; vehicle;
+          label="Example Vehicle Library\n(select a module)";
+          node [shape=Mrecord];
+          a [label="wheel" URL="\ref wheel"];
+          b [label="cabin" URL="\ref cabin"];
+          c [label="vehicle" URL="\ref vehicle"];
       } }
      \enddot
 
-    With this library you will be able to make the vehicle of your dreams.
-    It does not matter if you prefer cars, trucks, or vans, you are now
-    empowered to instantiate whichever you prefer. You can even choose
-    to enlarge your rims and change your vehicles body color.
+    With this library you will be able to make simple models that (almost)
+    resemble vehicles. It does not matter if you prefer cars, trucks, or
+    vans, you can instantiate whichever you prefer. You can even choose
+    your wheel size and change your vehicles color.
 
-    \warning Vehicles constructed with this library __may not be street legal!__
+    See the <A href="#table_of_all">table</A> of all Generated Images.
+
+    \warning  Vehicles constructed with this library __should not be
+              constructed without additional design refinement!__
 
   \section modules Library Modules
 
-    - module \link wheel() \endlink
-    - module \link cabin() \endlink
-    - module \link vehicle() \endlink
+    - \ref wheel "Wheel Module Documentation".
+    - \ref cabin "Cabin Module Documentation".
+    - \ref vehicle "Vehicle Module Documentation".
 
   \section using Using the Library
 
-    To demystify the use of this all inclusive library, please see the
-    following exemplary use case on how to incorporate these library modules
-    into your dream design.
+    The basic vehicle is constructed with seven parameters as shown
+    in the script segment below. Please review the \ref vehicle module
+    documentation for more details on each configuration option.
 
     \dontinclude vehicle_test.scad
     \skip use
     \until vehicle_wheels );
 
-  \section views Vehicle Views
+    \note This library does not use global variables and therefore may be
+          included using the \c use OpenSCAD command.
+
+  \section views Views
+
+    \amu_define  theadt ( View from all angles. )
+    \amu_shell   ifurls ( "yes 'https://github.com/royasutton/openscad-amu^' | head -6" )
+    \amu_shell   count6 ( "seq -f '(%g)' -s '^' 6" )
+    \amu_combine ititle ( j=" " f="^" t=";" p="Viewed from the" "front.;right side.;left side.;top.;bottom.;back." )
+    \amu_combine ifiles ( p="../png/vehicle_test" suffix=".png" "car" "12" "green" "left front back top bottom right" "320x240" )
+    \amu_shell   tcols3 ( "seq -f 'Column (%g)' -s '^' 3" )
 
     \htmlonly
-      <table> <caption id="Views">View from all angles</caption>
-      <tr><th>Front <th>Right Side <th>Left Side
-      <tr><td><img src=../png/vehicle_test_car_12_green_left_320x240.png>
-          <td><img src=../png/vehicle_test_car_12_green_front_320x240.png>
-          <td><img src=../png/vehicle_test_car_12_green_back_320x240.png></tr>
-      <tr><th>Top <th>Bottom <th>Rear
-      <tr><td><img src=../png/vehicle_test_car_12_green_top_320x240.png>
-          <td><img src=../png/vehicle_test_car_12_green_bottom_320x240.png>
-          <td><img src=../png/vehicle_test_car_12_green_right_320x240.png></tr>
-      </table>
+      \amu_image_table ( t=html if="${ifiles}" ix="320" th="${theadt}" it="${ititle}" ih="${ititle}" ch="${tcols3}" iu="${ifurls}" )
     \endhtmlonly
+    \latexonly
+      \amu_image_table ( t=latex if="${ifiles}" ix="2.00in" th="${theadt}" it="${count6}" ih="${ititle}" ch="${tcols3}" iu="${ifurls}" )
+    \endlatexonly
 
-    \image latex vehicle_test_car_12_green_left_320x240.png "Front" width=2.5in
-    \image latex vehicle_test_car_12_green_front_320x240.png "Right Side" width=2.5in
-    \image latex vehicle_test_car_12_green_back_320x240.png "Left Side" width=2.5in
-    \image latex vehicle_test_car_12_green_top_320x240.png "Top" width=2.5in
-    \image latex vehicle_test_car_12_green_bottom_320x240.png "Bottom" width=2.5in
-    \image latex vehicle_test_car_12_green_right_320x240.png "Rear" width=2.5in
+    Click on an image above to follow its hyperlink.
 
   \section examples Examples
 
-    Here are a few examples to stimulate your imagination.
+    Here are a few examples. All of these images are rendered from the
+    design library scripts in the same file that also created this
+    documentation. The images and Stereo Lithography (STL) models have been
+    generated using OpenSCAD via the auxiliary scripts at the end of
+    this file.
 
   \subsection example_12 Vehicles with 12in Wheels
 
-    \htmlonly
-      <table> <caption id="table">Green</caption>
-      <tr><th>Cars <th>Trucks <th>Vans
-      <tr><td><img src=../png/vehicle_test_car_12_green_diag_320x240.png>
-          <td><img src=../png/vehicle_test_truck_12_green_diag_320x240.png>
-          <td><img src=../png/vehicle_test_van_12_green_diag_320x240.png></tr>
-      </table>
-      <table> <caption id="table">Blue</caption>
-      <tr><th>Cars <th>Trucks <th>Vans
-      <tr><td><img src=../png/vehicle_test_car_12_blue_diag_320x240.png>
-          <td><img src=../png/vehicle_test_truck_12_blue_diag_320x240.png>
-          <td><img src=../png/vehicle_test_van_12_blue_diag_320x240.png></tr>
-      </table>
-    \endhtmlonly
+    \amu_define  theadt ( Green and Blue: Cars, Trucks, and Vans. )
+    \amu_combine ititle ( j=" " f="^" p="A" "car truck van" " thats " "green blue" s=" with 12in wheels." )
+    \amu_combine ifiles ( p="../png/vehicle_test" s=".png" "car truck van" "12" "green blue" "diag" "320x240" )
 
-    \image latex vehicle_test_car_12_green_diag_320x240.png "Green Car with 12in Wheels" width=2.5in
-    \image latex vehicle_test_truck_12_green_diag_320x240.png "Green Truck with 12in Wheels" width=2.5in
-    \image latex vehicle_test_van_12_green_diag_320x240.png "Green Van with 12in Wheels" width=2.5in
-    \image latex vehicle_test_car_12_blue_diag_320x240.png "Blue Car with 12in Wheels" width=2.5in
-    \image latex vehicle_test_truck_12_blue_diag_320x240.png "Blue Truck with 12in Wheels" width=2.5in
-    \image latex vehicle_test_van_12_blue_diag_320x240.png "Blue Van with 12in Wheels" width=2.5in
+    \htmlonly
+      \amu_image_table ( t=html if="${ifiles}" ix="320" th="${theadt}" it="${ititle}" ih="${ititle}" ch="${tcols3}" )
+    \endhtmlonly
+    \latexonly
+      \amu_image_table ( t=latex if="${ifiles}" ix="2.00in" th="${theadt}" it="${count6}" ih="${ititle}" ch="${tcols3}" )
+    \endlatexonly
 
   \subsection example_17 Vehicles with 17in Wheels
 
-    \htmlonly
-      <table> <caption id="table">Green</caption>
-      <tr><th>Cars <th>Trucks <th>Vans
-      <tr><td><img src=../png/vehicle_test_car_17_green_diag_320x240.png>
-          <td><img src=../png/vehicle_test_truck_17_green_diag_320x240.png>
-          <td><img src=../png/vehicle_test_van_17_green_diag_320x240.png></tr>
-      </table>
-      <table> <caption id="table">Blue</caption>
-      <tr><th>Cars <th>Trucks <th>Vans
-      <tr><td><img src=../png/vehicle_test_car_17_blue_diag_320x240.png>
-          <td><img src=../png/vehicle_test_truck_17_blue_diag_320x240.png>
-          <td><img src=../png/vehicle_test_van_17_blue_diag_320x240.png></tr>
-      </table>
-    \endhtmlonly
+    \amu_combine ititle ( j=" " f="^" p="A" "car truck van" " thats " "green blue" s=" with 17in wheels." )
+    \amu_combine ifiles ( p="../png/vehicle_test" s=".png" "car truck van" "17" "green blue" "diag" "320x240" )
 
-    \image latex vehicle_test_car_17_green_diag_320x240.png "Green Car with 17in Wheels" width=2.5in
-    \image latex vehicle_test_truck_17_green_diag_320x240.png "Green Truck with 17in Wheels" width=2.5in
-    \image latex vehicle_test_van_17_green_diag_320x240.png "Green Van with 17in Wheels" width=2.5in
-    \image latex vehicle_test_car_17_blue_diag_320x240.png "Blue Car with 17in Wheels" width=2.5in
-    \image latex vehicle_test_truck_17_blue_diag_320x240.png "Blue Truck with 17in Wheels" width=2.5in
-    \image latex vehicle_test_van_17_blue_diag_320x240.png "Blue Van with 17in Wheels" width=2.5in
+    \htmlonly
+      \amu_image_table ( t=html if="${ifiles}" ix="320" th="${theadt}" it="${ititle}" ih="${ititle}" ch="${tcols3}" )
+    \endhtmlonly
+    \latexonly
+      \amu_image_table ( t=latex if="${ifiles}" ix="2.00in" th="${theadt}" it="${count6}" ih="${ititle}" ch="${tcols3}" )
+    \endlatexonly
 
   \section downloads Downloads
 
-  \subsection models STL Models Ready for Manufacture
+  \subsection models STL Models
 
     - <a href="../stl/vehicle_test_car_12.stl">Car with 12in wheels</a>
     - <a href="../stl/vehicle_test_car_17.stl">Car with 17in wheels</a>
@@ -159,30 +156,78 @@
     - <a href="../stl/vehicle_test_van_12.stl">Van with 12in wheels</a>
     - <a href="../stl/vehicle_test_van_17.stl">Van with 17in wheels</a>
 
-  \subsection refman  PDF Reference Manual
+  \subsection refman PDF Reference Manual
 
-    If you are kind or generous, you will <a href="../latex/refman.pdf">
-    download the printable PDF version</a> of the library documentation and pass it
-    out to all of your family, friends, and acquaintances.
+    Doxygen generates documentation if numerous formats. The Doxygen
+    configuration file for this example has been setup to generate this
+    HTML output as well as Latex generated PDF reference manual.
+
+    Here is the Doxygen/Latex generated <a href="../latex/refman.pdf">
+    PDF version</a> of this library documentation.
 
     \latexonly
-      Congratulations, you have found me. This is the PDF Reference manual. No need
-      to search any further. Simply print me and follow the above directions.
+      This is the latex-generated PDF Reference manual.
     \endlatexonly
 
-  \todo This library is absolutely perfect and has zero bugs. Just use me and relax.
-  \todo Spread the word. Everything is better now.
+  \subsection appendix Appendix: All Generated Images
+
+    \amu_define  id     ( table_of_all )
+    \amu_shell   tcolsw ( "seq -f 'Column (%g)' -s '^' 10" )
+    \amu_define  theadt ( Table of all Generated Images. )
+    \amu_shell   iheadt ( "seq -f 'h%g' -s '^' 84" )
+    \amu_shell   countw ( "seq -f '(%g)' -s '^' 84" )
+    \amu_shell   tcolsw ( "seq -f 'Col (%g)' -s '^' 10" )
+    \amu_combine ititle ( joiner=" " separator="^" tokenizer=" " prefix="a"
+                          "car truck van"
+                          "with" "12 17" "wheels" "thats"
+                          "blue, green," "viewed" "from"
+                          "front. right. left. top. bottom. back. diagonal." )
+    \amu_combine ifiles ( prefix="../png/vehicle_test" suffix=".png"
+                          "car truck van"
+                          "12 17"
+                          "blue green"
+                          "left front back top bottom right diag" "320x240" )
+
+    \htmlonly
+      \amu_image_table ( type=html
+                         id="${id}" table_heading="${theadt}"
+                         columns="10" column_headings="${tcolsw}"
+                         image_headings="${iheadt}"
+                         image_files="${ifiles}" image_width="92"
+                         image_titles="${ititle}" )
+    \endhtmlonly
+
+    \latexonly
+      \amu_image_table ( type=latex
+                         id="${id}" table_heading="${theadt}"
+                         columns="10" column_headings="${tcolsw}"
+                         image_headings="${iheadt}"
+                         image_files="${ifiles}" image_width="0.50in"
+                         image_titles="${countw}" )
+    \endlatexonly
+
+    The images above were created by OpenSCAD with invocations driven from a
+    makefile generated by the auxiliary scripts below in the script scope "_test".
+    With OpenSCAD AutoMake Utilities it is easy to maintain current documentation
+    for mechanical designs. Running \c make on the designs' makefile, updates all
+    scripted tests and documentation.
+
+  \note There are also UNIX man page documentation that has been generated
+        via Doxygen. It can be found at: <tt>\@builddir\@/share/examples/build/man</tt>.
+
+  \todo Improve the vehicle window detail.
+  \todo Fix all the typos and spelling mistakes.
 
 *******************************************************************************/
 
 /***************************************************************************//**
 
-  \example vehicle_document.scad using the wheel library module
-  \example vehicle_test.scad using the vehicle library module
+  \example vehicle_document.scad using the wheel library module.
+  \example vehicle_test.scad using the vehicle library module.
 
 *******************************************************************************/
 
-//! Top quality high speed wheel model.
+//! Parameterized wheel model.
 /***************************************************************************//**
 
   \param diameter   <integer> wheel rim diameter size in inches.
@@ -202,15 +247,17 @@
     \skip use
     \until 10 );
 
-    Sample 17in wheels:
+    Sample 17in wheel:
 
-    \image html  vehicle_document_17_320x240_front.png "17in Wheel Top View"
-    \image html  vehicle_document_17_320x240_top.png "17in Wheel Front View"
-    \image html  vehicle_document_17_320x240_diag.png "17in Wheel Diagonal View"
+    \amu_combine titles (j=" " f="^" t=" " p="A" "12in 17in" "wheel," "top front diagonal" s=" view")
+    \amu_combine files  (p="../png/vehicle_document" s=".png" "12 17" "320x240" "front top diag")
 
-    \image latex  vehicle_document_17_320x240_front.eps "17in Wheel Top View" width=2.5in
-    \image latex  vehicle_document_17_320x240_top.eps "17in Wheel Front View" width=2.5in
-    \image latex  vehicle_document_17_320x240_diag.eps "17in Wheel Diagonal View" width=2.5in
+    \htmlonly
+      \amu_image_table ( t=html if="${files}" ix="320" it="${titles}" ih="${titles}" ch="${tcols3}" )
+    \endhtmlonly
+    \latexonly
+      \amu_image_table ( t=latex if="${files}" ix="2.00in" it="${count6}" ih="${titles}" ch="${tcols3}" )
+    \endlatexonly
 
   \protected
 
@@ -226,7 +273,7 @@ module wheel( diameter=15, width=7, wallheight=6, tirecolor="black", rimcolor="w
   cylinder(h=width/10, d=(diameter+wallheight*2)*98/100, center=true);
 }
 
-//! Flexible vehicle cabin design module.
+//! Parameterized vehicle cabin design module.
 /***************************************************************************//**
 
   \param size       <integer[x, y, z]> Overall size of cabin
@@ -245,7 +292,7 @@ module cabin( size, cabcolor ) {
   color( "whitesmoke" ) cube([1/2, size[1]*90/100, size[2]*90/100], center=true);
 }
 
-//! Versatile all-inclusive computer aided vehicle design.
+//! Parameterized vehicle design module.
 /***************************************************************************//**
 
   \param type       <string>  Type of vehicle desired. One of {car, truck, van}.
@@ -265,6 +312,9 @@ module cabin( size, cabcolor ) {
     \dontinclude vehicle_test.scad
     \skip use
     \until vehicle_wheels );
+
+  \test Determine the minimum and maximum wheel size that work for each
+        vehicle and add to this documentation.
 
   \public
 
@@ -391,7 +441,7 @@ Begin_Scope _document;
 
       set_Ext "png"
       set_Convert_Exts "eps jpeg"  set_Convert_Opts "-verbose"
-      set_Opts "--preview --projection=o --viewall"
+      set_Opts "--preview --projection=o"
       set_Opts_Combine "wheel sizes views";
 
     script

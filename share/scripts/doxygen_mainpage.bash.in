@@ -1,4 +1,4 @@
-#/#
+#/##############################################################################
 
   \mainpage Support Scripts Documentation
 
@@ -18,10 +18,11 @@
 
   \section scripts Scripts
 
-  \subsection support_segregate segregate.bash
-    \copydetails segregate
+  \subsection segregate_bash segregate.bash
+    \subsubsection segregate_bash_help Help Text:
+      \include segregate.help
 
-#/
+###############################################################################/
 
 
 #
