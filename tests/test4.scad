@@ -35,11 +35,12 @@ ep = 0.02;
 
   \amu_eval      files3   ( '_op1 _op2' "_m1 _m2" "_x1, _x2" )
   \amu_shell     files4   ( "echo ${files1} 's d d'" )
-  \amu_shell     date     ( "date" stderr )
-  \amu_combine   files5   (   'base1' "_op1 _op2" "_m1 _m2" "_x1 _x2" ".jpg" separator=" " )
-  \amu_combine   files6   ( p='base1' s=".jpg" "_op1 _op2" "_m1 _m2" "_x1 _x2" f=" " )
+  \amu_shell     date     ( "date" ++stderr ++e )
+  \amu_shell              ( "ls /non-existent-directory " ++s )
+  \amu_combine   files5   ( p='base1' s=".jpg" "op1 op2" "m1 m2" "x1 x2" separator=" " joiner='_' )
+  \amu_combine   files6   ( p='base1' s=".jpg" "op1 op2" "m1 m2" "x1 x2" f=" ")
 
-  \amu_html_viewer ( type="png, svg, stl" )
+  \amu_file_viewer ( type="png, svg, stl" )
 
   here are the files: \amu_eval ( f1=2
                                   f2="${files5}"
@@ -65,14 +66,67 @@ ep = 0.02;
   \amu_image_table (
     type=html
     table_width="75%"
-    table_title="Know is the time."
+    table_heading="Know is the time."
     columns=3
-    column_titles="one : two : three : four"
-    image_width=200p
-    image_height=100p
-    image_files="file1 file2 file3"
-    image_titles="a title 1 : a title 2 : a title 3"
+    column_headings="
+      one^  two  ^
+      three
+    "
+    image_width=200
+    image_height=100
+    image_files="${files5}"
+    image_titles=
+      "     a title 1^     a title 2^a title 3^a title 4^
+       title 5~title 6~title 7~title 8"
+    image_urls="
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com
+    "
   )
+
+  \amu_image_table (
+    type=latex
+    id=my_latex_table
+    table_heading="Know is the time."
+    columns=4
+    column_headings="
+      one^  two  ^
+      three^four
+    "
+    image_width=2in
+    image_height=1in
+    image_files="${files5}"
+    image_headings="
+      heading 1^
+      heading 2^
+      heading 3^
+      heading 4^
+      heading 5^
+      heading 6^
+      heading 7^
+      heading 8
+    "
+    image_titles=
+      "     a title 1^     a title 2^a title 3^a title 4^
+       title 5~title 6~title 7~title 8"
+    image_urls="
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com^
+      http://www.google.com
+    "
+  )
+
 
   \public
 *******************************************************************************/

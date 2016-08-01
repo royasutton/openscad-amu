@@ -28,7 +28,11 @@
     OpenSCAD Doxygen input filter main source.
 
   \todo add option to list JavaScript referenced by all input source. this
-        would help construct makefile dependencies (--list-js).
+        would help construct makefile dependencies (--list-js). The larger
+        point is that this filter needs to be responsible for installing
+        and removing JavaScript dependencies (or at least communicating
+        them to a responsible party). See Doxygen configuration tab
+        HTML_EXTRA_FILES.
   \test make sure the filter can be defined in the doxygen input file with
         the --lip-path option specified. If this does not work, will need
         to turn to environment variable definition (OPENSCAD_AMU_LIB).
