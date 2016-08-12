@@ -34,6 +34,12 @@ using namespace std;
 
 #include "openscad_seam_scanner.hpp"
 
+#include "boost/filesystem.hpp"
+
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 SEAM::SEAM_Scanner::SEAM_Scanner(const string& f, const bool& m, const string& s)
 {
   // initialize output prefix string

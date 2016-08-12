@@ -30,15 +30,19 @@
   \todo add command line option to extract scripts that match specific
         scope name and script type: {MFScript and/or Openscad}.
   \todo filter the openscad-seam run summary info based on the run mode.
-  \todo cleanup the header files. remove external dependencies from class
-        headers and place in the source where they are needed.
+  \todo support a configurable scope joiner that defaults to "_".
 
   \ingroup openscad_seam_src
 *******************************************************************************/
 
 #include "openscad_seam_scanner.hpp"
-#include "boost/program_options.hpp"
 
+#include "boost/program_options.hpp"
+#include "boost/filesystem.hpp"
+
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
 
 // return value constants.
 namespace

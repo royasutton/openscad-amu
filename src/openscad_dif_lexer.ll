@@ -27,12 +27,20 @@
   \brief
     Doxygen input filter lexical analyzer source for OpenSCAD script.
 
+  \todo honor Doxygen \verbatim \endverbatim command state (amu should ECHO
+        while between theses tags)... or support a double back-slash so
+        that commands can be escaped.
+
   \ingroup openscad_dif_src
 *******************************************************************************/
 
 %{
 
 #include "openscad_dif_scanner.hpp"
+
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
 
 #undef  YY_DECL
 #define YY_DECL int ODIF::ODIF_Scanner::scan(void)

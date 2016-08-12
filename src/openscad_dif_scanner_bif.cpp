@@ -36,7 +36,9 @@
 
 #include <boost/tokenizer.hpp>
 
+#if defined(HAVE_CONFIG_H)
 #include "config.h"
+#endif
 
 using namespace std;
 
@@ -354,6 +356,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
   \todo might be nice to use a more general way of added attributes to the
         table elements using an attributes database based on the environment
         variables. each tag checks the database for existing attributes.
+  \todo center html tables by default.
 
 *******************************************************************************/
 string

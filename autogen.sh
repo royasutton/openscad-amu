@@ -8,10 +8,7 @@ autoreconf_opts="--force --install -I m4"
 
 echo "${rootname} begin"
 
-# auto-configure if needed
-if [ ! -x configure ] ; then
-  autoreconf ${autoreconf_opts} || exit 1
-fi
+autoreconf ${autoreconf_opts} || exit 1
 
 echo "${rootname} end"
 

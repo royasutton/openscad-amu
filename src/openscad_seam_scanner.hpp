@@ -39,14 +39,11 @@
 
 #include "openscad_seam_scope.hpp"
 
-#include "boost/filesystem.hpp"
-
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include <stack>
-
-#include "config.h"
 
 namespace SEAM{
 

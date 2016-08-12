@@ -34,6 +34,10 @@
 
 #include "openscad_seam_scanner.hpp"
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 #undef  YY_DECL
 #define YY_DECL int SEAM::SEAM_Scanner::scan(void)
 

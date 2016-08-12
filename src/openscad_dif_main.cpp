@@ -49,7 +49,9 @@
 #include "boost/program_options.hpp"
 #include "boost/filesystem.hpp"
 
+#if defined(HAVE_CONFIG_H)
 #include "config.h"
+#endif
 
 using namespace std;
 
