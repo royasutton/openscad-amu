@@ -14,9 +14,29 @@ programs_help = \
 	openscad-dif.help \
 	openscad-seam.help
 
+BUILD_DATE="$(shell date)"
+BUILD_ARCH="$(shell uname -sr) ($(shell uname -m))"
+
+AM_CXXFLAGS = \
+	-W -Wall -Wextra -Wno-sign-compare \
+	-ansi -U__STRICT_ANSI__
+
+AM_CPPFLAGS = \
+	$(BOOST_CPPFLAGS) \
+	-D__BUILD_DATE__=\"$(BUILD_DATE)\" \
+	-D__BUILD_ARCH__=\"$(BUILD_ARCH)\" \
+	-D__BASH_PATH__=\"$(BASH_PATH)\" \
+	-D__MAKE_PATH__=\"$(MAKE_PATH)\" \
+	-D__LIB_PATH__=\"$(pkgdatadir)/$(PACKAGE_VERSION)\" \
+	-D__OPENSCAD_PATH__=\"$(OPENSCAD_PATH)\"
+
+AM_LDFLAGS = \
+	$(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_FILESYSTEM_LIBS) \
+	$(BOOST_SYSTEM_LDFLAGS) $(BOOST_SYSTEM_LIBS) \
+	$(BOOST_PROGRAM_OPTIONS_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIBS)
+
 # bash-dif
 bash_dif_SOURCES = bash_dif_lexer.cc
-bash_dif_CXXFLAGS = -W -Wall -Wextra -ansi
 bash_dif_CPPFLAGS =
 bash_dif_LDFLAGS =
 
@@ -30,18 +50,8 @@ openscad_dif_SOURCES = \
 	openscad_dif_util.cpp \
 	openscad_dif_main.cpp
 
-openscad_dif_CXXFLAGS = -W -Wall -Wextra -ansi
-openscad_dif_CPPFLAGS = \
-	$(BOOST_CPPFLAGS) \
-	-D__BASH_PATH__=\"$(BASH_PATH)\" \
-	-D__MAKE_PATH__=\"$(MAKE_PATH)\" \
-	-D__LIB_PATH__=\"$(pkgdatadir)/$(PACKAGE_VERSION)\" \
-	-D__OPENSCAD_PATH__=\"$(OPENSCAD_PATH)\"
-
 openscad_dif_LDFLAGS = \
-	$(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_FILESYSTEM_LIBS) \
-	$(BOOST_SYSTEM_LDFLAGS) $(BOOST_SYSTEM_LIBS) \
-	$(BOOST_PROGRAM_OPTIONS_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIBS) \
+	$(AM_LDFLAGS) \
 	$(BOOST_REGEX_LDFLAGS) $(BOOST_REGEX_LIBS)
 
 # openscad-seam
@@ -51,19 +61,6 @@ openscad_seam_SOURCES = \
 	openscad_seam_scanner.hpp \
 	openscad_seam_scanner.cpp \
 	openscad_seam_main.cpp
-
-openscad_seam_CXXFLAGS = -W -Wall -Wextra -ansi
-openscad_seam_CPPFLAGS = \
-	$(BOOST_CPPFLAGS) \
-	-D__BASH_PATH__=\"$(BASH_PATH)\" \
-	-D__MAKE_PATH__=\"$(MAKE_PATH)\" \
-	-D__LIB_PATH__=\"$(pkgdatadir)/$(PACKAGE_VERSION)\" \
-	-D__OPENSCAD_PATH__=\"$(OPENSCAD_PATH)\"
-
-openscad_seam_LDFLAGS = \
-	$(BOOST_FILESYSTEM_LDFLAGS) $(BOOST_FILESYSTEM_LIBS) \
-	$(BOOST_SYSTEM_LDFLAGS) $(BOOST_SYSTEM_LIBS) \
-	$(BOOST_PROGRAM_OPTIONS_LDFLAGS) $(BOOST_PROGRAM_OPTIONS_LIBS)
 
 SUFFIXES = .bash .makefile .stamp .help
 

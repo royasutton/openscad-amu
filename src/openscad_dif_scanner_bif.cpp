@@ -163,24 +163,27 @@ ODIF::ODIF_Scanner::bif_shell(void)
   if ( flag_stde )
     scmd.append(" 2>&1");
 
+  string result;
+
+#ifdef HAVE_POPEN
   FILE* pipe;
   char buffer[128];
 
-  // XXX replace popen _popen for windows/cygwin?.
   pipe = popen( scmd.c_str(), "r" );
 
   if (!pipe)
     return( amu_error_msg("popen() failed for " + scmd) );
 
-  string result;
   while ( !feof(pipe) )
   {
     if ( fgets(buffer, 128, pipe) != NULL )
         result.append( buffer );
   }
 
-  // XXX replace pclose with _pclose for windows/cygwin?.
   pclose(pipe);
+#else /* HAVE_POPEN */
+  return( amu_error_msg("popen() not available, unable to execute " + scmd) );
+#endif /* HAVE_POPEN */
 
   if (flag_rmnl)
     result = replace_chars(result, "\n\r", ' ');

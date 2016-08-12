@@ -1,35 +1,35 @@
 #
-# configure
+# configure derivatives
 #
-aclocal.m4
-autom4te.cache/
+
+/aclocal.m4
+/autom4te.cache/
+/configure
+/m4/libtool.m4
+/m4/ltoptions.m4
+/m4/ltsugar.m4
+/m4/ltversion.m4
+/m4/lt~obsolete.m4
+/scripts/
+
 config.h.in
-config.h.in~
-configure
-m4/libtool.m4
-m4/ltoptions.m4
-m4/ltsugar.m4
-m4/ltversion.m4
-m4/lt~obsolete.m4
-scripts/
 Makefile.in
-share/examples/Makefile.in
-share/lib/Makefile.in
-share/mk/Makefile.in
-share/scripts/Makefile.in
-src/Makefile.in
-tests/Makefile.in
 
 #
-# in-place build
+# build derivatives (in-place)
 #
 
+#
+# build derivatives (sub-directory)
+#
+
+/build/
 
 #
-# separate build
+# build scripts
 #
-bs/
-build/
+
+/bs/
 
 #
 # eof

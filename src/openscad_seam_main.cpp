@@ -275,6 +275,9 @@ main(int argc, char** argv)
                << "    bug report: " << PACKAGE_BUGREPORT << endl
                << "      site url: " << PACKAGE_URL << endl
                << endl
+               << "    build date: " << __BUILD_DATE__ << endl
+               << "  architecture: " << __BUILD_ARCH__ << endl
+               << endl
                << "      lib path: " << __LIB_PATH__ << endl
                << " openscad path: " << __OPENSCAD_PATH__ << endl
                << "     bash path: " << __BASH_PATH__ << endl

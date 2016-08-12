@@ -17,16 +17,16 @@ AC_CONFIG_MACRO_DIR([m4])
 
 # omitting files: AUTHORS, ChangeLog, NEWS, and README
 # therefore does not conform to the typical gnu standards
-# using the [foreign] option
+# using init option [foreign]
 AM_INIT_AUTOMAKE([foreign])
 
 ##############################################################################
-# Default install directory
+# default: install prefix
 ##############################################################################
 #AC_PREFIX_DEFAULT($HOME/projects/cnc)
 
 ##############################################################################
-# Checking for required programs
+# check: required build tools
 ##############################################################################
 AC_PROG_CC
 AC_PROG_CXX
@@ -41,6 +41,9 @@ if test "x$LEX" != xflex; then
 	AC_SUBST([LEXLIB], [''])
 fi
 
+##############################################################################
+# check: required programs
+##############################################################################
 # gnu make command name
 AC_MSG_CHECKING([GNU Make])
 AX_CHECK_GNU_MAKE()
@@ -109,7 +112,7 @@ else
 fi
 
 ##############################################################################
-# Checking for required libraries
+# check: required libraries
 ##############################################################################
 AC_MSG_CHECKING([for required boost libraries])
 BOOST_REQUIRE([1.35.0])
@@ -119,18 +122,23 @@ BOOST_PROGRAM_OPTIONS
 BOOST_REGEX
 
 ##############################################################################
-# Create config.h
+# check: functions
 ##############################################################################
-AC_CONFIG_HEADERS([config.h])
+AC_CHECK_FUNCS([popen])
 
 ##############################################################################
-# Create Makefiles
+# create: other options
 ##############################################################################
+AC_CONFIG_HEADERS([src/config.h])
+
 AM_EXTRA_RECURSIVE_TARGETS([
 docs
 tests
 ])
 
+##############################################################################
+# create: configured files
+##############################################################################
 AC_CONFIG_FILES([
 Makefile
 
@@ -159,16 +167,20 @@ tests/Makefile
 AC_OUTPUT
 
 ##############################################################################
-# Show configuration
+# show: configuration summary
 ##############################################################################
 AC_MSG_NOTICE([
 **************************************************************************
 configuration:
 
   C++ compiler:             $CXX
-  Lexical analyser          $LEX
+  Lexical analyser:         $LEX
 
-  installation prefix:      $prefix
+  install \${prefix}:        $prefix
+  install \${exec_prefix}:   $exec_prefix
+  system config root dir:   $sysconfdir
+  system data root dir:     $datarootdir
+  binaries dir:             $bindir
 
   gnu make path:            $MAKE_PATH
   bash path:                $BASH_PATH

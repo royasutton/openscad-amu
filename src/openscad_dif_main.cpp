@@ -148,6 +148,9 @@ main(int argc, char** argv)
                << "    bug report: " << PACKAGE_BUGREPORT << endl
                << "      site url: " << PACKAGE_URL << endl
                << endl
+               << "    build date: " << __BUILD_DATE__ << endl
+               << "  architecture: " << __BUILD_ARCH__ << endl
+               << endl
                << "      lib path: " << __LIB_PATH__ << endl
                << endl;
         else
