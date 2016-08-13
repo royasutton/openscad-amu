@@ -121,7 +121,7 @@ main(int argc, char** argv)
 
       // output help and exit
       if ( vm.count("help") || (argc==1) ) {
-        cout << command_name << " v" << PACKAGE_VERSION << endl
+        cout << command_name << " " << PACKAGE_VERSION << endl
              << endl
              <<
   "Doxygen input filter for OpenSCAD source files. Can be used in conjunction\n"

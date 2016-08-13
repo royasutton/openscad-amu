@@ -355,7 +355,11 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
      titles   | "~^"
 
   \todo consider support for global image path variable stored in the
-        scanners environment variable map (varm) if needed.
+        scanners environment variable map (varm) if needed. need a way to
+        copy referenced files into the output directory (html/latex), if it
+        does not already exists there and reference the local copy. this
+        will allow the produced documentation to be compiled into more
+        portable files.
   \todo might be nice to use a more general way of added attributes to the
         table elements using an attributes database based on the environment
         variables. each tag checks the database for existing attributes.

@@ -303,7 +303,7 @@ main( int argc, char** argv ) {
   }
 
   if ( help || argc != 2 ) {
-    cout << argv[0] << " v" << PACKAGE_VERSION << endl
+    cout << argv[0] << " " << PACKAGE_VERSION << endl
          << endl
          << "Doxygen input filter for bash source files. Can be used in\n"
             "conjunction with doxygen tags INPUT_FILTER and FILTER_*." << endl

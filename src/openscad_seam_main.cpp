@@ -242,7 +242,7 @@ main(int argc, char** argv)
 
       // output help and exit
       if ( vm.count("help") || (argc==1) ) {
-        cout << command_name << " v" << PACKAGE_VERSION << endl
+        cout << command_name << " " << PACKAGE_VERSION << endl
              << endl
              <<
   "OpenSCAD Script Extractor and Auto-Make (SEAM) tool. Extracts OpenSCAD\n"
