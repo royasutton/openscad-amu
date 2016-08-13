@@ -256,7 +256,7 @@ module bearing_lbb_aim(
 
 
 /*******************************************************************************
-Begin_Scope _doc;
+Begin_Scope doc;
 
   //
   // Openscad documentation code

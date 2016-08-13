@@ -70,6 +70,9 @@ class SEAM_Scanner : public yyFlexLexer{
     //! set scanner root scope name.
     void set_rootscope( const std::string& t );
 
+    //! set the scope hierarchy joiner string.
+    void set_scopejoiner(const std::string& s) { scopejoiner = s; }
+
     //! turn scanner debugging on or off.
     void set_debug(bool f) { yy_flex_debug = f; }
 
@@ -177,6 +180,7 @@ class SEAM_Scanner : public yyFlexLexer{
     std::stack<SEAM_Scope> scope;       //!< scope stack.
 
     std::string rootscope;              //!< scanner root scope name.
+    std::string scopejoiner;            //!< scanner scope hierarchy conjoiner string.
     std::string output_prefix;          //!< scanner output path prefix.
     bool prefix_scripts;                //!< prefixing extracted scripts?
 

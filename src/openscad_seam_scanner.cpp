@@ -263,21 +263,32 @@ SEAM::SEAM_Scanner::set_rootscope( const std::string& t )
 void
 SEAM::SEAM_Scanner::begin_scope( const char t, const std::string& lm )
 {
-  string cs;
   string id = get_word( lm, 2 );
 
   // remove ';' character at end of string
   id.erase(id.length()-1, 1);
 
-  if ( t == 'r' ) cs = id;
-  else            cs = scope.top().name();
-
-  scope.push(SEAM_Scope(cs, id, t));
-
   string lt;
-  if      (t == 'a') lt = "append";
-  else if (t == 'p') lt = "prepend";
-  else               lt = "root";
+  string cs;
+
+  if      ( t == 'r' )
+  {
+    lt = "root";
+    cs = id;
+    scope.push(SEAM_Scope(cs, id, t));
+  }
+  else if ( t == 'p' )
+  {
+    lt = "prepend";
+    cs = scope.top().name();
+    scope.push(SEAM_Scope(cs, id + scopejoiner, t));
+  }
+  else   // t == 'a'
+  {
+    lt = "append";
+    cs = scope.top().name();
+    scope.push(SEAM_Scope(cs, scopejoiner + id, t));
+  }
 
   if (verbose) cout << ops << "begin scope " << lt << ":[" << id << "] "
                     << cs << " --> " << scope.top().name() << "," << endl;

@@ -30,7 +30,6 @@
   \todo add command line option to extract scripts that match specific
         scope name and script type: {MFScript and/or Openscad}.
   \todo filter the openscad-seam run summary info based on the run mode.
-  \todo support a configurable scope joiner that defaults to "_".
 
   \ingroup openscad_seam_src
 *******************************************************************************/
@@ -116,6 +115,7 @@ main(int argc, char** argv)
 
     string input;
     string scope;
+    string joiner         = "_";
     string prefix;
     int prefix_ipp        = -1;
     bool prefix_scripts   = true;
@@ -160,6 +160,9 @@ main(int argc, char** argv)
           po::value<string>(&scope),
           "Scope root name. When not specified, the input file stem "
           "name is used.")
+      ("joiner,j",
+          po::value<string>(&joiner)->default_value(joiner),
+          "Scope joiner. String used to conjoin scope hierarchies.")
       ("prefix,p",
           po::value<string>(&prefix),
           "Output prefix for derived files. This path is prepended to "
@@ -340,7 +343,7 @@ main(int argc, char** argv)
       throw std::logic_error( std::string("invalid option '--mode=" )
               + mode + "', may be one of ( count | extract | return )" );
 
-    // validate for 'extract' mode
+    // validate: 'extract' mode
     if ( mode_char == 'e' )
     {
       option_depend( vm, "prefix-ipp", "prefix");
@@ -354,7 +357,7 @@ main(int argc, char** argv)
                 + "' requires option '--target=arg'" );
     }
 
-    // validate for 'count' or 'return' modes
+    // validate: 'count' or 'return' modes
     if ( mode_char == 'c'  || mode_char == 'r' )
     {
       vector<string> va_v;
@@ -382,7 +385,7 @@ main(int argc, char** argv)
         option_set_conflict( vm, it->c_str(), ", only valid for --mode='extract'");
     }
 
-    // validate for 'return' mode
+    // validate: 'return' mode
     if ( mode_char == 'r' )
     {
       vector<string> va_v;
@@ -405,7 +408,7 @@ main(int argc, char** argv)
     {
       path input_path (input);
 
-      // scope - set to input file stem name when not specified
+      // scope: set to input file stem name when not specified
       if ( !vm.count("scope") ) {
         if ( vm.count("verbose")  )
           cout << "** root scope unspecified, assigning input file stem name..."
@@ -489,6 +492,7 @@ main(int argc, char** argv)
             << MF_FKEY("input") << MF_SSTR(input) << endl
             << MF_ENDL
             << MF_FKEY("root scope") << MF_SSTR(scope) << endl
+            << MF_FKEY("scope joiner") << MF_SSTR(joiner) << endl
             << MF_FKEY("prefix") << MF_SSTR(prefix) << endl
             << MF_FKEY("prefix-ipp") << MF_SINT(prefix_ipp) << endl
             << MF_FKEY("prefix-scripts") << MF_BOOL(prefix_scripts) << endl
@@ -539,6 +543,7 @@ main(int argc, char** argv)
       SEAM::SEAM_Scanner scanner( input, true, command_name + ": " );
 
       scanner.set_rootscope( scope );
+      scanner.set_scopejoiner( joiner );
 
       scanner.set_makefile_ext( makefile_ext );
       scanner.set_mfscript_ext( mfscript_ext );
@@ -574,6 +579,7 @@ main(int argc, char** argv)
       SEAM::SEAM_Scanner scanner( input, false, command_name + ": " );
 
       scanner.set_rootscope( scope );
+      scanner.set_scopejoiner( joiner );
       scanner.set_output_prefix( output_prefix );
       scanner.set_prefix_scripts( prefix_scripts );
 
