@@ -31,7 +31,10 @@ Install
 To make and install using the default prefix issue:
 
 $ autogen.sh
-$ configure && make && make install
+
+$ configure && make
+
+$ make install
 
 To make the documentation:
 

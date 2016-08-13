@@ -359,7 +359,6 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
   \todo might be nice to use a more general way of added attributes to the
         table elements using an attributes database based on the environment
         variables. each tag checks the database for existing attributes.
-  \todo center html tables by default.
 
 *******************************************************************************/
 string
@@ -507,7 +506,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
     string column_heading_attr  = " bgcolor=\"#E2E8F2\"";
 
     // begin table
-    result.append("<table");
+    result.append("<table align=\"center\"");
     if ( table_width.length() ) result.append(" style=\"width:" + table_width + "\"");
     result.append( table_attr );
     result.append(">");
