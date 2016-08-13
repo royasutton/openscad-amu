@@ -395,7 +395,7 @@ Begin_Scope _test;
 
     script
       Begin_Makefile_New
-        Include_Copy "${__LIBPATH__}/mk/parallel_jobs.mk"
+        Include_Copy "${__LIBPATH__}/include/parallel_jobs.mk"
         Summary  Tables  Targets  Menu_Ext
       End_Makefile;
 
@@ -436,7 +436,7 @@ Begin_Scope _document;
 
     variables
       set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"
-      add_Depend "${__LIBPATH__}/mk/parallel_jobs.mk"
+      add_Depend "${__LIBPATH__}/include/parallel_jobs.mk"
       set_Source "${__SCOPE_FILE__}"   set_Prefix "${__PREFIX__}"
 
       set_Ext "png"
@@ -446,7 +446,7 @@ Begin_Scope _document;
 
     script
       Begin_Makefile
-        Include "${__LIBPATH__}/mk/parallel_jobs.mk"
+        Include "${__LIBPATH__}/include/parallel_jobs.mk"
         Summary  Tables  Targets  Menu
       End_Makefile;
 

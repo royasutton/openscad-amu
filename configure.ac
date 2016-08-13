@@ -151,7 +151,7 @@ share/examples/vehicle.doxyfile
 share/lib/Makefile
 share/lib/Doxyfile
 
-share/mk/Makefile
+share/include/Makefile
 
 share/scripts/Makefile
 share/scripts/Doxyfile

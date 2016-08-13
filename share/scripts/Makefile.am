@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# top_srcdir/share
+# top_srcdir/share/scripts
 #
 ##############################################################################
 
@@ -50,8 +50,6 @@ uninstall-local:
 		rm -fv $(install_path)/$$f \
 	; done
 	-rmdir -v '$(install_path)'
-	-rmdir -v '$(version_path)'
-	-rmdir -v '$(root_path)'
 
 CLEANFILES = \
 	doxygen.stamp \

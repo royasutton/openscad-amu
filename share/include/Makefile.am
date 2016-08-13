@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# top_srcdir/share/mk
+# top_srcdir/share/include
 #
 ##############################################################################
 
@@ -15,7 +15,7 @@ EXTRA_DIST = \
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
 
-install_path = $(version_path)/mk
+install_path = $(version_path)/include
 
 ##############################################################################
 # targets

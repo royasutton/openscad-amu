@@ -9,10 +9,21 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = \
 	src \
 	share/scripts \
-	share/mk \
+	share/include \
 	share/examples \
 	share/lib \
 	tests
+
+root_path = $(DESTDIR)$(pkgdatadir)
+version_path = $(root_path)/$(PACKAGE_VERSION)
+
+##############################################################################
+# targets
+##############################################################################
+
+uninstall-local:
+	-rmdir -v '$(version_path)'
+	-rmdir -v '$(root_path)'
 
 ##############################################################################
 # eof
