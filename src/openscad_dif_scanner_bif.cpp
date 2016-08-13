@@ -47,41 +47,50 @@ using namespace std;
 
   \details
 
-    Create a local copy of the current variable map (scope), add all named
-    variable arguments pairs to local variable scope (name=value), then
-    form the output text by appending each each positional argument value
-    (separated by a single space character), skipping the function name,
-    to a string and recursively expanding all variables in the text. Escaped
-    variables are reduced and checked during subsequent expansions. The
-    expanded string is returned when there are no variable substitutions
-    or escaped variable reductions in the text.
+    Create a local copy of the current variable map (scope). Then process
+    each argument one-by-one (skipping function name):
+
+    Named argument value pairs are stored to the local variable scope
+    (name=value).
+
+    Positional arguments are expanded using the local variable map and
+    appended to the return result. Escaped variables are reduced and
+    checked during subsequent expansions.
+
+    The result is returned when there are no more named or positional
+    arguments.
 
   \todo might be nice to have a flag that allows for local assignments to
         be stored in the global environment variable map (++global).
+        this would not offer new capability, just shorter syntax.
+  \todo might be nice to have a configurable word joiner thats stored in
+        the variable map that defaults to " " (joiner="<string>").
+        this would offer new capability.
 
 *******************************************************************************/
 string
 ODIF::ODIF_Scanner::bif_eval(void)
 {
-  // create local variable scope map
+  // create local copy of the global variable scope map
   env_var vm = varm;
-
-  // add all argument name=value pairs to local variable scope
-  vector<string> nv = fx_argv.names_v(true, false);
-  for ( vector<string>::iterator it=nv.begin(); it!=nv.end(); ++it )
-    vm.store( *it, fx_argv.arg( *it ) );
 
   string result;
 
-  // process each positional argument value, skip function name (position zero)
-  vector<string> pv = fx_argv.values_v(false, true);
-  for ( vector<string>::iterator it=pv.begin()+1; it!=pv.end(); ++it ) {
-    // expand variables in the positional argument value text
-    string epat = vm.expand_text( *it );
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    if ( it->positional )     // expand positional argument value string
+    {
+      if ( result.length() != 0 ) result.append(" ");
 
-    if ( result.length() != 0 ) result.append(" ");
-
-    result.append( epat );
+      result.append( vm.expand_text( it->value ) );
+    }
+    else                      // add name=value pairs to variable scope
+    {
+      vm.store( it->name, it->value );
+    }
   }
 
   return( result );

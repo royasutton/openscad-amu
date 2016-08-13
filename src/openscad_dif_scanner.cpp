@@ -27,7 +27,7 @@
   \brief
     OpenSCAD Doxygen input filter scanner class source.
 
-  \todo would be interesting if the the filter 'dif' could communicate
+  \todo would be interesting if the filter 'dif' could communicate
         variable definitions to the extractor 'seam'. dif would need to
         generate a state file that could be read by seam. would help
         reduce repeating combination terms.
