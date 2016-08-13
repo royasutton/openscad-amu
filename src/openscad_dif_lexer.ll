@@ -27,10 +27,6 @@
   \brief
     Doxygen input filter lexical analyzer source for OpenSCAD script.
 
-  \todo honor Doxygen \verbatim \endverbatim command state (amu should ECHO
-        while between theses tags)... or support a double back-slash so
-        that commands can be escaped.
-
   \ingroup openscad_dif_src
 *******************************************************************************/
 
@@ -77,6 +73,7 @@ incr_var_post                     {id}("++"|"--")
 
 amu_func                          [\\@](?i:amu)_{id}
 amu_define                        [\\@](?i:amu_define)
+amu_escaped                       "\\"[\\@]
 
 %%
 
@@ -99,6 +96,9 @@ amu_define                        [\\@](?i:amu_define)
 <COMMENT><<EOF>>                  { abort("unterminated comment"); }
 <COMMENT>{amu_define}             { def_init(); yy_push_state(AMUMDEFINE); }
 <COMMENT>{amu_func}               { fx_init(); yy_push_state(AMUFUNC); }
+<COMMENT>{amu_escaped}            { /* remove prefixed escape char, output the rest */
+                                    string mt = YYText();
+                                    scanner_output( mt.substr(1,mt.length()-1) ); }
 <COMMENT>{nr}                     { scanner_echo(); }
 <COMMENT>.                        { scanner_echo(); }
 

@@ -194,7 +194,11 @@
   \todo a syntax highlighter extension would be nice: Doxygen with
         amu extensions and amu auxilary script scopes for OpenSCAD and
         MFScript (extended BASH).
-
+  \todo create an template that checks the system for required
+        dependencies and installs or report missing components.
+        should have a few example cases: single library, design, etc.
+        should compile and install library and documentation into
+        a standard location (ie: ~/.local/share/OpenSCAD/libraries)
 ###############################################################################/
 
 

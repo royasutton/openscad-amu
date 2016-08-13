@@ -315,7 +315,7 @@ ODIF::ODIF_Scanner::fx_set_tovar(void)
 void
 ODIF::ODIF_Scanner::fx_set_arg_name(void)
 {
-  // remove '=' from argument name in matched text (last character)
+  // remove '=' appended argument name in matched text (ie: 'id=' last character)
   string mt = YYText();
   fx_argv.set_next_name( mt.substr(0,mt.length()-1) );
 }
