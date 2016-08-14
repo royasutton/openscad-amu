@@ -690,9 +690,9 @@ function add_targets_dirs()
 # \returns void
 #
 # \details
-#   Output explicit make targets of the form all<suffix>, list<suffix>, and
-#   clean<suffix> for the specified category. The suffix for each category
-#   is shown in the following table.
+#   Output explicit make targets of the form all<suffix>, echo<suffix>,
+#   list<suffix>, and clean<suffix> for the specified category. The suffix
+#   for each category is shown in the following table.
 #
 #   category | suffix
 #   :-------:|:------------------------------
