@@ -362,7 +362,7 @@ function add_target()
   print_textbox -hvc '#' -bb
 
   # append target to each category
-  for tcs in "" "_${srn}" "_${srn}_${output_ext}" ; do
+  for tcs in "_${srn}_${output_ext}" "_${srn}" "" ; do
     print_m -j
     print_m -j targets${tcs} += $filename_out
     print_m -j cleanfiles${tcs} += $filename_time
@@ -475,9 +475,9 @@ function add_target_convert()
 
   # append target lists
   print_m -j
-  print_m -j targets += $filename_out
-  print_m -j targets_${srn} += $filename_out
   print_m -j targets_${srn}_${new_sdir} += $filename_out
+  print_m -j targets_${srn} += $filename_out
+  print_m -j targets += $filename_out
 
   # target recipe
   print_m -j
@@ -709,13 +709,42 @@ function add_targets_menu()
   {
     declare local suffix=$1
 
+    # all<*>:
     print_m -j
     print_m -j .PHONY : all$suffix
     print_m -j all$suffix : \$\{targets$suffix\}
 
+    # echo_all<*>:
     print_m -j
-    print_m -j .PHONY : list$suffix
-    print_m -j list$suffix :
+    print_m -j .PHONY : echo_all$suffix
+    print_m -j echo_all$suffix :
+    print_m -j -e "\t" "@echo \"\${targetsdir$suffix} \${targets$suffix} \${cleanfiles$suffix}\""
+
+    # echo_targetsdir<*>:
+    print_m -j
+    print_m -j .PHONY : echo_targetsdir$suffix
+    print_m -j echo_targetsdir$suffix :
+    print_m -j -e "\t" "@echo \"\${targetsdir$suffix}\""
+
+    # echo_targets<*>:
+    print_m -j
+    print_m -j .PHONY : echo_targets$suffix
+    print_m -j echo_targets$suffix :
+    print_m -j -e "\t" "@echo \"\${targets$suffix}\""
+
+    # echo_cleanfiles<*>:
+    print_m -j
+    print_m -j .PHONY : echo_cleanfiles$suffix
+    print_m -j echo_cleanfiles$suffix :
+    print_m -j -e "\t" "@echo \"\${cleanfiles$suffix}\""
+
+    # list_all<*>:
+    print_m -j
+    print_m -j .PHONY : list_all$suffix
+    print_m -j list_all$suffix :
+    print_m -j -e "\t" "@echo ; echo \"# [ targetsdir$suffix ] (\$(words \${targetsdir$suffix}))\""
+    print_m -j -e "\t" "@for x in \$(shell seq 80); do echo -n \"#\" ; done ; echo"
+    print_m -j -e "\t" "@\$(foreach v,\${targetsdir$suffix},echo \${v};)"
 
     print_m -j -e "\t" "@echo ; echo \"# [ targets$suffix ] (\$(words \${targets$suffix}))\""
     print_m -j -e "\t" "@for x in \$(shell seq 80); do echo -n \"#\" ; done ; echo"
@@ -725,14 +754,34 @@ function add_targets_menu()
     print_m -j -e "\t" "@for x in \$(shell seq 80); do echo -n \"#\" ; done ; echo"
     print_m -j -e "\t" "@\$(foreach v,\${cleanfiles$suffix},echo \${v};)"
 
+    # list_targetsdir<*>:
+    print_m -j
+    print_m -j .PHONY : list_targetsdir$suffix
+    print_m -j list_targetsdir$suffix :
     print_m -j -e "\t" "@echo ; echo \"# [ targetsdir$suffix ] (\$(words \${targetsdir$suffix}))\""
     print_m -j -e "\t" "@for x in \$(shell seq 80); do echo -n \"#\" ; done ; echo"
     print_m -j -e "\t" "@\$(foreach v,\${targetsdir$suffix},echo \${v};)"
 
+    # list_targets<*>:
+    print_m -j
+    print_m -j .PHONY : list_targets$suffix
+    print_m -j list_targets$suffix :
+    print_m -j -e "\t" "@echo ; echo \"# [ targets$suffix ] (\$(words \${targets$suffix}))\""
+    print_m -j -e "\t" "@for x in \$(shell seq 80); do echo -n \"#\" ; done ; echo"
+    print_m -j -e "\t" "@\$(foreach v,\${targets$suffix},echo \${v};)"
+
+    # list_cleanfiles<*>:
+    print_m -j
+    print_m -j .PHONY : list_cleanfiles$suffix
+    print_m -j list_cleanfiles$suffix :
+    print_m -j -e "\t" "@echo ; echo \"# [ cleanfiles$suffix ] (\$(words \${cleanfiles$suffix}))\""
+    print_m -j -e "\t" "@for x in \$(shell seq 80); do echo -n \"#\" ; done ; echo"
+    print_m -j -e "\t" "@\$(foreach v,\${cleanfiles$suffix},echo \${v};)"
+
+    # clean<*>:
     print_m -j
     print_m -j .PHONY : clean$suffix
     print_m -j clean$suffix :
-
     print_m -j -e "\t" "-@test -z \"\${targets$suffix}\" || $sc_rm $sc_rm_opts \${targets$suffix}"
     print_m -j -e "\t" "-@test -z \"\${cleanfiles$suffix}\" || $sc_rm $sc_rm_opts \${cleanfiles$suffix}"
     print_m -j -e "\t" "-@test -z \"\${targetsdir$suffix}\" || $sc_rmdir $sc_rmdir_opts \${targetsdir$suffix}"
