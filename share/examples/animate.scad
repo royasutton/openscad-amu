@@ -90,7 +90,7 @@ module vehicle( type="car", bodycolor="yellow", cabcolor="lightgray",
 
 /***************************************************************************//**
 
-Begin_Scope _move;
+Begin_Scope move;
   Begin_OpenSCAD;
     use <animate.scad>;
     position=0;
@@ -118,7 +118,7 @@ Begin_Scope _move;
   End_MFScript;
 End_Scope;
 
-Begin_Scope _rotate;
+Begin_Scope rotate;
   Begin_OpenSCAD;
     use <animate.scad>;
     vehicle();

@@ -360,7 +360,7 @@ module vehicle( type="car", bodycolor="yellow", cabcolor="lightgray",
 
 /***************************************************************************//**
 
-Begin_Scope _test;
+Begin_Scope test;
 
   Begin_OpenSCAD;
 
@@ -416,7 +416,7 @@ Begin_Scope _test;
 
 End_Scope;
 
-Begin_Scope _document;
+Begin_Scope document;
 
   Begin_OpenSCAD;
 
