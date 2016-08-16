@@ -95,7 +95,7 @@ main(int argc, char** argv)
       ("lib-path",
           po::value<string>(&lib_path)->default_value(lib_path),
           "Makefile script library path.")
-      ("debug",
+      ("debug-scanner",
           "Run scanner in debug mode.\n")
       ("verbose,V",
           "Run in verbose mode.")
@@ -180,7 +180,7 @@ main(int argc, char** argv)
     ODIF::ODIF_Scanner scanner( input, command_name + ": " );
 
     scanner.set_lib_path( lib_path );
-    scanner.set_debug( vm.count("debug")>0 );
+    scanner.set_debug( vm.count("debug-scanner")>0 );
 
     while( scanner.scan() != 0 )
       ;

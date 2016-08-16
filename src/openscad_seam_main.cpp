@@ -219,7 +219,7 @@ main(int argc, char** argv)
       ("config,c",
           po::value<string>(&config),
           "Configuration file with one or more option value pairs.\n")
-      ("debug",
+      ("debug-scanner",
           "Run scanner in debug mode.\n")
       ("verbose,V",
           "Run in verbose mode.")
@@ -390,7 +390,7 @@ main(int argc, char** argv)
     {
       vector<string> va_v;
 
-      va_v.push_back("debug");
+      va_v.push_back("debug-scanner");
       va_v.push_back("verbose");
 
      // make sure none of these options have been specified
@@ -525,7 +525,7 @@ main(int argc, char** argv)
             << MF_ENDL
             << MF_FKEY("config file") << MF_SSTR(config) << endl
             << MF_ENDL
-            << MF_FKEY("debug") << MF_BOOL((vm.count("debug")>0)) << endl
+            << MF_FKEY("debug-scanner") << MF_BOOL((vm.count("debug-scanner")>0)) << endl
             << MF_FKEY("verbose") << MF_BOOL((vm.count("verbose")>0)) << endl
             << endl;
     }
@@ -549,7 +549,7 @@ main(int argc, char** argv)
       scanner.set_mfscript_ext( mfscript_ext );
       scanner.set_openscad_ext( openscad_ext );
 
-      scanner.set_debug( vm.count("debug")>0 );
+      scanner.set_debug( vm.count("debug-scanner")>0 );
       scanner.set_verbose( vm.count("verbose")>0 );
 
       while( scanner.scan() != 0 )
@@ -601,7 +601,7 @@ main(int argc, char** argv)
       scanner.set_run( run );
       scanner.set_make( make );
 
-      scanner.set_debug( vm.count("debug")>0 );
+      scanner.set_debug( vm.count("debug-scanner")>0 );
       scanner.set_verbose( vm.count("verbose")>0 );
 
       while( scanner.scan() != 0 )
