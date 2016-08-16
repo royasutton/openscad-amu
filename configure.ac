@@ -142,16 +142,20 @@ tests
 AC_CONFIG_FILES([
 Makefile
 
+share/Makefile
+
 share/examples/Makefile
 share/examples/convert.bash
 share/examples/hello_world.bash
 share/examples/log_segregate.bash
 share/examples/vehicle.doxyfile
 
-share/lib/Makefile
-share/lib/Doxyfile
+share/functions/Makefile
 
 share/include/Makefile
+
+share/lib/Makefile
+share/lib/Doxyfile
 
 share/scripts/Makefile
 share/scripts/Doxyfile

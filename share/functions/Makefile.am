@@ -1,11 +1,11 @@
 ##############################################################################
 #
-# top_srcdir/share/include
+# top_srcdir/share/functions
 #
 ##############################################################################
 
 files = \
-	parallel_jobs.mk
+	amu_date
 
 files_am =
 
@@ -15,7 +15,7 @@ EXTRA_DIST = \
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
 
-install_path = $(version_path)/include
+install_path = $(version_path)/functions
 
 ##############################################################################
 # targets
@@ -26,7 +26,7 @@ install_path = $(version_path)/include
 install-data-local: | '$(install_path)'
 	( cd ${srcdir} && \
 		for f in $(files); do \
-			$(INSTALL_DATA) $$f '$(install_path)' \
+			$(INSTALL_SCRIPT) $$f '$(install_path)' \
 		; done \
 	) && \
 	( cd ${builddir} && \

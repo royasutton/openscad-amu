@@ -37,6 +37,8 @@
 
 #include "openscad_dif_scanner.hpp"
 
+#include "boost/filesystem.hpp"
+
 #include <set>
 
 #if defined(HAVE_CONFIG_H)
@@ -253,9 +255,10 @@ ODIF::ODIF_Scanner::fx_init(void)
 
   \details
 
-  \todo support external commands of the form \amu_(external) where
-        the command 'external' may be placed in the a subdirectory of
-        the LIB_PATH. prepare and pass the arguments.
+    Compare name with each of the built-in functions. If does not match one
+    of the built-in functions, check for function in ${lib_path}/functions.
+    If matched is found, call and obtain result. Copy result to output
+    or store to named results variable.
 
 *******************************************************************************/
 void
@@ -263,28 +266,90 @@ ODIF::ODIF_Scanner::fx_pend(void)
 {
   fi_eline = lineno();
 
-  bool found = false;
-
   string result;
+  bool has_result = false;
 
-  if      (fx_name.compare("eval")==0)        { found=true; result=bif_eval(); }
-  else if (fx_name.compare("shell")==0)       { found=true; result=bif_shell(); }
-  else if (fx_name.compare("combine")==0)     { found=true; result=bif_combine(); }
-  else if (fx_name.compare("image_table")==0) { found=true; result=bif_image_table(); }
-  else if (fx_name.compare("file_viewer")==0) { found=true; result=bif_file_viewer(); }
-  else                                        { found=false; }
-
-  if ( found )
+  /* check build-in functions */
+  if      (fx_name.compare("eval")==0)        { has_result=true; result=bif_eval(); }
+  else if (fx_name.compare("shell")==0)       { has_result=true; result=bif_shell(); }
+  else if (fx_name.compare("combine")==0)     { has_result=true; result=bif_combine(); }
+  else if (fx_name.compare("image_table")==0) { has_result=true; result=bif_image_table(); }
+  else if (fx_name.compare("file_viewer")==0) { has_result=true; result=bif_file_viewer(); }
+  else
   {
-    // output to scanner or store to variable map
+    /* check external function */
+    namespace bfs=boost::filesystem;
+    bfs::path exfx_path;
+
+    exfx_path  = lib_path;
+    exfx_path /= "functions";
+    exfx_path /= "amu_" + fx_name;
+
+    if ( bfs::exists( exfx_path ) )
+    {
+      if ( bfs::is_regular_file( exfx_path ) )
+      {
+        string scmd = exfx_path.string();
+
+        // append arguments
+        typedef vector<func_args::arg_term>::iterator fa_iter;
+        for ( fa_iter it=fx_argv.argv.begin()+1; it!=fx_argv.argv.end(); ++it ) {
+          scmd.append( " " );
+          if ( it->positional ) scmd.append( it->value );
+          else                  scmd.append( it->name + "=" + it->value );
+        }
+
+        if ( debug_filter ) {
+          scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
+          scanner_output( scmd );
+          scanner_output( "\n\\endif\n" );
+        }
+
+#ifdef HAVE_POPEN
+        FILE* pipe;
+        char buffer[128];
+
+        pipe = popen( scmd.c_str(), "r" );
+
+        if (!pipe)
+          result = "popen() failed for " + scmd;
+        else
+        {
+          has_result=true;
+
+          while ( !feof(pipe) )
+          {
+            if ( fgets(buffer, 128, pipe) != NULL )
+                result.append( buffer );
+          }
+
+          pclose(pipe);
+        }
+#else /* HAVE_POPEN */
+        result = "popen() not available, unable to execute " + scmd;
+#endif /* HAVE_POPEN */
+
+      }
+      else
+      {
+        result = exfx_path.string() + " is not a regular file.";
+      }
+    }
+    else
+    {
+      /* built-in not matched and external function does not exists */
+      result = "unknown function.";
+    }
+  }
+
+  if ( has_result )
+  {
+    // output result to scanner or store to variable map
     if ( fx_tovar.length() == 0 )
       scanner_output( result );
     else {
       varm.store(fx_tovar, result);
 
-      // filter debugging:
-      // copy assignment to output within a conditional documentation section
-      // ### THIS INSERTS LINES INTO THE TEXT WHICH IS NOT RECOMMENDED BY DOXYGEN ###
       // XXX: make output more portable: (cr, lf, cr+lf)
       if ( debug_filter ) {
         scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
@@ -295,9 +360,7 @@ ODIF::ODIF_Scanner::fx_pend(void)
   }
   else
   {
-    string et = amu_error_msg("unknown function.");
-
-    scanner_output( et );
+    scanner_output( amu_error_msg(result) );
   }
 
   // output blank lines to maintain file length when functions are

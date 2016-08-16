@@ -1,0 +1,66 @@
+#/bin/bash
+## openscad_dif external filter function example.
+#/##############################################################################
+#
+#   \file   amu_(date)
+#
+#   \author Roy Allen Sutton <royasutton@hotmail.com>.
+#   \date   2016
+#
+#   \copyright
+#     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#     (https://github.com/royasutton/openscad-amu)).
+#
+#     openscad-amu is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     openscad-amu is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#     for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+#   \details
+#
+#     Openscad Doxygen input filter external function example. Can be
+#     used to inset the current date into the filtered source file.
+#
+#   \warning
+#
+#     It is important to not insert any newlines into the output so as not
+#     to change the number of lines in the filtered file.
+#
+#   \ingroup openscad_dif
+###############################################################################/
+
+while [ $# -gt 0 ] ; do
+  case $1 in
+  d|date)       echo -n "$(date +%y%m%d)"                  ;;
+  y|year)       echo -n "$(date +%y)"                      ;;
+  m|month)      echo -n "$(date +%m)"                      ;;
+  a|day)        echo -n "$(date +%d)"                      ;;
+
+  t|time)       echo -n "$(date +%H%M%S)"                  ;;
+  h|hour)       echo -n "$(date +%H)"                      ;;
+  i|minute)     echo -n "$(date +%M)"                      ;;
+  s|second)     echo -n "$(date +%S)"                      ;;
+
+    p|space)    echo -n " "                                ;;
+  :|c|colon)    echo -n ":"                                ;;
+  -|l|dash)     echo -n "-"                                ;;
+
+  r|string)     echo -n "$2"                       ; shift ;;
+  *)            echo -n "[$1] invalid."                    ;;
+  esac
+
+  shift 1
+done
+
+#==============================================================================
+# eof
+#==============================================================================
