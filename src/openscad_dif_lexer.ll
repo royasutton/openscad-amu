@@ -135,6 +135,7 @@ amu_escaped                       "\\"[\\@]
 <FUNCARGSQ,FUNCARGDQ>\\\"         { apt(); fx_app_qarg_escaped(); }
 <FUNCARGSQ,FUNCARGDQ>\\{id_var}   { apt(); fx_app_qarg_escaped(); }
 <FUNCARGSQ,FUNCARGDQ>{id_var}     { apt(); fx_app_qarg_expanded(); }
+<FUNCARGSQ,FUNCARGDQ>{nr}         { apt(); fx_app_qarg(); }
 <FUNCARGSQ,FUNCARGDQ>.            { apt(); fx_app_qarg(); }
 <FUNCARGSQ><<EOF>>                { abort("unterminated single quote", fi_bline); }
 <FUNCARGDQ><<EOF>>                { abort("unterminated double quote", fi_bline); }
