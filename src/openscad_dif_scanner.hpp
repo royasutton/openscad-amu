@@ -73,6 +73,9 @@ class ODIF_Scanner : public yyFlexLexer{
     //! turn scanner debugging on or off.
     void set_debug(bool f) { yy_flex_debug = f; }
 
+    //! turn filter debugging output on or off.
+    void set_debug_filter(bool f) { debug_filter = f; }
+
     //! set the output prefix text string.
     void set_ops(const std::string& s) { ops = s; }
     //! get the output prefix text string.
@@ -86,6 +89,7 @@ class ODIF_Scanner : public yyFlexLexer{
   private:
     // scanner
     bool scanner_output_on;             //!< scanner output on.
+    bool debug_filter;                  //!< filter debugging output.
 
     std::string ops;                    //!< output prefix string.
 

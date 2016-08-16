@@ -53,6 +53,7 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
 
   input_name = f;
   scanner_output_on = true;
+  debug_filter = false;
 
   init();
 }
@@ -281,14 +282,15 @@ ODIF::ODIF_Scanner::fx_pend(void)
     else {
       varm.store(fx_tovar, result);
 
-      // debugging: output assignment within a conditional documentation section
+      // filter debugging:
+      // copy assignment to output within a conditional documentation section
       // ### THIS INSERTS LINES INTO THE TEXT WHICH IS NOT RECOMMENDED BY DOXYGEN ###
       // XXX: make output more portable: (cr, lf, cr+lf)
-      /*
-        scanner_output( "\n\\if __COPY_TOVAR_DEBUG_TO_OUTPUT__\n" );
+      if ( debug_filter ) {
+        scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
         scanner_output( fx_tovar + "=[" + result + "]" );
         scanner_output( "\n\\endif\n" );
-      */
+      }
     }
   }
   else

@@ -96,7 +96,9 @@ main(int argc, char** argv)
           po::value<string>(&lib_path)->default_value(lib_path),
           "Makefile script library path.")
       ("debug-scanner",
-          "Run scanner in debug mode.\n")
+          "Run scanner in debug mode.")
+      ("debug-filter",
+          "Turn on filter debugging.\n")
       ("verbose,V",
           "Run in verbose mode.")
       ("version,v",
@@ -181,6 +183,7 @@ main(int argc, char** argv)
 
     scanner.set_lib_path( lib_path );
     scanner.set_debug( vm.count("debug-scanner")>0 );
+    scanner.set_debug_filter( vm.count("debug-filter")>0 );
 
     while( scanner.scan() != 0 )
       ;
