@@ -209,13 +209,13 @@ main(int argc, char** argv)
           "GNU Make executable path.\n")
       ("makefile-ext",
           po::value<string>(&makefile_ext)->default_value(makefile_ext),
-          "Makefile file extention.")
+          "Makefile file extension.")
       ("mfscript-ext",
           po::value<string>(&mfscript_ext)->default_value(mfscript_ext),
-          "Makefile scripts file extention.")
+          "Makefile scripts file extension.")
       ("openscad-ext",
           po::value<string>(&openscad_ext)->default_value(openscad_ext),
-          "OpenSCAD scripts file extention.\n")
+          "OpenSCAD scripts file extension.\n")
       ("config,c",
           po::value<string>(&config),
           "Configuration file with one or more option value pairs.\n")
