@@ -188,26 +188,6 @@ ODIF::ODIF_Scanner::unquote(const string &s)
 {
   string r = s;
 
-  /*
-  // assumes quotes exists as first and last characters if any
-
-  // check if string has at least two characters
-  if ( s.length()>1 ) {
-    // check if first character is ['] or ["]
-    if ( s.at(0) == '\'' || s.at(s.length()-1) == '\"' ) {
-      // now check if first and last characters match
-      if ( s.at(0) == s.at(s.length()-1) ) {
-        // check for quoted NULL ""
-        if ( s.length() == 2 )
-          r.clear();
-        else
-          // update 'r' with removed the first and last characters
-          r = s.substr( 1, s.length()-2 );
-      }
-    }
-  }
-  */
-
   // search substring for first and last quote characters if any
 
   size_t fp = s.find_first_of("\"\'");
@@ -350,7 +330,6 @@ ODIF::ODIF_Scanner::fx_pend(void)
     else {
       varm.store(fx_tovar, result);
 
-      // XXX: make output more portable: (cr, lf, cr+lf)
       if ( debug_filter ) {
         scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
         scanner_output( fx_tovar + "=[" + result + "]" );
@@ -365,8 +344,7 @@ ODIF::ODIF_Scanner::fx_pend(void)
 
   // output blank lines to maintain file length when functions are
   // broken across multiple lines (don't begin and end on the same line).
-  for(size_t i=fi_bline; i<fi_eline; i++)
-    scanner_output("\n");  // XXX: make output more portable: (cr, lf, cr+lf)
+  for(size_t i=fi_bline; i<fi_eline; i++) scanner_output("\n");
 }
 
 void
@@ -495,8 +473,7 @@ ODIF::ODIF_Scanner::def_pend(void)
 
   // output blank lines to maintain file length when definitions are
   // broken across multiple lines (don't begin and end on the same line).
-  for(size_t i=def_bline; i<def_eline; i++)
-    scanner_output("\n");  // XXX: make output more portable: (cr, lf, cr+lf)
+  for(size_t i=def_bline; i<def_eline; i++) scanner_output("\n");
 }
 
 void
