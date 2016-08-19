@@ -47,6 +47,24 @@ using namespace std;
 namespace po = boost::program_options;
 
 
+// program constants.
+namespace
+{
+  // program return value constants.
+  const size_t SUCCESS = 0;
+  const size_t ERROR_UNHANDLED_EXCEPTION = 1;
+  const size_t ERROR_IN_COMMAND_LINE = 2;
+  const size_t ERROR_UNABLE_TO_OPEN_FILE = 3;
+  const size_t ERROR_SCRIPT_COUNT_ZERO = 4;
+
+  // program run mode constants.
+  const size_t MODE_COUNT   = 1;
+  const size_t MODE_EXTRACT = 2;
+  const size_t MODE_RETURN  = 4;
+  const size_t MODE_ALL     = 7;
+}
+
+
 //! check if an option is set and throws exception if so.
 void
 option_set_conflict(
@@ -88,24 +106,12 @@ option_depend(
 }
 
 
-// return value constants.
-namespace
-{
-  const size_t MODE_COUNT   = 1;
-  const size_t MODE_EXTRACT = 2;
-  const size_t MODE_RETURN  = 4;
-  const size_t MODE_ALL     = 7;
-}
-
-
-// po_modes format encoding
-//  bit use                0         1
-//  1   line               regular   newline
-//  2   string quoting     not       quoted
-
 //! Structure to specify a program option name and its mode contexts.
 typedef struct {
-    int format;                     //!< output line format.
+    int format;                     //!< line output format encoding.
+        // bit  use                 0         1
+        //  1   new section         no        yes
+        //  2   quote strings       no        yes
     string name;                    //!< name.
     string description;             //!< description.
     size_t modes;                   //!< mode contexts.
@@ -168,19 +174,6 @@ show_options(
   }
 
   cout << ops << endl;
-}
-
-
-// return value constants.
-namespace
-{
-  const size_t SUCCESS = 0;
-
-  const size_t ERROR_UNHANDLED_EXCEPTION = 1;
-  const size_t ERROR_IN_COMMAND_LINE = 2;
-  const size_t ERROR_UNABLE_TO_OPEN_FILE = 3;
-
-  const size_t ERROR_SCRIPT_COUNT_ZERO = 4;
 }
 
 
