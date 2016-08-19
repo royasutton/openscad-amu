@@ -93,7 +93,7 @@ doxygen.stamp: Doxyfile Makefile $(doxygen_stamp_other_dependacies)
 #	&& ( cd doxygen/latex && make )
 
 $(programs_help): $(bin_PROGRAMS)
-	$* --help > $@
+	./$* --help > $@
 
 bash_dif_lexer.cc: bash_dif_lexer.hh
 bash_dif_lexer.hh \
