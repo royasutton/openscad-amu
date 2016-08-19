@@ -29,7 +29,6 @@
 
   \todo add command line option to extract scripts that match specific
         scope name and script type: {MFScript and/or Openscad}.
-  \todo filter the openscad-seam run summary info based on the run mode.
 
   \ingroup openscad_seam_src
 *******************************************************************************/
@@ -38,31 +37,20 @@
 
 #include "boost/program_options.hpp"
 #include "boost/filesystem.hpp"
+#include "boost/any.hpp"
 
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
 
-// return value constants.
-namespace
-{
-  const size_t SUCCESS = 0;
-
-  const size_t ERROR_UNHANDLED_EXCEPTION = 1;
-  const size_t ERROR_IN_COMMAND_LINE = 2;
-  const size_t ERROR_UNABLE_TO_OPEN_FILE = 3;
-
-  const size_t ERROR_SCRIPT_COUNT_ZERO = 4;
-}
-
-
 using namespace std;
+namespace po = boost::program_options;
 
 
 //! check if an option is set and throws exception if so.
 void
 option_set_conflict(
-  const boost::program_options::variables_map& vm,
+  const po::variables_map& vm,
   const char* opt,
   const char* msg)
 {
@@ -75,7 +63,7 @@ option_set_conflict(
 //! check if both options are set and throws exception if so.
 void
 option_conflict(
-  const boost::program_options::variables_map& vm,
+  const po::variables_map& vm,
   const char* opt1,
   const char* opt2)
 {
@@ -89,7 +77,7 @@ option_conflict(
 //! check for opt2 if opt1 is set and throws exception if not.
 void
 option_depend(
-  const boost::program_options::variables_map& vm,
+  const po::variables_map& vm,
   const char* opt1,
   const char* opt2)
 {
@@ -97,6 +85,102 @@ option_depend(
     if ( vm.count(opt2) == 0 || vm[opt2].defaulted() )
       throw std::logic_error( std::string("Option '--" ) + opt1
             + "' requires option '--" + opt2 + "'" );
+}
+
+
+// return value constants.
+namespace
+{
+  const size_t MODE_COUNT   = 1;
+  const size_t MODE_EXTRACT = 2;
+  const size_t MODE_RETURN  = 4;
+  const size_t MODE_ALL     = 7;
+}
+
+
+// po_modes format encoding
+//  bit use                0         1
+//  1   line               regular   newline
+//  2   string quoting     not       quoted
+
+//! Structure to specify a program option name and its mode contexts.
+typedef struct {
+    int format;                     //!< output line format.
+    string name;                    //!< name.
+    string description;             //!< description.
+    size_t modes;                   //!< mode contexts.
+} po_modes;
+
+
+//! Output the program options in human readable form.
+void
+show_options(
+  const string &title,
+  const string &ops,
+  const vector<po_modes> &ov,
+  const size_t mode,
+  const po::variables_map& vm)
+{
+  cout << ops << endl
+       << ops << " " << title << endl;
+
+  size_t max_length=0;
+  for(vector<po_modes>::const_iterator it = ov.begin(); it != ov.end(); ++it)
+    if ( it->description.length() > max_length )
+      max_length = it->description.length();
+
+  for(vector<po_modes>::const_iterator it = ov.begin(); it != ov.end(); ++it) {
+    if (it->modes & mode ) {
+
+      switch ( it->format & 1 )
+      {
+        case 0 : cout << ops; break;
+        case 1 : cout << ops << endl << ops; break;
+      }
+
+      if ( it->description.length() != 0 ) {
+        if ( vm[it->name].defaulted() ) cout << " (d)";
+        else                            cout << "    ";
+
+        cout << string(max_length-it->description.length()+1, ' ')
+             << it->description << ": ";
+
+        if        (((boost::any)vm[it->name].value()).type() == typeid(int)) {
+          cout << vm[it->name].as<int>();
+        } else if (((boost::any)vm[it->name].value()).type() == typeid(bool)) {
+          cout << ((vm[it->name].as<bool>()==true) ? "yes" : "no");
+        } else if (((boost::any)vm[it->name].value()).type() == typeid(string)) {
+          if (it->format & 2) cout << "\"";
+          cout << vm[it->name].as<string>();
+          if (it->format & 2) cout << "\"";
+        } else if (((boost::any)vm[it->name].value()).type() == typeid(vector<string>)) {
+          vector<string> v = vm[it->name].as<vector<string> >();
+          for ( vector<string>::iterator vit=v.begin(); vit != v.end(); ++vit) {
+            cout << endl << ops << string(max_length+(1+4+2), ' ') << *vit;
+          }
+        } else {
+          cout << "<unspecified>";
+        }
+      }
+
+      cout << endl;
+    }
+  }
+
+  cout << ops << endl;
+}
+
+
+// return value constants.
+namespace
+{
+  const size_t SUCCESS = 0;
+
+  const size_t ERROR_UNHANDLED_EXCEPTION = 1;
+  const size_t ERROR_IN_COMMAND_LINE = 2;
+  const size_t ERROR_UNABLE_TO_OPEN_FILE = 3;
+
+  const size_t ERROR_SCRIPT_COUNT_ZERO = 4;
 }
 
 
@@ -141,8 +225,6 @@ main(int argc, char** argv)
     string openscad_ext   = ".scad";
 
     string config;
-
-    namespace po = boost::program_options;
 
     po::options_description opts("Options");
     opts.add_options()
@@ -331,20 +413,21 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
 
     // validate mode
-    char mode_char;
+    size_t run_mode;
 
-    if      ( mode.compare(0, mode.length(), "count", 0, mode.length()) == 0 )
-      mode_char = 'c';
-    else if ( mode.compare(0, mode.length(), "extract", 0, mode.length()) == 0 )
-      mode_char = 'e';
-    else if ( mode.compare(0, mode.length(), "return", 0, mode.length()) == 0 )
-      mode_char = 'r';
-    else
+    if      ( mode.compare(0, mode.length(), "count", 0, mode.length()) == 0 ) {
+      run_mode = MODE_COUNT;
+    } else if ( mode.compare(0, mode.length(), "extract", 0, mode.length()) == 0 ) {
+      run_mode = MODE_EXTRACT;
+    } else if ( mode.compare(0, mode.length(), "return", 0, mode.length()) == 0 ) {
+      run_mode = MODE_RETURN;
+    } else {
       throw std::logic_error( std::string("invalid option '--mode=" )
               + mode + "', may be one of ( count | extract | return )" );
+    }
 
     // validate: 'extract' mode
-    if ( mode_char == 'e' )
+    if ( run_mode & MODE_EXTRACT )
     {
       option_depend( vm, "prefix-ipp", "prefix");
 
@@ -358,7 +441,7 @@ main(int argc, char** argv)
     }
 
     // validate: 'count' or 'return' modes
-    if ( mode_char == 'c'  || mode_char == 'r' )
+    if ( run_mode & (MODE_COUNT|MODE_RETURN) )
     {
       vector<string> va_v;
 
@@ -386,7 +469,7 @@ main(int argc, char** argv)
     }
 
     // validate: 'return' mode
-    if ( mode_char == 'r' )
+    if ( run_mode & MODE_RETURN )
     {
       vector<string> va_v;
 
@@ -415,6 +498,9 @@ main(int argc, char** argv)
                << endl;
 
         scope = input_path.stem().string();
+
+        // insert change into variable map
+        vm.insert(make_pair("scope", po::variable_value(scope, true)));
       }
 
       // output prefix
@@ -452,12 +538,22 @@ main(int argc, char** argv)
         tmp_path /= ipp_path;
 
         output_prefix = tmp_path.parent_path().string();
+
+        // insert change into variable map
+        vm.insert(make_pair("output-prefix", po::variable_value(output_prefix, false)));
       } else {
         if ( vm.count("verbose")  )
           cout << "** prefix unspecified, using input file path..." << endl;
 
         output_prefix = input_path.parent_path().string();
+
+        // insert change into variable map
+        vm.insert(make_pair("prefix", po::variable_value(input_path.parent_path().string(), true)));
+        vm.insert(make_pair("output-prefix", po::variable_value(input_path.parent_path().string(), true)));
       }
+
+      // notify variable map changes
+      po::notify(vm);
     }
     catch (const filesystem_error& ex)
     {
@@ -468,66 +564,37 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
     // show configuration
     ////////////////////////////////////////////////////////////////////////////
-    #define MF_FKEY( k ) \
-            ( \
-              string("**                ").substr( 0, (17-string(k).length()) ) + \
-              string(k) + \
-              string(": ") \
-            )
-    #define MF_ENDL ("**\n")
-    #define MF_BOOL( b ) ((b==true) ? "yes" : "no")
-    #define MF_SSTR( s ) (s.empty() ? "*<not specified>*" : s)
-    #define MF_SINT( i ) \
-            ( (i==-1) \
-              ? "*<not specified>*" \
-              : static_cast<ostringstream &>((ostringstream()<<dec<<i)).str() \
-            )
 
     if ( vm.count("verbose")  )
     {
-      cout  << "** configuration:" << endl
-            << MF_ENDL
-            << MF_FKEY("mode") << MF_SSTR(mode) << endl
-            << MF_ENDL
-            << MF_FKEY("input") << MF_SSTR(input) << endl
-            << MF_ENDL
-            << MF_FKEY("root scope") << MF_SSTR(scope) << endl
-            << MF_FKEY("scope joiner") << MF_SSTR(joiner) << endl
-            << MF_FKEY("prefix") << MF_SSTR(prefix) << endl
-            << MF_FKEY("prefix-ipp") << MF_SINT(prefix_ipp) << endl
-            << MF_FKEY("prefix-scripts") << MF_BOOL(prefix_scripts) << endl
-            << MF_FKEY("output prefix") << MF_SSTR(output_prefix) << endl
-            << MF_ENDL;
+      vector<po_modes> ov;
 
-      if ( define.size() > 0 )
-      {
-        for(size_t i=0; i<define.size(); ++i) {
-          cout << MF_FKEY("define") << MF_SSTR(define[i]) << endl;
-        }
-        cout << MF_ENDL;
-      }
+      ov.push_back((po_modes){1, "mode", "mode", MODE_ALL});
+      ov.push_back((po_modes){1, "input", "input", MODE_ALL});
+      ov.push_back((po_modes){1, "scope", "root scope", MODE_ALL});
+      ov.push_back((po_modes){2, "joiner", "scope joiner", MODE_ALL});
+      ov.push_back((po_modes){0, "prefix", "prefix", MODE_EXTRACT});
+      ov.push_back((po_modes){0, "prefix-ipp", "prefix ipp", MODE_EXTRACT});
+      ov.push_back((po_modes){0, "prefix-scripts", "prefix scripts", MODE_EXTRACT});
+      ov.push_back((po_modes){1, "output-prefix", "output prefix", MODE_EXTRACT});
+      ov.push_back((po_modes){1, "define", "define", MODE_EXTRACT});
+      ov.push_back((po_modes){1, "comments", "comments", MODE_EXTRACT});
+      ov.push_back((po_modes){0, "show", "show", MODE_EXTRACT});
+      ov.push_back((po_modes){0, "run", "run mfscripts", MODE_EXTRACT});
+      ov.push_back((po_modes){0, "make", "run make", MODE_EXTRACT});
+      ov.push_back((po_modes){1, "target", "make target", MODE_EXTRACT});
+      ov.push_back((po_modes){1, "lib-path", "lib path", MODE_EXTRACT});
+      ov.push_back((po_modes){0, "openscad-path", "openscad path", MODE_EXTRACT});
+      ov.push_back((po_modes){0, "bash-path", "bash path", MODE_EXTRACT});
+      ov.push_back((po_modes){0, "make-path", "make path", MODE_EXTRACT});
+      ov.push_back((po_modes){1, "makefile-ext", "makefile ext", MODE_EXTRACT | MODE_COUNT});
+      ov.push_back((po_modes){0, "mfscript-ext", "mfscript ext", MODE_EXTRACT | MODE_COUNT});
+      ov.push_back((po_modes){0, "openscad-ext", "openscad ext", MODE_EXTRACT | MODE_COUNT});
+      ov.push_back((po_modes){1, "config", "config file", MODE_ALL});
+      ov.push_back((po_modes){1, "debug-scanner", "debug scanner", MODE_ALL});
+      ov.push_back((po_modes){0, "verbose", "verbose", MODE_ALL});
 
-       cout << MF_FKEY("comments") << MF_BOOL(comments) << endl
-            << MF_FKEY("show") << MF_BOOL(show) << endl
-            << MF_FKEY("run mfscripts")   << MF_BOOL(run) << endl
-            << MF_FKEY("run make")   << MF_BOOL(make) << endl
-            << MF_ENDL
-            << MF_FKEY("make target") << MF_SSTR(target) << endl
-            << MF_ENDL
-            << MF_FKEY("lib path") << MF_SSTR(lib_path) << endl
-            << MF_FKEY("openscad path") << MF_SSTR(openscad_path) << endl
-            << MF_FKEY("bash path") << MF_SSTR(bash_path) << endl
-            << MF_FKEY("make path") << MF_SSTR(make_path) << endl
-            << MF_ENDL
-            << MF_FKEY("makefile ext") << MF_SSTR(makefile_ext) << endl
-            << MF_FKEY("mfscript ext") << MF_SSTR(mfscript_ext) << endl
-            << MF_FKEY("openscad ext") << MF_SSTR(openscad_ext) << endl
-            << MF_ENDL
-            << MF_FKEY("config file") << MF_SSTR(config) << endl
-            << MF_ENDL
-            << MF_FKEY("debug-scanner") << MF_BOOL((vm.count("debug-scanner")>0)) << endl
-            << MF_FKEY("verbose") << MF_BOOL((vm.count("verbose")>0)) << endl
-            << endl;
+      show_options( "configuration:", "**", ov, run_mode, vm );
     }
 
 
@@ -538,7 +605,7 @@ main(int argc, char** argv)
     //
     // 'count' or 'return' mode
     //
-    if ( mode_char == 'c' || mode_char == 'r' )
+    if ( run_mode & (MODE_COUNT|MODE_RETURN) )
     {
       SEAM::SEAM_Scanner scanner( input, true, command_name + ": " );
 
@@ -557,7 +624,7 @@ main(int argc, char** argv)
 
       int script_count = scanner.get_script_count();
 
-      if ( mode_char == 'c' )
+      if ( run_mode & MODE_COUNT )
       {
         cout << "script count = " <<  script_count << endl;
 

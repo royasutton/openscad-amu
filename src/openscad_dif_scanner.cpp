@@ -240,6 +240,10 @@ ODIF::ODIF_Scanner::fx_init(void)
     If matched is found, call and obtain result. Copy result to output
     or store to named results variable.
 
+  \todo support function amu_mfscript_targets ( scope=test ext=stl ) that
+        returns a list of targets for the named makefile scope, extension,
+        etc.
+
 *******************************************************************************/
 void
 ODIF::ODIF_Scanner::fx_pend(void)
