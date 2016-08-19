@@ -43,6 +43,9 @@
 #include "config.h"
 #endif
 
+//! \ingroup openscad_seam_src
+//! @{
+
 using namespace std;
 namespace po = boost::program_options;
 
@@ -757,6 +760,8 @@ main(int argc, char** argv)
 
   exit( SUCCESS );
 }
+
+//! @}
 
 
 /*******************************************************************************

@@ -35,6 +35,9 @@
 
 #include <string>
 
+//! \ingroup openscad_seam_src
+//! @{
+
 namespace SEAM{
 
 //! Class that tracts scope hierarchy.
@@ -88,6 +91,8 @@ class SEAM_Scope {
 } /* end namespace SEAM */
 
 #endif /* END __SEAM_SCOPE_HPP__ */
+
+//! @}
 
 
 /*******************************************************************************

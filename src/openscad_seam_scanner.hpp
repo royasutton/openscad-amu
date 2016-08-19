@@ -45,6 +45,9 @@
 #include <vector>
 #include <stack>
 
+//! \ingroup openscad_seam_src
+//! @{
+
 namespace SEAM{
 
 //! Class that implements the script extractor scanner.
@@ -248,6 +251,8 @@ class SEAM_Scanner : public yyFlexLexer{
 } /* end namespace SEAM */
 
 #endif /* END __SEAM_SCANNER_HPP__ */
+
+//! @}
 
 
 /*******************************************************************************
