@@ -16,11 +16,6 @@ files_am = \
 	log_segregate.bash \
 	vehicle.doxyfile
 
-makefiles = \
-	convert.makefile \
-	hello_world.makefile \
-	log_segregate.makefile
-
 SUFFIXES = .bash .makefile .stamp
 
 EXTRA_DIST = \
@@ -39,33 +34,53 @@ install_path = $(version_path)/examples
 ##############################################################################
 
 docs-local: \
-	examples.stamp \
 	embedding_scheme.scripts \
+	\
+	convert.makefile \
+	hello_world.makefile \
+	log_segregate.makefile \
+	\
 	vehicle_document.stamp \
 	vehicle_test.stamp \
 	animate_move.stamp \
 	animate_rotate.stamp \
+	\
 	doxygen.stamp
 
-examples.stamp: $(makefiles)
-	touch examples.stamp
+CLEANFILES = \
+	embedding_scheme.scripts
+
+embedding_scheme.scripts: $(srcdir)/embedding_scheme.scad $(openscad_seam)
+	$(openscad_seam) --mode count --input $< --scope source --verbose \
+		> embedding_scheme.scripts
+
+CLEANFILES += \
+	convert.makefile \
+	hello_world.makefile \
+	log_segregate.makefile
 
 .bash.makefile:
 	$(BASH_PATH) --norc --noprofile $<
 
-# remove "lib path" from output for privacy
-embedding_scheme.scripts: $(srcdir)/embedding_scheme.scad $(openscad_seam)
-	$(openscad_seam) --mode count --input $< --scope source --verbose \
-		| grep -v "lib path" \
-		> embedding_scheme.scripts
+CLEANFILES += \
+	vehicle_document.stamp \
+	vehicle_test.stamp \
+	animate_move.stamp \
+	animate_rotate.stamp
 
 .makefile.stamp:
 	OPENSCADPATH=${srcdir} \
 	make -f $< all
 	touch $@
 
-build:
-	mkdir -v build
+build: ; mkdir -v build
+
+CLEANFILES += \
+	vehicle_document.scad \
+	vehicle_document.bash \
+	vehicle_test.scad \
+	vehicle_test.bash \
+	vehicle.scad.conf
 
 vehicle_document.makefile \
 vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
@@ -75,7 +90,15 @@ vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
 		--define __INCLUDE_PATH__=\"$(srcdir)\" \
+		--write-config $(<F).conf \
 		--verbose
+
+CLEANFILES += \
+	animate_move.scad \
+	animate_move.bash \
+	animate_rotate.scad \
+	animate_rotate.bash \
+	animate.scad.conf
 
 animate_move.makefile \
 animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
@@ -85,7 +108,13 @@ animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
 		--define __INCLUDE_PATH__=\"$(srcdir)\" \
+		--write-config $(<F).conf \
 		--verbose
+
+CLEANFILES += \
+	doxygen.stamp \
+	doxygen.tagfile \
+	doxygen.warn
 
 doxygen.stamp: vehicle.doxyfile Makefile $(srcdir)/vehicle.scad
 	$(DOXYGEN_PATH) vehicle.doxyfile \
@@ -111,18 +140,6 @@ uninstall-local:
 		rm -fv $(install_path)/$$f \
 	; done
 	-rmdir -v '$(install_path)'
-
-CLEANFILES = \
-	$(makefiles) \
-	examples.stamp \
-	embedding_scheme.scripts \
-	vehicle_document.scad 	vehicle_document.bash 	vehicle_document.stamp \
-	vehicle_test.scad 			vehicle_test.bash 			vehicle_test.stamp \
-	animate_move.scad 			animate_move.bash 			animate_move.stamp \
-	animate_rotate.scad 		animate_rotate.bash 		animate_rotate.stamp \
-	doxygen.stamp \
-	doxygen.tagfile \
-	doxygen.warn
 
 clean-local:
 	-make -f vehicle_document.makefile clean
