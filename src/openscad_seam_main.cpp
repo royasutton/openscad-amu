@@ -118,16 +118,17 @@ typedef struct {
 } po_modes;
 
 
-//! Output the program options in human readable form.
+//! Output the program options in (more) human readable format.
 void
-show_options(
+format_options(
+  ostream& sout,
   const string &title,
   const string &ops,
   const vector<po_modes> &ov,
   const size_t mode,
   const po::variables_map& vm)
 {
-  cout << ops << endl
+  sout << ops << endl
        << ops << " " << title << endl;
 
   size_t max_length=0;
@@ -140,40 +141,87 @@ show_options(
 
       switch ( it->format & 1 )
       {
-        case 0 : cout << ops; break;
-        case 1 : cout << ops << endl << ops; break;
+        case 0 : sout << ops; break;
+        case 1 : sout << ops << endl << ops; break;
       }
 
       if ( it->description.length() != 0 ) {
-        if ( vm[it->name].defaulted() ) cout << " (d)";
-        else                            cout << "    ";
+        if ( vm[it->name].defaulted() ) sout << " (d)";
+        else                            sout << "    ";
 
-        cout << string(max_length-it->description.length()+1, ' ')
+        sout << string(max_length-it->description.length()+1, ' ')
              << it->description << ": ";
 
         if        (((boost::any)vm[it->name].value()).type() == typeid(int)) {
-          cout << vm[it->name].as<int>();
+          sout << vm[it->name].as<int>();
         } else if (((boost::any)vm[it->name].value()).type() == typeid(bool)) {
-          cout << ((vm[it->name].as<bool>()==true) ? "yes" : "no");
+          sout << ((vm[it->name].as<bool>()==true) ? "yes" : "no");
         } else if (((boost::any)vm[it->name].value()).type() == typeid(string)) {
-          if (it->format & 2) cout << "\"";
-          cout << vm[it->name].as<string>();
-          if (it->format & 2) cout << "\"";
+          if (it->format & 2) sout << "\"";
+          sout << vm[it->name].as<string>();
+          if (it->format & 2) sout << "\"";
         } else if (((boost::any)vm[it->name].value()).type() == typeid(vector<string>)) {
           vector<string> v = vm[it->name].as<vector<string> >();
           for ( vector<string>::iterator vit=v.begin(); vit != v.end(); ++vit) {
-            cout << endl << ops << string(max_length+(1+4+2), ' ') << *vit;
+            sout << endl << ops << string(max_length+(1+4+2), ' ') << *vit;
           }
         } else {
-          cout << "<unspecified>";
+          sout << "<unspecified>";
         }
       }
 
-      cout << endl;
+      sout << endl;
     }
   }
 
-  cout << ops << endl;
+  sout << ops << endl;
+}
+
+
+//! Output the program options in configuration file format.
+void
+write_options(
+  ostream& sout,
+  const po::variables_map& vm)
+{
+  sout << "#" << endl
+       << "# input: " << vm["input"].as<string>() << endl
+       << "#" << endl
+       << endl;
+
+  for(po::variables_map::const_iterator it = vm.begin(); it != vm.end(); ++it)
+  {
+    // skip some options
+    if (  !it->first.compare("config") |
+          !it->first.compare("write-config") |
+          !it->first.compare("verbose") |
+          !it->first.compare("debug-scanner") ) continue;
+
+    sout << "# " << it->first;
+    if ( it->second.defaulted() ) sout << " (defaulted)";
+    sout << endl;
+
+    if        (((boost::any)it->second.value()).type() == typeid(int)) {
+      sout << it->first << "=" << it->second.as<int>();
+    } else if (((boost::any)it->second.value()).type() == typeid(bool)) {
+      sout << it->first << "=" << it->second.as<bool>();
+    } else if (((boost::any)it->second.value()).type() == typeid(string)) {
+      sout << it->first << "=" << it->second.as<string>();
+    } else if (((boost::any)it->second.value()).type() == typeid(vector<string>)) {
+      vector<string> v = it->second.as<vector<string> >();
+      for ( vector<string>::iterator vit=v.begin(); vit != v.end(); ++vit) {
+        sout << it->first << "=" << *vit;
+        if ( (vit+1) != v.end() ) sout << endl;
+      }
+    } else {
+      sout << it->first << "=unknown-value-type";
+    }
+
+    sout << endl << endl;
+  }
+  sout << "#" << endl
+       << "# eof" << endl
+       << "#" << endl;
 }
 
 
@@ -218,6 +266,7 @@ main(int argc, char** argv)
     string openscad_ext   = ".scad";
 
     string config;
+    string write_config;
 
     po::options_description opts("Options");
     opts.add_options()
@@ -294,6 +343,9 @@ main(int argc, char** argv)
       ("config,c",
           po::value<string>(&config),
           "Configuration file with one or more option value pairs.\n")
+      ("write-config,w",
+          po::value<string>(&write_config),
+          "Write configuration file with program options.\n")
       ("debug-scanner",
           "Run scanner in debug mode.\n")
       ("verbose,V",
@@ -367,8 +419,11 @@ main(int argc, char** argv)
         exit( SUCCESS );
       }
 
-      // parse options from supplied config file
+      // parse configuration file options
       if ( vm.count("config")  ) {
+        // notify not called to allow require options to be parsed
+        // from configuration file... manually retrieve specified
+        // configuration file name
         config = vm["config"].as<string>();
 
         ifstream config_file ( config.c_str() );
@@ -377,7 +432,7 @@ main(int argc, char** argv)
           if ( vm.count("verbose")  )
             cout << "reading configuration file " << config << endl;
 
-          po::store(po::parse_config_file(config_file, opts), vm);
+          po::store(po::parse_config_file(config_file, opts, true), vm);
         } else {
           cerr << "ERROR: unable to open config file [" << config
                << "]" << endl;
@@ -418,6 +473,7 @@ main(int argc, char** argv)
       throw std::logic_error( std::string("invalid option '--mode=" )
               + mode + "', may be one of ( count | extract | return )" );
     }
+
 
     // validate: 'extract' mode
     if ( run_mode & MODE_EXTRACT )
@@ -558,36 +614,59 @@ main(int argc, char** argv)
     // show configuration
     ////////////////////////////////////////////////////////////////////////////
 
-    if ( vm.count("verbose")  )
-    {
-      vector<po_modes> ov;
+    vector<po_modes> ov;
 
-      ov.push_back((po_modes){1, "mode", "mode", MODE_ALL});
-      ov.push_back((po_modes){1, "input", "input", MODE_ALL});
-      ov.push_back((po_modes){1, "scope", "root scope", MODE_ALL});
-      ov.push_back((po_modes){2, "joiner", "scope joiner", MODE_ALL});
-      ov.push_back((po_modes){0, "prefix", "prefix", MODE_EXTRACT});
-      ov.push_back((po_modes){0, "prefix-ipp", "prefix ipp", MODE_EXTRACT});
-      ov.push_back((po_modes){0, "prefix-scripts", "prefix scripts", MODE_EXTRACT});
-      ov.push_back((po_modes){1, "output-prefix", "output prefix", MODE_EXTRACT});
-      ov.push_back((po_modes){1, "define", "define", MODE_EXTRACT});
-      ov.push_back((po_modes){1, "comments", "comments", MODE_EXTRACT});
-      ov.push_back((po_modes){0, "show", "show", MODE_EXTRACT});
-      ov.push_back((po_modes){0, "run", "run mfscripts", MODE_EXTRACT});
-      ov.push_back((po_modes){0, "make", "run make", MODE_EXTRACT});
-      ov.push_back((po_modes){1, "target", "make target", MODE_EXTRACT});
-      ov.push_back((po_modes){1, "lib-path", "lib path", MODE_EXTRACT});
-      ov.push_back((po_modes){0, "openscad-path", "openscad path", MODE_EXTRACT});
-      ov.push_back((po_modes){0, "bash-path", "bash path", MODE_EXTRACT});
-      ov.push_back((po_modes){0, "make-path", "make path", MODE_EXTRACT});
-      ov.push_back((po_modes){1, "makefile-ext", "makefile ext", MODE_EXTRACT | MODE_COUNT});
-      ov.push_back((po_modes){0, "mfscript-ext", "mfscript ext", MODE_EXTRACT | MODE_COUNT});
-      ov.push_back((po_modes){0, "openscad-ext", "openscad ext", MODE_EXTRACT | MODE_COUNT});
-      ov.push_back((po_modes){1, "config", "config file", MODE_ALL});
-      ov.push_back((po_modes){1, "debug-scanner", "debug scanner", MODE_ALL});
-      ov.push_back((po_modes){0, "verbose", "verbose", MODE_ALL});
+    ov.push_back((po_modes){1, "mode", "run mode", MODE_ALL});
+    ov.push_back((po_modes){1, "input", "input", MODE_ALL});
+    ov.push_back((po_modes){1, "scope", "root scope", MODE_ALL});
+    ov.push_back((po_modes){2, "joiner", "scope joiner", MODE_ALL});
+    ov.push_back((po_modes){0, "prefix", "prefix", MODE_EXTRACT});
+    ov.push_back((po_modes){0, "prefix-ipp", "prefix ipp", MODE_EXTRACT});
+    ov.push_back((po_modes){0, "prefix-scripts", "prefix scripts", MODE_EXTRACT});
+    ov.push_back((po_modes){1, "output-prefix", "output prefix", MODE_EXTRACT});
+    ov.push_back((po_modes){1, "define", "define", MODE_EXTRACT});
+    ov.push_back((po_modes){1, "comments", "comments", MODE_EXTRACT});
+    ov.push_back((po_modes){0, "show", "show", MODE_EXTRACT});
+    ov.push_back((po_modes){0, "run", "run mfscripts", MODE_EXTRACT});
+    ov.push_back((po_modes){0, "make", "run make", MODE_EXTRACT});
+    ov.push_back((po_modes){1, "target", "make target", MODE_EXTRACT});
+    ov.push_back((po_modes){1, "lib-path", "lib path", MODE_EXTRACT});
+    ov.push_back((po_modes){0, "openscad-path", "openscad path", MODE_EXTRACT});
+    ov.push_back((po_modes){0, "bash-path", "bash path", MODE_EXTRACT});
+    ov.push_back((po_modes){0, "make-path", "make path", MODE_EXTRACT});
+    ov.push_back((po_modes){1, "makefile-ext", "makefile ext", MODE_EXTRACT | MODE_COUNT});
+    ov.push_back((po_modes){0, "mfscript-ext", "mfscript ext", MODE_EXTRACT | MODE_COUNT});
+    ov.push_back((po_modes){0, "openscad-ext", "openscad ext", MODE_EXTRACT | MODE_COUNT});
+    ov.push_back((po_modes){1, "config", "config file", MODE_ALL});
+    ov.push_back((po_modes){0, "write-config", "write config file", MODE_ALL});
+    ov.push_back((po_modes){1, "debug-scanner", "debug scanner", MODE_ALL});
+    ov.push_back((po_modes){0, "verbose", "verbose", MODE_ALL});
 
-      show_options( "configuration:", "**", ov, run_mode, vm );
+    if ( vm.count("verbose")  ) {
+      format_options( cout, "configuration:", "**", ov, run_mode, vm );
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // write configuration
+    ////////////////////////////////////////////////////////////////////////////
+
+    if ( vm.count("write-config")  ) {
+      ofstream config_file ( write_config.c_str() );
+
+      if ( config_file.good() ) {
+        if ( vm.count("verbose")  )
+          cout << "writing configuration file " << write_config << endl;
+
+        format_options( config_file, "configuration:", "#", ov, run_mode, vm );
+        write_options( config_file, vm) ;
+      } else {
+        cerr << "ERROR: unable to open config file [" << write_config
+             << "]" << endl;
+
+        exit( ERROR_UNABLE_TO_OPEN_FILE );
+      }
+      config_file.close();
     }
 
 
