@@ -71,6 +71,12 @@ class ODIF_Scanner : public yyFlexLexer{
     //! reset scanner to initial condition.
     void init(void);
 
+    //! set scanner root scope name.
+    void set_rootscope( const std::string& t ) { rootscope = t; }
+
+    //! set the scope hierarchy joiner string.
+    void set_scopejoiner(const std::string& s) { scopejoiner = s; }
+
     //! turn scanner debugging on or off.
     void set_debug(bool f) { yy_flex_debug = f; }
 
@@ -82,10 +88,25 @@ class ODIF_Scanner : public yyFlexLexer{
     //! get the output prefix text string.
     std::string get_ops(void) { return ops; }
 
+    //! set the output prefix path.
+    void set_output_prefix(const std::string& s) { output_prefix = s; }
+    //! get the output prefix path.
+    std::string get_output_prefix(void) { return output_prefix; }
+
     //! set the base path to the package library.
     void set_lib_path(const std::string& s) { lib_path = s; }
     //! get the base path of the package library.
     std::string get_lib_path(void) { return lib_path; }
+
+    //! set the path to the GNUMake used to process the generated makefiles.
+    void set_make_path(const std::string& s) { make_path = s; }
+    //! get the path of the GNUMake used to process the generated makefiles.
+    std::string get_make_path(void) { return make_path; }
+
+    //! set the file extension used for generated makefiles.
+    void set_makefile_ext(const std::string& s) { makefile_ext = s; }
+    //! get the file extension used for generated makefiles.
+    std::string get_makefile_ext(void) { return makefile_ext; }
 
   private:
     // scanner
@@ -97,7 +118,14 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string input_name;             //!< scanner input file name.
     std::ifstream input_file;           //!< scanner input file.
 
+    std::string rootscope;              //!< scanner root scope name.
+    std::string scopejoiner;            //!< scanner scope hierarchy conjoiner string.
+    std::string output_prefix;          //!< scanner output path prefix.
+
     std::string lib_path;               //!< path the library.
+    std::string make_path;              //!< path to gnumake.
+
+    std::string makefile_ext;           //!< makefile extension.
 
     //! write the entire string s to the scanner output.
     void scanner_output(const std::string& s) { scanner_output( s.c_str(), s.length() ); }

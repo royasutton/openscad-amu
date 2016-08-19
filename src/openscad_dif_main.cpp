@@ -33,13 +33,8 @@
         and removing JavaScript dependencies (or at least communicating
         them to a responsible party). See Doxygen configuration tab
         HTML_EXTRA_FILES.
-  \test make sure the filter can be defined in the doxygen input file with
-        the --lip-path option specified. If this does not work, will need
-        to turn to environment variable definition (OPENSCAD_AMU_LIB).
   \todo add option to create a histogram/map of amu command that exists
         in the input file.
-  \todo add an option that echos macro to-variables and macro definitions
-        to the scanner output file to help with macro definition coding.
 
   \ingroup openscad_dif_src
 *******************************************************************************/
@@ -53,10 +48,12 @@
 #include "config.h"
 #endif
 
-using namespace std;
-
 //! \ingroup openscad_dif_src
 //! @{
+
+using namespace std;
+namespace po = boost::program_options;
+
 
 // return value constants.
 namespace
@@ -66,6 +63,20 @@ namespace
   const size_t ERROR_UNHANDLED_EXCEPTION = 1;
   const size_t ERROR_IN_COMMAND_LINE = 2;
   const size_t ERROR_UNABLE_TO_OPEN_FILE = 3;
+}
+
+
+//! check for opt2 if opt1 is set and throws exception if not.
+void
+option_depend(
+  const po::variables_map& vm,
+  const char* opt1,
+  const char* opt2)
+{
+  if ( vm.count(opt1) && !vm[opt1].defaulted() )
+    if ( vm.count(opt2) == 0 || vm[opt2].defaulted() )
+      throw std::logic_error( std::string("Option '--" ) + opt1
+            + "' requires option '--" + opt2 + "'" );
 }
 
 
@@ -81,10 +92,17 @@ main(int argc, char** argv)
     string command_name = boost::filesystem::basename( argv[0] );
 
     string input;
+    string scope;
+    string joiner         = "_";
+
+    string output_prefix;
 
     string lib_path       = __LIB_PATH__;
+    string make_path      = __MAKE_PATH__;
 
-    namespace po = boost::program_options;
+    string makefile_ext   = ".makefile";
+
+    string config;
 
     po::options_description opts("Options");
     opts.add_options()
@@ -92,9 +110,28 @@ main(int argc, char** argv)
           po::value<string>(&input)->required(),
           "Input file containing annotated script(s) embedded within "
           "comments.\n")
+      ("scope,s",
+          po::value<string>(&scope),
+          "Scope root name. When not specified, the input file stem "
+          "name is used.")
+      ("joiner,j",
+          po::value<string>(&joiner)->default_value(joiner),
+          "Scope joiner. String used to conjoin scope hierarchies.\n")
+      ("output-prefix,o",
+          po::value<string>(&output_prefix),
+          "Output prefixed used by seam for extracted auxiliary scripts.\n")
       ("lib-path",
           po::value<string>(&lib_path)->default_value(lib_path),
           "Makefile script library path.")
+      ("make-path",
+          po::value<string>(&make_path)->default_value(make_path),
+          "GNU Make executable path.\n")
+      ("makefile-ext",
+          po::value<string>(&makefile_ext)->default_value(makefile_ext),
+          "Makefile file extension.\n")
+      ("config,c",
+          po::value<string>(&config),
+          "Configuration file with one or more option value pairs.\n")
       ("debug-scanner",
           "Run scanner in debug mode.")
       ("debug-filter",
@@ -132,6 +169,8 @@ main(int argc, char** argv)
              << endl
              << "Example:" << endl
              << "  FILTER_PATTERNS = *.scad=<prefix>/bin/" << command_name << endl
+             << "  FILTER_PATTERNS = *.scad=\"<prefix>/bin/" << command_name
+             << " --config <config>\"" <<endl
              << endl
              << opts
              << endl;
@@ -161,6 +200,29 @@ main(int argc, char** argv)
         exit( SUCCESS );
       }
 
+      // parse configuration file options
+      if ( vm.count("config")  ) {
+        // notify not called to allow require options to be parsed
+        // from configuration file... manually retrieve specified
+        // configuration file name
+        config = vm["config"].as<string>();
+
+        ifstream config_file ( config.c_str() );
+
+        if ( config_file.good() ) {
+          if ( vm.count("verbose")  )
+            cout << "reading configuration file " << config << endl;
+
+          po::store(po::parse_config_file(config_file, opts, true), vm);
+        } else {
+          cerr << "ERROR: unable to open config file [" << config
+               << "]" << endl;
+
+          exit( ERROR_UNABLE_TO_OPEN_FILE );
+        }
+        config_file.close();
+      }
+
       po::notify(vm);
     }
     catch(po::required_option& e)
@@ -176,12 +238,65 @@ main(int argc, char** argv)
 
 
     ////////////////////////////////////////////////////////////////////////////
+    // validate arguments
+    ////////////////////////////////////////////////////////////////////////////
+
+     option_depend( vm, "verbose", "version");
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // show configuration
+    ////////////////////////////////////////////////////////////////////////////
+
+    // iff --debug-filter is set
+    if ( vm.count("debug-filter")  ) {
+      cout << "\\if __INCLUDE_FILTER_DEBUG__" << endl;
+      for(po::variables_map::const_iterator it = vm.begin(); it != vm.end(); ++it)
+      {
+        // skip some options
+        if (  !it->first.compare("debug-filter") |
+              !it->first.compare("debug-scanner") ) continue;
+
+        cout << "# " << it->first;
+        if ( it->second.defaulted() ) cout << " (defaulted)";
+        cout << endl;
+
+        if        (((boost::any)it->second.value()).type() == typeid(int)) {
+          cout << it->first << "=" << it->second.as<int>();
+        } else if (((boost::any)it->second.value()).type() == typeid(bool)) {
+          cout << it->first << "=" << it->second.as<bool>();
+        } else if (((boost::any)it->second.value()).type() == typeid(string)) {
+          cout << it->first << "=" << it->second.as<string>();
+        } else if (((boost::any)it->second.value()).type() == typeid(vector<string>)) {
+          vector<string> v = it->second.as<vector<string> >();
+          for ( vector<string>::iterator vit=v.begin(); vit != v.end(); ++vit) {
+            cout << it->first << "=" << *vit;
+            if ( (vit+1) != v.end() ) cout << endl;
+          }
+        } else {
+          cout << it->first << "=unknown-value-type";
+        }
+
+        cout << endl << endl;
+      }
+      cout << "\\endif" << endl;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
     // setup and run scanner
     ////////////////////////////////////////////////////////////////////////////
 
     ODIF::ODIF_Scanner scanner( input, command_name + ": " );
 
+    scanner.set_rootscope( scope );
+    scanner.set_scopejoiner( joiner );
+    scanner.set_output_prefix( output_prefix );
+
     scanner.set_lib_path( lib_path );
+    scanner.set_make_path( make_path );
+
+    scanner.set_makefile_ext( makefile_ext );
+
     scanner.set_debug( vm.count("debug-scanner")>0 );
     scanner.set_debug_filter( vm.count("debug-filter")>0 );
 
