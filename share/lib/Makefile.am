@@ -24,7 +24,9 @@ version_path = $(root_path)/$(PACKAGE_VERSION)
 install_path = $(version_path)/lib
 
 doxygen_stamp_other_dependacies = \
-	$(top_builddir)/share/examples/examples.stamp \
+	$(top_builddir)/share/examples/convert.makefile \
+	$(top_builddir)/share/examples/hello_world.makefile \
+	$(top_builddir)/share/examples/log_segregate.makefile \
 	$(top_builddir)/share/scripts/doxygen.tagfile \
 	$(top_builddir)/src/doxygen.tagfile
 
