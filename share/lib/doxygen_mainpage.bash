@@ -349,6 +349,20 @@
   \example vehicle_test.makefile
     Makefile created by extracted MFSript vehicle_test.bash
 
+  \example animate_move.scad
+    OpenSCAD script extracted from animate.scad.
+  \example animate_move.bash
+    MFSript extracted from animate.scad.
+  \example animate_move.makefile
+    Makefile created by extracted MFSript animate_move.bash
+
+  \example animate_rotate.scad
+    OpenSCAD script extracted from animate.scad.
+  \example animate_rotate.bash
+    MFSript extracted from animate.scad.
+  \example animate_rotate.makefile
+    Makefile created by extracted MFSript animate_rotate.bash
+
 ###############################################################################/
 
 
