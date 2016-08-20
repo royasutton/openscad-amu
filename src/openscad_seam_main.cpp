@@ -269,7 +269,7 @@ main(int argc, char** argv)
     string openscad_ext   = ".scad";
 
     string config;
-    string write_config;
+    bool write_config     = false;
 
     po::options_description opts("Options");
     opts.add_options()
@@ -347,7 +347,7 @@ main(int argc, char** argv)
           po::value<string>(&config),
           "Configuration file with one or more option value pairs.\n")
       ("write-config,w",
-          po::value<string>(&write_config),
+          po::value<bool>(&write_config)->default_value(write_config),
           "Write configuration file with program options.\n")
       ("debug-scanner",
           "Run scanner in debug mode.\n")
@@ -429,15 +429,15 @@ main(int argc, char** argv)
         // configuration file name
         config = vm["config"].as<string>();
 
+        if ( vm.count("verbose")  )
+          cout << "reading configuration file: " << config << endl;
+
         ifstream config_file ( config.c_str() );
 
         if ( config_file.good() ) {
-          if ( vm.count("verbose")  )
-            cout << "reading configuration file " << config << endl;
-
           po::store(po::parse_config_file(config_file, opts, true), vm);
         } else {
-          cerr << "ERROR: unable to open config file [" << config
+          cerr << "ERROR: unable to open configuration file [" << config
                << "]" << endl;
 
           exit( ERROR_UNABLE_TO_OPEN_FILE );
@@ -514,6 +514,8 @@ main(int argc, char** argv)
       va_v.push_back("show");
       va_v.push_back("run");
       va_v.push_back("make");
+
+      va_v.push_back("write-config");
 
      // make sure none of these options have been specified
       for( vector<string>::iterator it = va_v.begin(); it != va_v.end(); ++it )
@@ -641,35 +643,12 @@ main(int argc, char** argv)
     ov.push_back((po_modes){0, "mfscript-ext", "mfscript ext", MODE_EXTRACT | MODE_COUNT});
     ov.push_back((po_modes){0, "openscad-ext", "openscad ext", MODE_EXTRACT | MODE_COUNT});
     ov.push_back((po_modes){1, "config", "config file", MODE_ALL});
-    ov.push_back((po_modes){0, "write-config", "write config file", MODE_ALL});
+    ov.push_back((po_modes){0, "write-config", "write config file", MODE_EXTRACT});
     ov.push_back((po_modes){1, "debug-scanner", "debug scanner", MODE_ALL});
     ov.push_back((po_modes){0, "verbose", "verbose", MODE_ALL});
 
     if ( vm.count("verbose")  ) {
       format_options( cout, "configuration:", "**", ov, run_mode, vm );
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////
-    // write configuration
-    ////////////////////////////////////////////////////////////////////////////
-
-    if ( vm.count("write-config")  ) {
-      ofstream config_file ( write_config.c_str() );
-
-      if ( config_file.good() ) {
-        if ( vm.count("verbose")  )
-          cout << "writing configuration file " << write_config << endl;
-
-        format_options( config_file, "configuration:", "#", ov, run_mode, vm );
-        write_options( config_file, vm) ;
-      } else {
-        cerr << "ERROR: unable to open config file [" << write_config
-             << "]" << endl;
-
-        exit( ERROR_UNABLE_TO_OPEN_FILE );
-      }
-      config_file.close();
     }
 
 
@@ -749,6 +728,44 @@ main(int argc, char** argv)
       while( scanner.scan() != 0 )
         ;
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // write run configuration
+    ////////////////////////////////////////////////////////////////////////////
+
+    if ( write_config )
+    {
+      path input_path ( input );
+      path conf_path;
+
+      // configuration file name
+      if ( prefix_scripts ) {
+        conf_path /= output_prefix;
+        conf_path /= input_path.stem();
+      } else {
+        conf_path += input_path.stem();
+      }
+
+      conf_path += ".conf";
+
+      if ( vm.count("verbose")  )
+        cout << "writing configuration file: " << conf_path.string() << endl;
+
+      ofstream config_file ( conf_path.c_str() );
+
+      if ( config_file.good() ) {
+        format_options( config_file, "configuration:", "#", ov, run_mode, vm );
+        write_options( config_file, vm) ;
+      } else {
+        cerr << "ERROR: unable to open configuration file [" << conf_path.string()
+             << "]" << endl;
+
+        exit( ERROR_UNABLE_TO_OPEN_FILE );
+      }
+      config_file.close();
+    }
+
   }
   catch(exception& e)
   {

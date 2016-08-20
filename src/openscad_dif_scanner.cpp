@@ -279,9 +279,9 @@ ODIF::ODIF_Scanner::fx_pend(void)
         }
 
         if ( debug_filter ) {
-          scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
+          scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n\\verbatim\n" );
           scanner_output( scmd );
-          scanner_output( "\n\\endif\n" );
+          scanner_output( "\n\\endverbatim\n\\endif\n" );
         }
 
 #ifdef HAVE_POPEN
@@ -330,9 +330,9 @@ ODIF::ODIF_Scanner::fx_pend(void)
       varm.store(fx_tovar, result);
 
       if ( debug_filter ) {
-        scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
+        scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n\\verbatim\n" );
         scanner_output( fx_tovar + "=[" + result + "]" );
-        scanner_output( "\n\\endif\n" );
+        scanner_output( "\n\\endverbatim\n\\endif\n" );
       }
     }
   }

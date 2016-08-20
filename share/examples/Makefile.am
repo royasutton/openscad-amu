@@ -33,21 +33,27 @@ install_path = $(version_path)/examples
 # targets
 ##############################################################################
 
-docs-local: \
-	embedding_scheme.scripts \
-	\
-	convert.makefile \
-	hello_world.makefile \
-	log_segregate.makefile \
-	\
-	vehicle_document.stamp \
-	vehicle_test.stamp \
-	animate_move.stamp \
-	animate_rotate.stamp \
-	\
-	doxygen.stamp
+docs-local: examples.stamp
 
 CLEANFILES = \
+	examples.stamp
+
+examples.stamp: \
+		embedding_scheme.scripts \
+		\
+		convert.makefile \
+		hello_world.makefile \
+		log_segregate.makefile \
+		\
+		vehicle_document.stamp \
+		vehicle_test.stamp \
+		animate_move.stamp \
+		animate_rotate.stamp \
+		\
+		doxygen.stamp
+	touch $@
+
+CLEANFILES += \
 	embedding_scheme.scripts
 
 embedding_scheme.scripts: $(srcdir)/embedding_scheme.scad $(openscad_seam)
@@ -80,7 +86,7 @@ CLEANFILES += \
 	vehicle_document.bash \
 	vehicle_test.scad \
 	vehicle_test.bash \
-	vehicle.scad.conf
+	vehicle.conf
 
 vehicle_document.makefile \
 vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
@@ -90,7 +96,7 @@ vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
 		--define __INCLUDE_PATH__=\"$(srcdir)\" \
-		--write-config $(<F).conf \
+		--write-config yes \
 		--verbose
 
 CLEANFILES += \
@@ -98,7 +104,7 @@ CLEANFILES += \
 	animate_move.bash \
 	animate_rotate.scad \
 	animate_rotate.bash \
-	animate.scad.conf
+	animate.conf
 
 animate_move.makefile \
 animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
@@ -108,7 +114,7 @@ animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
 		--define __INCLUDE_PATH__=\"$(srcdir)\" \
-		--write-config $(<F).conf \
+		--write-config yes \
 		--verbose
 
 CLEANFILES += \

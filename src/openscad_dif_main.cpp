@@ -207,15 +207,15 @@ main(int argc, char** argv)
         // configuration file name
         config = vm["config"].as<string>();
 
+        if ( vm.count("verbose")  )
+          cout << "reading configuration file: " << config << endl;
+
         ifstream config_file ( config.c_str() );
 
         if ( config_file.good() ) {
-          if ( vm.count("verbose")  )
-            cout << "reading configuration file " << config << endl;
-
           po::store(po::parse_config_file(config_file, opts, true), vm);
         } else {
-          cerr << "ERROR: unable to open config file [" << config
+          cerr << "ERROR: unable to open configuration file [" << config
                << "]" << endl;
 
           exit( ERROR_UNABLE_TO_OPEN_FILE );
@@ -250,7 +250,7 @@ main(int argc, char** argv)
 
     // iff --debug-filter is set
     if ( vm.count("debug-filter")  ) {
-      cout << "\\if __INCLUDE_FILTER_DEBUG__" << endl;
+      cout << "\n\\if __INCLUDE_FILTER_DEBUG__\n\\verbatim\n";
       for(po::variables_map::const_iterator it = vm.begin(); it != vm.end(); ++it)
       {
         // skip some options
@@ -279,7 +279,7 @@ main(int argc, char** argv)
 
         cout << endl << endl;
       }
-      cout << "\\endif" << endl;
+      cout << "\n\\endverbatim\n\\endif\n";
     }
 
     ////////////////////////////////////////////////////////////////////////////
