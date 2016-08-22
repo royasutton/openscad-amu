@@ -88,10 +88,50 @@ class ODIF_Scanner : public yyFlexLexer{
     //! get the output prefix text string.
     std::string get_ops(void) { return ops; }
 
+    //! set the configuration file path prefix.
+    void set_config_prefix(const std::string& s) { config_prefix = s; }
+    //! get the configuration file path prefix.
+    std::string get_config_prefix(void) { return config_prefix; }
+
     //! set the output prefix path.
     void set_output_prefix(const std::string& s) { output_prefix = s; }
     //! get the output prefix path.
     std::string get_output_prefix(void) { return output_prefix; }
+
+    //! set whether to prefix the output prefix path to extracted scripts.
+    void set_prefix_scripts(bool f) { prefix_scripts = f; }
+    //! get if whether the extracted scripts will be prefix with the output prefix path.
+    bool get_prefix_scripts(void) { return prefix_scripts; }
+
+    //! set whether to search makefile target directories for files references.
+    void set_search(bool f) { search = f; }
+    //! get if whether will search makefile target directories for files references.
+    bool get_search(void) { return search; }
+
+    //! set the vector of include paths.
+    void set_include_path(const std::vector<std::string>& p) { include_path = p; }
+    //! get the vector of include paths.
+    std::vector<std::string> get_include_path(void) { return include_path; }
+
+    //! set the html output path.
+    void set_html_output(const std::string& s) { html_output = s; }
+    //! get the html output path.
+    std::string get_html_output(void) { return html_output; }
+
+    //! set the latex output path.
+    void set_latex_output(const std::string& s) { latex_output = s; }
+    //! get the latex output path.
+    std::string get_latex_output(void) { return latex_output; }
+
+    //! set the docbook output path.
+    void set_docbook_output(const std::string& s) { docbook_output = s; }
+    //! get the docbook output path.
+    std::string get_docbook_output(void) { return docbook_output; }
+
+    //! set the rtf output path.
+    void set_rtf_output(const std::string& s) { rtf_output = s; }
+    //! get the rtf output path.
+    std::string get_rtf_output(void) { return rtf_output; }
 
     //! set the base path to the package library.
     void set_lib_path(const std::string& s) { lib_path = s; }
@@ -110,22 +150,32 @@ class ODIF_Scanner : public yyFlexLexer{
 
   private:
     // scanner
-    bool scanner_output_on;             //!< scanner output on.
-    bool debug_filter;                  //!< filter debugging output.
+    bool scanner_output_on;                 //!< scanner output on.
+    bool debug_filter;                      //!< filter debugging output.
 
-    std::string ops;                    //!< output prefix string.
+    std::string ops;                        //!< output prefix string.
 
-    std::string input_name;             //!< scanner input file name.
-    std::ifstream input_file;           //!< scanner input file.
+    std::string input_name;                 //!< scanner input file name.
+    std::ifstream input_file;               //!< scanner input file.
 
-    std::string rootscope;              //!< scanner root scope name.
-    std::string scopejoiner;            //!< scanner scope hierarchy conjoiner string.
-    std::string output_prefix;          //!< scanner output path prefix.
+    std::string config_prefix;              //!< scanner configuration file path prefix.
+    std::string rootscope;                  //!< scanner root scope name.
+    std::string scopejoiner;                //!< scanner scope hierarchy conjoiner string.
+    std::string output_prefix;              //!< scanner output path prefix.
+    bool prefix_scripts;                    //!< prefixing extracted scripts?
 
-    std::string lib_path;               //!< path the library.
-    std::string make_path;              //!< path to gnumake.
+    bool search;                            //!< search makefile target directories.
+    std::vector<std::string> include_path;  //!< vector of include paths.
 
-    std::string makefile_ext;           //!< makefile extension.
+    std::string html_output;                //!< html output path.
+    std::string latex_output;               //!< latex output path.
+    std::string docbook_output;             //!< docbook output path.
+    std::string rtf_output;                 //!< rtf output path.
+
+    std::string lib_path;                   //!< path the library.
+    std::string make_path;                  //!< path to gnumake.
+
+    std::string makefile_ext;               //!< makefile extension.
 
     //! write the entire string s to the scanner output.
     void scanner_output(const std::string& s) { scanner_output( s.c_str(), s.length() ); }

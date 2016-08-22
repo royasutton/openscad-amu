@@ -44,6 +44,8 @@
 #include "boost/program_options.hpp"
 #include "boost/filesystem.hpp"
 
+#include <iomanip>
+
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
@@ -55,14 +57,58 @@ using namespace std;
 namespace po = boost::program_options;
 
 
-// return value constants.
+// program constants.
 namespace
 {
+  // program return value constants.
   const size_t SUCCESS = 0;
-
   const size_t ERROR_UNHANDLED_EXCEPTION = 1;
   const size_t ERROR_IN_COMMAND_LINE = 2;
   const size_t ERROR_UNABLE_TO_OPEN_FILE = 3;
+}
+
+
+//! output build information.
+void
+build_info(ostream& sout, const string& command_name)
+{
+  int w=20;
+
+  sout << command_name << " " << PACKAGE_VERSION << endl << endl
+       << setw(w) << "package: " << PACKAGE_NAME << endl
+       << setw(w) << "version: " << PACKAGE_VERSION << endl
+       << setw(w) << "bug report: " << PACKAGE_BUGREPORT << endl
+       << setw(w) << "site url: " << PACKAGE_URL << endl << endl
+       << setw(w) << "build date: " << __BUILD_DATE__ << endl
+       << setw(w) << "architecture: " << __BUILD_ARCH__ << endl << endl
+       << setw(w) << "default lib path: " << __LIB_PATH__ << endl << endl;
+}
+
+
+//! check if an option is set and throws exception if so.
+void
+option_set_conflict(
+  const po::variables_map& vm,
+  const char* opt,
+  const char* msg)
+{
+  if ( vm.count(opt) && !vm[opt].defaulted() )
+    throw std::logic_error( std::string("Conflicting option '--")
+          + opt + "'" + msg );
+}
+
+
+//! check if both options are set and throws exception if so.
+void
+option_conflict(
+  const po::variables_map& vm,
+  const char* opt1,
+  const char* opt2)
+{
+  if ( vm.count(opt1) && !vm[opt1].defaulted()
+    && vm.count(opt2) && !vm[opt2].defaulted() )
+    throw std::logic_error( std::string("Conflicting options '--")
+          + opt1 + "' and '--" + opt2 + "'" );
 }
 
 
@@ -80,6 +126,45 @@ option_depend(
 }
 
 
+//! begin or end a comment block for filter debugging messages.
+void
+debug_hf(const bool output, const bool header, const string& command_name="")
+{
+  if ( output )
+  {
+    if ( header ) {
+      cout << "//! \\cond __INCLUDE_FILTER_DEBUG__" << endl
+           << "/**" << endl
+           << "\\page debug_" << command_name
+           << " Debug (" << command_name << ")" << endl
+           << "\\verbatim" << endl;
+
+      cerr << "filter debugging page begin:" << endl;
+
+      build_info( cout, command_name );
+      build_info( cerr, command_name );
+    } else {
+      cout << "\\endverbatim" << endl
+           << "*/" << endl
+           << "//! \\endcond" << endl;
+
+      cerr << "filter debugging page end." << endl;
+    }
+  }
+}
+
+//! output filter debugging message to debug page and standard error.
+void
+debug_m(const bool output, const string message)
+{
+  if ( output )
+  {
+    cout << message << endl;
+    cerr << message << endl;
+  }
+}
+
+
 //! program main.
 int
 main(int argc, char** argv)
@@ -91,59 +176,103 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
     string command_name = boost::filesystem::basename( argv[0] );
 
+    // command line
     string input;
-    string scope;
-    string joiner         = "_";
-
-    string output_prefix;
-
+    bool search           = false;
+    vector<string> include_path;
+    string html_output    = "html";
+    string latex_output   = "latex";
+    string docbook_output = "docbook";
+    string rtf_output     = "rtf";
     string lib_path       = __LIB_PATH__;
-    string make_path      = __MAKE_PATH__;
-
-    string makefile_ext   = ".makefile";
-
+    string auto_config;
     string config;
 
-    po::options_description opts("Options");
-    opts.add_options()
+    bool debug_filter     = false;
+
+    // configuration file
+    string scope;
+    string joiner         = "_";
+    bool prefix_scripts   = true;
+    string output_prefix;
+    string make_path      = __MAKE_PATH__;
+    string makefile_ext   = ".makefile";
+
+    po::options_description opts_cli("Options (visible)");
+    opts_cli.add_options()
       ("input,i",
           po::value<string>(&input)->required(),
           "Input file containing annotated script(s) embedded within "
           "comments.\n")
-      ("scope,s",
-          po::value<string>(&scope),
-          "Scope root name. When not specified, the input file stem "
-          "name is used.")
-      ("joiner,j",
-          po::value<string>(&joiner)->default_value(joiner),
-          "Scope joiner. String used to conjoin scope hierarchies.\n")
-      ("output-prefix,o",
-          po::value<string>(&output_prefix),
-          "Output prefixed used by seam for extracted auxiliary scripts.\n")
+      ("search,s",
+          po::value<bool>(&search)->default_value(search),
+          "Search makefile target output directories for files referenced "
+          "by the filter functions.")
+      ("include-path,I",
+          po::value<vector<string> >(&include_path),
+          "One or more directories to search for files references.\n")
+      ("html-output",
+          po::value<string>(&html_output)->default_value(html_output),
+          "Directory where filter functions will copy HTML documents.")
+      ("latex-output",
+          po::value<string>(&latex_output)->default_value(latex_output),
+          "Directory where filter functions will copy Latex documents.")
+      ("docbook-output",
+          po::value<string>(&docbook_output)->default_value(docbook_output),
+          "Directory where filter functions will copy Docbook documents.")
+      ("rtf-output",
+          po::value<string>(&rtf_output)->default_value(rtf_output),
+          "Directory where filter functions will copy RTF documents.\n")
       ("lib-path",
           po::value<string>(&lib_path)->default_value(lib_path),
-          "Makefile script library path.")
-      ("make-path",
-          po::value<string>(&make_path)->default_value(make_path),
-          "GNU Make executable path.\n")
-      ("makefile-ext",
-          po::value<string>(&makefile_ext)->default_value(makefile_ext),
-          "Makefile file extension.\n")
+          "Makefile script library path.\n")
+      ("auto-config,a",
+          po::value<string>(&auto_config),
+          "Auto configuration path. When specified, this path is checked "
+          "for a configuration file for the specified input file and read "
+          "if it exists.")
       ("config,c",
           po::value<string>(&config),
           "Configuration file with one or more option value pairs.\n")
       ("debug-scanner",
           "Run scanner in debug mode.")
       ("debug-filter",
-          "Turn on filter debugging.\n")
+          "Turn on filter debugging output.\n")
       ("verbose,V",
-          "Run in verbose mode.")
+          "Provide verbose help or version output.")
       ("version,v",
           "Report tool version.")
       ("help,h",
           "Print this help messages.")
     ;
 
+    po::options_description opts_conf("Options (hidden)");
+    opts_conf.add_options()
+      ("scope,s",
+          po::value<string>(&scope),
+          "Scope root name.")
+      ("joiner,j",
+          po::value<string>(&joiner)->default_value(joiner),
+          "Scope joiner. String used to conjoin scope hierarchies.\n")
+      ("prefix-scripts,x",
+          po::value<bool>(&prefix_scripts)->default_value(prefix_scripts),
+          "Output path prefix were prepended to extracted scripts.")
+      ("output-prefix,o",
+          po::value<string>(&output_prefix),
+          "Output prefixed used by seam.\n")
+      ("make-path",
+          po::value<string>(&make_path)->default_value(make_path),
+          "GNU Make executable path.")
+      ("makefile-ext",
+          po::value<string>(&makefile_ext)->default_value(makefile_ext),
+          "Makefile file extension.")
+    ;
+
+    // all parsed options
+    po::options_description opts("Options (all)");
+    opts.add(opts_cli).add(opts_conf);
+
+    // positional options
     po::positional_options_description opts_pos;
     opts_pos.add("input", 1);
 
@@ -155,11 +284,15 @@ main(int argc, char** argv)
 
     try
     {
+      using namespace boost::filesystem;
+
+      // parse command line options
       po::store(po::command_line_parser(argc, argv).options(opts)
                   .positional(opts_pos).run(), vm);
 
       // output help and exit
-      if ( vm.count("help") || (argc==1) ) {
+      if ( vm.count("help") || (argc==1) )
+      {
         cout << command_name << " " << PACKAGE_VERSION << endl
              << endl
              <<
@@ -169,50 +302,78 @@ main(int argc, char** argv)
              << endl
              << "Example:" << endl
              << "  FILTER_PATTERNS = *.scad=<prefix>/bin/" << command_name << endl
-             << "  FILTER_PATTERNS = *.scad=\"<prefix>/bin/" << command_name
-             << " --config <config>\"" <<endl
-             << endl
-             << opts
+             << "  FILTER_PATTERNS = \"*.scad=\\\"<prefix>/bin/" << command_name
+             << " --config <config>\\\"\"" <<endl
              << endl;
+
+        if ( vm.count("verbose") )  cout << opts     << endl;
+        else                        cout << opts_cli << endl;
 
         exit( SUCCESS );
       }
 
       // output version and exit
-      if ( vm.count("version")  ) {
-
-        if ( vm.count("verbose")  )
-          cout << command_name << " " << PACKAGE_VERSION << endl
-               << endl
-               << "       package: " << PACKAGE_NAME << endl
-               << "       version: " << PACKAGE_VERSION << endl
-               << "    bug report: " << PACKAGE_BUGREPORT << endl
-               << "      site url: " << PACKAGE_URL << endl
-               << endl
-               << "    build date: " << __BUILD_DATE__ << endl
-               << "  architecture: " << __BUILD_ARCH__ << endl
-               << endl
-               << "      lib path: " << __LIB_PATH__ << endl
-               << endl;
-        else
+      if ( vm.count("version") )
+      {
+        if ( vm.count("verbose") ) {
+          build_info( cout, command_name );
+        } else {
           cout << PACKAGE_VERSION << endl;
+        }
 
         exit( SUCCESS );
       }
 
+      debug_filter = ( vm.count("debug-filter")>0 );
+
+      // begin filter debugging page
+      debug_hf( debug_filter, true, command_name );
+
+      // auto configuration
+      if ( vm.count("auto-config") )
+      {
+        // early partial validation
+        option_set_conflict( vm, "config", " not allowed with auto configuration");
+        option_depend( vm, "auto-config", "input");
+
+        // notify not called to prevent exception from required program options,
+        // get values from variable map directly.
+        input = vm["input"].as<string>();
+        auto_config = vm["auto-config"].as<string>();
+
+        debug_m( debug_filter, "attempting auto-configuration with path: ["
+                                + auto_config + "]");
+
+        path input_path ( input );
+        path conf_path ( auto_config );
+
+        conf_path /= input_path.stem();
+        conf_path += ".conf";
+
+        if ( exists(conf_path) && is_regular_file(conf_path) )
+        {
+          debug_m( debug_filter, "configuration found: [" + conf_path.string() + "]");
+
+          // insert configuration file name into variable map to be parsed later.
+          vm.insert( make_pair("config", po::variable_value(conf_path.string(), true)) );
+        } else {
+          debug_m( debug_filter, "configuration file not found." );
+        }
+      }
+
       // parse configuration file options
-      if ( vm.count("config")  ) {
-        // notify not called to allow require options to be parsed
-        // from configuration file... manually retrieve specified
-        // configuration file name
+      if ( vm.count("config") )
+      {
+        // notify not called to prevent exception from required program options,
+        // get values from variable map directly.
         config = vm["config"].as<string>();
 
-        if ( vm.count("verbose")  )
-          cout << "reading configuration file: " << config << endl;
+        debug_m( debug_filter, "reading configuration file: [" + config + "]");
 
         ifstream config_file ( config.c_str() );
 
-        if ( config_file.good() ) {
+        if ( config_file.good() )
+        { // parse configuration file options
           po::store(po::parse_config_file(config_file, opts, true), vm);
         } else {
           cerr << "ERROR: unable to open configuration file [" << config
@@ -220,6 +381,7 @@ main(int argc, char** argv)
 
           exit( ERROR_UNABLE_TO_OPEN_FILE );
         }
+
         config_file.close();
       }
 
@@ -248,39 +410,45 @@ main(int argc, char** argv)
     // show configuration
     ////////////////////////////////////////////////////////////////////////////
 
-    // iff --debug-filter is set
-    if ( vm.count("debug-filter")  ) {
-      cout << "\n\\if __INCLUDE_FILTER_DEBUG__\n\\verbatim\n";
+    if ( debug_filter )
+    {
+      cout << endl << "program options:" << endl << endl;
+
       for(po::variables_map::const_iterator it = vm.begin(); it != vm.end(); ++it)
       {
         // skip some options
         if (  !it->first.compare("debug-filter") |
               !it->first.compare("debug-scanner") ) continue;
 
-        cout << "# " << it->first;
-        if ( it->second.defaulted() ) cout << " (defaulted)";
-        cout << endl;
-
+        int w=15;
+        cout << setw(w) << it->first << " = [";
         if        (((boost::any)it->second.value()).type() == typeid(int)) {
-          cout << it->first << "=" << it->second.as<int>();
+          cout << it->second.as<int>();
         } else if (((boost::any)it->second.value()).type() == typeid(bool)) {
-          cout << it->first << "=" << it->second.as<bool>();
+          cout << it->second.as<bool>();
         } else if (((boost::any)it->second.value()).type() == typeid(string)) {
-          cout << it->first << "=" << it->second.as<string>();
+          cout << it->second.as<string>();
         } else if (((boost::any)it->second.value()).type() == typeid(vector<string>)) {
           vector<string> v = it->second.as<vector<string> >();
           for ( vector<string>::iterator vit=v.begin(); vit != v.end(); ++vit) {
-            cout << it->first << "=" << *vit;
-            if ( (vit+1) != v.end() ) cout << endl;
+            if ( (vit) != v.begin() ) cout << setw(w+4) << "+ [";
+            cout << *vit;
+            if ( (vit+1) != v.end() ) cout << "]" << endl;
           }
         } else {
-          cout << it->first << "=unknown-value-type";
+          cout << "<unknown-value-type>";
         }
+        cout << "]";
 
-        cout << endl << endl;
+        if ( it->second.defaulted() ) cout << " (defaulted)";
+
+        cout << endl;
       }
-      cout << "\n\\endverbatim\n\\endif\n";
     }
+
+    // end filter debugging page
+    debug_hf( debug_filter, false );
+
 
     ////////////////////////////////////////////////////////////////////////////
     // setup and run scanner
@@ -288,17 +456,25 @@ main(int argc, char** argv)
 
     ODIF::ODIF_Scanner scanner( input, command_name + ": " );
 
+    // command line
+    scanner.set_search( search );
+    scanner.set_include_path( include_path );
+    scanner.set_html_output( html_output );
+    scanner.set_latex_output( latex_output );
+    scanner.set_docbook_output( docbook_output );
+    scanner.set_rtf_output( rtf_output );
+    scanner.set_lib_path( lib_path );
+    scanner.set_config_prefix( auto_config );
+    scanner.set_debug( vm.count("debug-scanner")>0 );
+    scanner.set_debug_filter( debug_filter );
+
+    // configuration file
     scanner.set_rootscope( scope );
     scanner.set_scopejoiner( joiner );
+    scanner.set_prefix_scripts( prefix_scripts );
     scanner.set_output_prefix( output_prefix );
-
-    scanner.set_lib_path( lib_path );
     scanner.set_make_path( make_path );
-
     scanner.set_makefile_ext( makefile_ext );
-
-    scanner.set_debug( vm.count("debug-scanner")>0 );
-    scanner.set_debug_filter( vm.count("debug-filter")>0 );
 
     while( scanner.scan() != 0 )
       ;

@@ -39,6 +39,8 @@
 #include "boost/filesystem.hpp"
 #include "boost/any.hpp"
 
+#include <iomanip>
+
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
 #endif
@@ -65,6 +67,26 @@ namespace
   const size_t MODE_EXTRACT = 2;
   const size_t MODE_RETURN  = 4;
   const size_t MODE_ALL     = 7;
+}
+
+
+//! output build information.
+void
+build_info(ostream& sout, const string& command_name)
+{
+  int w=20;
+
+  sout << command_name << " " << PACKAGE_VERSION << endl << endl
+       << setw(w) << "package: " << PACKAGE_NAME << endl
+       << setw(w) << "version: " << PACKAGE_VERSION << endl
+       << setw(w) << "bug report: " << PACKAGE_BUGREPORT << endl
+       << setw(w) << "site url: " << PACKAGE_URL << endl << endl
+       << setw(w) << "build date: " << __BUILD_DATE__ << endl
+       << setw(w) << "architecture: " << __BUILD_ARCH__ << endl << endl
+       << setw(w) << "default lib path: " << __LIB_PATH__ << endl
+       << setw(w) << "openscad path: " << __OPENSCAD_PATH__ << endl
+       << setw(w) << "bash path: " << __BASH_PATH__ << endl
+       << setw(w) << "gnu make path: " << __MAKE_PATH__ << endl << endl;
 }
 
 
@@ -134,7 +156,7 @@ format_options(
   sout << ops << endl
        << ops << " " << title << endl;
 
-  size_t max_length=0;
+  int max_length=0;
   for(vector<po_modes>::const_iterator it = ov.begin(); it != ov.end(); ++it)
     if ( it->description.length() > max_length )
       max_length = it->description.length();
@@ -152,8 +174,7 @@ format_options(
         if ( vm[it->name].defaulted() ) sout << " (d)";
         else                            sout << "    ";
 
-        sout << string(max_length-it->description.length()+1, ' ')
-             << it->description << ": ";
+        sout << setw(max_length+1) << it->description << ": ";
 
         if        (((boost::any)vm[it->name].value()).type() == typeid(int)) {
           sout << vm[it->name].as<int>();
@@ -374,7 +395,8 @@ main(int argc, char** argv)
                   .positional(opts_pos).run(), vm);
 
       // output help and exit
-      if ( vm.count("help") || (argc==1) ) {
+      if ( vm.count("help") || (argc==1) )
+      {
         cout << command_name << " " << PACKAGE_VERSION << endl
              << endl
              <<
@@ -398,38 +420,25 @@ main(int argc, char** argv)
       }
 
       // output version and exit
-      if ( vm.count("version")  ) {
-
-        if ( vm.count("verbose")  )
-          cout << command_name << " " << PACKAGE_VERSION << endl
-               << endl
-               << "       package: " << PACKAGE_NAME << endl
-               << "       version: " << PACKAGE_VERSION << endl
-               << "    bug report: " << PACKAGE_BUGREPORT << endl
-               << "      site url: " << PACKAGE_URL << endl
-               << endl
-               << "    build date: " << __BUILD_DATE__ << endl
-               << "  architecture: " << __BUILD_ARCH__ << endl
-               << endl
-               << "      lib path: " << __LIB_PATH__ << endl
-               << " openscad path: " << __OPENSCAD_PATH__ << endl
-               << "     bash path: " << __BASH_PATH__ << endl
-               << " gnu make path: " << __MAKE_PATH__ << endl
-               << endl;
-        else
+      if ( vm.count("version") )
+      {
+        if ( vm.count("verbose") ) {
+          build_info( cout, command_name );
+        } else {
           cout << PACKAGE_VERSION << endl;
+        }
 
         exit( SUCCESS );
       }
 
       // parse configuration file options
-      if ( vm.count("config")  ) {
-        // notify not called to allow require options to be parsed
-        // from configuration file... manually retrieve specified
-        // configuration file name
+      if ( vm.count("config") )
+      {
+        // notify not called to prevent exception from required program options,
+        // get values from variable map directly.
         config = vm["config"].as<string>();
 
-        if ( vm.count("verbose")  )
+        if ( vm.count("verbose") )
           cout << "reading configuration file: " << config << endl;
 
         ifstream config_file ( config.c_str() );
