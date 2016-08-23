@@ -765,7 +765,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
 *******************************************************************************/
 string
-ODIF::ODIF_Scanner::bif_file_viewer(void)
+ODIF::ODIF_Scanner::bif_viewer(void)
 {
   string result;
 
@@ -801,7 +801,7 @@ ODIF::ODIF_Scanner::bif_file_viewer(void)
 
 *******************************************************************************/
 string
-ODIF::ODIF_Scanner::bif_mfscript_make_target(void)
+ODIF::ODIF_Scanner::bif_make(void)
 {
   // options declaration: vana & vans.
   // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!

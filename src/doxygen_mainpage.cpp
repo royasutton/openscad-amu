@@ -154,11 +154,30 @@
     List of additional functions that can be used in the script
     documentation.
 
-    \verbatim
-    \amu_eval <var> ( arg1 arg2 .. argn )
-    \amu_shell <var> ( "command string" <--stderr> )
-    \amu_combine <var> ( --prefix(-p)="text" --suffix(-s)="text" --separator(-f)="text" "set1" "set2" ... "setn" )
-    \endverbatim
+    | additional available functions |
+    |:-------------------------------|
+    | \ref ODIF::ODIF_Scanner::bif_eval() "\\amu_eval" |
+    | \ref ODIF::ODIF_Scanner::bif_shell() "\\amu_shell" |
+    | \ref ODIF::ODIF_Scanner::bif_combine() "\\amu_combine" |
+    | \ref ODIF::ODIF_Scanner::bif_image_table() "\\amu_image_table" |
+    | \ref ODIF::ODIF_Scanner::bif_viewer() "\\amu_viewer" |
+    | \ref ODIF::ODIF_Scanner::bif_make() "\\amu_make" |
+    | *also see:* <prefix>/functions/amu_<name> |
+
+    \section variable Variable
+    \subsection implimented Implimented reference
+
+    \li ${var}
+
+    \subsection ideas Ideas for list selection
+
+    \li ${var[n]}
+    \li ${var[1,2,3,7-10]}
+    \li ${#var[0]}
+    \li ${#var[*]} or consider functions such as ${word #, ${var}}
+    \li ${var[@]:0}
+    \li ${var[@]:1}
+    \li ${var[@]:1:2}
 
 *******************************************************************************/
 

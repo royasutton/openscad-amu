@@ -269,15 +269,15 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_image_table();
   }
-  else if (fx_name.compare("file_viewer")==0)
+  else if (fx_name.compare("viewer")==0)
   {
     has_result=true;
-    result=bif_file_viewer();
+    result=bif_viewer();
   }
-  else if (fx_name.compare("mfscript_make_target")==0)
+  else if (fx_name.compare("make")==0)
   {
     has_result=true;
-    result=bif_mfscript_make_target();
+    result=bif_make();
   }
   else
   {
@@ -500,8 +500,6 @@ ODIF::ODIF_Scanner::def_set_name(void)
   def_name=YYText();
 }
 
-
-//! output filter debugging message to debug page and standard error.
 void
 ODIF::ODIF_Scanner::filter_debug(const string& m)
 {
