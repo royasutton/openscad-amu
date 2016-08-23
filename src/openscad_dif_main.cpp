@@ -155,7 +155,7 @@ debug_hf(const bool output, const bool header, const string& command_name="")
 
 //! output filter debugging message to debug page and standard error.
 void
-debug_m(const bool output, const string message)
+debug_m(const bool output, const string& message)
 {
   if ( output )
   {

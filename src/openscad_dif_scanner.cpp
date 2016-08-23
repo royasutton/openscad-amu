@@ -249,11 +249,36 @@ ODIF::ODIF_Scanner::fx_pend(void)
   bool has_result = false;
 
   /* check build-in functions */
-  if      (fx_name.compare("eval")==0)        { has_result=true; result=bif_eval(); }
-  else if (fx_name.compare("shell")==0)       { has_result=true; result=bif_shell(); }
-  else if (fx_name.compare("combine")==0)     { has_result=true; result=bif_combine(); }
-  else if (fx_name.compare("image_table")==0) { has_result=true; result=bif_image_table(); }
-  else if (fx_name.compare("file_viewer")==0) { has_result=true; result=bif_file_viewer(); }
+  if      (fx_name.compare("eval")==0)
+  {
+    has_result=true;
+    result=bif_eval();
+  }
+  else if (fx_name.compare("shell")==0)
+  {
+    has_result=true;
+    result=bif_shell();
+  }
+  else if (fx_name.compare("combine")==0)
+  {
+    has_result=true;
+    result=bif_combine();
+  }
+  else if (fx_name.compare("image_table")==0)
+  {
+    has_result=true;
+    result=bif_image_table();
+  }
+  else if (fx_name.compare("file_viewer")==0)
+  {
+    has_result=true;
+    result=bif_file_viewer();
+  }
+  else if (fx_name.compare("mfscript_make_target")==0)
+  {
+    has_result=true;
+    result=bif_mfscript_make_target();
+  }
   else
   {
     /* check external function */
@@ -278,11 +303,7 @@ ODIF::ODIF_Scanner::fx_pend(void)
           else                  scmd.append( it->name + "=" + it->value );
         }
 
-        if ( debug_filter ) {
-          scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n\\verbatim\n" );
-          scanner_output( scmd );
-          scanner_output( "\n\\endverbatim\n\\endif\n" );
-        }
+        filter_debug( scmd );
 
 #ifdef HAVE_POPEN
         FILE* pipe;
@@ -329,11 +350,7 @@ ODIF::ODIF_Scanner::fx_pend(void)
     else {
       varm.store(fx_tovar, result);
 
-      if ( debug_filter ) {
-        scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n\\verbatim\n" );
-        scanner_output( fx_tovar + "=[" + result + "]" );
-        scanner_output( "\n\\endverbatim\n\\endif\n" );
-      }
+      filter_debug( fx_tovar + "=[" + result + "]" );
     }
   }
   else
@@ -481,6 +498,23 @@ ODIF::ODIF_Scanner::def_set_name(void)
   if ( def_name.length() )
     abort("previously defined var: " + def_name, lineno(), YYText());
   def_name=YYText();
+}
+
+
+//! output filter debugging message to debug page and standard error.
+void
+ODIF::ODIF_Scanner::filter_debug(const string& m)
+{
+  if ( debug_filter )
+  {
+    scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
+    scanner_output( "\\verbatim\n" );
+    scanner_output( m );
+    scanner_output( "\n\\endverbatim\n" );
+    scanner_output( "\\endif\n" );
+
+    cerr << ops << m << endl;
+  }
 }
 
 
