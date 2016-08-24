@@ -93,7 +93,7 @@ option_set_conflict(
   const char* msg)
 {
   if ( vm.count(opt) && !vm[opt].defaulted() )
-    throw std::logic_error( std::string("Conflicting option '--")
+    throw logic_error( string("Conflicting option '--")
           + opt + "'" + msg );
 }
 
@@ -107,7 +107,7 @@ option_conflict(
 {
   if ( vm.count(opt1) && !vm[opt1].defaulted()
     && vm.count(opt2) && !vm[opt2].defaulted() )
-    throw std::logic_error( std::string("Conflicting options '--")
+    throw logic_error( string("Conflicting options '--")
           + opt1 + "' and '--" + opt2 + "'" );
 }
 
@@ -121,7 +121,7 @@ option_depend(
 {
   if ( vm.count(opt1) && !vm[opt1].defaulted() )
     if ( vm.count(opt2) == 0 || vm[opt2].defaulted() )
-      throw std::logic_error( std::string("Option '--" ) + opt1
+      throw logic_error( string("Option '--" ) + opt1
             + "' requires option '--" + opt2 + "'" );
 }
 
@@ -193,7 +193,7 @@ main(int argc, char** argv)
     // configuration file
     string scope;
     string joiner         = "_";
-    bool prefix_scripts   = true;
+    bool prefix_scripts   = false;
     string output_prefix;
     string make_path      = __MAKE_PATH__;
     string makefile_ext   = ".makefile";

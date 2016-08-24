@@ -98,7 +98,7 @@ option_set_conflict(
   const char* msg)
 {
   if ( vm.count(opt) && !vm[opt].defaulted() )
-    throw std::logic_error( std::string("Conflicting option '--")
+    throw logic_error( string("Conflicting option '--")
           + opt + "'" + msg );
 }
 
@@ -112,7 +112,7 @@ option_conflict(
 {
   if ( vm.count(opt1) && !vm[opt1].defaulted()
     && vm.count(opt2) && !vm[opt2].defaulted() )
-    throw std::logic_error( std::string("Conflicting options '--")
+    throw logic_error( string("Conflicting options '--")
           + opt1 + "' and '--" + opt2 + "'" );
 }
 
@@ -126,7 +126,7 @@ option_depend(
 {
   if ( vm.count(opt1) && !vm[opt1].defaulted() )
     if ( vm.count(opt2) == 0 || vm[opt2].defaulted() )
-      throw std::logic_error( std::string("Option '--" ) + opt1
+      throw logic_error( string("Option '--" ) + opt1
             + "' requires option '--" + opt2 + "'" );
 }
 
@@ -187,7 +187,9 @@ format_options(
         } else if (((boost::any)vm[it->name].value()).type() == typeid(vector<string>)) {
           vector<string> v = vm[it->name].as<vector<string> >();
           for ( vector<string>::iterator vit=v.begin(); vit != v.end(); ++vit) {
-            sout << endl << ops << string(max_length+(1+4+2), ' ') << *vit;
+            if ( (vit) != v.begin() ) sout << ops << setw(max_length+(1+4+2)) << "+ ";
+            sout << *vit;
+            if ( (vit+1) != v.end() ) sout << endl;
           }
         } else {
           sout << "<unspecified>";
@@ -482,7 +484,7 @@ main(int argc, char** argv)
     } else if ( mode.compare(0, mode.length(), "return", 0, mode.length()) == 0 ) {
       run_mode = MODE_RETURN;
     } else {
-      throw std::logic_error( std::string("invalid option '--mode=" )
+      throw logic_error( string("invalid option '--mode=" )
               + mode + "', may be one of ( count | extract | return )" );
     }
 
@@ -493,11 +495,11 @@ main(int argc, char** argv)
       option_depend( vm, "prefix-ipp", "prefix");
 
       if ( make && !run )
-          throw std::logic_error( std::string("Option '--make=yes" )
+          throw logic_error( string("Option '--make=yes" )
                 + "' requires option '--run=yes'" );
 
       if ( make && target.empty() )
-          throw std::logic_error( std::string("Option '--make=yes" )
+          throw logic_error( string("Option '--make=yes" )
                 + "' requires option '--target=arg'" );
     }
 
