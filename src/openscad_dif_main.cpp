@@ -193,6 +193,7 @@ main(int argc, char** argv)
     // configuration file
     string scope;
     string joiner         = "_";
+    vector<string> scope_id;
     bool prefix_scripts   = false;
     string output_prefix;
     string make_path      = __MAKE_PATH__;
@@ -248,16 +249,19 @@ main(int argc, char** argv)
 
     po::options_description opts_conf("Options (hidden)");
     opts_conf.add_options()
-      ("scope,s",
+      ("scope",
           po::value<string>(&scope),
           "Scope root name.")
-      ("joiner,j",
+      ("joiner",
           po::value<string>(&joiner)->default_value(joiner),
-          "Scope joiner. String used to conjoin scope hierarchies.\n")
-      ("prefix-scripts,x",
+          "Scope joiner. String used to conjoin scope hierarchies.")
+      ("scope-id",
+          po::value<vector<string> >(&scope_id),
+          "One or more scope identifiers.\n")
+      ("prefix-scripts",
           po::value<bool>(&prefix_scripts)->default_value(prefix_scripts),
           "Output path prefix were prepended to extracted scripts.")
-      ("output-prefix,o",
+      ("output-prefix",
           po::value<string>(&output_prefix),
           "Output prefixed used by seam.\n")
       ("make-path",
@@ -471,6 +475,7 @@ main(int argc, char** argv)
     // configuration file
     scanner.set_rootscope( scope );
     scanner.set_scopejoiner( joiner );
+    scanner.set_scope_id( scope_id );
     scanner.set_prefix_scripts( prefix_scripts );
     scanner.set_output_prefix( output_prefix );
     scanner.set_make_path( make_path );

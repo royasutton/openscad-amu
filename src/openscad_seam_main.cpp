@@ -636,7 +636,8 @@ main(int argc, char** argv)
     ov.push_back((po_modes){1, "input", "input", MODE_ALL});
     ov.push_back((po_modes){1, "scope", "root scope", MODE_ALL});
     ov.push_back((po_modes){2, "joiner", "scope joiner", MODE_ALL});
-    ov.push_back((po_modes){0, "prefix", "prefix", MODE_EXTRACT});
+    ov.push_back((po_modes){0, "scope-id", "scope identifiers", MODE_EXTRACT});
+    ov.push_back((po_modes){1, "prefix", "prefix", MODE_EXTRACT});
     ov.push_back((po_modes){0, "prefix-ipp", "prefix ipp", MODE_EXTRACT});
     ov.push_back((po_modes){0, "prefix-scripts", "prefix scripts", MODE_EXTRACT});
     ov.push_back((po_modes){1, "output-prefix", "output prefix", MODE_EXTRACT});
@@ -738,6 +739,16 @@ main(int argc, char** argv)
 
       while( scanner.scan() != 0 )
         ;
+
+      // add the vector of scope identifiers to the program options
+      // to be written to the configuration file.
+      if ( write_config )
+      {
+        vm.insert( make_pair( "scope-id",
+                              po::variable_value(scanner.get_scope_id(), true)
+                            )
+                 );
+      }
     }
 
 

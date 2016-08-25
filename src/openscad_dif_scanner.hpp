@@ -97,6 +97,9 @@ class ODIF_Scanner : public yyFlexLexer{
     //! get the scope hierarchy joiner string.
     std::string get_scopejoiner(void) { return scopejoiner; }
 
+    //! set the vector of scope identifiers.
+    void set_scope_id(const std::vector<std::string>& v) { scope_id = v; }
+
     //! set the output prefix path.
     void set_output_prefix(const std::string& s) { output_prefix = s; }
     //! get the output prefix path.
@@ -165,6 +168,7 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string config_prefix;              //!< scanner configuration file path prefix.
     std::string rootscope;                  //!< scanner root scope name.
     std::string scopejoiner;                //!< scanner scope hierarchy conjoiner string.
+    std::vector<std::string> scope_id;      //!< vector of scope identifiers.
     std::string output_prefix;              //!< scanner output path prefix.
     bool prefix_scripts;                    //!< prefixing extracted scripts?
 

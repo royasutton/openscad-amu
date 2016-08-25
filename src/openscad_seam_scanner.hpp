@@ -76,6 +76,9 @@ class SEAM_Scanner : public yyFlexLexer{
     //! set the scope hierarchy joiner string.
     void set_scopejoiner(const std::string& s) { scopejoiner = s; }
 
+    //! get the vector of scope identifiers.
+    std::vector<std::string> get_scope_id(void) { return scope_id; }
+
     //! turn scanner debugging on or off.
     void set_debug(bool f) { yy_flex_debug = f; }
 
@@ -181,6 +184,7 @@ class SEAM_Scanner : public yyFlexLexer{
     std::ofstream output_file;          //!< scanner output file.
 
     std::stack<SEAM_Scope> scope;       //!< scope stack.
+    std::vector<std::string> scope_id;  //!< vector of scope identifiers.
 
     std::string rootscope;              //!< scanner root scope name.
     std::string scopejoiner;            //!< scanner scope hierarchy conjoiner string.

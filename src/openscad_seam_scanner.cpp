@@ -86,14 +86,9 @@ SEAM::SEAM_Scanner::init(void)
   output_name.clear();
   switch_output( &cout );
 
-  // if rootscope has been preveously set,
-  // empty stack and reset to initial rootscope
-  if ( !rootscope.empty() ) {
-    while ( !scope.empty())
-      scope.pop();
-
-    scope.push(SEAM_Scope( rootscope ));
-  }
+  // if rootscope has been preveously set, reset to initial rootscope
+  if ( !rootscope.empty() )
+    set_rootscope( rootscope );
 
   if ( input_file.is_open() ) {
     if ( !scanner_count_mode )
@@ -257,7 +252,15 @@ void
 SEAM::SEAM_Scanner::set_rootscope( const std::string& t )
 {
   rootscope = t;
+
+  // empty stack and initialize rootscope
+  while ( !scope.empty())
+    scope.pop();
   scope.push(SEAM_Scope( rootscope ));
+
+  // clear and initialize the scope_id vector with the rootscope
+  scope_id.clear();
+  scope_id.push_back( rootscope );
 }
 
 void
@@ -292,6 +295,9 @@ SEAM::SEAM_Scanner::begin_scope( const char t, const std::string& lm )
 
   if (verbose) cout << ops << "begin scope " << lt << ":[" << id << "] "
                     << cs << " --> " << scope.top().name() << "," << endl;
+
+  // add new scope to the scope identifiers vector
+  scope_id.push_back( scope.top().name() );
 }
 
 void
