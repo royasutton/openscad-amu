@@ -419,8 +419,18 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
     if ( search )
     {
-      debug_m(debug_filter, "auto-search: configuring include paths.\n"
-                            "checking each scope for generated makefile:");
+      debug_m(debug_filter, "auto-search: configuring include paths.");
+
+      string first_include_path;
+      if ( auto_config.compare(".") && auto_config.length() )
+        first_include_path = auto_config;
+      else
+        first_include_path = ".";
+
+      debug_m(debug_filter, "inserting [" + first_include_path + "] as first include path.");
+      include_path.insert(include_path.begin(), first_include_path);
+
+      debug_m(debug_filter, "checking each scope for generated makefile:");
 
       map<string,string> path_map;
 
