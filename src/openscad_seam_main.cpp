@@ -35,9 +35,9 @@
 
 #include "openscad_seam_scanner.hpp"
 
-#include "boost/program_options.hpp"
-#include "boost/filesystem.hpp"
-#include "boost/any.hpp"
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/any.hpp>
 
 #include <iomanip>
 

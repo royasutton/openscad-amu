@@ -32,7 +32,7 @@
 
 #include "openscad_dif_scanner.hpp"
 
-#include "boost/filesystem.hpp"
+#include <boost/filesystem.hpp>
 
 #include <set>
 

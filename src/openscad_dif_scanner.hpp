@@ -37,15 +37,15 @@
 #include <FlexLexer.h>
 #endif
 
+#include "openscad_dif_util.hpp"
+
+#include <boost/algorithm/string.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <boost/algorithm/string.hpp>
-
-#include "openscad_dif_util.hpp"
 
 //! \ingroup openscad_dif_src
 //! @{

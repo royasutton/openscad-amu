@@ -41,8 +41,8 @@
 
 #include "openscad_dif_scanner.hpp"
 
-#include "boost/program_options.hpp"
-#include "boost/filesystem.hpp"
+#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <iomanip>

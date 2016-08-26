@@ -32,9 +32,9 @@
 
 #include "openscad_dif_scanner.hpp"
 
-#include <set>
-
 #include <boost/tokenizer.hpp>
+
+#include <set>
 
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
