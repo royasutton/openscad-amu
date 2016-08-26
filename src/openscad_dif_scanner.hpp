@@ -110,11 +110,6 @@ class ODIF_Scanner : public yyFlexLexer{
     //! get if whether the extracted scripts will be prefix with the output prefix path.
     bool get_prefix_scripts(void) { return prefix_scripts; }
 
-    //! set whether to search makefile target directories for files references.
-    void set_search(bool f) { search = f; }
-    //! get if whether will search makefile target directories for files references.
-    bool get_search(void) { return search; }
-
     //! set the vector of include paths.
     void set_include_path(const std::vector<std::string>& p) { include_path = p; }
     //! get the vector of include paths.
@@ -172,7 +167,6 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string output_prefix;              //!< scanner output path prefix.
     bool prefix_scripts;                    //!< prefixing extracted scripts?
 
-    bool search;                            //!< search makefile target directories.
     std::vector<std::string> include_path;  //!< vector of include paths.
 
     std::string html_output;                //!< html output path.

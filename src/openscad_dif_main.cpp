@@ -43,8 +43,10 @@
 
 #include "boost/program_options.hpp"
 #include "boost/filesystem.hpp"
+#include <boost/tokenizer.hpp>
 
 #include <iomanip>
+#include <map>
 
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
@@ -54,6 +56,7 @@
 //! @{
 
 using namespace std;
+using namespace boost::filesystem;
 namespace po = boost::program_options;
 
 
@@ -155,12 +158,16 @@ debug_hf(const bool output, const bool header, const string& command_name="")
 
 //! output filter debugging message to debug page and standard error.
 void
-debug_m(const bool output, const string& message)
+debug_m(const bool& output, const string& message, const bool& newline=true)
 {
   if ( output )
   {
-    cout << message << endl;
-    cerr << message << endl;
+    cout << message;
+    if ( newline )
+      cout << endl;
+    cerr << message;
+    if ( newline )
+      cerr << endl;
   }
 }
 
@@ -174,7 +181,7 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
     // setup command line arguments
     ////////////////////////////////////////////////////////////////////////////
-    string command_name = boost::filesystem::basename( argv[0] );
+    string command_name = basename( argv[0] );
 
     // command line
     string input;
@@ -288,8 +295,6 @@ main(int argc, char** argv)
 
     try
     {
-      using namespace boost::filesystem;
-
       // parse command line options
       po::store(po::command_line_parser(argc, argv).options(opts)
                   .positional(opts_pos).run(), vm);
@@ -406,14 +411,136 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
     // validate arguments
     ////////////////////////////////////////////////////////////////////////////
-
      option_depend( vm, "verbose", "version");
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // include-path auto-configuration
+    ////////////////////////////////////////////////////////////////////////////
+    if ( search )
+    {
+      debug_m(debug_filter, "auto-search: configuring include paths.\n"
+                            "checking each scope for generated makefile:");
+
+      map<string,string> path_map;
+
+      // check each scope identifier
+      for ( vector<string>::iterator vit=scope_id.begin(); vit != scope_id.end(); ++vit)
+      {
+        string scope_name( *vit );
+        string target_prefix = "echo_targetsdir";
+
+        // assemble system command
+        string scmd;
+        string opts = " --no-print-directory";
+
+        path makefile_path;
+
+        // handle configuration prefix if not current directory (or empty)
+        if ( auto_config.compare(".") && auto_config.length() )
+        {
+          makefile_path /= auto_config;
+          opts += " --directory=" + auto_config;
+        }
+
+        makefile_path /= scope_name + makefile_ext;
+
+        scmd = make_path + opts
+             + " -f " + scope_name + makefile_ext
+             + " " + target_prefix;
+
+        // capture standard error as well
+        scmd.append(" 2>&1");
+
+        debug_m(debug_filter, "scope: " + scope_name);
+
+        // does makefile exists?
+        if ( exists(makefile_path) && is_regular_file(makefile_path) )
+        {
+          debug_m(debug_filter, "  makefile [" + makefile_path.string() + "] exists");
+
+          // run make to discover the target output directories
+          string result;
+
+#ifdef HAVE_POPEN
+          FILE* pipe;
+          char buffer[128];
+
+          pipe = popen( scmd.c_str(), "r" );
+          if (pipe)
+          {
+            while ( !feof(pipe) ) {
+              if ( fgets(buffer, 128, pipe) != NULL )
+                  result.append( buffer );
+            }
+            pclose(pipe);
+          }
+          else
+          {
+            debug_m(debug_filter, "popen() failed for " + scmd);
+          }
+#else /* HAVE_POPEN */
+          debug_m(debug_filter, "popen() not available, unable to execute " + scmd);
+#endif /* HAVE_POPEN */
+
+          path include_path_prefix;
+          // handle configuration prefix if not current directory (or empty)
+          if ( auto_config.compare(".") && auto_config.length() )
+            include_path_prefix /= auto_config;
+
+          // tokenize result string of directories
+          typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+          boost::char_separator<char> fsep(" \n");
+          tokenizer rt_tok( result, fsep );
+
+          //  add each include path if directory exists
+          for ( tokenizer::iterator it=rt_tok.begin(); it!=rt_tok.end(); ++it )
+          {
+            path tp( include_path_prefix );
+            tp /= *it;
+
+            debug_m(debug_filter, "  path [" + tp.string() + "] ", false);
+            if ( exists(tp) && is_directory(tp) )
+            { // add to include path map if it does not already exists
+              if ( path_map.find(*it) == path_map.end() )
+                path_map.insert( make_pair( *it, tp.string() ) );
+
+              debug_m(debug_filter, "exists.");
+            }
+            else
+            {
+              debug_m(debug_filter, "does not exists.");
+            }
+          }
+        }
+        else
+        {
+          debug_m(debug_filter, "  makefile [" + makefile_path.string() + "] does not exists");
+        }
+      }
+
+      // add directories in map to include path
+      debug_m(debug_filter, "adding unique directories to include-path:");
+      for( map<string,string>::iterator mit=path_map.begin(); mit != path_map.end(); ++mit)
+      {
+        include_path.push_back( mit->second );
+        debug_m(debug_filter, "  adding [" + mit->second + "]");
+      }
+
+      // insert discovered paths into a new program option identifier.
+      // this is for informational purposes only for use with debugging.
+      // do not notify so as to not overwrite the same additions to include_path.
+      vm.insert(make_pair("auto-path", po::variable_value(include_path, false)));
+    }
+    else
+    {
+      debug_m(debug_filter, "auto-search: inactive.");
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////
     // show configuration
     ////////////////////////////////////////////////////////////////////////////
-
     if ( debug_filter )
     {
       cout << endl << "program options:" << endl << endl;
@@ -457,11 +584,9 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
     // setup and run scanner
     ////////////////////////////////////////////////////////////////////////////
-
     ODIF::ODIF_Scanner scanner( input, command_name + ": " );
 
     // command line
-    scanner.set_search( search );
     scanner.set_include_path( include_path );
     scanner.set_html_output( html_output );
     scanner.set_latex_output( latex_output );
