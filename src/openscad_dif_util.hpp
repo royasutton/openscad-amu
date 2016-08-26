@@ -275,6 +275,16 @@ class func_args {
 
 } /* end namespace ODIF */
 
+
+namespace UTIL{
+
+  //! run a system command and capture return result.
+  void sys_command( const std::string& command, std::string& result,
+                    bool& good, const bool& standard_error=false);
+
+}
+
+
 #endif /* END __ODIF_UTIL_HPP__ */
 
 //! @}

@@ -304,31 +304,7 @@ ODIF::ODIF_Scanner::fx_pend(void)
         }
 
         filter_debug( scmd );
-
-#ifdef HAVE_POPEN
-        FILE* pipe;
-        char buffer[128];
-
-        pipe = popen( scmd.c_str(), "r" );
-
-        if (!pipe)
-          result = "popen() failed for " + scmd;
-        else
-        {
-          has_result=true;
-
-          while ( !feof(pipe) )
-          {
-            if ( fgets(buffer, 128, pipe) != NULL )
-                result.append( buffer );
-          }
-
-          pclose(pipe);
-        }
-#else /* HAVE_POPEN */
-        result = "popen() not available, unable to execute " + scmd;
-#endif /* HAVE_POPEN */
-
+        UTIL::sys_command( scmd, result, has_result, false );
       }
       else
       {

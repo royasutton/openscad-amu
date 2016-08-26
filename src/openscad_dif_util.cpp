@@ -42,7 +42,7 @@ using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// env_var
+// ODIF::env_var
 ////////////////////////////////////////////////////////////////////////////////
 
 ODIF::env_var::env_var( const string& p, const string& s,
@@ -207,7 +207,7 @@ ODIF::env_var::dump(void) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// func_args
+// ODIF::func_args
 ////////////////////////////////////////////////////////////////////////////////
 
 ODIF::func_args::func_args(const string& p)
@@ -441,7 +441,6 @@ ODIF::func_args::pairs_str(bool n, bool p, string a)
   return ( rv );
 }
 
-
 void
 ODIF::func_args::dump(void)
 {
@@ -458,6 +457,54 @@ ODIF::func_args::dump(void)
   }
 
   cout << ")";
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// UTIL
+////////////////////////////////////////////////////////////////////////////////
+
+void
+UTIL::sys_command(
+  const string& command,
+        string& result,
+        bool& good,
+  const bool& standard_error)
+{
+  string cmd_str( command );
+
+  if ( standard_error )
+    cmd_str.append(" 2>&1");
+
+#ifdef HAVE_POPEN
+  FILE* pipe;
+  char buffer[128];
+
+  pipe = popen( cmd_str.c_str(), "r" );
+
+  if (!pipe)
+  {
+    result = "popen() failed for " + cmd_str;
+
+    good=false;
+  }
+  else
+  {
+    while ( !feof(pipe) )
+    {
+      if ( fgets(buffer, 128, pipe) != NULL )
+          result.append( buffer );
+    }
+
+    pclose(pipe);
+
+    good=true;
+  }
+#else /* HAVE_POPEN */
+  result = "popen() not available, unable to execute " + cmd_str;
+
+  good=false;
+#endif /* HAVE_POPEN */
 }
 
 

@@ -169,38 +169,26 @@ ODIF::ODIF_Scanner::bif_shell(void)
   // unquote and trim the command string
   string scmd = unquote_trim( fx_argv.arg( 1 ) );
 
-  if ( flag_stde )
-    scmd.append(" 2>&1");
-
   string result;
+  bool good=false;
 
-#ifdef HAVE_POPEN
-  FILE* pipe;
-  char buffer[128];
+  filter_debug( scmd );
+  UTIL::sys_command( scmd, result, good, flag_stde );
 
-  pipe = popen( scmd.c_str(), "r" );
-
-  if (!pipe)
-    return( amu_error_msg("popen() failed for " + scmd) );
-
-  while ( !feof(pipe) )
+  if ( good == false )
   {
-    if ( fgets(buffer, 128, pipe) != NULL )
-        result.append( buffer );
+    return( amu_error_msg( result) );
   }
+  else
+  {
+    if (flag_rmnl)
+      result = replace_chars(result, "\n\r", ' ');
 
-  pclose(pipe);
-#else /* HAVE_POPEN */
-  return( amu_error_msg("popen() not available, unable to execute " + scmd) );
-#endif /* HAVE_POPEN */
+    if (flag_eval)
+      result = varm.expand_text(result);
 
-  if (flag_rmnl)
-    result = replace_chars(result, "\n\r", ' ');
-
-  if (flag_eval)
-    result = varm.expand_text(result);
-
-  return( result );
+    return( result );
+  }
 }
 
 /***************************************************************************//**
@@ -898,37 +886,21 @@ ODIF::ODIF_Scanner::bif_make(void)
        + " -f " + makefile_stem + get_makefile_ext()
        + " " + target_prefix + mf_scopejoiner + make_target;
 
-  // capture standard error as well
-  scmd.append(" 2>&1");
+  // issue system command
+  string result;
+  bool good=false;
 
   filter_debug( scmd );
+  UTIL::sys_command( scmd, result, good, true );
 
-  //
-  // issue system command
-  //
-  string result;
-
-#ifdef HAVE_POPEN
-  FILE* pipe;
-  char buffer[128];
-
-  pipe = popen( scmd.c_str(), "r" );
-
-  if (!pipe)
-    return( amu_error_msg("popen() failed for " + scmd) );
-
-  while ( !feof(pipe) )
+  if ( good )
   {
-    if ( fgets(buffer, 128, pipe) != NULL )
-        result.append( buffer );
+    return( result );
   }
-
-  pclose(pipe);
-#else /* HAVE_POPEN */
-  return( amu_error_msg("popen() not available, unable to execute " + scmd) );
-#endif /* HAVE_POPEN */
-
-  return( result );
+  else
+  {
+    return( amu_error_msg( result ) );
+  }
 }
 
 

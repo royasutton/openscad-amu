@@ -449,9 +449,6 @@ main(int argc, char** argv)
              + " -f " + scope_name + makefile_ext
              + " " + target_prefix;
 
-        // capture standard error as well
-        scmd.append(" 2>&1");
-
         debug_m(debug_filter, "scope: " + scope_name);
 
         // does makefile exists?
@@ -461,27 +458,22 @@ main(int argc, char** argv)
 
           // run make to discover the target output directories
           string result;
+          bool good=false;
 
-#ifdef HAVE_POPEN
-          FILE* pipe;
-          char buffer[128];
+          debug_m(debug_filter, "  running: " + scmd );
+          UTIL::sys_command( scmd, result, good, true );
 
-          pipe = popen( scmd.c_str(), "r" );
-          if (pipe)
+          if ( good )
           {
-            while ( !feof(pipe) ) {
-              if ( fgets(buffer, 128, pipe) != NULL )
-                  result.append( buffer );
-            }
-            pclose(pipe);
+            debug_m(debug_filter, "   result: " + result, false );
           }
           else
           {
-            debug_m(debug_filter, "popen() failed for " + scmd);
+            debug_m(debug_filter, "    error: " + result, true );
+
+            // system command error, don't add directories.
+            continue;
           }
-#else /* HAVE_POPEN */
-          debug_m(debug_filter, "popen() not available, unable to execute " + scmd);
-#endif /* HAVE_POPEN */
 
           path include_path_prefix;
           // handle configuration prefix if not current directory (or empty)
@@ -524,7 +516,7 @@ main(int argc, char** argv)
       for( map<string,string>::iterator mit=path_map.begin(); mit != path_map.end(); ++mit)
       {
         include_path.push_back( mit->second );
-        debug_m(debug_filter, "  adding [" + mit->second + "]");
+        debug_m(debug_filter, "adding [" + mit->second + "]");
       }
 
       // insert discovered paths into a new program option identifier.
