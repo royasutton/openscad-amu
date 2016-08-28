@@ -41,6 +41,7 @@
 #endif
 
 using namespace std;
+namespace bfs=boost::filesystem;
 
 
 ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
@@ -282,7 +283,6 @@ ODIF::ODIF_Scanner::fx_pend(void)
   else
   {
     /* check external function */
-    namespace bfs=boost::filesystem;
     bfs::path exfx_path;
 
     exfx_path  = lib_path;
@@ -477,18 +477,172 @@ ODIF::ODIF_Scanner::def_set_name(void)
 }
 
 void
-ODIF::ODIF_Scanner::filter_debug(const string& m)
+ODIF::ODIF_Scanner::filter_debug(
+  const string& m,
+  const bool& h,
+  const bool& f,
+  const bool& s
+)
 {
   if ( debug_filter )
   {
-    scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
-    scanner_output( "\\verbatim\n" );
-    scanner_output( m );
-    scanner_output( "\n\\endverbatim\n" );
-    scanner_output( "\\endif\n" );
+    if (s )
+    {
+      if ( h )
+      {
+        scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
+        scanner_output( "\\verbatim\n" );
+      }
+
+      scanner_output( m );
+      scanner_output( "\n" );
+
+      if ( f )
+      {
+        scanner_output( "\\endverbatim\n" );
+        scanner_output( "\\endif\n" );
+      }
+    }
 
     cerr << ops << m << endl;
   }
+}
+
+/***************************************************************************//**
+
+  \param file       file to locate.
+  \param found      status of if the file was located.
+  \param extension  return file name with file extension.
+  \param uri        return file name with URI formatting.
+  \param copy       copy the found file to the specified outdir.
+  \param outdir     destination directory for file copy.
+  \param rid        rename the copied file with an random identifier.
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::file_rl(
+  const string& file,
+        bool& found,
+  const bool& extension,
+  const bool& uri,
+  const bool& copy,
+  const string& outdir,
+  const bool& rid
+)
+{
+  filter_debug( "locate file: [" + file + "]", true, false, false);
+
+  // check each include path for file.
+  bfs::path found_file;
+  found = false;
+  for( vector<string>::iterator it = include_path.begin();
+                                it != include_path.end() && !found;
+                              ++it )
+  {
+    bfs::path f( file );
+    bfs::path p;
+
+    // check with just the filename.
+    p  = *it;
+    p /= f.filename();
+
+    filter_debug( "  checking: " + p.string(), false, false, false);
+    if ( exists(p) && is_regular_file(p) ) {
+      found = true;
+      found_file = p;
+
+      break;
+    }
+
+    // check with existing prefixed path.
+    p  = *it;
+    p /= f;
+
+    filter_debug( "  checking: " + p.string(), false, false, false);
+    if ( exists(p) && is_regular_file(p) ) {
+      found = true;
+      found_file = p;
+
+      break;
+    }
+  }
+
+  string return_file;
+  if ( found )
+  {
+    filter_debug( " found.", false, false, false);
+
+    // target is found file name without a prefixed path.
+    bfs::path target( found_file.filename() );
+
+    if ( copy )
+    {
+      // source file
+      bfs::path source( found_file );
+
+      // generate rid for target file?
+      if ( rid == true ) {
+        target = bfs::unique_path( bfs::path("%%%%-%%%%-%%%%-%%%%-%%%%-%%%%") );
+        target += found_file.extension();
+      }
+
+      // handle configuration prefix if not current directory (or empty)
+      bfs::path out_path;
+      if ( get_config_prefix().compare(".") && get_config_prefix().length() )
+        out_path /= get_config_prefix();
+
+      // were scripts and configuration already prefixed by seam?
+      // if not, add the output prefix to the output path.
+      if ( get_prefix_scripts() == false )
+        out_path /= get_output_prefix();
+
+      out_path /= outdir;
+
+      bfs::path target_path ( out_path / target );
+      bool copy_target = true;
+
+      filter_debug( " copying to [" + out_path.string() + "]", false, false, false);
+
+      // do not copy if the file exists and has same size.
+      if ( exists(target_path) && is_regular_file(target_path) )
+      {
+        if ( bfs::file_size( source ) == bfs::file_size( target_path ) )
+        {
+          filter_debug( "  same sized file exists.", false, false, false);
+
+          copy_target = false;
+        }
+        else
+        {
+          bfs::remove( target_path );
+        }
+      }
+
+      if ( copy_target )
+      {
+        bfs::copy_file( source, target_path, bfs::copy_option::overwrite_if_exists );
+        filter_debug( " done.", false, false, false);
+      }
+    }
+
+    // return file name with file extension?
+    if ( extension == true )
+      return_file = target.string();
+    else
+      return_file = target.stem().string();
+
+    // return file name with URI formating?
+    if ( uri == true )
+      return_file = "file://" + return_file;
+  }
+  else
+  { // file not located, return original reference string.
+    return_file = file;
+  }
+
+  filter_debug( " reference [" + return_file + "]", false, true, false);
+
+  return( return_file );
 }
 
 

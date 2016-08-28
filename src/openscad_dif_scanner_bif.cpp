@@ -559,8 +559,15 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       result.append("<td>");
 
       // begin image
-      if ( image_urls.length() ) result.append("<a href=\"" + iu_v[if_num] + "\">");
-      result.append("<img src=\"" + file + "\"");
+      bool found = false;
+      if ( image_urls.length() )
+        result.append( "<a href=\""
+                     + file_rl( iu_v[if_num], found, true, true, true, get_html_output(), false )
+                     + "\">" );
+
+      result.append( "<img src=\""
+                   + file_rl( file, found, true, false, true, get_html_output(), false )
+                   + "\"" );
 
       if ( image_titles.length() ) {
         result.append(" title=\"" + it_v[if_num] + "\"");
@@ -664,7 +671,12 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       // begin cell
 
       // begin image
-      if ( image_urls.length() ) result.append( "\\href{" + iu_v[if_num] + "}{");
+      bool found = false;
+      if ( image_urls.length() )
+        result.append( "\\href{"
+                     + file_rl( iu_v[if_num], found, true, true, true, get_latex_output(), false )
+                     + "}{" );
+
       result.append("\\includegraphics");
 
       // assemble attributes
@@ -678,7 +690,10 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
       if ( attr.length() )            result.append( "[" + attr + "]" );
 
-      result.append("{" + file + "}");
+      result.append( "{"
+                   + file_rl( file, found, false, false, true, get_latex_output(), false )
+                   + "}" );
+
       if ( image_urls.length() ) result.append( "}");
 
       // end image

@@ -289,7 +289,14 @@ class ODIF_Scanner : public yyFlexLexer{
     void def_app(void) { def_text+=YYText(); }
 
     //! output filter debugging message to standard output and standard error.
-    void filter_debug(const std::string& m);
+    void filter_debug( const std::string& m, const bool& h=true,
+                       const bool& f=true, const bool& s=true);
+
+    //! try to locate a file and copy it to an output directory.
+    std::string file_rl( const std::string& file, bool& found,
+                         const bool& extension=true, const bool& uri=false,
+                         const bool& copy=true, const std::string& outdir="",
+                         const bool& rid=false);
 
 
     // built-in amu functions
