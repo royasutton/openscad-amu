@@ -255,7 +255,8 @@ ODIF::ODIF_Scanner::fx_pend(void)
     // output result to scanner or store to variable map
     if ( fx_tovar.length() == 0 )
       scanner_output( result );
-    else {
+    else
+    {
       varm.store(fx_tovar, result);
 
       filter_debug( fx_tovar + "=[" + result + "]" );
@@ -390,7 +391,11 @@ ODIF::ODIF_Scanner::def_pend(void)
   if ( def_name.length() == 0 )
     scanner_output( def_text );
   else
+  {
     varm.store( def_name, def_text );
+
+    filter_debug( def_name + "=[" + def_text + "]" );
+  }
 
   def_name.clear();
   def_text.clear();
@@ -426,7 +431,7 @@ ODIF::ODIF_Scanner::filter_debug(
         scanner_output( "\\verbatim\n" );
       }
 
-      scanner_output( m );
+      scanner_output( "(line " + UTIL::to_string( lineno() ) + ") " + m );
       scanner_output( "\n" );
 
       if ( f )
@@ -436,7 +441,9 @@ ODIF::ODIF_Scanner::filter_debug(
       }
     }
 
-    cerr << ops << m << endl;
+
+
+    cerr << ops << "(line " << dec << lineno() << ") " << m << endl;
   }
 }
 
