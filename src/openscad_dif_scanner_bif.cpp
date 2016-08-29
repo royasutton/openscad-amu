@@ -174,7 +174,7 @@ ODIF::ODIF_Scanner::bif_shell(void)
   bool good=false;
 
   filter_debug( scmd );
-  UTIL::sys_command( scmd, result, good, flag_stde );
+  UTIL::sys_command( scmd, result, good, flag_stde, flag_rmnl );
 
   if ( good == false )
   {
@@ -182,9 +182,6 @@ ODIF::ODIF_Scanner::bif_shell(void)
   }
   else
   {
-    if (flag_rmnl)
-      result = UTIL::replace_chars(result, "\n\r", ' ');
-
     if (flag_eval)
       result = varm.expand_text(result);
 
@@ -797,6 +794,14 @@ ODIF::ODIF_Scanner::bif_viewer(void)
       extension     | e   |              | limit targets by extension
       target_prefix | tp  | echo_targets | make target prefix
 
+
+    Command flags and result filtering.
+
+     flags   | sc  | default | description
+    :-------:|:---:|:-------:|:-----------------------------------------
+      stderr | s   | false   | capture standard error output as well
+      rmnl   | r   | true    | remove line-feeds / carriage returns
+
     The scope identifier is initially the default root scope (specified by the
     program option set on the command line or in a configuration file). Each
     argument is then processes to modify the scope identifier according to the
@@ -819,11 +824,13 @@ ODIF::ODIF_Scanner::bif_make(void)
   "append",           "a",
   "prepend",          "p",
   "extension",        "e",
-  "target_prefix",    "tp"
+  "target_prefix",    "tp",
+  "stderr",           "s",
+  "rmnl",             "r"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
-  size_t ap=8;
+  size_t ap=14;
 
   // generate options help string.
   string help = "options: [";
@@ -842,6 +849,10 @@ ODIF::ODIF_Scanner::bif_make(void)
   string target_prefix = "echo_targets";
   string mf_scopejoiner = "_";
   string target_ext;
+
+  // flag defaults
+  bool flag_stde = false;
+  bool flag_rmnl = true;
 
   // iterate over the arguments, skipping function name (position zero)
   for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
@@ -881,6 +892,14 @@ ODIF::ODIF_Scanner::bif_make(void)
       { // target_prefix
         target_prefix = v;
       }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])))
+      { // stderr
+        flag_stde=( atoi( v.c_str() ) > 0 );
+      }
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])))
+      { // rmnl
+        flag_rmnl=( atoi( v.c_str() ) > 0 );
+      }
       else
       { // invalid
         return( amu_error_msg(n + " invalid option. " + help) );
@@ -911,7 +930,7 @@ ODIF::ODIF_Scanner::bif_make(void)
   bool good=false;
 
   filter_debug( scmd );
-  UTIL::sys_command( scmd, result, good, true );
+  UTIL::sys_command( scmd, result, good, flag_stde, flag_rmnl );
 
   if ( good )
   {

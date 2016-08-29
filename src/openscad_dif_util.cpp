@@ -470,7 +470,8 @@ UTIL::sys_command(
   const string& command,
         string& result,
         bool& good,
-  const bool& standard_error)
+  const bool& standard_error,
+  const bool& replace_newlines)
 {
   string cmd_str( command );
 
@@ -506,6 +507,9 @@ UTIL::sys_command(
 
   good=false;
 #endif /* HAVE_POPEN */
+
+  if ( replace_newlines )
+    result = UTIL::replace_chars(result, "\n\r", ' ');
 }
 
 string

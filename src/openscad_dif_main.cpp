@@ -471,7 +471,7 @@ main(int argc, char** argv)
           bool good=false;
 
           debug_m(debug_filter, "  running: " + scmd );
-          UTIL::sys_command( scmd, result, good, true );
+          UTIL::sys_command( scmd, result, good, true, true );
 
           if ( good )
           {
