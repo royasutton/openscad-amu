@@ -185,7 +185,7 @@ main(int argc, char** argv)
 
     // command line
     string input;
-    bool search           = false;
+    bool search           = true;
     vector<string> include_path;
     string html_output    = "html";
     string latex_output   = "latex";
