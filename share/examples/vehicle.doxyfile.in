@@ -15,7 +15,12 @@ EXAMPLE_PATH           = "@builddir@"
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = "@builddir@/build/png" \
                          "@builddir@/build/png2eps"
-FILTER_PATTERNS        = *.scad="@top_builddir@/src/openscad-dif"
+FILTER_PATTERNS        = "*.scad=\"@top_builddir@/src/openscad-dif \
+                                   --auto-config @builddir@ \
+                                   --html-output html \
+                                   --latex-output latex\""
+#                                   --debug-filter \
+ENABLED_SECTIONS       = __INCLUDE_FILTER_DEBUG__
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 GENERATE_TREEVIEW      = YES
