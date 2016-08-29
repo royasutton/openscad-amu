@@ -788,7 +788,7 @@ ODIF::ODIF_Scanner::bif_viewer(void)
 
      options        | sc  | default      |  description
     :--------------:|:---:|:------------:|:------------------------------------
-      set           | s   |              | set the scope identifier to argument
+      set           | si  |              | set the scope identifier to argument
       append        | a   |              | append argument to scope identifier
       prepend       | p   |              | prepend argument to scope identifier
       extension     | e   |              | limit targets by extension
@@ -820,7 +820,7 @@ ODIF::ODIF_Scanner::bif_make(void)
   // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
   string vana[] =
   {
-  "set",              "s",
+  "set",              "si",
   "append",           "a",
   "prepend",          "p",
   "extension",        "e",
