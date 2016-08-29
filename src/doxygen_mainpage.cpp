@@ -162,6 +162,7 @@
     | \ref ODIF::ODIF_Scanner::bif_image_table() "\\amu_image_table" |
     | \ref ODIF::ODIF_Scanner::bif_viewer() "\\amu_viewer" |
     | \ref ODIF::ODIF_Scanner::bif_make() "\\amu_make" |
+    | \ref ODIF::ODIF_Scanner::bif_copy() "\\amu_copy" |
     | *also see:* <prefix>/functions/amu_<name> |
 
     \section variable Variable

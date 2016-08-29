@@ -212,6 +212,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_make();
   }
+  else if (fx_name.compare("copy")==0)
+  {
+    has_result=true;
+    result=bif_copy();
+  }
   else
   {
     /* check external function */

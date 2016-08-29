@@ -351,12 +351,6 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
      files    | ", "
      titles   | "~^"
 
-  \todo consider support for global image path variable stored in the
-        scanners environment variable map (varm) if needed. need a way to
-        copy referenced files into the output directory (html/latex), if it
-        does not already exists there and reference the local copy. this
-        will allow the produced documentation to be compiled into more
-        portable files.
   \todo might be nice to use a more general way of added attributes to the
         table elements using an attributes database based on the environment
         variables. each tag checks the database for existing attributes.
@@ -902,7 +896,7 @@ ODIF::ODIF_Scanner::bif_make(void)
       }
       else
       { // invalid
-        return( amu_error_msg(n + " invalid option. " + help) );
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
       }
     }
   }
@@ -939,6 +933,156 @@ ODIF::ODIF_Scanner::bif_make(void)
   else
   {
     return( amu_error_msg( result ) );
+  }
+}
+
+/***************************************************************************//**
+  \details
+
+    Copy the list of files to the output directory for the specified
+    documentation types.
+
+     options    | sc  | default | description
+    :----------:|:---:|:-------:|:-----------------------------
+      files     | f   |         | list of files
+      types     | t   |         | html, latex, docbook, or rtf
+
+    The tokenizer character that separates lists are summarized in the
+    following table.
+
+     type     | any of
+    :--------:|:------:
+     files    | ", "
+     types    | ", "
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_copy(void)
+{
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "files",            "f",
+  "types",            "t"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  size_t ap=4;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  // variables
+  string files;
+  string types;
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if      (!(n.compare(vana[0])&&n.compare(vana[1])))
+      { // files
+        files = UTIL::unquote_trim( v );
+      }
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // types
+        types = UTIL::unquote_trim( v );
+      }
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  //
+  // validate arguments
+  //
+  typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+  boost::char_separator<char> fsep(", ");
+
+  tokenizer f_tok( files, fsep );
+  tokenizer t_tok( types, fsep );
+
+  vector<string> outpath;
+
+  for ( tokenizer::iterator tit=t_tok.begin(); tit!=t_tok.end(); ++tit )
+  {
+    if      ( !tit->compare("html") )
+    {
+      outpath.push_back( get_html_output() );
+    }
+    else if ( !tit->compare("latex") )
+    {
+      outpath.push_back( get_latex_output() );
+    }
+    else if ( !tit->compare("docbook") )
+    {
+      outpath.push_back( get_docbook_output() );
+    }
+    else if ( !tit->compare("rtf") )
+    {
+      outpath.push_back( get_rtf_output() );
+    }
+    else
+    {
+      return( amu_error_msg( *tit + " invalid type option. "
+                                    "may be [html, latex, docbook, or rtf].") );
+    }
+  }
+
+  filter_debug(fx_name + " begin", true, false, true);
+
+  filter_debug("files=[" + files + "]", false, false, true);
+  filter_debug("types=[" + types + "]", false, false, true);
+
+  string result;
+
+  // iterate over each file and output path
+  for ( tokenizer::iterator fit=f_tok.begin(); fit!=f_tok.end(); ++fit )
+  {
+    for ( vector<string>::iterator pit=outpath.begin(); pit!=outpath.end(); ++pit )
+    {
+      string file( *fit );
+      string path( *pit );
+
+      bool found=false;
+      string rl = file_rl(file, found, true, false, true, path, false);
+
+      if ( found == false )
+        result.append(" " + rl);
+
+      filter_debug("copy " + file + " to " + path + " : " +
+                   (found?string("ok"):string("not found")),
+                   false, false, true);
+    }
+  }
+
+  filter_debug(fx_name + " end", false, true, true);
+
+  if ( result.length() )
+  {
+    return ( amu_error_msg("not found: " + result) );
+  }
+  else
+  {
+    return( result );
   }
 }
 
