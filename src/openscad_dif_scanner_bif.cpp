@@ -33,6 +33,7 @@
 #include "openscad_dif_scanner.hpp"
 
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <set>
 
@@ -167,7 +168,7 @@ ODIF::ODIF_Scanner::bif_shell(void)
     return(amu_error_msg("requires a single positional argument. " + help));
 
   // unquote and trim the command string
-  string scmd = unquote_trim( fx_argv.arg( 1 ) );
+  string scmd = UTIL::unquote_trim( fx_argv.arg( 1 ) );
 
   string result;
   bool good=false;
@@ -182,7 +183,7 @@ ODIF::ODIF_Scanner::bif_shell(void)
   else
   {
     if (flag_rmnl)
-      result = replace_chars(result, "\n\r", ' ');
+      result = UTIL::replace_chars(result, "\n\r", ' ');
 
     if (flag_eval)
       result = varm.expand_text(result);
@@ -220,6 +221,8 @@ ODIF::ODIF_Scanner::bif_shell(void)
 string
 ODIF::ODIF_Scanner::bif_combine(void)
 {
+  using namespace UTIL;
+
   // options declaration: vana & vans.
   // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
   string vana[] =
@@ -365,6 +368,8 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
 string
 ODIF::ODIF_Scanner::bif_image_table(void)
 {
+  using namespace UTIL;
+
   // options declaration: vana & vans.
   // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
   string vana[] =

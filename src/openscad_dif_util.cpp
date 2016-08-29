@@ -33,6 +33,7 @@
 #include "openscad_dif_util.hpp"
 
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
@@ -505,6 +506,88 @@ UTIL::sys_command(
 
   good=false;
 #endif /* HAVE_POPEN */
+}
+
+string
+UTIL::get_word(const string& w, const int n)
+{
+  istringstream iss(w);
+  string iw, rw;
+
+  for (int l=1; iss >> iw; l++)
+    if ( l==n ) {
+      rw=iw;
+      break;
+    }
+
+  return rw;
+}
+
+string
+UTIL::remove_chars(const string &s, const string &c)
+{
+  return ( replace_chars(s, c, '\0') );
+}
+
+string
+UTIL::replace_chars(const string &s, const string &c, const char r)
+{
+  string result;
+
+  for ( string::const_iterator its=s.begin(); its!=s.end(); ++its ) {
+    bool append = true;
+
+    for ( string::const_iterator itc=c.begin(); itc!=c.end(); ++itc )
+      if ( *its == *itc ) { append = false; break; }
+
+    if ( append )       result += *its;
+    else if (r != '\0') result += r;
+  }
+
+  return( result );
+}
+
+string
+UTIL::unquote(const string &s)
+{
+  string r = s;
+
+  // search substring for first and last quote characters if any
+
+  size_t fp = s.find_first_of("\"\'");
+  size_t lp = s.find_last_of("\"\'");
+
+  // make sure different character pointers
+  if ( fp != lp ) {
+    // make sure the characters match: ie '' or ""
+    if ( s.at(fp) == s.at(lp) ) {
+      // check for quoted NULL ""
+      if ( (lp-fp) < 2 )
+        r.clear();
+      else
+        r = s.substr( fp+1, lp-1 );
+    }
+  }
+
+  return( r );
+}
+
+
+string
+UTIL::unquote_trim(const string &s)
+{
+  return ( boost::trim_copy( unquote( s ) ) );
+}
+
+
+string
+UTIL::to_string(const long v)
+{
+  ostringstream os;
+
+  os << dec << v;
+
+  return ( os.str() );
 }
 
 

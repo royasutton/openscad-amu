@@ -133,75 +133,11 @@ ODIF::ODIF_Scanner::amu_error_msg(const string& m)
      << ops
      << input_name
      << ", line " << dec << lineno() << ", "
-     << get_word(amu_parsed_text, 1)
+     << UTIL::get_word(amu_parsed_text, 1)
      << " " << m
      << "</tt>";
 
   return ( os.str() );
-}
-
-string
-ODIF::ODIF_Scanner::get_word(const string& w, const int n)
-{
-  istringstream iss(w);
-  string iw, rw;
-
-  for (int l=1; iss >> iw; l++)
-    if ( l==n ) {
-      rw=iw;
-      break;
-    }
-
-  return rw;
-}
-
-string
-ODIF::ODIF_Scanner::remove_chars(const string &s, const string &c)
-{
-  return ( replace_chars(s, c, '\0') );
-}
-
-string
-ODIF::ODIF_Scanner::replace_chars(const string &s, const string &c, const char r)
-{
-  string result;
-
-  for ( string::const_iterator its=s.begin(); its!=s.end(); ++its ) {
-    bool append = true;
-
-    for ( string::const_iterator itc=c.begin(); itc!=c.end(); ++itc )
-      if ( *its == *itc ) { append = false; break; }
-
-    if ( append )       result += *its;
-    else if (r != '\0') result += r;
-  }
-
-  return( result );
-}
-
-string
-ODIF::ODIF_Scanner::unquote(const string &s)
-{
-  string r = s;
-
-  // search substring for first and last quote characters if any
-
-  size_t fp = s.find_first_of("\"\'");
-  size_t lp = s.find_last_of("\"\'");
-
-  // make sure different character pointers
-  if ( fp != lp ) {
-    // make sure the characters match: ie '' or ""
-    if ( s.at(fp) == s.at(lp) ) {
-      // check for quoted NULL ""
-      if ( (lp-fp) < 2 )
-        r.clear();
-      else
-        r = s.substr( fp+1, lp-1 );
-    }
-  }
-
-  return( r );
 }
 
 void
@@ -424,15 +360,15 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
   // conditionally assign value the named function argument?
   if ( fx_argv.get_next_name().length() )
   {
-    if ( post )                 fx_argv.store( to_string(old_val) );      // var++
-    else                        fx_argv.store( to_string(new_val) );      // ++var
+    if ( post )                 fx_argv.store( UTIL::to_string(old_val) );      // var++
+    else                        fx_argv.store( UTIL::to_string(new_val) );      // ++var
   }
 
   // store variable:
   // var++ : as named function argument (name=count)
   // ++var : in the environment variable map
-  if ( post )                   varm.store( vn, to_string(new_val) );     // var++
-  else                          fx_argv.store( vn, to_string(new_val) );  // ++var
+  if ( post )                   varm.store( vn, UTIL::to_string(new_val) );     // var++
+  else                          fx_argv.store( vn, UTIL::to_string(new_val) );  // ++var
 }
 
 

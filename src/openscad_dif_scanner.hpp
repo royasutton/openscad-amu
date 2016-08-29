@@ -39,8 +39,6 @@
 
 #include "openscad_dif_util.hpp"
 
-#include <boost/algorithm/string.hpp>
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -191,28 +189,6 @@ class ODIF_Scanner : public yyFlexLexer{
 
     //! generate standard error message string with message m.
     std::string amu_error_msg(const std::string& m);
-
-    //! return word number n from string w.
-    std::string get_word(const std::string& w, const int n);
-
-    //! remove all characters in c from from string s.
-    std::string remove_chars(const std::string &s, const std::string &c);
-
-    //! replace all characters in c in string s with replacement character r.
-    std::string replace_chars(const std::string &s, const std::string &c, const char r='\0');
-
-    //! unquote outermost matching quotation characters, '' or "", from string.
-    std::string unquote(const std::string &s);
-
-    //! unquote outermost matching quotation characters and trim whitespace.
-    std::string unquote_trim(const std::string &s) { return ( boost::trim_copy(unquote(s)) ); }
-
-    //! convert a long integer to a string.
-    std::string to_string(const long v) {
-      std::ostringstream os;
-      os << std::dec << v;
-      return ( os.str() );
-    }
 
     env_var     varm;                   //!< scanner environment variable map.
 
