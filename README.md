@@ -1,5 +1,7 @@
-Build scripting and documenting OpenSCAD designs
-================================================
+openscad-amu
+============
+
+> Utilities for build scripting and documenting OpenSCAD designs...
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://github.com/royasutton/openscad-amu/blob/master/COPYING)
 
@@ -9,8 +11,8 @@ for scripting the compilation of OpenSCAD designs and a source code
 _pre-processor_ that allows __*.scad__ to be documented using Doxygen.
 
 
-Downloading openscad-amu
-------------------------
+Downloading
+-----------
 
 You can find official source releases of the utilities at:
 
@@ -93,8 +95,8 @@ the following can be used:
     $ git describe
 
 
-Contributing to openscad-amu
-----------------------------
+Contributing
+------------
 
 openscad-amu uses [git] for development tracking, and is hosted on [GitHub]
 following the usual practice of [forking] and submitting [pull requests]
