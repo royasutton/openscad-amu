@@ -108,6 +108,7 @@ amu_escaped                       "\\"[\\@]
 <AMUFUNC>{id}                     { apt(); fx_set_tovar(); }
 <AMUFUNC>\(                       { apt(); BEGIN(FUNCARG); }
 <AMUFUNC>{ws}+                    { apt(); }
+<AMUFUNC>{nr}                     { apt(); }
 <AMUFUNC>.                        { abort("in function name", lineno(), YYText()); }
 
   /* parse arguments */
@@ -146,6 +147,7 @@ amu_escaped                       "\\"[\\@]
 <AMUMDEFINE>{id}                  { apt(); def_set_name(); }
 <AMUMDEFINE>\(                    { apt(); BEGIN(DEFINEARG); }
 <AMUMDEFINE>{ws}+                 { apt(); }
+<AMUMDEFINE>{nr}                  { apt(); }
 <AMUMDEFINE>.                     { abort("in define", lineno(), YYText()); }
 
 <DEFINEARG>\)                     { apt(); def_pend(); yy_pop_state(); }
