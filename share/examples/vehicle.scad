@@ -177,11 +177,10 @@
   \subsection appendix Appendix: All Generated Images
 
     \amu_define  id     ( table_of_all )
-    \amu_shell   tcolsw ( "seq -f 'Column (%g)' -s '^' 10" )
+    \amu_shell   tcolsw ( "seq -f 'Col (%g)' -s '^' 10" )
     \amu_define  theadt ( Table of all Generated Images. )
     \amu_shell   iheadt ( "seq -f 'h%g' -s '^' 84" )
     \amu_shell   countw ( "seq -f '(%g)' -s '^' 84" )
-    \amu_shell   tcolsw ( "seq -f 'Col (%g)' -s '^' 10" )
     \amu_combine ititle ( joiner=" " separator="^" tokenizer=" " prefix="a"
                           "car truck van"
                           "with" "12 17" "wheels" "thats"
