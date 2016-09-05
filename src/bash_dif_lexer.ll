@@ -217,8 +217,12 @@ bcmt                              "#/"[#!/]+
 ecmt                              "#"+"/"
 
   /* match from beginning of line only for cmtld, cmtli */
-cmtld                             ^{ws}*"##"[#]*    /* pass comment */
-cmtli                             ^{ws}*"#"[#]*     /* in comment */
+  /* pass comment line */
+cmtld                             ^{ws}*"##"[#]*
+  /* coment line in comment */
+cmtli                             ^{ws}*"#"[#]*
+  /* escape comment in comment */
+esccc                             [\\]"#"
 
   /* append trailing whitespace {ws} to avoid substring matching */
 kw_afn                            [\\@](?i:afn){ws}
@@ -238,6 +242,7 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
   /* inside comment block */
 <COMMENT>{bcmt}                   { abort("nested comment blocks", lineno(), YYText()); }
 <COMMENT>{ecmt}                   { cb.app_text( " */" );  yy_pop_state(); }
+<COMMENT>{esccc}                  { cb.app_text( "#" ); }
 <COMMENT>{cmtli}                  { cb.app_text( " *" ); }
 <COMMENT>{nr}                     { cb.app_text( YYText() ); }
 <COMMENT>.                        { cb.app_text( YYText() ); }
