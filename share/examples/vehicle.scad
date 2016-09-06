@@ -39,7 +39,7 @@
 
 /***************************************************************************//**
 
-  \mainpage Example Library Documentation
+  \mainpage Example Vehicle Design Library
 
   \tableofcontents
 
@@ -57,7 +57,7 @@
 
     \dot
       graph g { subgraph cluster_model { graph[style=solid];
-          label="Example Vehicle Library\n(select a module)";
+          label="Vehicle Design Library\n(select a module)";
           node [shape=Mrecord];
           a [label="wheel" URL="\ref wheel"];
           b [label="cabin" URL="\ref cabin"];

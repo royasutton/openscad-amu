@@ -28,8 +28,6 @@
 #
 #     Core make makefile script functions. Many of these functions should
 #     not be used directlyin a script and, as such, are marked \c private.
-#     See the \ref quick_start for a introduction on how to use these
-#     functions.
 #
 #   \ingroup library_core
 ###############################################################################/

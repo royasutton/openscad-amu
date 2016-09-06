@@ -57,7 +57,7 @@ CLEANFILES += \
 	embedding_scheme.scripts
 
 embedding_scheme.scripts: $(srcdir)/embedding_scheme.scad $(openscad_seam)
-	$(openscad_seam) --mode count --input $< --scope source --verbose \
+	$(openscad_seam) --mode count  --joiner=- --input $< --scope root --verbose \
 		> embedding_scheme.scripts
 
 CLEANFILES += \

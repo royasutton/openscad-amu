@@ -8,7 +8,8 @@ openscad-amu
 
 OpenSCAD Automake Utilities (__openscad-amu__) provide a _framework_
 for scripting the compilation of OpenSCAD designs and a source code
-_pre-processor_ that allows __*.scad__ to be documented using Doxygen.
+_pre-processor_ that allows __*.scad__ (and __*.bash__) to be documented
+using Doxygen.
 
 
 Downloading
@@ -34,8 +35,7 @@ and documentation markup of OpenSCAD language-based mechanical designs.
 
 It establishes a framework that allows auxiliary scripts to be written in
 structured comment blocks of __*.scad__ source code which are used to
-construct *Makefiles* that automate the design compilations using
-[OpenSCAD].
+construct *Makefiles* that automate design compilation using [OpenSCAD].
 
 With design documentation, it seems natural to leverage existing tools
 that extract code documentation from annotated sources. Inasmuch,
