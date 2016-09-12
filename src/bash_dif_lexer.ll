@@ -333,7 +333,7 @@ main( int argc, char** argv ) {
     exit( EXIT_SUCCESS );
   }
 
-  ifstream infile ( arg1.c_str() );
+  std::ifstream infile ( arg1.c_str() );
 
   if ( infile.good() ) {
     bash_difFlexLexer* lexer = new bash_difFlexLexer( &infile , &cout );

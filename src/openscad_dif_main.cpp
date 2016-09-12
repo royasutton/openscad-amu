@@ -379,7 +379,7 @@ main(int argc, char** argv)
 
         debug_m( debug_filter, "reading configuration file: [" + config + "]");
 
-        ifstream config_file ( config.c_str() );
+        std::ifstream config_file ( config.c_str() );
 
         if ( config_file.good() )
         { // parse configuration file options

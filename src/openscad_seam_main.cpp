@@ -443,7 +443,7 @@ main(int argc, char** argv)
         if ( vm.count("verbose") )
           cout << "reading configuration file: " << config << endl;
 
-        ifstream config_file ( config.c_str() );
+        std::ifstream config_file ( config.c_str() );
 
         if ( config_file.good() ) {
           po::store(po::parse_config_file(config_file, opts, true), vm);
@@ -774,7 +774,7 @@ main(int argc, char** argv)
       if ( vm.count("verbose")  )
         cout << "writing configuration file: " << conf_path.string() << endl;
 
-      ofstream config_file ( conf_path.c_str() );
+      std::ofstream config_file ( conf_path.c_str() );
 
       if ( config_file.good() ) {
         format_options( config_file, "configuration:", "#", ov, run_mode, vm );

@@ -364,7 +364,7 @@ SEAM::SEAM_Scanner::end_mfscript(void)
   switch_output( &std::cout );
 
   if ( show ) {
-    ifstream tmp_file( script_file.c_str() );
+    std::ifstream tmp_file( script_file.c_str() );
 
     cout << "### begin show file [" << script_file << "] ###" << endl;
     cout << tmp_file.rdbuf();
@@ -452,7 +452,7 @@ SEAM::SEAM_Scanner::end_openscad(void)
   switch_output( &std::cout );
 
   if ( show ) {
-    ifstream tmp_file( script_file.c_str() );
+    std::ifstream tmp_file( script_file.c_str() );
 
     cout << "### begin show file [" << script_file << "] ###" << endl;
     cout << tmp_file.rdbuf();
