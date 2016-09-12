@@ -263,7 +263,7 @@ Begin_Scope doc;
   //
 
   Begin_OpenSCAD;
-    use <test_01.scad>;
+    use <test1.scad>;
 
     //
     // parallel inset mount demo
