@@ -6,7 +6,7 @@
       node [shape=Mrecord, fontname=Helvetica, fontsize=10];
       a [label="openscad-amu" URL="../../../share/lib/doxygen/html/index.html"];
       b [label="C++ Programs" URL="index.html" style="filled"];
-      c [label="Makefile Script Library" URL="../../../share/lib/doxygen/html/library.html"];
+      c [label="Makefile Script Library" URL="../../../share/lib/doxygen/html/mslibrary.html"];
       d [label="Support Scripts" URL="../../../share/scripts/doxygen/html/index.html"];
       a->b; a->c; a->d;
     }
