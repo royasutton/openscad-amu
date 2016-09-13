@@ -38,11 +38,27 @@
 
 
 #==============================================================================
-# enforce minimum bash version.
+# enforce requirements
 #==============================================================================
 
+# minimum bash version.
 if [[ "$BASH_VERSINFO" -lt 4 ]] ; then
-  echo >&2 "requires bash >= 4.\n"
+  echo >&2 "requires bash >= 4."
+  return 1 2>/dev/null
+  exit 1
+fi
+
+# ${__LIBPATH__} must be set.
+if [[ -z "${__LIBPATH__}" ]] ; then
+  echo >&2 "\${__LIBPATH__} not set, aborting."
+  return 1 2>/dev/null
+  exit 1
+fi
+
+# ${__LIBPATH__}/lib must exist.
+if [[ ! -d "${__LIBPATH__}/lib" ]] ; then
+  echo >&2 "\${__LIBPATH__}=[${__LIBPATH__}] and" \
+           "${__LIBPATH__}/lib directory does not exist, aborting."
   return 1 2>/dev/null
   exit 1
 fi
@@ -171,6 +187,8 @@ declare -i makefile_textbox_box_width=80
 
 [[ -n $__VERBOSE__ ]] && \
 echo "done."
+
+return 0
 
 
 #==============================================================================
