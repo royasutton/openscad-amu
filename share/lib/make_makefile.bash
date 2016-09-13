@@ -1244,5 +1244,25 @@ function variables()
 
 
 #==============================================================================
+# protect functions
+#==============================================================================
+readonly -f \
+  makefile_titleblock_begin \
+  makefile_titleblock_end \
+  show_variable_summary \
+  show_opts_set_tables \
+  show_arg_list_status \
+  add_target \
+  add_target_convert \
+  generate_targets \
+  add_targets \
+  add_targets_dirs \
+  add_targets_menu \
+  script_redirect \
+  script \
+  variables
+
+
+#==============================================================================
 # eof
 #==============================================================================
