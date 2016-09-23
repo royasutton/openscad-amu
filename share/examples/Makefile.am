@@ -33,6 +33,8 @@ install_path = $(version_path)/examples
 # targets
 ##############################################################################
 
+all-local: $(files_am)
+
 docs-local: examples.stamp
 
 CLEANFILES = \
@@ -129,7 +131,7 @@ doxygen.stamp: vehicle.doxyfile Makefile $(srcdir)/vehicle.scad
 
 '$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
 
-install-data-local: | '$(install_path)'
+install-data-local: $(files_am) | '$(install_path)'
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_DATA) $$f '$(install_path)' \

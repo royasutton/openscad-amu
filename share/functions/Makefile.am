@@ -21,9 +21,11 @@ install_path = $(version_path)/functions
 # targets
 ##############################################################################
 
+all-local: $(files_am)
+
 '$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
 
-install-data-local: | '$(install_path)'
+install-data-local: $(files_am) | '$(install_path)'
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_SCRIPT) $$f '$(install_path)' \
