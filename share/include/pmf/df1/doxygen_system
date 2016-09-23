@@ -1,0 +1,116 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# System
+################################################################################
+
+#------------------------------------------------------------------------------#
+# Commands
+#------------------------------------------------------------------------------#
+
+path_doxygen				:= $(call first_of,doxygen)
+path_openscad_dif		:= $(call first_of,openscad-dif-$(AMU_TOOL_VERSION) openscad-dif)
+
+#------------------------------------------------------------------------------#
+# OS Configuration
+#------------------------------------------------------------------------------#
+
+__os_found := $(false)
+
+# Linux
+ifeq (${os},Linux)
+	openscad_libraries	:= $(HOME)/.local/share/OpenSCAD/libraries
+
+	__os_found := $(true)
+endif
+
+ifeq (${os},CYGWIN_NT)
+	openscad_libraries	:= $(shell cygpath --mydocs)/OpenSCAD/libraries
+
+	__os_found := $(true)
+endif
+
+#------------------------------------------------------------------------------#
+# Configuration Check
+#------------------------------------------------------------------------------#
+
+# OS
+ifeq ($(__os_found),$(false))
+  $(error OS [$(os)] needs to be configured in [$(lastword $(MAKEFILE_LIST))])
+else
+  undefine __os_found
+endif
+
+# Commands
+doxygen_commands_required := \
+	path_doxygen \
+	path_openscad_dif
+
+# Warning list first, then error.
+$(call variable_list_check, \
+	$(doxygen_commands_required),found,$(false),$(true))
+$(call variable_list_check, \
+	$(doxygen_commands_required),found,$(false),$(false))
+
+#------------------------------------------------------------------------------#
+# References
+#------------------------------------------------------------------------------#
+
+#------------------------------------------------------------------------------#
+# Reference Check
+#------------------------------------------------------------------------------#
+
+doxygen_commands_configured := \
+	$(doxygen_commands_required)
+
+$(call variable_list_check, \
+	$(doxygen_commands_configured),configured,$(true),$(false))
+
+#------------------------------------------------------------------------------#
+# System Constants
+#------------------------------------------------------------------------------#
+
+doxygenvn := $(shell $(path_doxygen) 2>&1 --version)
+doxygenvs := doxygen$(doxygenvn)
+
+amudifvn := $(subst v,$(empty),$(shell $(path_openscad_dif) 2>&1 --version))
+amudifvs := amudif$(amudifvn)
+
+#------------------------------------------------------------------------------#
+# Configuration Variable List
+#------------------------------------------------------------------------------#
+
+doxygen_config_variables := \
+	openscad_libraries \
+	\
+	doxygenvs \
+	doxygenvn \
+	\
+	amudifvs \
+	amudifvn \
+
+################################################################################
+# eof
+################################################################################

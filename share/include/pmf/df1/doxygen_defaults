@@ -1,0 +1,72 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Defaults
+################################################################################
+
+# Output formats
+generate_html								:= $(true)
+generate_latex							:= $(true)
+generate_man								:= $(true)
+
+# Debugging
+debug_dif_scanner						:= $(false)
+debug_dif_filter						:= $(false)
+
+# Configuration input file
+doxygen_config							:= Doxyfile
+
+# Additional paths (for controlled variables)
+example_path_add						:=
+image_path_add							:=
+enabled_sections_add				:=
+
+# Output sub-directory names
+html_output									:= html
+latex_output								:= latex
+man_output									:= man
+
+# Output file names
+latex_stamp_name						:= latex$(stamp_ext)
+doxygen_stamp_name					:= doxygen$(stamp_ext)
+doxygen_tag_name						:= doxygen.tags
+doxygen_warn_name						:= doxygen.warnings
+doxygen_config_auto_name		:= $(doxygen_config).auto
+
+#------------------------------------------------------------------------------#
+# Control Variable List
+#------------------------------------------------------------------------------#
+
+doxygen_control_variables := \
+	generate_html \
+	generate_latex \
+	generate_man \
+	\
+	debug_dif_scanner \
+	debug_dif_filter
+
+################################################################################
+# eof
+################################################################################

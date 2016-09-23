@@ -1,0 +1,141 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+this_guard := __amu_pm_init__
+this_file  := $(lastword $(MAKEFILE_LIST))
+
+ifndef $(this_guard)
+$(this_guard) := $(notdir $(this_file))
+
+	#---------------------------------------------------------------------------#
+	# Output Verbosity and Function Debugging
+	#---------------------------------------------------------------------------#
+
+	# Predefin AMU_PM_VERBOSE and/or AMU_PM_DEBUG to any non-empty string
+	# to enable. (ie: AMU_PM_VERBOSE := defined).
+
+	ifdef AMU_PM_VERBOSE
+		amu_pm_m = $(info amu_pm: $1)
+	else
+		amu_pm_m :=
+	endif
+
+	ifdef AMU_PM_DEBUG
+		amu_pm_dm = $(warning $1)
+		amu_pm_d1 = $(warning $0('$1'))
+		amu_pm_d2 = $(warning $0('$1','$2'))
+		amu_pm_d3 = $(warning $0('$1','$2','$3'))
+		amu_pm_d4 = $(warning $0('$1','$2','$3','$4'))
+	else
+		amu_pm_dm :=
+		amu_pm_d1 :=
+		amu_pm_d2 :=
+		amu_pm_d3 :=
+		amu_pm_d4 :=
+	endif
+
+	#---------------------------------------------------------------------------#
+  # Check GNU Make Version
+	#---------------------------------------------------------------------------#
+
+  gnumake_vmin := 13.81
+  ifeq ($(gnumake_vmin),$(firstword $(sort $(MAKE_VERSION) $(gnumake_vmin))))
+    $(call amu_pm_m,GNU make $(MAKE_VERSION))
+  else
+    $(error GNU Make $(gnumake_vmin) or higher required)
+  endif
+
+	#------------------------------------------------------------------------------#
+	# AMU_PM_GET_COMPONENTS (arg1,arg2,arg3)
+	# arg1: include path prefix.
+	# arg2: design flow path prefix.
+	# arg3: list of component type names.
+	# arg4: list of component section names.
+	# returns list of existing makefile components.
+	#------------------------------------------------------------------------------#
+  define AMU_PM_GET_COMPONENTS
+    $(amu_pm_d4)$(foreach p,$3,$(foreach s,$4,
+      $(if $(wildcard $(strip $1)$(strip $2)$p_$s),$(strip $2)$p_$s,
+        $(call amu_pm_dm,skipping [$(strip $1)$(strip $2)$p_$s], does not exists.)
+      )
+    ))
+  endef
+
+	#---------------------------------------------------------------------------#
+  # Assign defaults when not predefined.
+	#---------------------------------------------------------------------------#
+
+	# Include file directory prefix.
+  ifndef AMU_PM_PREFIX
+    AMU_PM_PREFIX	:= $(dir $(this_file))
+    $(call amu_pm_m,setting: AMU_PM_PREFIX=$(AMU_PM_PREFIX))
+  endif
+
+	# Design flow sub-directory.
+  ifndef AMU_PM_DESIGN_FLOW
+    AMU_PM_DESIGN_FLOW := df1/
+    $(call amu_pm_m,setting: AMU_PM_DESIGN_FLOW=$(AMU_PM_DESIGN_FLOW))
+  endif
+
+	# Makefile component list.
+  ifndef AMU_PM_COMPONENTS
+    AMU_PM_COMPONENTS := doxygen scopes
+    $(call amu_pm_m,setting: AMU_PM_COMPONENTS=$(AMU_PM_COMPONENTS))
+  endif
+
+	#---------------------------------------------------------------------------#
+  # Include Init Components
+	#---------------------------------------------------------------------------#
+
+  $(call amu_pm_m,include [$($(this_guard))])
+
+	amu_pm_init_components := \
+		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX),$(AMU_PM_DESIGN_FLOW), \
+			base $(AMU_PM_COMPONENTS), \
+			constants functions system defaults))
+
+  $(foreach x, $(amu_pm_init_components), \
+      $(call amu_pm_m,include [$x]) \
+      $(eval include $(AMU_PM_PREFIX)$x) \
+  )
+
+	#------------------------------------------------------------------------------#
+	# Bootstrap Variable List
+	#------------------------------------------------------------------------------#
+
+	amu_pm_bootstrap_variables := \
+		AMU_PM_PREFIX \
+		AMU_PM_DESIGN_FLOW \
+		AMU_PM_COMPONENTS \
+		AMU_PM_VERBOSE \
+		AMU_PM_DEBUG \
+		AMU_TOOL_VERSION
+
+else
+  $(call amu_pm_dm,This makefile [$($(this_guard))] has already been included.)
+endif
+
+################################################################################
+# eof
+################################################################################

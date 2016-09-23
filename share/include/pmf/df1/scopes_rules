@@ -1,0 +1,100 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Rules
+################################################################################
+
+#------------------------------------------------------------------------------#
+# Build Targets
+#------------------------------------------------------------------------------#
+
+.SUFFIXES: $(src_ext) $(mfs_ext) $(mf_ext) $(stamp_ext)
+
+.PHONY:	all-scopes
+all-scopes:	$(scope_stamp)
+
+# Make scope makefile targets and update scope time stamp
+%$(stamp_ext): %(mf_ext)
+	OPENSCADPATH=.:$(if $(design_prefix),$(design_prefix),.)$(if $(library_prefix),$(library_prefix),:.) \
+	$(path_gnumake) -f $< all \
+	&& touch $@
+
+#if DEBUG
+#.SECONDARY: $(scope_mfs)
+#endif
+
+# Create scope makefile from scope MFScript
+%$(mf_ext): %$(mfs_ext)
+	$(path_bash) --norc --noprofile $<
+
+# OPENSCAD_SEAM_OPTS
+OPENSCAD_SEAM_OPTS = --comments yes --run no --make no
+OPENSCAD_SEAM_OPTS += --verbose
+OPENSCAD_SEAM_OPTS += --show yes
+#OPENSCAD_SEAM_OPTS += --debug
+
+# Extract scope MFScript from source
+%$(mfs_ext): %$(src_ext)
+	$(path_openscad_seam) \
+		$(OPENSCAD_SEAM_OPTS) \
+		--input $< \
+		--prefix $(output_directory) --prefix-ipp 0 --prefix-scripts no \
+		--bash-path $(path_bash) \
+		--make-path $(path_gnumake) \
+		--openscad-path $(path_openscad) \
+		--openscad-ext $(src_ext) \
+		--mfscript-ext $(mfs_ext) \
+		--makefile-ext $(mf_ext)
+
+#------------------------------------------------------------------------------#
+# Clean Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: clean-scopes
+clean-scopes: $(scope_mf)
+	-list='$^'; for i in $$list ; do $(path_gnumake) -f $$i clean ; done
+	-$(rm_f) $^
+
+#------------------------------------------------------------------------------#
+# Information Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: info-scopes
+info-scopes: | silent
+	$(call heading1, Scope Information)
+	$(call list_variables,$(scopes_control_variables),$(true), control)
+	$(call list_variables,$(scopes_config_variables),$(false), variables)
+	$(call enumerate_variable,scopes_commands_configured,$(true),$(true))
+	$(foreach x, \
+		scopes \
+		scope_stamp \
+		scope_mf \
+		scope_mfs \
+		scope_scad \
+	,$(call enumerate_variable,$x,$(false),$(false)))
+
+################################################################################
+# eof
+################################################################################

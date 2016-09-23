@@ -1,0 +1,87 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Variables
+################################################################################
+
+# Parallel Execution
+ifeq ($(amu_pm_parallel_jobs),$(true))
+  MAKEFLAGS += --jobs=$(cpu_cnt)
+endif
+
+# Output directory
+output_directory := \
+	$(call join_with,$(if $(output_path_use_dir_sep),$(os_dir_sep),$(output_path_term_joiner)), \
+		$(strip $(foreach x,$(output_path_spec), \
+			$(if $(call bool_decode,$(output_path_add_$x)),$($x)))))$(os_dir_sep)
+
+#------------------------------------------------------------------------------#
+# Configuration Variable List
+#------------------------------------------------------------------------------#
+
+project_config_variables := \
+	design_prefix	\
+	design \
+	\
+	library_prefix \
+	library \
+	\
+	version \
+	\
+	output_directory \
+	\
+	src_ext	\
+	mfs_ext	\
+	mf_ext \
+	stamp_ext
+
+#------------------------------------------------------------------------------#
+# Help text
+#------------------------------------------------------------------------------#
+
+define help_text_base
+ help:
+   Display this help text.
+
+ all:
+ clean:
+ info:
+   Build/clean/info all targets for all components [$(AMU_PM_COMPONENTS)].
+
+ info-makefile:
+ info-project:
+ info-system:
+   Display makefile/project/system information.
+
+ info-x:
+ print-x:
+ list-x  slist-x :
+ listv-x slistv-x:
+   Output info, print, list, or list values for the variable named x.
+endef
+
+################################################################################
+# eof
+################################################################################

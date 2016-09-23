@@ -1,0 +1,143 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Variables
+################################################################################
+
+# Input source files
+#src_files :=
+
+ifdef design
+	ifdef design_prefix
+		src_files += $(addprefix $(design_prefix),$(addsuffix $(src_ext),$(design)))
+	else
+		src_files += $(addsuffix $(src_ext),$(design))
+	endif
+endif
+
+ifdef library
+	ifdef library_prefix
+		src_files += $(addprefix $(library_prefix),$(addsuffix $(src_ext),$(library)))
+	else
+		src_files += $(addsuffix $(src_ext),$(library))
+	endif
+endif
+
+# Paths
+# $(prefix_scope_scripts), $(image_extension_paths) requires:[scopes]
+autoconf_path	:= $(if $(prefix_scope_scripts),$(output_directory),auto-config)
+example_path 	:= $(if $(prefix_scope_scripts),$(output_directory)) $(example_path_add)
+image_path		:= $(addprefix $(output_directory),$(image_extension_paths)) $(image_path_add)
+
+# Filter configuration
+openscad_dif_opts := \
+	$(strip \
+		--auto-config $(autoconf_path) \
+		$(if $(call bool_decode,$(generate_html)),--html-output $(html_output)) \
+		$(if $(call bool_decode,$(generate_latex)),--latex-output $(latex_output)) \
+		$(if $(call bool_decode,$(debug_dif_scanner)),--debug-scanner) \
+		$(if $(call bool_decode,$(debug_dif_filter)),--debug-filter) \
+	)
+
+enabled_sections := \
+	$(strip \
+		$(if $(call bool_decode,$(debug_dif_filter)),__INCLUDE_FILTER_DEBUG__) \
+		$(enabled_sections_add) \
+	)
+
+# Output file names in output directory
+latex_stamp         := $(addprefix $(output_directory),$(latex_stamp_name))
+doxygen_stamp       := $(addprefix $(output_directory),$(doxygen_stamp_name))
+doxygen_tag         := $(addprefix $(output_directory),$(doxygen_tag_name))
+doxygen_warn        := $(addprefix $(output_directory),$(doxygen_warn_name))
+doxygen_config_auto := $(addprefix $(output_directory),$(doxygen_config_auto_name))
+
+# Clean Files
+cleanfiles_doxygen := \
+	$(doxygen_stamp) \
+	$(doxygen_tag) \
+	$(doxygen_warn) \
+	$(doxygen_config_auto) \
+	$(if $(generate_latex),$(latex_stamp))
+
+# Doxygen auto-configuration file variables
+define doxygen_config_auto_text
+    PROJECT_NUMBER=$(version)
+    INPUT=$(src_files)
+    FILE_PATTERNS=*$(src_ext)
+    FILTER_PATTERNS="*$(src_ext)=\"$(path_openscad_dif) $(openscad_dif_opts)\""
+    ENABLED_SECTIONS=$(enabled_sections)
+    EXAMPLE_PATH=$(example_path)
+    IMAGE_PATH=$(image_path)
+    OUTPUT_DIRECTORY=$(output_directory)
+    EXTENSION_MAPPING=$(subst .,$(empty),$(src_ext))=C
+    GENERATE_HTML=$(if $(generate_html),YES,NO)
+    HTML_OUTPUT=$(html_output)
+    GENERATE_LATEX=$(if $(generate_latex),YES,NO)
+    LATEX_OUTPUT=$(latex_output)
+    GENERATE_MAN=$(if $(generate_man),YES,NO)
+    MAN_OUTPUT=$(man_output)
+    GENERATE_TAGFILE=$(doxygen_tag)
+    WARN_LOGFILE=$(doxygen_warn)
+endef
+
+#------------------------------------------------------------------------------#
+# Configuration Variable List
+#------------------------------------------------------------------------------#
+
+doxygen_config_variables += \
+	src_files \
+	doxygen_config \
+	\
+	example_path_add \
+	image_path_add \
+	enabled_sections_add \
+	\
+	html_output \
+	latex_output \
+	man_output \
+	\
+	latex_stamp \
+	doxygen_stamp \
+	doxygen_tag \
+	doxygen_warn \
+	doxygen_config_auto \
+	\
+	openscad_dif_opts
+
+#------------------------------------------------------------------------------#
+# Help text
+#------------------------------------------------------------------------------#
+
+define help_text_doxygen
+ all-doxygen:
+ clean-doxygen:
+ info-doxygen:
+   Build/clean/info for all Doxygen components.
+endef
+
+################################################################################
+# eof
+################################################################################

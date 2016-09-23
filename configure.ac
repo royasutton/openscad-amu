@@ -153,6 +153,9 @@ share/examples/vehicle.doxyfile
 share/functions/Makefile
 
 share/include/Makefile
+share/include/mf/Makefile
+share/include/pmf/Makefile
+share/include/pmf/df1/Makefile
 
 share/lib/Makefile
 share/lib/Doxyfile
@@ -161,6 +164,10 @@ share/scripts/Makefile
 share/scripts/Doxyfile
 share/scripts/doxygen_mainpage.bash
 share/scripts/segregate.bash
+
+share/templates/Makefile
+share/templates/df1/Makefile
+share/templates/df1/Project_Makefile
 
 src/Makefile
 src/Doxyfile

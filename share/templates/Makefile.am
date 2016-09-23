@@ -1,17 +1,17 @@
 ##############################################################################
 #
-# top_srcdir/share/include
+# top_srcdir/share/templates
 #
 ##############################################################################
 
+# lib depends on: examples and scripts (build afterwards)
 SUBDIRS = \
-	mf \
-	pmf
+	df1
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
 
-install_path = $(version_path)/include
+install_path = $(version_path)/templates
 
 ##############################################################################
 # targets

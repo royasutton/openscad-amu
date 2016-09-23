@@ -1,0 +1,189 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Functions
+################################################################################
+
+#------------------------------------------------------------------------------#
+#  Output Formatting
+#------------------------------------------------------------------------------#
+
+# horizontal_bar (arg1,arg2)
+# arg1: A character to repeat for the horizontal bar.
+# arg2: The number of times to repeat the character [default: $(terminal_columns)].
+# returns nothing.
+define horizontal_bar
+	$(amu_pm_d2)
+  $(info $(subst $(space),$(empty), \
+	$(foreach x,$(shell $(seq) $(or $2,$(terminal_columns))),$(or $1,#))))
+endef
+
+# heading1 (arg1,arg2,arg3)
+# arg1: The text for the level-1 heading.
+# arg2: A character for the horizontal bar [default: #].
+# arg3: A character to prefix each text line [default: #].
+# returns nothing.
+define heading1
+	$(amu_pm_d3)
+  $(call horizontal_bar,$2)
+  $(call horizontal_bar,$2)
+  $(info $(or $3,#)$(or $3,#))
+  $(info $(or $3,#)$(or $3,#)$1)
+  $(info $(or $3,#)$(or $3,#))
+  $(call horizontal_bar,$2)
+  $(call horizontal_bar,$2)
+endef
+
+# heading2 (arg1,arg2,arg3)
+# arg1: The text for the level-2 heading.
+# arg2: A character for the horizontal bar [default: #].
+# arg3: A character to prefix each text line [default: #].
+# returns nothing.
+define heading2
+	$(amu_pm_d3)
+  $(call horizontal_bar,$2)
+  $(info $(or $3,#)$1)
+  $(call horizontal_bar,$2)
+endef
+
+#------------------------------------------------------------------------------#
+#  Variable Output
+#------------------------------------------------------------------------------#
+
+# enumerate_variable (arg1,arg2)
+# arg1: A variable that will have its members enumerated.
+# arg2: An encoded boolean; display value of each enumerated member?
+# arg2: An encoded boolean; sort the enumerated member list?
+# returns nothing.
+define enumerate_variable
+	$(amu_pm_d3)
+  $(call heading2, [ $(strip $1) ($(words $($(strip $1)))) ] *,=,*)
+  $(foreach v, \
+		$(if $(call bool_decode,$3),$(sort $($(strip $1))),$($(strip $1))), \
+		$(info $(space3) $(if $(call bool_decode,$2),$v='$($v)',$v)) \
+	)
+endef
+
+# list_variables (arg1,arg2,arg3)
+# arg1: A Variable list.
+# arg2: An encoded boolean; decode values as booleans?
+# arg3: Optional list heading.
+# returns nothing.
+define list_variables
+	$(amu_pm_d3)
+	$(if $3,$(call heading2, [$3 ($(words $1)) ] *,=,*))
+  $(if $(call bool_decode,$2), \
+		$(foreach v,$1,$(info $(space3) $v=$(call bool_string,$($v)))), \
+		$(foreach v,$1,$(info $(space3) $v='$($v)')) \
+	)
+endef
+
+#------------------------------------------------------------------------------#
+# String
+#------------------------------------------------------------------------------#
+
+# strings_equal (arg1,arg2)
+# arg1: String1 for comparison.
+# arg2: String2 for comparison.
+# returns encoded boolean $(true) if string1 and string2 are identical.
+strings_equal = $(amu_pm_d2)$(if $(subst x$1,$(empty),x$2)$(subst x$2,$(empty),x$1),$(false),$(true))
+
+# strings_not_equal (arg1,arg2)
+# arg1: String1 for comparison.
+# arg2: String2 for comparison.
+# returns encoded boolean $(false) if string1 and string2 are identical.
+strings_not_equal = $(amu_pm_d2)$(if $(subst x$1,$(empty),x$2)$(subst x$2,$(empty),x$1),$(true),$(false))
+
+#------------------------------------------------------------------------------#
+# Boolean
+#------------------------------------------------------------------------------#
+
+# bool_encode (arg1)
+# arg1: A string.
+# returns $(true) if the string is not empty and $(false) otherwise.
+bool_encode = $(amu_pm_d1)$(if $1,$(true),$(false))
+
+# bool_decode (arg1)
+# arg1: An encoded boolean value [$(true)/$(false)].
+# returns $(true) if the boolean equals $(true) and $(empty) otherwise.
+bool_decode = $(amu_pm_d1)$(if $(call strings_equal,$(strip $1),$(true)),$(true),$(empty))
+
+# bool_string (arg1)
+# arg1: An encoded boolean [$(true)/$(false)].
+# returns the string representation of the encoded boolean value.
+bool_string = $(amu_pm_d1)$(if $(call bool_decode,$1),$$(true),$$(false))
+
+# not (arg1)
+# arg1: An encoded boolean value [$(true)/$(false)].
+# returns the inverse of the encoded boolean value.
+not = $(amu_pm_d1)$(if $(call bool_decode,$1),$(false),$(true))
+
+#------------------------------------------------------------------------------#
+# Other
+#------------------------------------------------------------------------------#
+
+# unique (arg1)
+# arg1: A list of space separated terms.
+# returns the list without repeat members.
+unique = $(amu_pm_d1)$(strip \
+	$(if $1,$(firstword $1) $(call unique,$(filter-out $(firstword $1),$1))) \
+	)
+
+# join_with (arg1,arg2,arg3)
+# arg1: A string that joins each member together.
+# arg2: A list of space separated members to join.
+# arg3: An encoded boolean; make resulting list members unique?
+# returns a string of joined terms connected together by the joiner string.
+join_with = $(amu_pm_d3)$(strip \
+	$(if $(call bool_decode,$3), \
+		$(subst $(space),$1,$(call unique,$(subst $1,$(space),$(strip $2)))), \
+		$(subst $(space),$1,$(strip $2)) \
+	))
+
+# first_of (arg1)
+# arg1: List of shell commands for which to search using which.
+# returns the first command found in the search path or $(empty) if none are found.
+first_of = $(amu_pm_d1)$(or $(firstword $(shell which 2> /dev/null $1)),$(empty))
+
+# variable_list_check (arg1,arg2,arg3,arg4)
+# arg1: A list of variables to check.
+# arg2: A check verb (ie: found, configured, etc).
+# arg3: An encoded boolean; use debug or verbose messages?
+# arg4: An encoded boolean; empty variables are errors or warnings?
+# returns nothing.
+define variable_list_check
+	$(foreach x,$(sort $1), \
+		$(if $($x), \
+			$(if $(call bool_decode,$3), \
+				$(call amu_pm_m,$2 $x=$($x)),$(call amu_pm_dm,$2 $x=$($x))), \
+			$(if $(call bool_decode,$4), \
+				$(warning WARNING: [$x] not $2),$(error [$x] not $2)) \
+		) \
+	)
+endef
+
+################################################################################
+# eof
+################################################################################

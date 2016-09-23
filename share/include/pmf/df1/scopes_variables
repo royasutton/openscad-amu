@@ -1,0 +1,63 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Variables
+################################################################################
+
+# Source scope scripts
+scope_stamp	:= $(addsuffix $(stamp_ext), $(scopes))
+scope_mf		:= $(addsuffix $(mf_ext), $(scopes))
+scope_mfs		:= $(addsuffix $(mfs_ext), $(scopes))
+scope_scad	:= $(addsuffix $(src_ext), $(scopes))
+
+ifeq (${prefix_scope_scripts},$(true))
+	scope_stamp	:= $(addprefix $(output_directory),$(scope_stamp))
+	scope_mf		:= $(addprefix $(output_directory),$(scope_mf))
+	scope_mfs		:= $(addprefix $(output_directory),$(scope_mfs))
+	scope_scad	:= $(addprefix $(output_directory),$(scope_scad))
+endif
+
+#------------------------------------------------------------------------------#
+# Configuration Variable List
+#------------------------------------------------------------------------------#
+
+scopes_config_variables += \
+	scope_joiner \
+	image_extension_paths
+
+#------------------------------------------------------------------------------#
+# Help text
+#------------------------------------------------------------------------------#
+
+define help_text_scopes
+ all-scopes:
+ clean-scopes:
+ info-scopes:
+   Build/clean/info for all openscad-amu scope components.
+endef
+
+################################################################################
+# eof
+################################################################################

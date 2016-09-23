@@ -1,0 +1,38 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Functions
+################################################################################
+
+# scope_expand (arg1,arg2)
+# arg1: List of openscad-amu scopes to prepend during expansion.
+# arg2: List of openscad-amu scopes to append during expansion.
+# returns a list of expanded scope names resulting from combining each scope
+# from arg1 with each scope of arg2, connected by the $(scope_joiner).
+scope_expand = $(amu_pm_d2)$(foreach p,$1,$(foreach s,$2,$p$(scope_joiner)$s))
+
+################################################################################
+# eof
+################################################################################
