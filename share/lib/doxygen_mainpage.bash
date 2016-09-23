@@ -141,7 +141,7 @@
         node [fontname=Helvetica fontsize=12];
         edge [arrowhead=vee];
 
-        a1 [shape=note label="Project\nMakefile"];
+        a1 [shape=note label="Project\nMakefile" URL="\ref project_makefile"];
         a2 [shape=note label="Source\n(*.scad)" URL="\ref vehicle.scad"];
         a3 [shape=note label="Project\nDoxyfile" URL="\ref vehicle.doxyfile"];
         b  [shape=box peripheries=2 style="filled" label="openscad-seam\n(extractor)" URL="\ref openscad_seam_ht"];
@@ -173,8 +173,11 @@
       }
     \enddot
 
-    The design flow is best automated using a project makefile. A basic
-    example project makefile is shown below for a project with two scopes.
+    The design flow is best automated using a makefile for the entire
+    project. A basic project makefile  example is shown below for a
+    project with two scopes.
+
+  \section project_makefile Project Makefile
 
     \code{makefile}
       \#

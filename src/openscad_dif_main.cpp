@@ -35,6 +35,8 @@
         HTML_EXTRA_FILES.
   \todo add option to create a histogram/map of amu command that exists
         in the input file.
+  \todo support --auto-config='auto-config'. When specified as such, the
+         auto configuration path is set to the path of the input file.
 
   \ingroup openscad_dif_src
 *******************************************************************************/
