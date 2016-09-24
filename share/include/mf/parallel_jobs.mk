@@ -1,26 +1,54 @@
-#==============================================================================#
-# share/include/parallel_jobs.mf
-#==============================================================================#
+################################################################################
+# share/include/mf/parallel_jobs.mf
+################################################################################
 
-run.system.os           := $(shell uname -s)
+undefine os_defined
+undefine os_configured
 
-ifeq (${run.system.os},FreeBSD)
-openscad                := openscad
-number_of_processors    := $(shell sysctl -n hw.ncpu)
+ifdef os
+  os_defined := true
+else
+  os := $(shell uname -s)
 endif
 
-ifeq (${run.system.os},CYGWIN_NT-10.0)
-openscad                := openscad
-number_of_processors    := $(shell nproc)
+#------------------------------------------------------------------------------#
+
+# Linux
+ifeq (${os},Linux)
+  cpu_cnt := $(shell nproc)
+  os_configured := true
 endif
 
-ifeq (${run.system.os},Linux)
-openscad                := openscad
-number_of_processors    := $(shell nproc)
+# CYGWIN - compare prefix only (ie: CYGWIN_NT-10.0 --> CYGWIN_NT)
+ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
+  cpu_cnt := $(shell nproc)
+  os_configured := true
 endif
 
-MAKEFLAGS += --jobs=$(number_of_processors)
+# FreeBSD
+ifeq (${os},FreeBSD)
+  cpu_cnt := $(shell sysctl -n hw.ncpu)
+  os_configured := true
+endif
 
-#==============================================================================#
+#------------------------------------------------------------------------------#
+
+ifdef os_configured
+  $(warning Configuring for parallel jobs;)
+  $(warning $(cpu_cnt) CPU's detected, setting flag --jobs=$(cpu_cnt).)
+  MAKEFLAGS += --jobs=$(cpu_cnt)
+  undefine os_configured
+else
+  $(warning OS [$(os)] not configured;)
+  $(warning see file [$${__LIBPATH__}/include/mf/parallel_jobs.mf])
+endif
+
+ifdef os_defined
+  undefine os_defined
+else
+  undefine os
+endif
+
+################################################################################
 # eof
-#==============================================================================#
+################################################################################
