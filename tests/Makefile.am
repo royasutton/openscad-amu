@@ -59,7 +59,7 @@ test1_doc.bash: $(openscad_seam) $(srcdir)/test1.scad | build
 		--run no \
 		--make no \
 		--lib-path $(top_srcdir)/share \
-		--define __INCLUDE_PATH__=\"$(top_srcdir)/share/include/mf\" \
+		--define __TEST_INCLUDE_PATH__=\"$(top_srcdir)/share/include/mf\" \
 		--verbose
 
 test3_doc.makefile: $(openscad_seam) $(srcdir)/test3.scad | build
@@ -71,7 +71,7 @@ test3_doc.makefile: $(openscad_seam) $(srcdir)/test3.scad | build
 		--run yes \
 		--make yes \
 		--lib-path $(top_srcdir)/share \
-		--define __INCLUDE_PATH__=\"$(top_srcdir)/share/include/mf\" \
+		--define __TEST_INCLUDE_PATH__=\"$(top_srcdir)/share/include/mf\" \
 		--verbose
 
 CLEANFILES = \
