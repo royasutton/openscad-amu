@@ -407,7 +407,15 @@ SEAM::SEAM_Scanner::end_mfscript(void)
   if ( make && !target.empty() ) {
     string scope_makefile = get_filename( makefile_ext );
 
-    string scmd = make_path + " --makefile=" + scope_makefile + " " + target;
+    boost::filesystem::path include_path;
+
+    include_path  = lib_path;
+    include_path /= "include";
+    include_path /= "mf";
+
+    string scmd = make_path
+                + " --include-dir=" + include_path.string()
+                + " --makefile=" + scope_makefile + " " + target;
 
     if ( verbose ) cout << ops << "executing make: " << scmd << endl;
 
