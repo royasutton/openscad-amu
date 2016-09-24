@@ -20,7 +20,7 @@ ifeq (${os},Linux)
 endif
 
 # CYGWIN - compare prefix only (ie: CYGWIN_NT-10.0 --> CYGWIN_NT)
-ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
+ifeq ($(firstword $(strip $(subst -, ,$(os)))),CYGWIN_NT)
   cpu_cnt := $(shell nproc)
   os_configured := true
 endif
