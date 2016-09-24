@@ -97,7 +97,6 @@ vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
 		--prefix build --prefix-ipp 0 --prefix-scripts no \
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
-		--define __INCLUDE_PATH__=\"$(srcdir)\" \
 		--write-config yes \
 		--verbose
 
@@ -115,7 +114,6 @@ animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
 		--prefix build --prefix-ipp 0 --prefix-scripts no \
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
-		--define __INCLUDE_PATH__=\"$(srcdir)\" \
 		--write-config yes \
 		--verbose
 
