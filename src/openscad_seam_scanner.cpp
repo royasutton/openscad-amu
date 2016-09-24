@@ -326,6 +326,12 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
   string scope_openscad = get_filename( openscad_ext );
   string mfscript_init = "lib/bootloader.bash";
 
+  boost::filesystem::path include_path;
+
+  include_path  = lib_path;
+  include_path /= "include";
+  include_path /= "mf";
+
   switch_output( mfscript_ext );
 
   output_file << "#!" << bash_path << endl;
@@ -340,7 +346,8 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
               << "__PREFIX__=\"" << output_prefix << "\"" << endl
               << "__SOURCE_FILE__=\"" << input_name << "\"" << endl
               << "__SCOPE_FILE__=\"" << scope_openscad << "\"" << endl
-              << "__MAKE_FILE__=\"" << scope_makefile << "\"" << endl;
+              << "__MAKE_FILE__=\"" << scope_makefile << "\"" << endl
+              << "__INCLUDE_PATH__=\"" << include_path.string() << "\"" << endl;
 
   if ( !openscad_path.empty() )
   output_file << "sc_openscad=" << openscad_path << endl;
