@@ -4,7 +4,7 @@
 #  Project Makefile (this file should be renamed to Makefile).
 #
 ################################################################################
-AMU_PM_PREFIX := __LIBPATH__/include/pmf/
+AMU_PM_PREFIX := __LIB_PATH__/include/pmf/
 
 #AMU_PM_PREFIX      := <<AMU-LIB-PATH>>/include/pmf/
 #AMU_PM_DESIGN_FLOW := df1/

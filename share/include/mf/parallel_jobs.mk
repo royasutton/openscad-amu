@@ -40,7 +40,7 @@ ifdef os_configured
   undefine os_configured
 else
   $(warning OS [$(os)] not configured;)
-  $(warning see file [$${__LIBPATH__}/include/mf/parallel_jobs.mf])
+  $(warning see file [$${__LIB_PATH__}/include/mf/parallel_jobs.mf])
 endif
 
 ifdef os_defined

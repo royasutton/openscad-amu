@@ -370,7 +370,7 @@ function add_target()
     # segregate log, if configured
     [[ -n $log_begin_rec ]] && \
     print_m -j cleanfiles${tcs} += \
-      \$\(shell ${__LIBPATH__}/scripts/segregate.bash --file $filename_log \
+      \$\(shell ${__LIB_PATH__}/scripts/segregate.bash --file $filename_log \
       --begin \"$log_begin_rec\" --end \"$log_end_rec\" \
       --list --ignore\)
   done
@@ -389,7 +389,7 @@ function add_target()
   # segregate log, if configured
   [[ -n $log_begin_rec ]] && \
   print_m -j -n " &&" \
-    ${__LIBPATH__}/scripts/segregate.bash \
+    ${__LIB_PATH__}/scripts/segregate.bash \
     --file $filename_log \
     --begin \"$log_begin_rec\" \
     --end \"$log_end_rec\"

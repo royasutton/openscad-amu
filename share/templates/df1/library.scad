@@ -69,7 +69,7 @@ Begin_Scope scope1;
 
     script
       Begin_Makefile_New
-        Include_Copy "${__LIBPATH__}/include/mf/parallel_jobs.mk"
+        Include_Copy "${__LIB_PATH__}/include/mf/parallel_jobs.mk"
         Summary  Tables  Targets  Menu
       End_Makefile;
   End_MFScript;
@@ -100,7 +100,7 @@ Begin_Scope scope2;
 
     script
       Begin_Makefile_New
-        Include_Copy "${__LIBPATH__}/include/mf/parallel_jobs.mk"
+        Include_Copy "${__LIB_PATH__}/include/mf/parallel_jobs.mk"
         Summary  Tables  Targets  Menu
       End_Makefile;
   End_MFScript;

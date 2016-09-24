@@ -294,7 +294,7 @@
     - make_makefile.bash
 
     To use the libray functions, a script must first set the environment
-    variable \c ${\__LIBPATH\__}. Optionally, \c ${\__VERBOSE\__} can be
+    variable \c ${\__LIB_PATH\__}. Optionally, \c ${\__VERBOSE\__} can be
     set to \c true to enable verbose output within the library functions.
     Next, source the \c bootloader.bash file to initialize the library.
     See the \ref hello_world example below for an example.

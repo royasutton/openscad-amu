@@ -334,8 +334,8 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
   if ( verbose )
   output_file << "__VERBOSE__=true" << endl;
 
-  output_file << "__LIBPATH__=\"" << lib_path << "\""
-              << " && source \"${__LIBPATH__}/" << mfscript_init << "\""
+  output_file << "__LIB_PATH__=\"" << lib_path << "\""
+              << " && source \"${__LIB_PATH__}/" << mfscript_init << "\""
               << " || exit 1" << endl
               << "__PREFIX__=\"" << output_prefix << "\"" << endl
               << "__SOURCE_FILE__=\"" << input_name << "\"" << endl

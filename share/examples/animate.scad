@@ -112,7 +112,7 @@ Begin_Scope move;
 
     script
       Begin_Makefile
-        Include_Copy "${__LIBPATH__}/include/mf/parallel_jobs.mk"
+        Include_Copy "${__LIB_PATH__}/include/mf/parallel_jobs.mk"
         Summary  Tables  Targets  Menu
       End_Makefile;
   End_MFScript;
@@ -139,7 +139,7 @@ Begin_Scope rotate;
 
     script
       Begin_Makefile
-        Include_Copy "${__LIBPATH__}/include/mf/parallel_jobs.mk"
+        Include_Copy "${__LIB_PATH__}/include/mf/parallel_jobs.mk"
         Summary  Tables  Targets  Menu
       End_Makefile;
   End_MFScript;

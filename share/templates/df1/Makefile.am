@@ -26,7 +26,7 @@ install_path = $(version_path)/templates/df1
 
 Project_Makefile: $(srcdir)/Project_Makefile.in Makefile
 	$(SED) \
-		-e 's,__LIBPATH__,$(version_path),g' \
+		-e 's,__LIB_PATH__,$(version_path),g' \
 		-e 's,__PACKAGE_VERSION__,$(PACKAGE_VERSION),g' \
 		$< > $@
 
