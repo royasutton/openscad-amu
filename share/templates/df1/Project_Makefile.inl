@@ -4,14 +4,14 @@
 #  Project Makefile (this file should be renamed to Makefile).
 #
 ################################################################################
-AMU_PM_PREFIX := __LIB_PATH__/include/pmf/
+AMU_PM_PREFIX := @__LIB_PATH__@/include/pmf/
 
-#AMU_PM_PREFIX      := <<AMU-LIB-PATH>>/include/pmf/
+#AMU_PM_PREFIX      := __LIB_PATH__/include/pmf/
 #AMU_PM_DESIGN_FLOW := df1/
 #AMU_PM_COMPONENTS  := doxygen
 #AMU_PM_VERBOSE     := defined
 #AMU_PM_DEBUG       := defined
-#AMU_TOOL_VERSION   := __PACKAGE_VERSION__
+#AMU_TOOL_VERSION   := @__PACKAGE_VERSION__@
 
 include $(AMU_PM_PREFIX)amu_pm_init
 

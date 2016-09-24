@@ -167,7 +167,6 @@ share/scripts/segregate.bash
 
 share/templates/Makefile
 share/templates/df1/Makefile
-share/templates/df1/Project_Makefile
 
 src/Makefile
 src/Doxyfile
