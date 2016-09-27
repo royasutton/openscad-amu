@@ -90,6 +90,9 @@ SEAM::SEAM_Scanner::init(void)
   if ( !rootscope.empty() )
     set_rootscope( rootscope );
 
+  // clear script_id vector
+  script_id.clear();
+
   if ( input_file.is_open() ) {
     if ( !scanner_count_mode )
       cout << ops << "resetting input file," << endl;
@@ -316,6 +319,9 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
 {
   scanner_script_count++;
 
+  // add script to script identifiers vector
+  script_id.push_back( get_filename( mfscript_ext ) );
+
   if (scanner_count_mode) {
     if ( verbose ) cout << ops << "(" << scanner_script_count << ") makefile script ["
                         << get_filename( mfscript_ext ) << "]" << endl;
@@ -441,6 +447,9 @@ void
 SEAM::SEAM_Scanner::begin_openscad(void)
 {
   scanner_script_count++;
+
+  // add script to script identifiers vector
+  script_id.push_back( get_filename( openscad_ext ) );
 
   if (scanner_count_mode) {
     if ( verbose ) cout << ops << "(" << scanner_script_count << ") openscad script ["
