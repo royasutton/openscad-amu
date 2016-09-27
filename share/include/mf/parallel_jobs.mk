@@ -34,8 +34,7 @@ endif
 #------------------------------------------------------------------------------#
 
 ifdef os_configured
-  $(warning Configuring for parallel jobs;)
-  $(warning $(cpu_cnt) CPU's detected, setting flag --jobs=$(cpu_cnt).)
+  $(warning $(cpu_cnt) CPU's detected, configuring parallel execution --jobs=$(cpu_cnt).)
   MAKEFLAGS += --jobs=$(cpu_cnt)
   undefine os_configured
 else
