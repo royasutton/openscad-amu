@@ -458,7 +458,7 @@ main(int argc, char** argv)
         makefile_path /= scope_name + makefile_ext;
 
         scmd = make_path + opts
-             + " -f " + scope_name + makefile_ext
+             + " --makefile=" + scope_name + makefile_ext
              + " " + target_prefix;
 
         debug_m(debug_filter, "scope: " + scope_name);
@@ -473,7 +473,7 @@ main(int argc, char** argv)
           bool good=false;
 
           debug_m(debug_filter, "  running: " + scmd );
-          UTIL::sys_command( scmd, result, good, true, true );
+          UTIL::sys_command( scmd, result, good, false, true );
 
           if ( good )
           {
