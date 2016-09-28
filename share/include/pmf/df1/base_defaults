@@ -46,37 +46,42 @@ system_control_variables := \
 # Project
 #------------------------------------------------------------------------------#
 
-# Design version
-version := 1.0
-
 # Keep secondary files for implicit rules
 debug_secondary := $(false)
 
 # Output root directory
 output_root := build
 
+# Project Name
+project_name := project
+
+# Project version
+project_version := 1.0
+
 # Output directory term separator
 output_path_term_joiner := _
 output_path_use_dir_sep := $(false)
 
-# Output root directory terms
-output_path_add_output_root := $(true)
-output_path_add_version     := $(true)
-output_path_add_os          := $(false)
-output_path_add_arch        := $(false)
-output_path_add_host        := $(false)
-output_path_add_amuseamvs   := $(false)
-output_path_add_amudifvs    := $(false)
-output_path_add_openscadvs  := $(false)
-output_path_add_doxygenvs   := $(false)
-output_path_add_datetime    := $(false)
-output_path_add_date        := $(false)
-output_path_add_time        := $(false)
+# Output directory terms
+output_path_add_output_root     := $(true)
+output_path_add_project_name    := $(false)
+output_path_add_project_version := $(true)
+output_path_add_os              := $(false)
+output_path_add_arch            := $(false)
+output_path_add_host            := $(false)
+output_path_add_amuseamvs       := $(false)
+output_path_add_amudifvs        := $(false)
+output_path_add_openscadvs      := $(false)
+output_path_add_doxygenvs       := $(false)
+output_path_add_datetime        := $(false)
+output_path_add_date            := $(false)
+output_path_add_time            := $(false)
 
 # Terms and ordering for output directory path
 output_path_spec := \
   output_root \
-  version \
+  project_name \
+  project_version \
   os \
   arch \
   host \

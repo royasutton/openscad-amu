@@ -73,6 +73,11 @@ ifeq (${os},Linux)
   cpu_cnt       := $(shell nproc)
   os_dir_sep    := /
 
+  install_prefix_scad := $(HOME)/.local/share/OpenSCAD/libraries
+  install_prefix_html := $(HOME)/.local/share/OpenSCAD/docs/html
+  install_prefix_pdf  := $(HOME)/.local/share/OpenSCAD/docs/pdf
+  install_prefix_man  := $(HOME)/.local/share/OpenSCAD/docs/man
+
   __os_found    := $(true)
 endif
 
@@ -94,6 +99,11 @@ ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
 
   cpu_cnt       := $(shell nproc)
   os_dir_sep    := /
+
+  install_prefix_scad := $(shell cygpath --mydocs)/OpenSCAD/libraries
+  install_prefix_html := $(shell cygpath --mydocs)/OpenSCAD/docs/html
+  install_prefix_pdf  := $(shell cygpath --mydocs)/OpenSCAD/docs/pdf
+  install_prefix_man  := $(shell cygpath --mydocs)/OpenSCAD/docs/man
 
   __os_found    := $(true)
 endif
@@ -180,7 +190,12 @@ system_config_variables := \
   cpu_cnt \
   os_dir_sep \
   \
-  terminal_columns
+  terminal_columns \
+  \
+  install_prefix_scad \
+  install_prefix_html \
+  install_prefix_pdf \
+  install_prefix_man
 
 ################################################################################
 # eof

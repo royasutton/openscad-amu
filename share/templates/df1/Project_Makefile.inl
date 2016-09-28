@@ -33,12 +33,13 @@ include $(AMU_PM_PREFIX)amu_pm_init
 #design_prefix  := ./
 #library_prefix := ./
 
-version        := 0.1
+project_name    := project
+project_version := 1.0
 
-design         := design
-library        := library
+design          := design
+library         := library
 
-doxygen_config := Doxyfile
+doxygen_config  := Doxyfile
 
 #------------------------------------------------------------------------------#
 include $(AMU_PM_PREFIX)amu_pm_rules

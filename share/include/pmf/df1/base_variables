@@ -35,6 +35,10 @@ endif
 design  := $(basename $(design))
 library := $(basename $(library))
 
+# Remove spaces from project name and version
+project_name    := $(subst $(space),$(empty),$(project_name))
+project_version := $(subst $(space),$(empty),$(project_version))
+
 # Input source files
 ifdef design
   ifdef design_prefix
@@ -63,13 +67,14 @@ output_directory := \
 #------------------------------------------------------------------------------#
 
 project_config_variables := \
+  project_name \
+  project_version \
+  \
   design_prefix \
   design \
   \
   library_prefix \
   library \
-  \
-  version \
   \
   output_directory \
   \

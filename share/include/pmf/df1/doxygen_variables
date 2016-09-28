@@ -70,7 +70,7 @@ enabled_sections := \
 
 # Doxygen auto-configuration file variables
 define doxygen_config_auto_text
-    PROJECT_NUMBER=$(version)
+    PROJECT_NUMBER=$(project_version)
     INPUT=$(src_files)
     FILE_PATTERNS=*$(scad_ext)
     FILTER_PATTERNS="*$(scad_ext)=\"$(path_openscad_dif) $(openscad_dif_opts)\""

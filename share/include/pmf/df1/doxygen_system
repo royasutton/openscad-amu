@@ -41,31 +41,9 @@ path_openscad_dif := \
 # OS Configuration
 #------------------------------------------------------------------------------#
 
-__os_found := $(false)
-
-# Linux
-ifeq (${os},Linux)
-  openscad_libraries  := $(HOME)/.local/share/OpenSCAD/libraries
-
-  __os_found := $(true)
-endif
-
-ifeq (${os},CYGWIN_NT)
-  openscad_libraries  := $(shell cygpath --mydocs)/OpenSCAD/libraries
-
-  __os_found := $(true)
-endif
-
 #------------------------------------------------------------------------------#
 # Configuration Check
 #------------------------------------------------------------------------------#
-
-# OS
-ifeq ($(__os_found),$(false))
-  $(error OS [$(os)] needs to be configured in [$(lastword $(MAKEFILE_LIST))])
-else
-  undefine __os_found
-endif
 
 # Commands
 doxygen_commands_required := \
@@ -96,6 +74,7 @@ $(call variable_list_check, \
 # System Constants
 #------------------------------------------------------------------------------#
 
+# Design flow tool versions
 doxygenvn := $(shell $(path_doxygen) 2>&1 --version)
 doxygenvs := doxygen$(doxygenvn)
 
@@ -107,8 +86,6 @@ amudifvs := amudif$(amudifvn)
 #------------------------------------------------------------------------------#
 
 doxygen_config_variables := \
-  openscad_libraries \
-  \
   doxygenvs \
   doxygenvn \
   \
