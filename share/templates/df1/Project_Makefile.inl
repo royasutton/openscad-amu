@@ -5,17 +5,18 @@
 #
 ################################################################################
 
-# Install Path Prefixes
+# Use library/tools from install path
 AMU_LIB_PATH            := @__LIB_PATH__@
+AMU_TOOL_PREFIX         := @bindir@/
 
-# Build Path Prefixes
+# Use library/tools from source and build path
 #AMU_LIB_PATH           := @abs_top_srcdir@/share
 #AMU_TOOL_PREFIX        := @abs_top_builddir@/src/
 
-#AMU_TOOL_VERSION       := @__PACKAGE_VERSION__@
 AMU_PM_PREFIX           := $(AMU_LIB_PATH)/include/pmf/
 #AMU_PM_VERBOSE         := defined
 #AMU_PM_DEBUG           := defined
+#AMU_TOOL_VERSION       := @__PACKAGE_VERSION__@
 
 include $(AMU_PM_PREFIX)amu_pm_init
 

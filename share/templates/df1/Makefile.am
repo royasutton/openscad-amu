@@ -40,7 +40,8 @@ do_am_local_subst = \
 		-e 's,[@]__LIB_PATH__[@],$(version_path),g' \
 		-e 's,[@]__PACKAGE_VERSION__[@],$(PACKAGE_VERSION),g' \
 		-e 's,[@]abs_top_builddir[@],$(abs_top_builddir),g' \
-		-e 's,[@]abs_top_srcdir[@],$(abs_top_srcdir),g'
+		-e 's,[@]abs_top_srcdir[@],$(abs_top_srcdir),g' \
+		-e 's,[@]bindir[@],$(bindir),g'
 
 Project_Makefile: $(srcdir)/Project_Makefile.inl Makefile
 	$(do_am_local_subst) $< > $@
