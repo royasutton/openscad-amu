@@ -487,11 +487,6 @@ main(int argc, char** argv)
             continue;
           }
 
-          path include_path_prefix;
-          // handle configuration prefix if not current directory (or empty)
-          if ( auto_config.compare(".") && auto_config.length() )
-            include_path_prefix /= auto_config;
-
           // tokenize result string of directories
           typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
           boost::char_separator<char> fsep(" \n");
@@ -500,8 +495,7 @@ main(int argc, char** argv)
           //  add each include path if directory exists
           for ( tokenizer::iterator it=rt_tok.begin(); it!=rt_tok.end(); ++it )
           {
-            path tp( include_path_prefix );
-            tp /= *it;
+            path tp( *it );
 
             debug_m(debug_filter, "  path [" + tp.string() + "] ", false);
             if ( exists(tp) && is_directory(tp) )
