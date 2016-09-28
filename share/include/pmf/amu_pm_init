@@ -86,6 +86,9 @@ $(this_guard) := $(notdir $(this_file))
   # Assign defaults when not predefined.
 	#---------------------------------------------------------------------------#
 
+	# openscad-amu lib-path (leave blank to use default)
+	# AMU_LIB_PATH
+
 	# Include file directory prefix.
   ifndef AMU_PM_PREFIX
     AMU_PM_PREFIX	:= $(dir $(this_file))
@@ -100,7 +103,13 @@ $(this_guard) := $(notdir $(this_file))
 
 	# Makefile component list.
   ifndef AMU_PM_COMPONENTS
-    AMU_PM_COMPONENTS := doxygen scopes
+    AMU_PM_COMPONENTS := scopes doxygen
+    $(call amu_pm_m,setting: AMU_PM_COMPONENTS=$(AMU_PM_COMPONENTS))
+  endif
+
+  ifdef AMU_PM_COMPONENTS_ADD
+    AMU_PM_COMPONENTS += $(AMU_PM_COMPONENTS_ADD)
+    $(call amu_pm_m,adding components: $(AMU_PM_COMPONENTS_ADD))
     $(call amu_pm_m,setting: AMU_PM_COMPONENTS=$(AMU_PM_COMPONENTS))
   endif
 
@@ -125,12 +134,15 @@ $(this_guard) := $(notdir $(this_file))
 	#------------------------------------------------------------------------------#
 
 	amu_pm_bootstrap_variables := \
+		AMU_LIB_PATH \
+		AMU_TOOL_PREFIX \
+		AMU_TOOL_VERSION \
 		AMU_PM_PREFIX \
 		AMU_PM_DESIGN_FLOW \
 		AMU_PM_COMPONENTS \
+		AMU_PM_COMPONENTS_ADD \
 		AMU_PM_VERBOSE \
-		AMU_PM_DEBUG \
-		AMU_TOOL_VERSION
+		AMU_PM_DEBUG
 
 else
   $(call amu_pm_dm,This makefile [$($(this_guard))] has already been included.)

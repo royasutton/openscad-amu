@@ -34,7 +34,8 @@
 all-doxygen: $(doxygen_stamp) $(if $(generate_latex),$(latex_stamp))
 
 # Auto-configuration file
-$(doxygen_config_auto): $(MAKEFILE_LIST) | $(output_directory)
+# depends on $(scopes_mf) since image_path=$(call scopes_targetsdir)
+$(doxygen_config_auto): $(MAKEFILE_LIST) $(scopes_mf) | $(output_directory)
 	$(call amu_pm_m,Generating auto-configuration file [$@])
 	$(file >$(doxygen_config_auto),$(doxygen_config_auto_text))
 

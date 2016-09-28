@@ -1,25 +1,30 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Project Makefile (this file should be renamed to Makefile).
+#  openscad-amu: Project Makefile (this file should be renamed to Makefile).
 #
 ################################################################################
-AMU_PM_PREFIX := @__LIB_PATH__@/include/pmf/
 
-#AMU_PM_PREFIX      := __LIB_PATH__/include/pmf/
-#AMU_PM_DESIGN_FLOW := df1/
-#AMU_PM_COMPONENTS  := doxygen
-#AMU_PM_VERBOSE     := defined
-#AMU_PM_DEBUG       := defined
-#AMU_TOOL_VERSION   := @__PACKAGE_VERSION__@
+# Install Path Prefixes
+AMU_LIB_PATH            := @__LIB_PATH__@
+
+# Build Path Prefixes
+#AMU_LIB_PATH           := @abs_top_srcdir@/share
+#AMU_TOOL_PREFIX        := @abs_top_builddir@/src/
+
+#AMU_TOOL_VERSION       := @__PACKAGE_VERSION__@
+AMU_PM_PREFIX           := $(AMU_LIB_PATH)/include/pmf/
+#AMU_PM_VERBOSE         := defined
+#AMU_PM_DEBUG           := defined
 
 include $(AMU_PM_PREFIX)amu_pm_init
 
 #------------------------------------------------------------------------------#
 # Default Overrides
 #------------------------------------------------------------------------------#
-#debug_dif_filter := $(true)
-amu_pm_parallel_jobs := $(true)
+#amu_pm_parallel_jobs  := $(true)
+#verbose_seam          := $(false)
+#debug_dif_filter      := $(true)
 
 #------------------------------------------------------------------------------#
 # Project
@@ -27,14 +32,14 @@ amu_pm_parallel_jobs := $(true)
 #design_prefix  := ./
 #library_prefix := ./
 
-version := 1.0
+version        := 0.1
 
-design  := design
-library := library
+design         := design
+library        := library
 
-scopes  := $(call scope_expand, design, scope1) \
-           $(call scope_expand, library, scope1 scope2) \
+doxygen_config := Doxyfile
 
+#------------------------------------------------------------------------------#
 include $(AMU_PM_PREFIX)amu_pm_rules
 ################################################################################
 # eof

@@ -30,7 +30,8 @@
   \private
 *******************************************************************************/
 module lm1( p1="X", p2=10 ) {
-  text(text=p1, size=p2);
+  linear_extrude(height=p2*10)
+  text(text=p1, size=p2*50);
 }
 
 
@@ -46,6 +47,8 @@ module lm1( p1="X", p2=10 ) {
 /***************************************************************************//**
 Begin_Scope scope1;
   Begin_OpenSCAD;
+    use <library.scad>;
+
     aux_script_str="A";
     aux_script_int=10;
 
@@ -53,9 +56,7 @@ Begin_Scope scope1;
   End_OpenSCAD;
 
   Begin_MFScript;
-    views   Name "views" Distance "100" Views "all";
-    images  Name "sizes" Aspect "4:3" Wsizes "320";
-    defines Name "str" Define "aux_script_str" Strings "A B";
+    defines Name "str" Define "aux_script_str" Strings "A B C";
     defines Name "int" Define "aux_script_int" Integers "1 2";
 
     variables
@@ -77,6 +78,8 @@ End_Scope;
 
 Begin_Scope scope2;
   Begin_OpenSCAD;
+    use <library.scad>;
+
     aux_script_str="A";
     aux_script_int=10;
 
@@ -84,9 +87,9 @@ Begin_Scope scope2;
   End_OpenSCAD;
 
   Begin_MFScript;
-    views   Name "views" Distance "100" Views "all";
+    views   Name "views" Distance "100" Views "top bottom diag";
     images  Name "sizes" Aspect "4:3" Wsizes "320";
-    defines Name "str" Define "aux_script_str" Strings "A B";
+    defines Name "str" Define "aux_script_str" Strings "A B C";
     defines Name "int" Define "aux_script_int" Integers "1 2";
 
     variables
@@ -95,7 +98,7 @@ Begin_Scope scope2;
 
       set_Ext "png"
       set_Convert_Exts "eps"  set_Convert_Opts "-verbose"
-      set_Opts "--preview --projection=o --viewall"
+      set_Opts "--preview --projection=o --viewall --autocenter"
       set_Opts_Combine "str int views sizes";
 
     script

@@ -52,7 +52,8 @@
   \protected
 *******************************************************************************/
 module dm1( p1="X", p2=10 ) {
-  text(text=p1, size=p2);
+  linear_extrude(height=p2*10)
+  text(text=p1, size=p2*50);
 }
 
 
@@ -73,9 +74,9 @@ dm1(p1=design_str, p2=design_int);
 /***************************************************************************//**
 Begin_Scope scope1;
   Begin_MFScript;
-    views   Name "views" Distance "100" Views "all";
+    views   Name "views" Distance "100" Views "top bottom diag";
     images  Name "sizes" Aspect "4:3" Wsizes "320";
-    defines Name "str" Define "design_str" Strings "A B";
+    defines Name "str" Define "design_str" Strings "A B C";
     defines Name "int" Define "design_int" Integers "1 2";
 
     variables
@@ -84,7 +85,7 @@ Begin_Scope scope1;
 
       set_Ext "png"
       set_Convert_Exts "eps"  set_Convert_Opts "-verbose"
-      set_Opts "--preview --projection=o --viewall"
+      set_Opts "--preview --projection=o --viewall --autocenter"
       set_Opts_Combine "str int views sizes";
 
     script

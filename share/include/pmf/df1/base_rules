@@ -95,6 +95,9 @@ info-project: | silent
 	$(call heading1, Project Information)
 	$(call list_variables,$(project_control_variables),$(true), control)
 	$(call list_variables,$(project_config_variables),$(false), variables)
+	$(foreach x, \
+		src_files \
+	,$(call enumerate_variable,$x,$(false),$(false)))
 
 #------------------------------------------------------------------------------#
 # Help Targets

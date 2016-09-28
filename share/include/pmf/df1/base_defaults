@@ -40,7 +40,7 @@ amu_pm_parallel_jobs := $(false)
 #------------------------------------------------------------------------------#
 
 system_control_variables := \
-	amu_pm_parallel_jobs
+  amu_pm_parallel_jobs
 
 #------------------------------------------------------------------------------#
 # Project
@@ -49,7 +49,7 @@ system_control_variables := \
 # Design version
 version := 1.0
 
-# Keep secondary files
+# Keep secondary files for implicit rules
 debug_secondary := $(false)
 
 # Output root directory
@@ -60,46 +60,46 @@ output_path_term_joiner := _
 output_path_use_dir_sep := $(false)
 
 # Output root directory terms
-output_path_add_output_root	:= $(true)
-output_path_add_version			:= $(true)
-output_path_add_os					:= $(false)
-output_path_add_arch				:= $(false)
-output_path_add_host				:= $(false)
-output_path_add_amuseamvs		:= $(false)
-output_path_add_amudifvs		:= $(false)
-output_path_add_openscadvs	:= $(false)
-output_path_add_doxygenvs		:= $(false)
-output_path_add_datetime		:= $(false)
-output_path_add_date				:= $(false)
-output_path_add_time				:= $(false)
+output_path_add_output_root := $(true)
+output_path_add_version     := $(true)
+output_path_add_os          := $(false)
+output_path_add_arch        := $(false)
+output_path_add_host        := $(false)
+output_path_add_amuseamvs   := $(false)
+output_path_add_amudifvs    := $(false)
+output_path_add_openscadvs  := $(false)
+output_path_add_doxygenvs   := $(false)
+output_path_add_datetime    := $(false)
+output_path_add_date        := $(false)
+output_path_add_time        := $(false)
 
 # Terms and ordering for output directory path
 output_path_spec := \
-	output_root \
-	version \
-	os \
-	arch \
-	host \
-	amuseamvs \
-	amudifvs \
-	openscadvs \
-	doxygenvs \
-	datetime \
-	date \
-	time
+  output_root \
+  version \
+  os \
+  arch \
+  host \
+  amuseamvs \
+  amudifvs \
+  openscadvs \
+  doxygenvs \
+  datetime \
+  date \
+  time
 
 # File extensions
-src_ext		:= .scad
-mfs_ext		:= .bash
-mf_ext		:= .makefile
-stamp_ext	:= .stamp
+scad_ext  := .scad
+mfs_ext   := .bash
+mf_ext    := .makefile
+stamp_ext := .stamp
 
 #------------------------------------------------------------------------------#
 # Project Control Variable List
 #------------------------------------------------------------------------------#
 
 project_control_variables := \
-	debug_secondary
+  debug_secondary
 
 ################################################################################
 # eof

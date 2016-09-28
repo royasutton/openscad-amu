@@ -30,72 +30,72 @@
 # Build Information
 #------------------------------------------------------------------------------#
 
-os				:= $(shell uname -s)
-arch			:= $(shell uname -m)
-host			:= $(shell hostname)
-datetime	:= $(shell date '+%y%m%d-%H%M')
-date			:= $(word 1,$(strip $(subst -,$(space),$(datetime))))
-time			:= $(word 2,$(strip $(subst -,$(space),$(datetime))))
+os        := $(shell uname -s)
+arch      := $(shell uname -m)
+host      := $(shell hostname)
+datetime  := $(shell date '+%y%m%d-%H%M')
+date      := $(word 1,$(strip $(subst -,$(space),$(datetime))))
+time      := $(word 2,$(strip $(subst -,$(space),$(datetime))))
 
 #------------------------------------------------------------------------------#
 # Commands
 #------------------------------------------------------------------------------#
 
-path_mkdir	:= $(call first_of,mkdir)
-path_rmdir	:= $(call first_of,rmdir)
-path_rm			:= $(call first_of,rm)
-path_cp			:= $(call first_of,cp)
-path_tar		:= $(call first_of,tar)
-path_zip		:= $(call first_of,zip)
-path_tput		:= $(call first_of,tput)
-path_seq		:= $(call first_of,seq)
-path_test		:= $(call first_of,test)
+path_mkdir  := $(call first_of,mkdir)
+path_rmdir  := $(call first_of,rmdir)
+path_rm     := $(call first_of,rm)
+path_cp     := $(call first_of,cp)
+path_tar    := $(call first_of,tar)
+path_zip    := $(call first_of,zip)
+path_tput   := $(call first_of,tput)
+path_seq    := $(call first_of,seq)
+path_test   := $(call first_of,test)
 
 #------------------------------------------------------------------------------#
 # OS Configuration
 #------------------------------------------------------------------------------#
 
-__os_found			:= $(false)
+__os_found      := $(false)
 
 # Linux
 ifeq (${os},Linux)
-	opts_mkdir_p	:= --parents --verbose
-	opts_rmdir		:= --verbose
-	opts_rm_f			:= --force --verbose
-	opts_rm_rf		:= --recursive --force --verbose
-	opts_cp_a			:= --archive --backup --verbose
-	opts_tar_c		:= --create --verbose --xz
-	opts_zip_c		:= -v
-	opts_tput_c		:= cols
-	opts_seq			:=
-	opts_test			:=
+  opts_mkdir_p  := --parents --verbose
+  opts_rmdir    := --verbose
+  opts_rm_f     := --force --verbose
+  opts_rm_rf    := --recursive --force --verbose
+  opts_cp_a     := --archive --backup --verbose
+  opts_tar_c    := --create --verbose --xz
+  opts_zip_c    := -v
+  opts_tput_c   := cols
+  opts_seq      :=
+  opts_test     :=
 
-	cpu_cnt				:= $(shell nproc)
-	os_dir_sep		:= /
+  cpu_cnt       := $(shell nproc)
+  os_dir_sep    := /
 
-	__os_found		:= $(true)
+  __os_found    := $(true)
 endif
 
 # CYGWIN - compare prefix only (ie: CYGWIN_NT-10.0 --> CYGWIN_NT)
 # Using OpenSCAD compiled for Windows.
 ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
-	os 						:= CYGWIN_NT
+  os            := CYGWIN_NT
 
-	opts_mkdir_p	:= --parents --verbose
-	opts_rmdir		:= --verbose
-	opts_rm_f			:= --force --verbose
-	opts_rm_rf		:= --recursive --force --verbose
-	opts_cp_a			:= --archive --backup --verbose
-	opts_tar_c		:= --create --verbose --xz
-	opts_zip_c		:= -v
-	opts_tput_c		:= cols
-	opts_seq			:=
-	opts_test			:=
+  opts_mkdir_p  := --parents --verbose
+  opts_rmdir    := --verbose
+  opts_rm_f     := --force --verbose
+  opts_rm_rf    := --recursive --force --verbose
+  opts_cp_a     := --archive --backup --verbose
+  opts_tar_c    := --create --verbose --xz
+  opts_zip_c    := -v
+  opts_tput_c   := cols
+  opts_seq      :=
+  opts_test     :=
 
-	cpu_cnt				:= $(shell nproc)
-	os_dir_sep		:= /
+  cpu_cnt       := $(shell nproc)
+  os_dir_sep    := /
 
-	__os_found		:= $(true)
+  __os_found    := $(true)
 endif
 
 #------------------------------------------------------------------------------#
@@ -111,53 +111,53 @@ endif
 
 # Commands
 base_commands_required := \
-	path_mkdir \
-	path_rmdir \
-	path_rm \
-	path_cp \
-	path_tar \
-	path_zip \
-	path_tput \
-	path_seq \
-	path_test
+  path_mkdir \
+  path_rmdir \
+  path_rm \
+  path_cp \
+  path_tar \
+  path_zip \
+  path_tput \
+  path_seq \
+  path_test
 
 $(call variable_list_check, \
-	$(base_commands_required),found,$(false),$(false))
+  $(base_commands_required),found,$(false),$(false))
 
 #------------------------------------------------------------------------------#
 # References
 #------------------------------------------------------------------------------#
 
-mkdir_p	:= $(path_mkdir) $(opts_mkdir_p)
-rmdir		:= $(path_rmdir) $(opts_rmdir)
-rm_f		:= $(path_rm) $(opts_rm_f)
-rm_rf		:= $(path_rm) $(opts_rm_rf)
-cp_a		:= $(path_cp) $(opts_cp_a)
-tar_c		:= $(path_tar) $(opts_tar_c)
-zip_c		:= $(path_zip) $(opts_zip_c)
-tput_c	:= $(path_tput) $(opts_tput_c)
-seq			:= $(path_seq) $(opts_seq)
-test		:= $(path_test) $(opts_test)
+mkdir_p := $(path_mkdir) $(opts_mkdir_p)
+rmdir   := $(path_rmdir) $(opts_rmdir)
+rm_f    := $(path_rm) $(opts_rm_f)
+rm_rf   := $(path_rm) $(opts_rm_rf)
+cp_a    := $(path_cp) $(opts_cp_a)
+tar_c   := $(path_tar) $(opts_tar_c)
+zip_c   := $(path_zip) $(opts_zip_c)
+tput_c  := $(path_tput) $(opts_tput_c)
+seq     := $(path_seq) $(opts_seq)
+test    := $(path_test) $(opts_test)
 
 #------------------------------------------------------------------------------#
 # Reference Check
 #------------------------------------------------------------------------------#
 
 base_commands_configured := \
-	\
-	mkdir_p \
-	rmdir \
-	rm_f \
-	rm_rf \
-	cp_a \
-	tar_c \
-	zip_c \
-	tput_c \
-	seq \
-	test
+  \
+  mkdir_p \
+  rmdir \
+  rm_f \
+  rm_rf \
+  cp_a \
+  tar_c \
+  zip_c \
+  tput_c \
+  seq \
+  test
 
 $(call variable_list_check, \
-	$(base_commands_configured),configured,$(true),$(false))
+  $(base_commands_configured),configured,$(true),$(false))
 
 #------------------------------------------------------------------------------#
 # System Constants
@@ -171,16 +171,16 @@ terminal_columns := $(shell $(tput_c))
 #------------------------------------------------------------------------------#
 
 system_config_variables := \
-	os \
-	arch \
-	host \
-	date \
-	time \
-	\
-	cpu_cnt \
-	os_dir_sep \
-	\
-	terminal_columns
+  os \
+  arch \
+  host \
+  date \
+  time \
+  \
+  cpu_cnt \
+  os_dir_sep \
+  \
+  terminal_columns
 
 ################################################################################
 # eof

@@ -31,35 +31,29 @@
 # AMU_TOOL_VERSION := v1.0
 
 # Prefix output path to auxiliary scope scripts
-prefix_scope_scripts				:= $(true)
+prefix_scopes_scripts := $(true)
 
 # Verbosity
-verbose_seam								:= $(false)
-verbose_seam_show						:= $(false)
+verbose_seam          := $(true)
+verbose_seam_show     := $(false)
 
 # Debugging
-debug_seam_scanner					:= $(false)
-
-# List of source auxilary scopes (should be set in Makefile).
-scopes											:=
+debug_seam_scanner    := $(false)
 
 # Scope joiner
-scope_joiner								:= _
-
-# Image search directory names
-image_extension_paths				:= png png2eps
+scopes_joiner         := _
 
 #------------------------------------------------------------------------------#
 # Control Variable List
 #------------------------------------------------------------------------------#
 
 scopes_control_variables := \
-	prefix_scope_scripts \
-	\
-	verbose_seam \
-	verbose_seam_show \
-	\
-	debug_seam_scanner
+  prefix_scopes_scripts \
+  \
+  verbose_seam \
+  verbose_seam_show \
+  \
+  debug_seam_scanner
 
 ################################################################################
 # eof

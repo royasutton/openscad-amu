@@ -27,45 +27,45 @@
 ################################################################################
 
 # Output formats
-generate_html								:= $(true)
-generate_latex							:= $(true)
-generate_man								:= $(true)
+generate_html               := $(true)
+generate_latex              := $(true)
+generate_man                := $(true)
 
 # Debugging
-debug_dif_scanner						:= $(false)
-debug_dif_filter						:= $(false)
+debug_dif_scanner           := $(false)
+debug_dif_filter            := $(false)
 
 # Configuration input file
-doxygen_config							:= Doxyfile
+doxygen_config              := Doxyfile
 
 # Additional paths (for controlled variables)
-example_path_add						:=
-image_path_add							:=
-enabled_sections_add				:=
+example_path_add            :=
+image_path_add              :=
+enabled_sections_add        :=
 
 # Output sub-directory names
-html_output									:= html
-latex_output								:= latex
-man_output									:= man
+html_output                 := html
+latex_output                := latex
+man_output                  := man
 
 # Output file names
-latex_stamp_name						:= latex$(stamp_ext)
-doxygen_stamp_name					:= doxygen$(stamp_ext)
-doxygen_tag_name						:= doxygen.tags
-doxygen_warn_name						:= doxygen.warnings
-doxygen_config_auto_name		:= $(doxygen_config).auto
+latex_stamp_name             = latex$(stamp_ext)
+doxygen_stamp_name           = doxygen$(stamp_ext)
+doxygen_tag_name            := doxygen.tags
+doxygen_warn_name           := doxygen.warnings
+doxygen_config_auto_name     = $(doxygen_config).auto
 
 #------------------------------------------------------------------------------#
 # Control Variable List
 #------------------------------------------------------------------------------#
 
 doxygen_control_variables := \
-	generate_html \
-	generate_latex \
-	generate_man \
-	\
-	debug_dif_scanner \
-	debug_dif_filter
+  generate_html \
+  generate_latex \
+  generate_man \
+  \
+  debug_dif_scanner \
+  debug_dif_filter
 
 ################################################################################
 # eof

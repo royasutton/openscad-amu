@@ -30,8 +30,12 @@
 # Commands
 #------------------------------------------------------------------------------#
 
-path_doxygen				:= $(call first_of,doxygen)
-path_openscad_dif		:= $(call first_of,openscad-dif-$(AMU_TOOL_VERSION) openscad-dif)
+path_doxygen := $(call first_of,doxygen)
+path_openscad_dif := \
+  $(call first_of, \
+    $(AMU_TOOL_PREFIX)openscad-dif-$(AMU_TOOL_VERSION) \
+    $(AMU_TOOL_PREFIX)openscad-dif \
+  )
 
 #------------------------------------------------------------------------------#
 # OS Configuration
@@ -41,15 +45,15 @@ __os_found := $(false)
 
 # Linux
 ifeq (${os},Linux)
-	openscad_libraries	:= $(HOME)/.local/share/OpenSCAD/libraries
+  openscad_libraries  := $(HOME)/.local/share/OpenSCAD/libraries
 
-	__os_found := $(true)
+  __os_found := $(true)
 endif
 
 ifeq (${os},CYGWIN_NT)
-	openscad_libraries	:= $(shell cygpath --mydocs)/OpenSCAD/libraries
+  openscad_libraries  := $(shell cygpath --mydocs)/OpenSCAD/libraries
 
-	__os_found := $(true)
+  __os_found := $(true)
 endif
 
 #------------------------------------------------------------------------------#
@@ -65,14 +69,14 @@ endif
 
 # Commands
 doxygen_commands_required := \
-	path_doxygen \
-	path_openscad_dif
+  path_doxygen \
+  path_openscad_dif
 
 # Warning list first, then error.
 $(call variable_list_check, \
-	$(doxygen_commands_required),found,$(false),$(true))
+  $(doxygen_commands_required),found,$(false),$(true))
 $(call variable_list_check, \
-	$(doxygen_commands_required),found,$(false),$(false))
+  $(doxygen_commands_required),found,$(false),$(false))
 
 #------------------------------------------------------------------------------#
 # References
@@ -83,10 +87,10 @@ $(call variable_list_check, \
 #------------------------------------------------------------------------------#
 
 doxygen_commands_configured := \
-	$(doxygen_commands_required)
+  $(doxygen_commands_required)
 
 $(call variable_list_check, \
-	$(doxygen_commands_configured),configured,$(true),$(false))
+  $(doxygen_commands_configured),configured,$(true),$(false))
 
 #------------------------------------------------------------------------------#
 # System Constants
@@ -103,13 +107,13 @@ amudifvs := amudif$(amudifvn)
 #------------------------------------------------------------------------------#
 
 doxygen_config_variables := \
-	openscad_libraries \
-	\
-	doxygenvs \
-	doxygenvn \
-	\
-	amudifvs \
-	amudifvn \
+  openscad_libraries \
+  \
+  doxygenvs \
+  doxygenvn \
+  \
+  amudifvs \
+  amudifvn \
 
 ################################################################################
 # eof
