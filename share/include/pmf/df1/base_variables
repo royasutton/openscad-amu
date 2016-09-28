@@ -62,6 +62,13 @@ output_directory := \
     $(strip $(foreach x,$(output_path_spec), \
       $(if $(call bool_decode,$(output_path_add_$x)),$($x)))))$(os_dir_sep)
 
+# Backup basename
+backup_basename := \
+  $(call join_with,$(empty),$(backup_root)$(os_dir_sep) \
+  $(call join_with,$(if $(backup_file_use_dir_sep),$(os_dir_sep),$(backup_file_term_joiner)), \
+    $(strip $(foreach x,$(backup_file_spec), \
+      $(if $(call bool_decode,$(backup_file_add_$x)),$($x))))))
+
 #------------------------------------------------------------------------------#
 # Configuration Variable List
 #------------------------------------------------------------------------------#
@@ -77,6 +84,7 @@ project_config_variables := \
   library \
   \
   output_directory \
+  backup_basename \
   \
   scad_ext  \
   mfs_ext \
