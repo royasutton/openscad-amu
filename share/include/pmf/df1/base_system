@@ -72,6 +72,7 @@ ifeq (${os},Linux)
 
   cpu_cnt       := $(shell nproc)
   dir_level_sep := /
+  env_field_sep := :
 
   install_prefix_scad := $(HOME)/.local/share/OpenSCAD/libraries
   install_prefix_html := $(HOME)/.local/share/OpenSCAD/docs/html
@@ -99,6 +100,7 @@ ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
 
   cpu_cnt       := $(shell nproc)
   dir_level_sep := /
+  env_field_sep := \;
 
   install_prefix_scad := $(shell cygpath --mydocs)/OpenSCAD/libraries
   install_prefix_html := $(shell cygpath --mydocs)/OpenSCAD/docs/html
@@ -189,6 +191,7 @@ system_config_variables := \
   \
   cpu_cnt \
   dir_level_sep \
+  env_field_sep \
   \
   terminal_columns \
   \

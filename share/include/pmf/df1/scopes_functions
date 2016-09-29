@@ -106,12 +106,12 @@ define scopes_run_mf
 $(amu_pm_d2)
 # build-stamp
 $(script_prefix)$2$(stamp_ext): $(script_prefix)$2$(mf_ext)
-	OPENSCADPATH=$(call join_with,:, \
+	OPENSCADPATH="$(call join_with,$(env_field_sep), \
 		. \
 		$(if $(dir $1),$(dir $1)) \
 		$(if $(design_prefix),$(design_prefix)) \
 		$(if $(library_prefix),$(library_prefix)) \
-		,$(true)) \
+		,$(true))" \
 	$(path_gnumake) --makefile=$(script_prefix)$2$(mf_ext) all \
 	&& touch $(script_prefix)$2$(stamp_ext)
 
