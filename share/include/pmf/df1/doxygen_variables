@@ -43,7 +43,7 @@ doxygen_clean_files := \
 
 # Path: autoconf_path, example_path
 # $(prefix_scopes_scripts) requires:[scopes]
-autoconf_path := $(if $(prefix_scopes_scripts),$(output_directory),auto-config)
+autoconf_path := $(if $(prefix_scopes_scripts),$(output_directory),.)
 example_path  := $(if $(prefix_scopes_scripts),$(output_directory)) $(example_path_add)
 
 # Path: image_path
@@ -57,7 +57,7 @@ openscad_dif_opts := \
     $(if $(call bool_decode,$(generate_html)),--html-output $(html_output)) \
     $(if $(call bool_decode,$(generate_latex)),--latex-output $(latex_output)) \
     $(if $(AMU_LIB_PATH),--lib-path $(AMU_LIB_PATH)) \
-    --auto-config $(autoconf_path) \
+    $(if $(autoconf_path),--auto-config $(autoconf_path)) \
     $(if $(call bool_decode,$(debug_dif_scanner)),--debug-scanner) \
     $(if $(call bool_decode,$(debug_dif_filter)),--debug-filter) \
   )
