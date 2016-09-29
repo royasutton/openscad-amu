@@ -58,14 +58,14 @@ endif
 
 # Output directory
 output_directory := \
-  $(call join_with,$(if $(output_path_use_dir_sep),$(os_dir_sep),$(output_path_term_joiner)), \
+  $(call join_with,$(if $(output_path_use_dir_sep),$(dir_level_sep),$(output_path_term_joiner)), \
     $(strip $(foreach x,$(output_path_spec), \
-      $(if $(call bool_decode,$(output_path_add_$x)),$($x)))))$(os_dir_sep)
+      $(if $(call bool_decode,$(output_path_add_$x)),$($x)))))$(dir_level_sep)
 
 # Backup basename
 backup_basename := \
-  $(call join_with,$(empty),$(backup_root)$(os_dir_sep) \
-  $(call join_with,$(if $(backup_file_use_dir_sep),$(os_dir_sep),$(backup_file_term_joiner)), \
+  $(call join_with,$(empty),$(backup_root)$(dir_level_sep) \
+  $(call join_with,$(if $(backup_file_use_dir_sep),$(dir_level_sep),$(backup_file_term_joiner)), \
     $(strip $(foreach x,$(backup_file_spec), \
       $(if $(call bool_decode,$(backup_file_add_$x)),$($x))))))
 
