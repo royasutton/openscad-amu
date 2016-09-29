@@ -100,7 +100,7 @@ ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
 
   cpu_cnt       := $(shell nproc)
   dir_level_sep := /
-  env_field_sep := \;
+  env_field_sep := ;
 
   install_prefix_scad := $(shell cygpath --mydocs)/OpenSCAD/libraries
   install_prefix_html := $(shell cygpath --mydocs)/OpenSCAD/docs/html
