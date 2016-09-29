@@ -65,8 +65,8 @@ scopes_scripts := \
     ) \
   )
 
-# assign modeling scripts to cleanfiles
-scopes_cleanfiles := $(filter %$(scad_ext),$(scopes_scripts))
+# assign modeling scripts to clean-files
+scopes_clean_files := $(filter %$(scad_ext),$(scopes_scripts))
 
 #------------------------------------------------------------------------------#
 # Configuration Variable List

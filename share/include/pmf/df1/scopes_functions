@@ -81,8 +81,8 @@ $(script_prefix)$2$(mfs_ext): $1 $$(MAKEFILE_LIST) | $(output_directory)
 		--mode extract --input $1 $(openscad_seam_opts1) $(openscad_seam_opts2)
 
 scopes_mfs += $(script_prefix)$2$(mfs_ext)
-scopes_cleanfiles += $(script_prefix)$2$(mfs_ext)
-scopes_cleanfiles += $(script_prefix)$(notdir $(basename $1)).conf
+scopes_clean_files += $(script_prefix)$2$(mfs_ext)
+scopes_clean_files += $(script_prefix)$(notdir $(basename $1)).conf
 endef
 
 # scopes_generate_mf (arg1)
@@ -95,7 +95,7 @@ $(script_prefix)$1$(mf_ext): $(script_prefix)$1$(mfs_ext)
 	$(path_bash) --norc --noprofile $(script_prefix)$1$(mfs_ext)
 
 scopes_mf += $(script_prefix)$1$(mf_ext)
-scopes_cleanfiles += $(script_prefix)$1$(mf_ext)
+scopes_clean_files += $(script_prefix)$1$(mf_ext)
 endef
 
 # scopes_run_mf (arg1,arg2)
@@ -116,7 +116,7 @@ $(script_prefix)$2$(stamp_ext): $(script_prefix)$2$(mf_ext)
 	&& touch $(script_prefix)$2$(stamp_ext)
 
 scopes_stamp += $(script_prefix)$2$(stamp_ext)
-scopes_cleanfiles += $(script_prefix)$2$(stamp_ext)
+scopes_clean_files += $(script_prefix)$2$(stamp_ext)
 endef
 
 ################################################################################

@@ -34,7 +34,7 @@ doxygen_warn        := $(addprefix $(output_directory),$(doxygen_warn_name))
 doxygen_config_auto := $(addprefix $(output_directory),$(notdir $(doxygen_config_auto_name)))
 
 # Clean Files
-cleanfiles_doxygen := \
+doxygen_clean_files := \
   $(doxygen_stamp) \
   $(doxygen_tag) \
   $(doxygen_warn) \
@@ -88,6 +88,9 @@ define doxygen_config_auto_text
     GENERATE_TAGFILE=$(doxygen_tag)
     WARN_LOGFILE=$(doxygen_warn)
 endef
+
+# backup files
+backup_files += $(doxygen_config)
 
 #------------------------------------------------------------------------------#
 # Configuration Variable List

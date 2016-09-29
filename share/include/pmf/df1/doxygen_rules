@@ -56,7 +56,7 @@ $(latex_stamp): $(doxygen_stamp)
 .PHONY: clean-doxygen
 clean-doxygen:
 	-@$(test) -d $(output_directory) && \
-	$(rm_f) $(cleanfiles_doxygen) && \
+	$(rm_f) $(doxygen_clean_files) && \
 	( cd $(output_directory) && \
 		$(rm_rf) \
 			$(if $(generate_html),$(html_output)) \

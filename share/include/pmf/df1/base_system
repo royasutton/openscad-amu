@@ -64,7 +64,7 @@ ifeq (${os},Linux)
   opts_rm_f     := --force --verbose
   opts_rm_rf    := --recursive --force --verbose
   opts_cp_a     := --archive --backup --verbose
-  opts_tar_c    := --create --verbose --xz
+  opts_tar_c    := --create --verbose --auto-compress
   opts_zip_c    := -v
   opts_tput_c   := cols
   opts_seq      :=
@@ -91,7 +91,7 @@ ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
   opts_rm_f     := --force --verbose
   opts_rm_rf    := --recursive --force --verbose
   opts_cp_a     := --archive --backup --verbose
-  opts_tar_c    := --create --verbose --xz
+  opts_tar_c    := --create --verbose --auto-compress
   opts_zip_c    := -v
   opts_tput_c   := cols
   opts_seq      :=

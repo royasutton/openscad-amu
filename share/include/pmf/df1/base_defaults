@@ -139,6 +139,9 @@ backup_file_spec := \
   date \
   time
 
+# default backup file extension
+backup_file_ext := .tar.xz
+
 # File extensions
 scad_ext  := .scad
 mfs_ext   := .bash

@@ -30,12 +30,12 @@
 # Build Targets
 #------------------------------------------------------------------------------#
 
-# Output directory
-$(output_directory):
-	$(mkdir_p) $(output_directory)
-
 .PHONY:	all
 all: $(addprefix all-,$(AMU_PM_COMPONENTS))
+
+# output directory
+$(output_directory):
+	$(mkdir_p) $(output_directory)
 
 #------------------------------------------------------------------------------#
 # Clean Targets
@@ -97,7 +97,28 @@ info-project: | silent
 	$(call list_variables,$(project_config_variables),$(false), variables)
 	$(foreach x, \
 		src_files \
+		backup_files \
 	,$(call enumerate_variable,$x,$(false),$(false)))
+
+#------------------------------------------------------------------------------#
+# Backup Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: backup
+backup: $(backup_basename)$(backup_file_ext)
+
+$(backup_basename).tar.xz: $(backup_files) | $(backup_root)
+	$(tar_c) --file $@ $(backup_files)
+
+$(backup_basename).tar.gz: $(backup_files) | $(backup_root)
+	$(tar_c) --file $@ $(backup_files)
+
+$(backup_basename).zip: $(backup_files) | $(backup_root)
+	$(zip_c) $@ $(backup_files)
+
+# backup directory
+$(backup_root):
+	$(mkdir_p) $(backup_root)
 
 #------------------------------------------------------------------------------#
 # Help Targets
