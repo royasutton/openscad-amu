@@ -47,10 +47,20 @@ clean: $(addprefix clean-,$(AMU_PM_COMPONENTS))
 	$(rmdir) $(output_directory)
 
 #------------------------------------------------------------------------------#
+# Install / Uninstall Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: install
+install: all $(addprefix install-,$(AMU_PM_COMPONENTS))
+
+.PHONY: uninstall
+uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS))
+
+#------------------------------------------------------------------------------#
 # Information Targets
 #------------------------------------------------------------------------------#
 
-silent   : ; @:
+silent : ; @:
 
 info-%: | silent
 	$(info variable: $*)
