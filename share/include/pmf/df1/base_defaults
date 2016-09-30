@@ -46,6 +46,9 @@ system_control_variables := \
 # Project
 #------------------------------------------------------------------------------#
 
+# Output title headings for make targets
+target_headings := $(true)
+
 # Keep secondary files for implicit rules
 debug_secondary := $(false)
 
@@ -153,6 +156,7 @@ stamp_ext := .stamp
 #------------------------------------------------------------------------------#
 
 project_control_variables := \
+  target_headings \
   debug_secondary
 
 ################################################################################

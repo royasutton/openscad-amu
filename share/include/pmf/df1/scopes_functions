@@ -77,6 +77,7 @@ define scopes_extract_mfs
 $(amu_pm_d2)
 # makefile-script
 $(script_prefix)$2$(mfs_ext): $1 $$(MAKEFILE_LIST) | $(output_directory)
+	$$(call target_begin)
 	$(path_openscad_seam) \
 		--mode extract --input $1 $(openscad_seam_opts1) $(openscad_seam_opts2)
 
@@ -92,6 +93,7 @@ define scopes_generate_mf
 $(amu_pm_d1)
 # makefile
 $(script_prefix)$1$(mf_ext): $(script_prefix)$1$(mfs_ext)
+	$$(call target_begin)
 	$(path_bash) --norc --noprofile $(script_prefix)$1$(mfs_ext)
 
 scopes_mf += $(script_prefix)$1$(mf_ext)
@@ -106,6 +108,7 @@ define scopes_run_mf
 $(amu_pm_d2)
 # build-stamp
 $(script_prefix)$2$(stamp_ext): $(script_prefix)$2$(mf_ext)
+	$$(call target_begin)
 	OPENSCADPATH="$(call join_with,$(env_field_sep), \
 		. \
 		$(if $(dir $1),$(dir $1)) \

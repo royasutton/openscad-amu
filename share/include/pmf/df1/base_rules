@@ -116,14 +116,18 @@ info-project: | silent
 
 .PHONY: backup
 backup: $(backup_basename)$(backup_file_ext)
+	$(call target_end)
 
 $(backup_basename).tar.xz: $(backup_files) | $(backup_root)
+	$(call target_begin)
 	$(tar_c) --file $@ $(backup_files)
 
 $(backup_basename).tar.gz: $(backup_files) | $(backup_root)
+	$(call target_begin)
 	$(tar_c) --file $@ $(backup_files)
 
 $(backup_basename).zip: $(backup_files) | $(backup_root)
+	$(call target_begin)
 	$(zip_c) $@ $(backup_files)
 
 # backup directory

@@ -68,6 +68,28 @@ define heading2
   $(call horizontal_bar,$2)
 endef
 
+# target_heading (arg1,arg2)
+# arg1: The text for the heading [default: target name].
+# arg2: Heading level number [1 or 2; default 1].
+# returns nothing (outputs iff target_headings == $(true)).
+define target_heading
+  $(amu_pm_d2)
+  $(if $(call bool_decode,$(target_headings)),
+    $(if $(call strings_equal,$(or $(strip $2),1),1),$(call heading1, $(or $1,$@)))
+    $(if $(call strings_equal,$(strip $2),2),$(call heading2, $(or $1,$@)))
+  )
+endef
+
+# target_begin (arg1,arg2)
+# arg1: Heading level number [1 or 2; default 1].
+# returns nothing.
+target_begin = $(call target_heading,(begin) $@,$(or $1,1))
+
+# target_end (arg1,arg2)
+# arg1: Heading level number [1 or 2; default 1].
+# returns nothing.
+target_end = $(call target_heading,(end) $@,$(or $1,2))
+
 #------------------------------------------------------------------------------#
 #  Variable Output
 #------------------------------------------------------------------------------#

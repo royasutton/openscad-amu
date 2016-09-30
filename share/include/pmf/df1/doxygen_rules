@@ -41,11 +41,13 @@ $(doxygen_config_auto): $(MAKEFILE_LIST) $(scopes_mf) | $(output_directory)
 
 # Doxygen
 $(doxygen_stamp): $(src_files) $(doxygen_config) $(doxygen_config_auto)
+	$(call target_begin)
 	cat $(doxygen_config) $(doxygen_config_auto) | $(path_doxygen) - \
 	&& touch $(doxygen_stamp)
 
 # Latex
 $(latex_stamp): $(doxygen_stamp)
+	$(call target_begin)
 	( cd $(output_directory)$(latex_output) && make ) \
 	&& touch $(latex_stamp)
 
