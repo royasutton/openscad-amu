@@ -37,7 +37,8 @@
 # from arg1 with each scope of arg2, connected by the $(scope_joiner).
 scope_expand = $(amu_pm_d2)$(foreach p,$1,$(foreach s,$2,$p$(scope_joiner)$s))
 
-# scopes_targetsdir
+# scopes_targetsdir (empty)
+# no arguments.
 # returns the unique list of output directories for the output targets of
 # all scope makefiles for all source files.
 scopes_targetsdir = \

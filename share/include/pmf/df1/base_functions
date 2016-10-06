@@ -80,24 +80,24 @@ define target_heading
   )
 endef
 
-# target_begin (arg1,arg2)
+# target_begin (arg1)
 # arg1: Heading level number [1 or 2; default 1].
 # returns nothing.
-target_begin = $(call target_heading,(begin) $@,$(or $1,1))
+target_begin = $(amu_pm_d1)$(call target_heading,(begin) $@,$(or $1,1))
 
-# target_end (arg1,arg2)
+# target_end (arg1)
 # arg1: Heading level number [1 or 2; default 1].
 # returns nothing.
-target_end = $(call target_heading,(end) $@,$(or $1,2))
+target_end = $(amu_pm_d1)$(call target_heading,(end) $@,$(or $1,2))
 
 #------------------------------------------------------------------------------#
 # Variable Output
 #------------------------------------------------------------------------------#
 
-# enumerate_variable (arg1,arg2)
+# enumerate_variable (arg1,arg2,arg3)
 # arg1: A variable that will have its members enumerated.
 # arg2: An encoded boolean; display value of each enumerated member?
-# arg2: An encoded boolean; sort the enumerated member list?
+# arg3: An encoded boolean; sort the enumerated member list?
 # returns nothing.
 define enumerate_variable
   $(amu_pm_d3)
@@ -257,10 +257,10 @@ define variable_list_check
   )
 endef
 
-# execute_command (arg1)
+# execute_command (arg1,arg2,arg3)
 # arg1: Command string.
 # arg2: An encoded boolean; compound command?
-# arg3: An encoded boolean; $(true)="||" $(false)="&&"
+# arg3: An encoded boolean; $(true) to join with "||" and $(false) for "&&"
 # returns command string.
 execute_command = $(amu_pm_d3) \
   $(if $(call bool_decode,$2),$(if $(call bool_decode,$3),$1 ||,$1 &&),$1$(newline))

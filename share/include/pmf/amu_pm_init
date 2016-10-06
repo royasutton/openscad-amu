@@ -43,16 +43,22 @@ $(this_guard) := $(notdir $(this_file))
 
 	ifdef AMU_PM_DEBUG
 		amu_pm_dm = $(warning $1)
+		amu_pm_d0 = $(warning $0(''))
 		amu_pm_d1 = $(warning $0('$1'))
 		amu_pm_d2 = $(warning $0('$1','$2'))
 		amu_pm_d3 = $(warning $0('$1','$2','$3'))
 		amu_pm_d4 = $(warning $0('$1','$2','$3','$4'))
+		amu_pm_d5 = $(warning $0('$1','$2','$3','$4','$5'))
+		amu_pm_d6 = $(warning $0('$1','$2','$3','$4','$5','$6'))
 	else
 		amu_pm_dm :=
+		amu_pm_d0 :=
 		amu_pm_d1 :=
 		amu_pm_d2 :=
 		amu_pm_d3 :=
 		amu_pm_d4 :=
+		amu_pm_d5 :=
+		amu_pm_d6 :=
 	endif
 
 	#---------------------------------------------------------------------------#

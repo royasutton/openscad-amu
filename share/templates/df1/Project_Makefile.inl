@@ -33,7 +33,7 @@ include $(AMU_PM_PREFIX)amu_pm_init
 #------------------------------------------------------------------------------#
 project_name    := template
 project_version := 1.0
-project_brief   := An openscad-amu Project Template.
+project_brief   := openscad-amu Project Template (df1).
 
 #design_prefix  := ./
 #library_prefix := ./
