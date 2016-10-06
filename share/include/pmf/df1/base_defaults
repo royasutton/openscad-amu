@@ -52,12 +52,10 @@ target_headings := $(true)
 # Keep secondary files for implicit rules
 debug_secondary := $(false)
 
-# Project Name
-project_name := project
-
-# Project version
+# Project name, version, and brief
+project_name    := project
 project_version := 1.0
-
+project_brief   := A Project Template.
 #
 # Output directory
 #

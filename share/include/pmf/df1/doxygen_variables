@@ -70,7 +70,9 @@ enabled_sections := \
 
 # Doxygen auto-configuration file variables
 define doxygen_config_auto_text
+    PROJECT_NAME=$(project_name)
     PROJECT_NUMBER=$(project_version)
+    PROJECT_BRIEF="$(project_brief)"
     INPUT=$(src_files)
     FILE_PATTERNS=*$(scad_ext)
     FILTER_PATTERNS="*$(scad_ext)=\"$(path_openscad_dif) $(openscad_dif_opts)\""
@@ -85,12 +87,20 @@ define doxygen_config_auto_text
     LATEX_OUTPUT=$(latex_output)
     GENERATE_MAN=$(if $(generate_man),YES,NO)
     MAN_OUTPUT=$(man_output)
+    MAN_SUBDIR=$(man_subdir)
     GENERATE_TAGFILE=$(doxygen_tag)
     WARN_LOGFILE=$(doxygen_warn)
 endef
 
 # backup files
 backup_files += $(doxygen_config)
+
+# documentation install identifier
+ifndef docs_install_id
+  docs_install_id := $(project_name)-$(project_version)
+else
+  $(call amu_pm_m,using pre-defined value for $$(docs_install_id))
+endif
 
 #------------------------------------------------------------------------------#
 # Configuration Variable List
@@ -106,6 +116,8 @@ doxygen_config_variables += \
   html_output \
   latex_output \
   man_output \
+  man_subdir \
+  docs_install_id \
   \
   latex_stamp \
   doxygen_stamp \
@@ -121,9 +133,23 @@ doxygen_config_variables += \
 
 define help_text_doxygen
  all-doxygen:
+     build all documentation.
+
  clean-doxygen:
+     clean all documentation.
+
+ install-doxygen:
+     install all documentation.
+
+ uninstall-doxygen:
+     remove all documentation.
+
+ doxygen-update-html-index:
+ doxygen-update-pdf-index:
+     update html/pdf documentation toc page.
+
  info-doxygen:
-   Build/clean/info for all Doxygen components.
+     doxygen components information.
 endef
 
 ################################################################################

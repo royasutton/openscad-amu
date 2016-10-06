@@ -1,0 +1,231 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Functions
+################################################################################
+
+#------------------------------------------------------------------------------#
+# documentation index html
+#------------------------------------------------------------------------------#
+
+# doxygen_index_html_update (arg1)
+# arg1: HTML documentation root directory.
+# update 'index.html' (returns nothing).
+define doxygen_index_html_update
+  $(amu_pm_d1)
+  $(file  > $(1)index.html,$(call doxygen_index_header,HTML))
+  $(file >> $(1)index.html,$(call doxygen_index_rows,$1,html))
+  $(file >> $(1)index.html,$(call doxygen_index_footer))
+  $(info updated: $(1)index.html)
+endef
+
+# doxygen_index_rows_html (arg1,arg2,arg3,arg4,arg5,arg6)
+# arg1: docs_install_id.
+# arg2: library_install_subdir.
+# arg3: date.
+# arg4: project_name.
+# arg5: project_version.
+# arg6: project_brief.
+# returns formatted table row.
+define doxygen_index_rows_html
+  <tr>
+    <td> <a href="$(strip $1)/index.html"> $(strip $1) </a> </td>
+    <td> $(strip $4) </td>
+    <td><center> $(strip $5) </center></td>
+    <td> $(strip $6) </td>
+    <td> $(strip $2) </td>
+    <td><center> $(strip $3) </center></td>
+  </tr>
+endef
+
+#------------------------------------------------------------------------------#
+# documentation index pdf
+#------------------------------------------------------------------------------#
+
+# doxygen_index_pdf_update (arg1)
+# arg1: PDF documentation root directory.
+# update 'index.html' (returns nothing).
+define doxygen_index_pdf_update
+  $(amu_pm_d1)
+  $(file  > $(1)index.html,$(call doxygen_index_header,PDF))
+  $(file >> $(1)index.html,$(call doxygen_index_rows,$1,pdf))
+  $(file >> $(1)index.html,$(call doxygen_index_footer))
+  $(info updated: $(1)index.html)
+endef
+
+# doxygen_index_rows_pdf (arg1,arg2,arg3,arg4,arg5,arg6)
+# arg1: docs_install_id.
+# arg2: library_install_subdir.
+# arg3: date.
+# arg4: project_name.
+# arg5: project_version.
+# arg6: project_brief.
+# returns formatted table row.
+define doxygen_index_rows_pdf
+  <tr>
+    <td> <a href="$(strip $1)/$(strip $1).pdf"> $(strip $1) </a> </td>
+    <td> $(strip $4) </td>
+    <td><center> $(strip $5) </center></td>
+    <td> $(strip $6) </td>
+    <td> $(strip $2) </td>
+    <td><center> $(strip $3) </center></td>
+  </tr>
+endef
+
+#------------------------------------------------------------------------------#
+# documentation index common
+#------------------------------------------------------------------------------#
+
+# doxygen_index_write_info (arg1,arg2)
+# arg1: Documentation root directory.
+# arg2: Installation subdirectory for info file.
+# writes 'index.info' to installation subdirectory (returns nothing).
+define doxygen_index_write_info
+  $(amu_pm_d2)
+  $(file > $1$2$(dir_level_sep)index.info,
+    $(call format_kv_variable,docs_install_id)
+    $(call format_kv_variable,library_install_subdir)
+    $(call format_kv_variable,date)
+    $(call format_kv_variable,project_name)
+    $(call format_kv_variable,project_version)
+    $(call format_kv_variable,project_brief)
+  )
+endef
+
+# doxygen_index_rows (arg1,arg2)
+# arg1: PDF documentation root directory.
+# arg2: row formatter id.
+# returns table rows for each installed document id.
+define doxygen_index_rows
+  $(foreach f,$(wildcard $1*$(dir_level_sep)index.info),
+    $(call doxygen_index_rows_$(2),
+      $(call read_key_value,$f,docs_install_id),
+      $(call read_key_value,$f,library_install_subdir),
+      $(call read_key_value,$f,date),
+      $(call read_key_value,$f,project_name),
+      $(call read_key_value,$f,project_version),
+      $(call read_key_value,$f,project_brief)
+    )
+  )
+endef
+
+# doxygen_index_header (arg1)
+# arg1: Sub-title.
+# returns predefined index.html header.
+define doxygen_index_header
+  <!DOCTYPE html>
+  <html>
+  <head>
+
+  <title>OpenSCAD Libraries Documentation ($1)</title>
+  <meta name="updated" content="$(date)$(time)" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #container {
+      min-height: 100%;
+      position: relative;
+    }
+    #header {
+      background: #dddddd;
+      padding: 10px;
+    }
+    #body {
+      padding: 25px;
+      padding-bottom: 30px;
+    }
+    #footer {
+      text-align: right;
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 20px;
+      background: #dddddd;
+    }
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 80%;
+    }
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 15px;
+    }
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+  </style>
+  </head>
+
+  <body>
+  <div id="container">
+  <div id="header">
+  <center>
+  <h1>OpenSCAD Libraries Documentation</h1>
+  <h3>($1)</h3>
+  </center>
+  </div>
+
+  <div id="body">
+  <center>
+  <table>
+  <caption>Table of Contents</caption>
+  <tr>
+    <th>Library ID</th>
+    <th>Name</th>
+    <th><center>Version</center></th>
+    <th>Description</th>
+    <th>Include Path</th>
+    <th><center>Installed</center></th>
+  </tr>
+endef
+
+# doxygen_index_footer (empty)
+# no arguments.
+# returns predefined index.html footer.
+define doxygen_index_footer
+  </table>
+  </center>
+  </div>
+
+  <div id="footer">
+    Generated by:
+    <a href="https://github.com/royasutton/openscad-amu">openscad-amu</a>,
+    TOC updated $(date) at $(time).
+  </div>
+
+  </div>
+  </body>
+  </html>
+endef
+
+################################################################################
+# eof
+################################################################################

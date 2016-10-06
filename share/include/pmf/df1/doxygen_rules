@@ -32,15 +32,18 @@
 
 .PHONY:	all-doxygen
 all-doxygen: $(doxygen_stamp) $(if $(generate_latex),$(latex_stamp))
+	$(call target_end)
 
 # Auto-configuration file
 # depends on $(scopes_mf) since image_path=$(call scopes_targetsdir)
 $(doxygen_config_auto): $(MAKEFILE_LIST) $(scopes_mf) | $(output_directory)
-	$(call amu_pm_m,Generating auto-configuration file [$@])
+	$(call target_begin)
 	$(file >$(doxygen_config_auto),$(doxygen_config_auto_text))
 
 # Doxygen
-$(doxygen_stamp): $(src_files) $(doxygen_config) $(doxygen_config_auto)
+# normally the Doxygen documentation will have references to targets build by
+# scope makefiles therefore add dependency on $(scopes_stamp).
+$(doxygen_stamp): $(src_files) $(doxygen_config) $(doxygen_config_auto) $(scopes_stamp)
 	$(call target_begin)
 	cat $(doxygen_config) $(doxygen_config_auto) | $(path_doxygen) - \
 	&& touch $(doxygen_stamp)
@@ -57,6 +60,7 @@ $(latex_stamp): $(doxygen_stamp)
 
 .PHONY: clean-doxygen
 clean-doxygen:
+	$(call target_begin)
 	-@$(test) -d $(output_directory) && \
 	$(rm_f) $(doxygen_clean_files) && \
 	( cd $(output_directory) && \
@@ -71,10 +75,145 @@ clean-doxygen:
 #------------------------------------------------------------------------------#
 
 .PHONY: install-doxygen
-install-doxygen: all-doxygen
+install-doxygen:
+	$(call target_end)
 
 .PHONY: uninstall-doxygen
 uninstall-doxygen:
+	$(call target_end)
+
+################################
+# HTML FORMATTED DOCUMENTATION #
+################################
+ifeq ($(generate_html),$(true))
+.PHONY: install-doxygen-html uninstall-doxygen-html
+install-doxygen: install-doxygen-html
+uninstall-doxygen: uninstall-doxygen-html
+
+# install ordering
+install-doxygen-html: install-doxygen-html-files install-doxygen-update-html-index
+	$(call target_end)
+
+# copy files
+install-doxygen-html-files: $(doxygen_stamp) | $(install_prefix_html) $(install_prefix_html)$(docs_install_id)
+	$(call target_begin)
+	( \
+		cd $(output_directory) && \
+		$(cp_a) $(html_output)$(dir_level_sep)* $(install_prefix_html)$(docs_install_id) \
+	)
+
+# create toc entry and update index
+install-doxygen-update-html-index: | $(install_prefix_html)$(docs_install_id)
+	$(call target_begin)
+	$(call doxygen_index_write_info,$(install_prefix_html),$(docs_install_id))
+	$(call doxygen_index_html_update,$(install_prefix_html))
+
+# create install directory
+$(install_prefix_html)$(docs_install_id): ; $(mkdir_p) $@
+
+# uninstall ordering
+uninstall-doxygen-html: uninstall-doxygen-html-files doxygen-update-html-index
+	$(call target_end)
+
+# remove files
+uninstall-doxygen-html-files:
+	$(call target_begin)
+	-( \
+		cd $(install_prefix_html) && \
+		$(rm_rf) $(docs_install_id) \
+	)
+
+# update index
+doxygen-update-html-index:
+	$(call target_begin)
+	$(call doxygen_index_html_update,$(install_prefix_html))
+endif
+
+###############################
+# PDF FORMATTED DOCUMENTATION #
+###############################
+ifeq ($(generate_latex),$(true))
+.PHONY: install-doxygen-pdf uninstall-doxygen-pdf
+install-doxygen: install-doxygen-pdf
+uninstall-doxygen: uninstall-doxygen-pdf
+
+# install ordering
+install-doxygen-pdf: install-doxygen-pdf-files install-doxygen-update-pdf-index
+	$(call target_end)
+
+# copy files
+install-doxygen-pdf-files: $(latex_stamp) | $(install_prefix_pdf) $(install_prefix_pdf)$(docs_install_id)
+	$(call target_begin)
+	( \
+		cd $(output_directory)$(latex_output) && \
+		$(cp_a) \
+			refman.pdf \
+			$(install_prefix_pdf)$(docs_install_id)$(dir_level_sep)$(docs_install_id).pdf \
+	)
+
+# create toc entry and update index
+install-doxygen-update-pdf-index: | $(install_prefix_pdf)$(docs_install_id)
+	$(call target_begin)
+	$(call doxygen_index_write_info,$(install_prefix_pdf),$(docs_install_id))
+	$(call doxygen_index_pdf_update,$(install_prefix_pdf))
+
+# create install directory
+$(install_prefix_pdf)$(docs_install_id): ; $(mkdir_p) $@
+
+# uninstall ordering
+uninstall-doxygen-pdf: uninstall-doxygen-pdf-files doxygen-update-pdf-index
+	$(call target_end)
+
+# remove files
+uninstall-doxygen-pdf-files:
+	$(call target_begin)
+	-( \
+		cd $(install_prefix_pdf) && \
+		$(rm_rf) $(docs_install_id) \
+	)
+
+# update index
+doxygen-update-pdf-index:
+	$(call target_begin)
+	$(call doxygen_index_pdf_update,$(install_prefix_pdf))
+endif
+
+###############################
+# MAN FORMATTED DOCUMENTATION #
+###############################
+ifeq ($(generate_man),$(true))
+.PHONY: install-doxygen-man uninstall-doxygen-man
+install-doxygen: install-doxygen-man
+uninstall-doxygen: uninstall-doxygen-man
+
+install-doxygen-man: $(doxygen_stamp) | $(install_prefix_man) $(install_prefix_man)$(man_subdir)
+	$(call target_begin)
+	$(mkdir_p) $(install_prefix_man)$(man_subdir)
+	$(foreach f, \
+		$(wildcard $(output_directory)$(man_output)$(dir_level_sep)$(man_subdir)$(dir_level_sep)*), \
+		$(call execute_command, \
+			$(cp_a) \
+				$f \
+				$(install_prefix_man)$(man_subdir)$(dir_level_sep)$(docs_install_id)-$(notdir $f) \
+		) \
+	)
+
+$(install_prefix_man)$(man_subdir): ; $(mkdir_p) $@
+
+uninstall-doxygen-man: $(doxygen_stamp)
+	$(call target_begin)
+	$(foreach f, \
+		$(wildcard $(output_directory)$(man_output)$(dir_level_sep)$(man_subdir)$(dir_level_sep)*), \
+		$(call execute_command, \
+			$(rm_f) \
+				$(install_prefix_man)$(man_subdir)$(dir_level_sep)$(docs_install_id)-$(notdir $f) \
+		) \
+	)
+	-( \
+		cd $(install_prefix_man) && \
+		$(rmdir_p) $(man_subdir) \
+	)
+endif
 
 #------------------------------------------------------------------------------#
 # Information Targets

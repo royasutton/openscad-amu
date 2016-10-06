@@ -27,7 +27,7 @@
 ################################################################################
 
 #------------------------------------------------------------------------------#
-#  Output Formatting
+# Output Formatting
 #------------------------------------------------------------------------------#
 
 # horizontal_bar (arg1,arg2)
@@ -91,7 +91,7 @@ target_begin = $(call target_heading,(begin) $@,$(or $1,1))
 target_end = $(call target_heading,(end) $@,$(or $1,2))
 
 #------------------------------------------------------------------------------#
-#  Variable Output
+# Variable Output
 #------------------------------------------------------------------------------#
 
 # enumerate_variable (arg1,arg2)
@@ -132,11 +132,23 @@ endef
 # returns encoded boolean $(true) if string1 and string2 are identical.
 strings_equal = $(amu_pm_d2)$(if $(subst x$1,$(empty),x$2)$(subst x$2,$(empty),x$1),$(false),$(true))
 
+# sstrings_equal (arg1,arg2)
+# arg1: String1 for comparison.
+# arg2: String2 for comparison.
+# returns encoded boolean $(true) if striped string1 and striped string2 are identical.
+sstrings_equal = $(amu_pm_d2)$(call strings_equal,$(strip $1),$(strip $2))
+
 # strings_not_equal (arg1,arg2)
 # arg1: String1 for comparison.
 # arg2: String2 for comparison.
 # returns encoded boolean $(false) if string1 and string2 are identical.
 strings_not_equal = $(amu_pm_d2)$(if $(subst x$1,$(empty),x$2)$(subst x$2,$(empty),x$1),$(true),$(false))
+
+# sstrings_not_equal (arg1,arg2)
+# arg1: String1 for comparison.
+# arg2: String2 for comparison.
+# returns encoded boolean $(false) if striped string1 and striped string2 are identical.
+sstrings_not_equal = $(amu_pm_d2)$(call strings_not_equal,$(strip $1),$(strip $2))
 
 #------------------------------------------------------------------------------#
 # Boolean
@@ -161,6 +173,42 @@ bool_string = $(amu_pm_d1)$(if $(call bool_decode,$1),$$(true),$$(false))
 # arg1: An encoded boolean value [$(true)/$(false)].
 # returns the inverse of the encoded boolean value.
 not = $(amu_pm_d1)$(if $(call bool_decode,$1),$(false),$(true))
+
+#------------------------------------------------------------------------------#
+# Text file variable I/O
+#------------------------------------------------------------------------------#
+
+# format_key_value (arg1,arg2)
+# arg1: Keyword.
+# arg2: Value.
+# returns formated keyword-value assignment.
+format_key_value = $(amu_pm_d2)$1 = $2
+
+# format_kv_variable (arg1)
+# arg1: Variable.
+# returns formated keyword-value assignment for a variable and its value.
+format_kv_variable = $(amu_pm_d1)$(call format_key_value,$1,$($1))
+
+# write_key_value (arg1,arg2,arg3)
+# arg1: File.
+# arg2: Keyword.
+# arg3: Value.
+# returns nothing.
+write_key_value = $(amu_pm_d3)$(file >> $1,$(call format_key_value,$2,$3))
+
+# read_key_value (arg1,arg2)
+# arg1: File.
+# arg2: Keyword.
+# returns the value of the last keyword found in the file and returns the
+# empty string when the keyword is not found (skips over empty lines and
+# lines that begin with the hash/comment character).
+read_key_value = $(amu_pm_d2)$(shell \
+  $(sed) -e '/^[[:space:]]*$(dollar)/d' \
+         -e '/^[[:space:]]*$(hash)/d' $1 \
+         -e 's/^[[:space:]\t]*//' | \
+  $(grep) $2 | \
+  $(tail) -1 | \
+  $(sed) 's/$(call format_key_value,$2,$(empty))//')
 
 #------------------------------------------------------------------------------#
 # Other
@@ -198,6 +246,7 @@ first_of = $(amu_pm_d1)$(strip \
 # arg4: An encoded boolean; empty variables are errors or warnings?
 # returns nothing.
 define variable_list_check
+  $(amu_pm_d4) \
   $(foreach x,$(sort $1), \
     $(if $($x), \
       $(if $(call bool_decode,$3), \
@@ -207,6 +256,14 @@ define variable_list_check
     ) \
   )
 endef
+
+# execute_command (arg1)
+# arg1: Command string.
+# arg2: An encoded boolean; compound command?
+# arg3: An encoded boolean; $(true)="||" $(false)="&&"
+# returns command string.
+execute_command = $(amu_pm_d3) \
+  $(if $(call bool_decode,$2),$(if $(call bool_decode,$3),$1 ||,$1 &&),$1$(newline))
 
 ################################################################################
 # eof

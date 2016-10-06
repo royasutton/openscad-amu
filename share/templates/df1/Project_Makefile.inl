@@ -23,18 +23,20 @@ include $(AMU_PM_PREFIX)amu_pm_init
 #------------------------------------------------------------------------------#
 # Default Overrides
 #------------------------------------------------------------------------------#
-#amu_pm_parallel_jobs  := $(true)
-#verbose_seam          := $(false)
-#debug_dif_filter      := $(true)
+#amu_pm_parallel_jobs   := $(true)
+#target_headings        := $(false)
+#verbose_seam           := $(false)
+#debug_dif_filter       := $(true)
 
 #------------------------------------------------------------------------------#
 # Project
 #------------------------------------------------------------------------------#
+project_name    := template
+project_version := 1.0
+project_brief   := An openscad-amu Project Template.
+
 #design_prefix  := ./
 #library_prefix := ./
-
-project_name    := project
-project_version := 1.0
 
 design          := design
 library         := library

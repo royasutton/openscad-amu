@@ -32,17 +32,22 @@
 
 .PHONY:	all
 all: $(addprefix all-,$(AMU_PM_COMPONENTS))
+	$(call target_end)
 
 # output directory
-$(output_directory):
-	$(mkdir_p) $(output_directory)
+$(output_directory): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Clean Targets
 #------------------------------------------------------------------------------#
 
 .PHONY: clean
-clean: $(addprefix clean-,$(AMU_PM_COMPONENTS))
+clean: $(addprefix clean-,$(AMU_PM_COMPONENTS) base)
+	$(call target_end)
+
+.PHONY: clean-base
+clean-base:
+	$(call target_begin)
 	-@$(test) -d $(output_directory) && \
 	$(rmdir) $(output_directory)
 
@@ -51,10 +56,58 @@ clean: $(addprefix clean-,$(AMU_PM_COMPONENTS))
 #------------------------------------------------------------------------------#
 
 .PHONY: install
-install: all $(addprefix install-,$(AMU_PM_COMPONENTS))
+install: $(addprefix install-,$(AMU_PM_COMPONENTS) library)
+	$(call target_end)
 
 .PHONY: uninstall
-uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS))
+uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS) library)
+	$(call target_end)
+
+.PHONY: install-library
+install-library: | $(install_prefix_scad)
+	$(call target_begin)
+	$(mkdir_p) $(install_prefix_scad)$(library_install_subdir)
+	$(foreach l,$(library_files), \
+		$(strip \
+		$(if \
+			$(call bool_decode, $(call sstrings_not_equal, \
+				$(notdir $(l:$(library_prefix)%=%)),$(l:$(library_prefix)%=%) \
+			)), \
+			$(call execute_command, \
+				$(mkdir_p) \
+					$(install_prefix_scad)$(library_install_subdir)$(dir $(l:$(library_prefix)%=%)) \
+			,$(true)) \
+		) \
+		$(call execute_command, \
+			$(cp_a)	$l $(install_prefix_scad)$(library_install_subdir)$(l:$(library_prefix)%=%) \
+		) \
+		)$(newline)\
+	)
+
+.PHONY: uninstall-library
+uninstall-library:
+	$(call target_begin)
+	$(foreach l,$(library_files), \
+		$(call execute_command, \
+			-$(rm_f) $(install_prefix_scad)$(library_install_subdir)$(l:$(library_prefix)%=%) \
+		) \
+		$(if \
+			$(call bool_decode, $(call sstrings_not_equal, \
+					$(notdir $(l:$(library_prefix)%=%)),$(l:$(library_prefix)%=%) \
+			)), \
+			$(call execute_command, \
+				-$(rmdir) \
+					$(install_prefix_scad)$(library_install_subdir)$(dir $(l:$(library_prefix)%=%)) \
+			) \
+		) \
+	)
+	-(cd $(install_prefix_scad) && $(rmdir_p) $(library_install_subdir))
+
+# install directories
+$(install_prefix_scad): ; $(mkdir_p) $@
+$(install_prefix_html): ; $(mkdir_p) $@
+$(install_prefix_pdf):  ; $(mkdir_p) $@
+$(install_prefix_man):  ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Information Targets
@@ -131,8 +184,7 @@ $(backup_basename).zip: $(backup_files) | $(backup_root)
 	$(zip_c) $@ $(backup_files)
 
 # backup directory
-$(backup_root):
-	$(mkdir_p) $(backup_root)
+$(backup_root): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Help Targets
@@ -141,7 +193,7 @@ $(backup_root):
 .PHONY: help
 help: | silent
 	$(call heading1, Help: Project Makefile (openscad-amu))
-	$(foreach x,base $(AMU_PM_COMPONENTS),\
+	$(foreach x,$(AMU_PM_COMPONENTS) base,\
 		$(call horizontal_bar,-) \
 		$(info [ $x ]) $(info $(empty)) \
 		$(info $(help_text_$x)) $(info $(empty)) \

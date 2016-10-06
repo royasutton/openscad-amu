@@ -85,9 +85,19 @@ scopes_config_variables += \
 
 define help_text_scopes
  all-scopes:
+     build all openscad-amu scope components.
+
  clean-scopes:
+     clean all openscad-amu scope components.
+
+ install-scopes:
+     nothing.
+
+ uninstall-scopes:
+     nothing.
+
  info-scopes:
-   Build/clean/info for all openscad-amu scope components.
+     scope components information.
 endef
 
 ################################################################################

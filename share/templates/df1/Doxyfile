@@ -4,9 +4,6 @@
 #
 ##############################################################################
 
-PROJECT_NAME           = "template"
-PROJECT_BRIEF          = "A Project Template."
-
 OPTIMIZE_OUTPUT_FOR_C  = YES
 
 STRIP_FROM_PATH        = .

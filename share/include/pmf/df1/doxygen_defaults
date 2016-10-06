@@ -47,6 +47,7 @@ enabled_sections_add        :=
 html_output                 := html
 latex_output                := latex
 man_output                  := man
+man_subdir                  := man3
 
 # Output file names
 latex_stamp_name             = latex$(stamp_ext)
