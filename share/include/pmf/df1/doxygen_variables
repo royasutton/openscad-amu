@@ -74,8 +74,8 @@ define doxygen_config_auto_text
     PROJECT_NUMBER=$(project_version)
     PROJECT_BRIEF="$(project_brief)"
     INPUT=$(src_files)
-    FILE_PATTERNS=*$(scad_ext)
-    FILTER_PATTERNS="*$(scad_ext)=\"$(path_openscad_dif) $(openscad_dif_opts)\""
+    FILE_PATTERNS="*$(scad_ext)"
+    FILTER_PATTERNS="*$(scad_ext)"="$(path_openscad_dif) $(openscad_dif_opts)"
     ENABLED_SECTIONS=$(enabled_sections)
     EXAMPLE_PATH=$(example_path)
     IMAGE_PATH=$(image_path)

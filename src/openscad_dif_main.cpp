@@ -313,8 +313,8 @@ main(int argc, char** argv)
              << endl
              << "Example:" << endl
              << "  FILTER_PATTERNS = *.scad=<prefix>/bin/" << command_name << endl
-             << "  FILTER_PATTERNS = \"*.scad=\\\"<prefix>/bin/" << command_name
-             << " --config <config>\\\"\"" <<endl
+             << "  FILTER_PATTERNS = \"*.scad\"=\"<prefix>/bin/" << command_name
+             << " --config <config>\"" <<endl
              << endl;
 
         if ( vm.count("verbose") )  cout << opts     << endl;
