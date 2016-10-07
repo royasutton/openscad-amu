@@ -311,10 +311,12 @@ main(int argc, char** argv)
   "with Doxygen tags INPUT_FILTER and FILTER_*.\n"
 
              << endl
-             << "Example:" << endl
-             << "  FILTER_PATTERNS = *.scad=<prefix>/bin/" << command_name << endl
-             << "  FILTER_PATTERNS = \"*.scad\"=\"<prefix>/bin/" << command_name
-             << " --config <config>\"" <<endl
+             << "Examples:" << endl
+             << "  INPUT_FILTER = <prefix>/bin/" << command_name << endl
+             << "  INPUT_FILTER = \"<prefix>/bin/" << command_name
+             << " --config <config>\"" << endl
+             << "  FILTER_PATTERNS = *.scad=\"<prefix>/bin/" << command_name
+             << " --config <config>\"" << endl
              << endl;
 
         if ( vm.count("verbose") )  cout << opts     << endl;

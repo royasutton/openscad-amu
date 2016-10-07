@@ -249,7 +249,18 @@
 
     To format the documentation, the source file is pre-processed using
     \ref openscad_dif and passed to Doxygen. This is specified using the
-    \c FILTER_PATTERNS configuration option as shown in the \ref vehicle.doxyfile.
+    \c INPUT_FILTER or \c FILTER_PATTERNS configuration option as shown
+    in the \ref vehicle.doxyfile.
+
+    \warning The Doxygen \c FILTER_PATTERNS
+             [bug \#504305](https://bugzilla.gnome.org/show_bug.cgi?id=504305)
+             has been fixed in Doxygen version 1.8.12. A workaround that
+             had been used ("*.ext=\"filter opts\\\"") no longer works after
+             the fix. To deal with this bug across doxygen versions, use
+             \c INPUT_FILTER to specify any filter that requires command line
+             options until version 1.8.12 reaches more repositories. The
+             new way to specify the filter pattern with command line
+             options is (*.ext="filter options").
 
     The following command generates the documentation:
 

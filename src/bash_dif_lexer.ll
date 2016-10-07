@@ -313,8 +313,9 @@ main( int argc, char** argv ) {
          << "Doxygen input filter for bash source files. Can be used in\n"
             "conjunction with doxygen tags INPUT_FILTER and FILTER_*." << endl
          << endl
-         << "Example:" << endl
-         << "  FILTER_PATTERNS = *.bash=<prefix>/bin/" << argv[0] << endl
+         << "Examples:" << endl
+         << "  INPUT_FILTER = <prefix>/" << argv[0] << endl
+         << "  FILTER_PATTERNS = *.bash=<prefix>/" << argv[0] << endl
          << endl
          << "Usage: " << endl
          << "  " << argv[0] << " ifile" << endl

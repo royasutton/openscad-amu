@@ -24,7 +24,7 @@ EXAMPLE_PATH           = "@top_builddir@/share/examples" \
                          "@builddir@"
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
-FILTER_PATTERNS        = *.bash="@top_builddir@/src/bash-dif"
+FILTER_PATTERNS        = *.bash=@top_builddir@/src/bash-dif
 GENERATE_HTML          = YES
 GENERATE_TREEVIEW      = YES
 HTML_OUTPUT            = html
