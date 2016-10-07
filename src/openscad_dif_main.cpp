@@ -35,6 +35,8 @@
         HTML_EXTRA_FILES.
   \todo add option to create a histogram/map of amu command that exists
         in the input file.
+  \todo support --auto-config='auto-config'. When specified as such, the
+         auto configuration path is set to the path of the input file.
 
   \ingroup openscad_dif_src
 *******************************************************************************/
@@ -309,10 +311,12 @@ main(int argc, char** argv)
   "with Doxygen tags INPUT_FILTER and FILTER_*.\n"
 
              << endl
-             << "Example:" << endl
-             << "  FILTER_PATTERNS = *.scad=<prefix>/bin/" << command_name << endl
-             << "  FILTER_PATTERNS = \"*.scad=\\\"<prefix>/bin/" << command_name
-             << " --config <config>\\\"\"" <<endl
+             << "Examples:" << endl
+             << "  INPUT_FILTER = <prefix>/bin/" << command_name << endl
+             << "  INPUT_FILTER = \"<prefix>/bin/" << command_name
+             << " --config <config>\"" << endl
+             << "  FILTER_PATTERNS = *.scad=\"<prefix>/bin/" << command_name
+             << " --config <config>\"" << endl
              << endl;
 
         if ( vm.count("verbose") )  cout << opts     << endl;
@@ -379,7 +383,7 @@ main(int argc, char** argv)
 
         debug_m( debug_filter, "reading configuration file: [" + config + "]");
 
-        ifstream config_file ( config.c_str() );
+        std::ifstream config_file ( config.c_str() );
 
         if ( config_file.good() )
         { // parse configuration file options
@@ -456,7 +460,7 @@ main(int argc, char** argv)
         makefile_path /= scope_name + makefile_ext;
 
         scmd = make_path + opts
-             + " -f " + scope_name + makefile_ext
+             + " --makefile=" + scope_name + makefile_ext
              + " " + target_prefix;
 
         debug_m(debug_filter, "scope: " + scope_name);
@@ -471,7 +475,7 @@ main(int argc, char** argv)
           bool good=false;
 
           debug_m(debug_filter, "  running: " + scmd );
-          UTIL::sys_command( scmd, result, good, true, true );
+          UTIL::sys_command( scmd, result, good, false, true );
 
           if ( good )
           {
@@ -485,11 +489,6 @@ main(int argc, char** argv)
             continue;
           }
 
-          path include_path_prefix;
-          // handle configuration prefix if not current directory (or empty)
-          if ( auto_config.compare(".") && auto_config.length() )
-            include_path_prefix /= auto_config;
-
           // tokenize result string of directories
           typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
           boost::char_separator<char> fsep(" \n");
@@ -498,8 +497,7 @@ main(int argc, char** argv)
           //  add each include path if directory exists
           for ( tokenizer::iterator it=rt_tok.begin(); it!=rt_tok.end(); ++it )
           {
-            path tp( include_path_prefix );
-            tp /= *it;
+            path tp( *it );
 
             debug_m(debug_filter, "  path [" + tp.string() + "] ", false);
             if ( exists(tp) && is_directory(tp) )

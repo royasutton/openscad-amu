@@ -1,0 +1,155 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Variables
+################################################################################
+
+# Parallel Execution
+ifeq ($(amu_pm_parallel_jobs),$(true))
+  MAKEFLAGS += --jobs=$(cpu_cnt)
+endif
+
+# Remove any file extension from design and library
+design  := $(basename $(design))
+library := $(basename $(library))
+
+# Remove spaces from project name and version
+project_name    := $(subst $(space),$(empty),$(project_name))
+project_version := $(subst $(space),$(empty),$(project_version))
+
+# Input source files
+ifdef design
+  ifdef design_prefix
+    design_files += $(addprefix $(design_prefix),$(addsuffix $(scad_ext),$(design)))
+  else
+    design_files += $(addsuffix $(scad_ext),$(design))
+  endif
+  src_files += $(design_files)
+endif
+
+ifdef library
+  ifdef library_prefix
+    library_files += $(addprefix $(library_prefix),$(addsuffix $(scad_ext),$(library)))
+  else
+    library_files += $(addsuffix $(scad_ext),$(library))
+  endif
+  src_files += $(library_files)
+endif
+
+# Output directory
+ifndef output_directory
+  output_directory := \
+    $(call join_with,$(if $(output_path_use_dir_sep),$(dir_level_sep),$(output_path_term_joiner)), \
+      $(strip $(foreach x,$(output_path_spec), \
+        $(if $(call bool_decode,$(output_path_add_$x)),$($x)))))$(dir_level_sep)
+else
+  $(call amu_pm_m,using pre-defined value for $$(output_directory))
+endif
+
+# Backup basename
+ifndef backup_basename
+  backup_basename := \
+    $(call join_with,$(empty),$(backup_root)$(dir_level_sep) \
+    $(call join_with,$(if $(backup_file_use_dir_sep),$(dir_level_sep),$(backup_file_term_joiner)), \
+      $(strip $(foreach x,$(backup_file_spec), \
+        $(if $(call bool_decode,$(backup_file_add_$x)),$($x))))))
+else
+  $(call amu_pm_m,using pre-defined value for $$(backup_basename))
+endif
+
+# backup files
+backup_files := $(src_files) $(word 1,$(MAKEFILE_LIST)) $(backup_files_add)
+
+# library install sub-directory
+ifndef library_install_subdir
+  library_install_subdir := $(project_name)-$(project_version)$(dir_level_sep)
+else
+  $(call amu_pm_m,using pre-defined value for $$(library_install_subdir))
+endif
+
+#------------------------------------------------------------------------------#
+# Configuration Variable List
+#------------------------------------------------------------------------------#
+
+project_config_variables := \
+  project_name \
+  project_version \
+  project_brief \
+ \
+  design_prefix \
+  design \
+  \
+  library_prefix \
+  library \
+  \
+  output_directory \
+  backup_basename \
+  backup_files_add \
+  library_install_subdir \
+  \
+  scad_ext  \
+  mfs_ext \
+  mf_ext \
+  stamp_ext
+
+#------------------------------------------------------------------------------#
+# Help text
+#------------------------------------------------------------------------------#
+
+define help_text_base
+ all, clean, install, uninstall, info:
+     do above named for all components.
+
+ clean-base:
+     clean base files.
+
+ install-library:
+     install library files.
+
+ uninstall-library:
+     remove installed library files.
+
+ info-makefile:
+     makefile information.
+
+ info-system:
+     system information.
+
+ info-project:
+     project information.
+
+ backup:
+     create backup of source files.
+
+ list-x, listv-x, slist-x, slistv-x, info-x, print-x:
+     show information for the variable named x.
+
+ help:
+     display this help text.
+endef
+
+################################################################################
+# eof
+################################################################################

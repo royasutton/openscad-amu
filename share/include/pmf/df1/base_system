@@ -1,0 +1,251 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# System
+################################################################################
+
+#------------------------------------------------------------------------------#
+# Build Information
+#------------------------------------------------------------------------------#
+
+os        := $(shell uname -s)
+arch      := $(shell uname -m)
+host      := $(shell hostname)
+datetime  := $(shell date '+%y%m%d-%H%M')
+date      := $(word 1,$(strip $(subst -,$(space),$(datetime))))
+time      := $(word 2,$(strip $(subst -,$(space),$(datetime))))
+
+#------------------------------------------------------------------------------#
+# Commands
+#------------------------------------------------------------------------------#
+
+path_mkdir  := $(call first_of,mkdir)
+path_rmdir  := $(call first_of,rmdir)
+path_rm     := $(call first_of,rm)
+path_cp     := $(call first_of,cp)
+path_tar    := $(call first_of,tar)
+path_zip    := $(call first_of,zip)
+path_tput   := $(call first_of,tput)
+path_seq    := $(call first_of,seq)
+path_test   := $(call first_of,test)
+path_sort   := $(call first_of,sort)
+path_grep   := $(call first_of,grep)
+path_cat    := $(call first_of,cat)
+path_sed    := $(call first_of,sed)
+path_tail   := $(call first_of,tail)
+
+#------------------------------------------------------------------------------#
+# OS Configuration
+#------------------------------------------------------------------------------#
+
+__os_found      := $(false)
+
+# Linux
+ifeq (${os},Linux)
+  opts_mkdir    := --verbose
+  opts_mkdir_p  := --parents --verbose
+  opts_rmdir    := --verbose
+  opts_rmdir_p  := --parents --verbose
+  opts_rm_f     := --force --verbose
+  opts_rm_rf    := --recursive --force --verbose
+  opts_cp_a     := --archive --verbose
+  opts_tar_c    := --create --verbose --auto-compress
+  opts_zip_c    := -v
+  opts_tput_c   := cols
+  opts_seq      :=
+  opts_test     :=
+  opts_sort     := --ignore-leading-blanks --dictionary-order
+  opts_sort_vu  := --ignore-leading-blanks --version-sort --unique
+  opts_grep     :=
+  opts_grep_v   := --invert-match
+  opts_cat      :=
+  opts_sed      :=
+  opts_tail     :=
+
+  cpu_cnt       := $(shell nproc)
+  dir_level_sep := /
+  env_field_sep := :
+
+  install_prefix_scad := $(HOME)/.local/share/OpenSCAD/libraries/
+  install_prefix_html := $(HOME)/.local/share/OpenSCAD/docs/html/
+  install_prefix_pdf  := $(HOME)/.local/share/OpenSCAD/docs/pdf/
+  install_prefix_man  := $(HOME)/.local/share/OpenSCAD/docs/man/
+
+  __os_found    := $(true)
+endif
+
+# CYGWIN - compare prefix only (ie: CYGWIN_NT-10.0 --> CYGWIN_NT)
+# Using OpenSCAD compiled for Windows.
+ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
+  os            := CYGWIN_NT
+
+  opts_mkdir    := --verbose
+  opts_mkdir_p  := --parents --verbose
+  opts_rmdir    := --verbose
+  opts_rmdir_p  := --parents --verbose
+  opts_rm_f     := --force --verbose
+  opts_rm_rf    := --recursive --force --verbose
+  opts_cp_a     := --archive --verbose
+  opts_tar_c    := --create --verbose --auto-compress
+  opts_zip_c    := -v
+  opts_tput_c   := cols
+  opts_seq      :=
+  opts_test     :=
+  opts_sort     := --ignore-leading-blanks --dictionary-order
+  opts_sort_vu  := --ignore-leading-blanks --version-sort --unique
+  opts_grep     :=
+  opts_grep_v   := --invert-match
+  opts_cat      :=
+  opts_sed      :=
+  opts_tail     :=
+
+  cpu_cnt       := $(shell nproc)
+  dir_level_sep := /
+  env_field_sep := ;
+
+  install_prefix_scad := $(shell cygpath --mydocs)/OpenSCAD/libraries/
+  install_prefix_html := $(shell cygpath --mydocs)/OpenSCAD/docs/html/
+  install_prefix_pdf  := $(shell cygpath --mydocs)/OpenSCAD/docs/pdf/
+  install_prefix_man  := $(shell cygpath --mydocs)/OpenSCAD/docs/man/
+
+  __os_found    := $(true)
+endif
+
+#------------------------------------------------------------------------------#
+# Configuration Check
+#------------------------------------------------------------------------------#
+
+# OS
+ifeq ($(__os_found),$(false))
+  $(error OS [$(os)] needs to be configured in [$(lastword $(MAKEFILE_LIST))])
+else
+  undefine __os_found
+endif
+
+# Commands
+base_commands_required := \
+  path_mkdir \
+  path_rmdir \
+  path_rm \
+  path_cp \
+  path_tar \
+  path_zip \
+  path_tput \
+  path_seq \
+  path_test \
+  path_sort \
+  path_grep \
+  path_cat \
+  path_sed \
+  path_tail
+
+$(call variable_list_check, \
+  $(base_commands_required),found,$(false),$(false))
+
+#------------------------------------------------------------------------------#
+# References
+#------------------------------------------------------------------------------#
+
+mkdir   := $(path_mkdir) $(opts_mkdir)
+mkdir_p := $(path_mkdir) $(opts_mkdir_p)
+rmdir   := $(path_rmdir) $(opts_rmdir)
+rmdir_p := $(path_rmdir) $(opts_rmdir_p)
+rm_f    := $(path_rm) $(opts_rm_f)
+rm_rf   := $(path_rm) $(opts_rm_rf)
+cp_a    := $(path_cp) $(opts_cp_a)
+tar_c   := $(path_tar) $(opts_tar_c)
+zip_c   := $(path_zip) $(opts_zip_c)
+tput_c  := $(path_tput) $(opts_tput_c)
+seq     := $(path_seq) $(opts_seq)
+test    := $(path_test) $(opts_test)
+sort    := $(path_sort) $(opts_sort)
+sort_vu := $(path_sort) $(opts_sort_vu)
+grep    := $(path_grep) $(opts_grep)
+grep_v  := $(path_grep) $(opts_grep_v)
+cat     := $(path_cat) $(opts_cat)
+sed     := $(path_sed) $(opts_sed)
+tail    := $(path_tail) $(opts_tail)
+
+#------------------------------------------------------------------------------#
+# Reference Check
+#------------------------------------------------------------------------------#
+
+base_commands_configured := \
+  \
+  mkdir \
+  mkdir_p \
+  rmdir \
+  rmdir_p \
+  rm_f \
+  rm_rf \
+  cp_a \
+  tar_c \
+  zip_c \
+  tput_c \
+  seq \
+  test \
+  sort \
+  sort_vu \
+  grep \
+  grep_v \
+  cat \
+  sed \
+  tail
+
+$(call variable_list_check, \
+  $(base_commands_configured),configured,$(true),$(false))
+
+#------------------------------------------------------------------------------#
+# System Constants
+#------------------------------------------------------------------------------#
+
+# Determine number of columns for terminal
+terminal_columns := $(shell $(tput_c))
+
+#------------------------------------------------------------------------------#
+# Configuration Variable List
+#------------------------------------------------------------------------------#
+
+system_config_variables := \
+  os \
+  arch \
+  host \
+  date \
+  time \
+  \
+  cpu_cnt \
+  dir_level_sep \
+  env_field_sep \
+  \
+  terminal_columns \
+  \
+  install_prefix_scad \
+  install_prefix_html \
+  install_prefix_pdf \
+  install_prefix_man
+
+################################################################################
+# eof
+################################################################################

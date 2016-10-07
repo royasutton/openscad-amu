@@ -2,8 +2,8 @@
 # hello_world.bash
 
 __VERBOSE__=true
-__LIBPATH__="@top_srcdir@/share"
-source "${__LIBPATH__}/lib/bootloader.bash"
+__LIB_PATH__="@top_srcdir@/share"
+source "${__LIB_PATH__}/lib/bootloader.bash"
 
 translate="0,0,0"
 distance="200"

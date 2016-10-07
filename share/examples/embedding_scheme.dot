@@ -4,20 +4,16 @@
 
 graph g {
   graph[ranksep=.1];
-  node [fontname=Helvetica, fontsize=10];
-  n1 [shape=component, label="model use\nscripts\n(OpenSCAD)"];
-  n2 [shape=note, label="build invocation\nscripts\n(MFScript)"];
-  n1--n2 [style=invis];
 
   subgraph cluster_model {
     graph[fontname=Helvetica, fontsize=10, style=solid];
     node [fontname=Helvetica, fontsize=10];
-    label="Design Model";
+    label="Design Source File (*.scad)\nScope (root)";
 
     subgraph cluster_example {
     graph[fontname=Helvetica, fontsize=10, style=dashed];
     node [fontname=Helvetica, fontsize=10];
-      label="example";
+      label="Scope (B)";
 
       n3 [shape=component, label=""];
       n4 [shape=note, label=""];
@@ -27,7 +23,7 @@ graph g {
     subgraph cluster_document {
     graph[fontname=Helvetica, fontsize=10, style=dashed];
     node [fontname=Helvetica, fontsize=10];
-      label="document";
+      label="Scope (A)";
 
       n5 [shape=component, label=""];
       n6 [shape=note, label=""];
@@ -36,7 +32,7 @@ graph g {
       subgraph cluster_internal {
       graph[fontname=Helvetica, fontsize=10, style=dashed];
       node [fontname=Helvetica, fontsize=10];
-        label="internal";
+        label="Scope (A-1)";
 
         n7 [shape=component, label=""];
         n8 [shape=note, label=""];
@@ -45,4 +41,15 @@ graph g {
     }
 
   }
+
+  subgraph cluster_key {
+    graph[fontname=Helvetica, fontsize=10, color="invis" fontcolor="gray"];
+    node [fontname=Helvetica, fontsize=10 color="gray" fontcolor="gray"];
+    label="symbol\nkey";
+
+    n1 [shape=component, label="Modeling\nScripts\n(*.scad)"];
+    n2 [shape=note, label="Build\nScripts\n(*.bash)"];
+    n1--n2 [style=invis];
+  }
+
 }

@@ -1,0 +1,60 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Defaults
+################################################################################
+
+# Preferred openscad-amu tools version to use (if available).
+# must be specified in Makefile prior to including amu_pm_init.
+# AMU_TOOL_VERSION := v1.0
+
+# Prefix output path to auxiliary scope scripts
+prefix_scopes_scripts := $(true)
+
+# Verbosity
+verbose_seam          := $(true)
+verbose_seam_show     := $(false)
+
+# Debugging
+debug_seam_scanner    := $(false)
+
+# Scope joiner
+scopes_joiner         := _
+
+#------------------------------------------------------------------------------#
+# Control Variable List
+#------------------------------------------------------------------------------#
+
+scopes_control_variables := \
+  prefix_scopes_scripts \
+  \
+  verbose_seam \
+  verbose_seam_show \
+  \
+  debug_seam_scanner
+
+################################################################################
+# eof
+################################################################################

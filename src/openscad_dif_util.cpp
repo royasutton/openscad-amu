@@ -27,6 +27,11 @@
   \brief
     OpenSCAD Doxygen input filter utility classes source.
 
+  \todo support variable expansion with word selection (or introduce a
+        framework for text functions). See expand(). Consider the forms:
+        ${var[n]}, ${var[1,2,3,7-10]}, ${#var[0]}, ${#var[*]},
+        ${var[@]:0}, ${var[@]:1}, ${var[@]:1:2}
+
   \ingroup openscad_dif_src
 *******************************************************************************/
 

@@ -1,0 +1,163 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Defaults
+################################################################################
+
+#------------------------------------------------------------------------------#
+# System
+#------------------------------------------------------------------------------#
+
+.DEFAULT_GOAL := help
+
+# Use parallel execution
+amu_pm_parallel_jobs := $(false)
+
+#------------------------------------------------------------------------------#
+# System Control Variable List
+#------------------------------------------------------------------------------#
+
+system_control_variables := \
+  amu_pm_parallel_jobs
+
+#------------------------------------------------------------------------------#
+# Project
+#------------------------------------------------------------------------------#
+
+# Output title headings for make targets
+target_headings := $(true)
+
+# Keep secondary files for implicit rules
+debug_secondary := $(false)
+
+# Project name, version, and brief
+project_name    := project
+project_version := 1.0
+project_brief   := A Project Template.
+
+#
+# Output directory
+#
+
+# root directory
+output_root := build
+
+# directory term separator
+output_path_term_joiner := _
+output_path_use_dir_sep := $(false)
+
+# directory terms
+output_path_add_output_root     := $(true)
+output_path_add_project_name    := $(false)
+output_path_add_project_version := $(true)
+output_path_add_os              := $(false)
+output_path_add_arch            := $(false)
+output_path_add_host            := $(false)
+output_path_add_amuseamvs       := $(false)
+output_path_add_amudifvs        := $(false)
+output_path_add_openscadvs      := $(false)
+output_path_add_doxygenvs       := $(false)
+output_path_add_datetime        := $(false)
+output_path_add_date            := $(false)
+output_path_add_time            := $(false)
+
+# directory terms and ordering
+output_path_spec := \
+  output_root \
+  project_name \
+  project_version \
+  os \
+  arch \
+  host \
+  amuseamvs \
+  amudifvs \
+  openscadvs \
+  doxygenvs \
+  datetime \
+  date \
+  time
+
+#
+# Backup file
+#
+
+# root directory
+backup_root := backups
+
+# directory term separator
+backup_file_term_joiner := _
+backup_file_use_dir_sep := $(false)
+
+# directory terms
+backup_file_add_backup_root     := $(false)
+backup_file_add_project_name    := $(true)
+backup_file_add_project_version := $(true)
+backup_file_add_os              := $(false)
+backup_file_add_arch            := $(false)
+backup_file_add_host            := $(false)
+backup_file_add_amuseamvs       := $(false)
+backup_file_add_amudifvs        := $(false)
+backup_file_add_openscadvs      := $(false)
+backup_file_add_doxygenvs       := $(false)
+backup_file_add_datetime        := $(true)
+backup_file_add_date            := $(false)
+backup_file_add_time            := $(false)
+
+# directory terms and ordering
+backup_file_spec := \
+  backup_root \
+  project_name \
+  project_version \
+  os \
+  arch \
+  host \
+  amuseamvs \
+  amudifvs \
+  openscadvs \
+  doxygenvs \
+  datetime \
+  date \
+  time
+
+# default backup file extension
+backup_file_ext := .tar.xz
+
+# File extensions
+scad_ext  := .scad
+mfs_ext   := .bash
+mf_ext    := .makefile
+stamp_ext := .stamp
+
+#------------------------------------------------------------------------------#
+# Project Control Variable List
+#------------------------------------------------------------------------------#
+
+project_control_variables := \
+  target_headings \
+  debug_secondary
+
+################################################################################
+# eof
+################################################################################

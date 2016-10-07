@@ -8,7 +8,8 @@ openscad-amu
 
 OpenSCAD Automake Utilities (__openscad-amu__) provide a _framework_
 for scripting the compilation of OpenSCAD designs and a source code
-_pre-processor_ that allows __*.scad__ to be documented using Doxygen.
+_pre-processor_ that allows __*.scad__ (and __*.bash__) to be documented
+using Doxygen.
 
 
 Downloading
@@ -34,8 +35,7 @@ and documentation markup of OpenSCAD language-based mechanical designs.
 
 It establishes a framework that allows auxiliary scripts to be written in
 structured comment blocks of __*.scad__ source code which are used to
-construct *Makefiles* that automate the design compilations using
-[OpenSCAD].
+construct *Makefiles* that automate design compilation using [OpenSCAD].
 
 With design documentation, it seems natural to leverage existing tools
 that extract code documentation from annotated sources. Inasmuch,
@@ -69,11 +69,40 @@ The openscad-amu documentation can be built and viewed by:
     $ make docs
     $ firefox share/lib/doxygen/html/index.html
 
-
 To install or uninstall openscad-amu, issue:
 
     $ make install
     $ make uninstall
+
+
+Project Template
+----------------
+
+Project templates are installed to the default library directory. To get
+started on a new project, copy the template files to a working directory
+and modify them as needed. The default library directory can be found
+by issuing the command:
+
+    $ openscad-seam --version --verbose
+
+To create a working copy assign LIB_PATH to the library directory reported
+from the above step:
+
+    $ LIB_PATH=`openscad-seam --version --verbose  | grep "lib path" | awk '{print $4}'`
+    $ echo ${LIB_PATH}
+
+Then follow these steps:
+
+    $ mkdir project_name
+    $ cd project_name
+    $ cp ${LIB_PATH}/templates/df1/{Doxyfile,design.scad,library.scad} .
+    $ cp ${LIB_PATH}/templates/df1/Project_Makefile Makefile
+
+    $ unset LIB_PATH
+
+To see a menu of makefile target options:
+
+    $ make help
 
 
 Selecting a Release

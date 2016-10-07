@@ -40,7 +40,7 @@ Begin_Scope doc;
 
     script
       Begin_Makefile_New
-        Include_Copy "${__INCLUDE_PATH__}/parallel_jobs.mk"
+        Include_Copy "${__TEST_INCLUDE_PATH__}/parallel_jobs.mk"
         Summary  Tables  Targets  Menu
       End_Makefile;
 

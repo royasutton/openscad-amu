@@ -39,7 +39,7 @@
 
 /***************************************************************************//**
 
-  \mainpage Example Library Documentation
+  \mainpage Example Vehicle Design Library
 
   \tableofcontents
 
@@ -57,7 +57,7 @@
 
     \dot
       graph g { subgraph cluster_model { graph[style=solid];
-          label="Example Vehicle Library\n(select a module)";
+          label="Vehicle Design Library\n(select a module)";
           node [shape=Mrecord];
           a [label="wheel" URL="\ref wheel"];
           b [label="cabin" URL="\ref cabin"];
@@ -177,11 +177,10 @@
   \subsection appendix Appendix: All Generated Images
 
     \amu_define  id     ( table_of_all )
-    \amu_shell   tcolsw ( "seq -f 'Column (%g)' -s '^' 10" )
+    \amu_shell   tcolsw ( "seq -f 'Col (%g)' -s '^' 10" )
     \amu_define  theadt ( Table of all Generated Images. )
     \amu_shell   iheadt ( "seq -f 'h%g' -s '^' 84" )
     \amu_shell   countw ( "seq -f '(%g)' -s '^' 84" )
-    \amu_shell   tcolsw ( "seq -f 'Col (%g)' -s '^' 10" )
     \amu_combine ititle ( joiner=" " separator="^" tokenizer=" " prefix="a"
                           "car truck van"
                           "with" "12 17" "wheels" "thats"
@@ -398,7 +397,7 @@ Begin_Scope test;
 
     script
       Begin_Makefile_New
-        Include_Copy "${__LIBPATH__}/include/parallel_jobs.mk"
+        Include_Copy "${__INCLUDE_PATH__}/parallel_jobs.mk"
         Summary  Tables  Targets  Menu_Ext
       End_Makefile;
 
@@ -439,7 +438,7 @@ Begin_Scope document;
 
     variables
       set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"
-      add_Depend "${__LIBPATH__}/include/parallel_jobs.mk"
+      add_Depend "${__INCLUDE_PATH__}/parallel_jobs.mk"
       set_Source "${__SCOPE_FILE__}"   set_Prefix "${__PREFIX__}"
 
       set_Ext "png"
@@ -449,7 +448,7 @@ Begin_Scope document;
 
     script
       Begin_Makefile
-        Include "${__LIBPATH__}/include/parallel_jobs.mk"
+        Include "${__INCLUDE_PATH__}/parallel_jobs.mk"
         Summary  Tables  Targets  Menu
       End_Makefile;
 

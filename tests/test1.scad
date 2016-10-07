@@ -263,7 +263,7 @@ Begin_Scope doc;
   //
 
   Begin_OpenSCAD;
-    use <test_01.scad>;
+    use <test1.scad>;
 
     //
     // parallel inset mount demo
@@ -354,7 +354,7 @@ Begin_Scope doc;
 
     script
       Begin_Makefile_New
-        Include_Copy "${__INCLUDE_PATH__}/parallel_jobs.mk"
+        Include_Copy "${__TEST_INCLUDE_PATH__}/parallel_jobs.mk"
         Summary  Tables  Targets  Menu_Ext
       End_Makefile;
 

@@ -1,0 +1,128 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Functions
+################################################################################
+
+#------------------------------------------------------------------------------#
+#  General
+#------------------------------------------------------------------------------#
+
+# scope_expand (arg1,arg2)
+# arg1: List of openscad-amu scopes to prepend during expansion.
+# arg2: List of openscad-amu scopes to append during expansion.
+# returns a list of expanded scope names resulting from combining each scope
+# from arg1 with each scope of arg2, connected by the $(scope_joiner).
+scope_expand = $(amu_pm_d2)$(foreach p,$1,$(foreach s,$2,$p$(scope_joiner)$s))
+
+# scopes_targetsdir (empty)
+# no arguments.
+# returns the unique list of output directories for the output targets of
+# all scope makefiles for all source files.
+scopes_targetsdir = \
+	$(call join_with,$(space), \
+    $(foreach m,$(scopes_mf), \
+      $(if $(wildcard $m), \
+			  $(shell $(path_gnumake) 2>/dev/null \
+						--no-print-directory --makefile=$m echo_targetsdir), \
+			  <required:$m>) \
+    ),$(true) \
+  )
+
+#------------------------------------------------------------------------------#
+#  Scope Rules Generation
+#------------------------------------------------------------------------------#
+
+# scopes_targets (arg1,arg2)
+# arg1: An OpenSCAD design source file.
+# arg2: An openscad-amu scope name.
+# returns rules for processing a scope in a source files.
+define scopes_targets
+$(amu_pm_d2)
+#
+#  FILE: $1
+# SCOPE: $2
+#
+$(call scopes_extract_mfs,$1,$2)
+$(call scopes_generate_mf,$2)
+$(call scopes_run_mf,$1,$2)
+endef
+
+# scopes_extract_mfs (arg1,arg2)
+# arg1: An OpenSCAD design source file.
+# arg2: An openscad-amu scope name.
+# returns rules to extract the makefile script for the named scope.
+define scopes_extract_mfs
+$(amu_pm_d2)
+# makefile-script
+$(script_prefix)$2$(mfs_ext): $1 $(MAKEFILE_LIST) | $(output_directory)
+	$$(call target_begin)
+	$(path_openscad_seam) \
+		--mode extract --input $1 $(openscad_seam_opts1) $(openscad_seam_opts2)
+
+scopes_mfs += $(script_prefix)$2$(mfs_ext)
+scopes_clean_files += $(script_prefix)$2$(mfs_ext)
+scopes_clean_files += $(script_prefix)$(notdir $(basename $1)).conf
+endef
+
+# scopes_generate_mf (arg1)
+# arg1: An openscad-amu scope name.
+# returns rules to generate a makefile for the named scope.
+define scopes_generate_mf
+$(amu_pm_d1)
+# makefile
+$(script_prefix)$1$(mf_ext): $(script_prefix)$1$(mfs_ext)
+	$$(call target_begin)
+	$(path_bash) --norc --noprofile $(script_prefix)$1$(mfs_ext)
+
+scopes_mf += $(script_prefix)$1$(mf_ext)
+scopes_clean_files += $(script_prefix)$1$(mf_ext)
+endef
+
+# scopes_run_mf (arg1,arg2)
+# arg1: An OpenSCAD design source file.
+# arg2: An openscad-amu scope name.
+# returns rules to run make on the generated makefile for the named scope.
+define scopes_run_mf
+$(amu_pm_d2)
+# build-stamp
+$(script_prefix)$2$(stamp_ext): $(script_prefix)$2$(mf_ext)
+	$$(call target_begin)
+	OPENSCADPATH="$(call join_with,$(env_field_sep), \
+		. \
+		$(if $(dir $1),$(dir $1)) \
+		$(if $(design_prefix),$(design_prefix)) \
+		$(if $(library_prefix),$(library_prefix)) \
+		,$(true))" \
+	$(path_gnumake) --makefile=$(script_prefix)$2$(mf_ext) all \
+	&& touch $(script_prefix)$2$(stamp_ext)
+
+scopes_stamp += $(script_prefix)$2$(stamp_ext)
+scopes_clean_files += $(script_prefix)$2$(stamp_ext)
+endef
+
+################################################################################
+# eof
+################################################################################

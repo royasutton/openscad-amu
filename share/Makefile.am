@@ -7,10 +7,12 @@
 # lib depends on: examples and scripts (build afterwards)
 SUBDIRS = \
 	examples \
+	scripts \
+	lib \
+	\
 	functions \
 	include \
-	scripts \
-	lib
+	templates
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)

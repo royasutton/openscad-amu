@@ -22,6 +22,8 @@ SUFFIXES = .bash .help
 # targets
 ##############################################################################
 
+all-local: $(files_am)
+
 docs-local: doxygen.stamp
 
 # run doxygen and update timestamp
@@ -38,7 +40,7 @@ doxygen.stamp: Doxyfile Makefile $(files_am) $(scripts_help)
 
 '$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
 
-install-data-local: | '$(install_path)'
+install-data-local: $(files_am) | '$(install_path)'
 	( cd ${builddir} && \
 		for f in $(files_am); do \
 			$(INSTALL_SCRIPT) $$f '$(install_path)' \

@@ -663,6 +663,31 @@ function table_dump_mf()
 }
 
 
+#==============================================================================
+# protect functions
+#==============================================================================
+readonly -f \
+  table_set \
+  table_getkeyname_echo \
+  table_getkeyname_tovar \
+  table_getval_echo \
+  table_getval_tovar \
+  table_unset \
+  table_key_exists \
+  table_key_value_empty \
+  table_getkeyids_echo \
+  table_getkeyids_tovar \
+  table_foreach \
+  table_getkeynames_echo \
+  table_getkeynames_tovar \
+  table_size_echo \
+  table_size_tovar \
+  table_copy \
+  table_unset_all \
+  table_dump \
+  table_dump_mf
+
+
 ## @}
 
 #==============================================================================

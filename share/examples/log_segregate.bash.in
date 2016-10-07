@@ -2,8 +2,8 @@
 # log_segregate.bash
 
 __VERBOSE__=true
-__LIBPATH__="@top_srcdir@/share"
-source "${__LIBPATH__}/lib/bootloader.bash"
+__LIB_PATH__="@top_srcdir@/share"
+source "${__LIB_PATH__}/lib/bootloader.bash"
 
 defines Name "part" Define "render_part" Strings  "cover base"
 defines Name "mode" Define "render_mode" Strings  "mode1 mode2"

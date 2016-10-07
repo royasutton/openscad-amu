@@ -1,0 +1,205 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Rules
+################################################################################
+
+#------------------------------------------------------------------------------#
+# Build Targets
+#------------------------------------------------------------------------------#
+
+.PHONY:	all
+all: $(addprefix all-,$(AMU_PM_COMPONENTS))
+	$(call target_end)
+
+# output directory
+$(output_directory): ; $(mkdir_p) $@
+
+#------------------------------------------------------------------------------#
+# Clean Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: clean
+clean: $(addprefix clean-,$(AMU_PM_COMPONENTS) base)
+	$(call target_end)
+
+.PHONY: clean-base
+clean-base:
+	$(call target_begin)
+	-@$(test) -d $(output_directory) && \
+	$(rmdir) $(output_directory)
+
+#------------------------------------------------------------------------------#
+# Install / Uninstall Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: install
+install: $(addprefix install-,$(AMU_PM_COMPONENTS) library)
+	$(call target_end)
+
+.PHONY: uninstall
+uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS) library)
+	$(call target_end)
+
+.PHONY: install-library
+install-library: | $(install_prefix_scad)
+	$(call target_begin)
+	$(mkdir_p) $(install_prefix_scad)$(library_install_subdir)
+	$(foreach l,$(library_files), \
+		$(strip \
+		$(if \
+			$(call bool_decode, $(call sstrings_not_equal, \
+				$(notdir $(l:$(library_prefix)%=%)),$(l:$(library_prefix)%=%) \
+			)), \
+			$(call execute_command, \
+				$(mkdir_p) \
+					$(install_prefix_scad)$(library_install_subdir)$(dir $(l:$(library_prefix)%=%)) \
+			,$(true)) \
+		) \
+		$(call execute_command, \
+			$(cp_a)	$l $(install_prefix_scad)$(library_install_subdir)$(l:$(library_prefix)%=%) \
+		) \
+		)$(newline)\
+	)
+
+.PHONY: uninstall-library
+uninstall-library:
+	$(call target_begin)
+	$(foreach l,$(library_files), \
+		$(call execute_command, \
+			-$(rm_f) $(install_prefix_scad)$(library_install_subdir)$(l:$(library_prefix)%=%) \
+		) \
+		$(if \
+			$(call bool_decode, $(call sstrings_not_equal, \
+					$(notdir $(l:$(library_prefix)%=%)),$(l:$(library_prefix)%=%) \
+			)), \
+			$(call execute_command, \
+				-$(rmdir) \
+					$(install_prefix_scad)$(library_install_subdir)$(dir $(l:$(library_prefix)%=%)) \
+			) \
+		) \
+	)
+	-(cd $(install_prefix_scad) && $(rmdir_p) $(library_install_subdir))
+
+# install directories
+$(install_prefix_scad): ; $(mkdir_p) $@
+$(install_prefix_html): ; $(mkdir_p) $@
+$(install_prefix_pdf):  ; $(mkdir_p) $@
+$(install_prefix_man):  ; $(mkdir_p) $@
+
+#------------------------------------------------------------------------------#
+# Information Targets
+#------------------------------------------------------------------------------#
+
+silent : ; @:
+
+info-%: | silent
+	$(info variable: $*)
+	$(info $(space)origin: $(origin $*))
+	$(info $(space)flavor: $(flavor $*))
+	$(info $(space) value: $(value $*))
+
+print-%: | silent
+	$(info $* = '$($*)')
+
+list-%: | silent
+	$(call enumerate_variable,$*,$(false),$(false))
+
+listv-%: | silent
+	$(call enumerate_variable,$*,$(true),$(false))
+
+slist-%: | silent
+	$(call enumerate_variable,$*,$(false),$(true))
+
+slistv-%: | silent
+	$(call enumerate_variable,$*,$(true),$(true))
+
+.PHONY: info
+info: info-makefile info-system info-project $(addprefix info-,$(AMU_PM_COMPONENTS))
+
+.PHONY: info-makefile
+info-makefile: | silent
+	$(call heading1, Makefile Information)
+	$(call list_variables,$(amu_pm_bootstrap_variables),$(false), bootstrap)
+	$(call enumerate_variable,amu_pm_init_components,$(false),$(false))
+	$(call enumerate_variable,amu_pm_rules_components,$(false),$(false))
+
+.PHONY: info-system
+info-system: | silent
+	$(call heading1, System Information)
+	$(call list_variables,$(system_control_variables),$(true), control)
+	$(call list_variables,$(system_config_variables),$(false), variables)
+	$(call enumerate_variable,base_commands_configured,$(true),$(true))
+
+.PHONY: info-project
+info-project: | silent
+	$(call heading1, Project Information)
+	$(call list_variables,$(project_control_variables),$(true), control)
+	$(call list_variables,$(project_config_variables),$(false), variables)
+	$(foreach x, \
+		src_files \
+		backup_files \
+	,$(call enumerate_variable,$x,$(false),$(false)))
+
+#------------------------------------------------------------------------------#
+# Backup Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: backup
+backup: $(backup_basename)$(backup_file_ext)
+	$(call target_end)
+
+$(backup_basename).tar.xz: $(backup_files) | $(backup_root)
+	$(call target_begin)
+	$(tar_c) --file $@ $(backup_files)
+
+$(backup_basename).tar.gz: $(backup_files) | $(backup_root)
+	$(call target_begin)
+	$(tar_c) --file $@ $(backup_files)
+
+$(backup_basename).zip: $(backup_files) | $(backup_root)
+	$(call target_begin)
+	$(zip_c) $@ $(backup_files)
+
+# backup directory
+$(backup_root): ; $(mkdir_p) $@
+
+#------------------------------------------------------------------------------#
+# Help Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: help
+help: | silent
+	$(call heading1, Help: Project Makefile (openscad-amu))
+	$(foreach x,$(AMU_PM_COMPONENTS) base,\
+		$(call horizontal_bar,-) \
+		$(info [ $x ]) $(info $(empty)) \
+		$(info $(help_text_$x)) $(info $(empty)) \
+	)
+	$(call horizontal_bar)
+
+################################################################################
+# eof
+################################################################################

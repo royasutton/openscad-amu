@@ -1,0 +1,105 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Variables
+################################################################################
+
+# auxiliary script output path prefix
+script_prefix := $(if $(call bool_decode,$(prefix_scopes_scripts)),$(output_directory))
+
+# openscad_seam_opts1: for modes=(extract|list)
+openscad_seam_opts1 := \
+  $(strip \
+    --joiner $(scopes_joiner) \
+    --makefile-ext $(mf_ext) \
+    --mfscript-ext $(mfs_ext) \
+    --openscad-ext $(scad_ext) \
+  )
+
+# openscad_seam_opts1: for modes=(extract)
+openscad_seam_opts2 := \
+  $(strip \
+    --prefix $(output_directory) \
+    --prefix-ipp 0 \
+    --prefix-scripts $(if $(call bool_decode,$(prefix_scopes_scripts)),yes,no) \
+    --comments yes \
+    --show $(if $(call bool_decode,$(verbose_seam_show)),yes,no) \
+    --run no \
+    --make no \
+    $(if $(AMU_LIB_PATH),--lib-path $(AMU_LIB_PATH)) \
+    --openscad-path $(path_openscad) \
+    --bash-path $(path_bash) \
+    --make-path $(path_gnumake) \
+    --write-config yes \
+    $(if $(call bool_decode,$(debug_seam_scanner)),--debug) \
+    $(if $(call bool_decode,$(verbose_seam)),--verbose) \
+  )
+
+# scopes auxiliary scripts for all source files
+scopes_scripts := \
+  $(addprefix $(script_prefix), \
+    $(foreach s,$(src_files), \
+      $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
+    ) \
+  )
+
+# assign modeling scripts to clean-files
+scopes_clean_files := $(filter %$(scad_ext),$(scopes_scripts))
+
+#------------------------------------------------------------------------------#
+# Configuration Variable List
+#------------------------------------------------------------------------------#
+
+scopes_config_variables += \
+  scopes_joiner \
+  \
+  script_prefix \
+  openscad_seam_opts1 \
+  openscad_seam_opts2
+
+#------------------------------------------------------------------------------#
+# Help text
+#------------------------------------------------------------------------------#
+
+define help_text_scopes
+ all-scopes:
+     build all openscad-amu scope components.
+
+ clean-scopes:
+     clean all openscad-amu scope components.
+
+ install-scopes:
+     nothing.
+
+ uninstall-scopes:
+     nothing.
+
+ info-scopes:
+     scope components information.
+endef
+
+################################################################################
+# eof
+################################################################################

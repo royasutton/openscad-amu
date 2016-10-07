@@ -31,18 +31,34 @@
 #     locates required system commands.
 #
 #     This is usually done near the top of the script. Prior to sourcing,
-#     the environment variable \c ${\__LIBPATH\__} must be set.
+#     the environment variable \c ${\__LIB_PATH\__} must be set.
 #
 #   \ingroup library_core
 ###############################################################################/
 
 
 #==============================================================================
-# enforce minimum bash version.
+# enforce requirements
 #==============================================================================
 
+# minimum bash version.
 if [[ "$BASH_VERSINFO" -lt 4 ]] ; then
-  echo >&2 "requires bash >= 4.\n"
+  echo >&2 "requires bash >= 4."
+  return 1 2>/dev/null
+  exit 1
+fi
+
+# ${__LIB_PATH__} must be set.
+if [[ -z "${__LIB_PATH__}" ]] ; then
+  echo >&2 "\${__LIB_PATH__} not set, aborting."
+  return 1 2>/dev/null
+  exit 1
+fi
+
+# ${__LIB_PATH__}/lib must exist.
+if [[ ! -d "${__LIB_PATH__}/lib" ]] ; then
+  echo >&2 "\${__LIB_PATH__}=[${__LIB_PATH__}] and" \
+           "${__LIB_PATH__}/lib directory does not exist, aborting."
   return 1 2>/dev/null
   exit 1
 fi
@@ -82,9 +98,9 @@ echo "loading automake utilities library functions:"
 
 for lib in $lib_list ; do
   [[ -n $__VERBOSE__ ]] && \
-  echo " " source ${__LIBPATH__}/lib/$lib
+  echo " " source ${__LIB_PATH__}/lib/$lib
 
-  source ${__LIBPATH__}/lib/$lib
+  source ${__LIB_PATH__}/lib/$lib
 done
 
 
@@ -171,6 +187,8 @@ declare -i makefile_textbox_box_width=80
 
 [[ -n $__VERBOSE__ ]] && \
 echo "done."
+
+return 0
 
 
 #==============================================================================

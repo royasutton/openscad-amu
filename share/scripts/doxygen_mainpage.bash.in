@@ -1,29 +1,31 @@
 #/##############################################################################
 
-  \mainpage Support Scripts Documentation
+  \mainpage Support Scripts
 
   \dot
     digraph example {
       node [shape=Mrecord, fontname=Helvetica, fontsize=10];
       a [label="openscad-amu" URL="../../../lib/doxygen/html/index.html"];
       b [label="C++ Programs" URL="../../../../src/doxygen/html/index.html"];
-      c [label="Makefile Script Library" URL="../../../lib/doxygen/html/index.html#library"];
+      c [label="Makefile Script Library" URL="../../../lib/doxygen/html/mslibrary.html"];
       d [label="Support Scripts" URL="index.html" style="filled"];
       a->b; a->c; a->d;
     }
   \enddot
 
-  Here you will find documentation for the support scripts that are used
-  by the OpenSCAD Automake Utilities Makefile Script library.
-
   \section scripts Scripts
 
   \subsection segregate_bash segregate.bash
-    \subsubsection segregate_bash_help Help Text:
-      \include segregate.help
+
+    \li \subpage segregate_bash_ht "Command line help"
 
 ###############################################################################/
 
+
+#/##############################################################################
+  \page segregate_bash_ht Command line help: segregate.bash
+  \include segregate.help
+###############################################################################/
 
 #
 # eof

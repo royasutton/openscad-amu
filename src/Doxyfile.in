@@ -40,4 +40,6 @@ MAN_OUTPUT             = man
 PREDEFINED             = DOXYGEN_SHOULD_SKIP_THIS
 GENERATE_TAGFILE       = doxygen.tagfile
 TAGFILES               =
+HAVE_DOT               = YES
 DOTFILE_DIRS           = "@top_srcdir@/share/examples"
+GENERATE_LEGEND        = YES

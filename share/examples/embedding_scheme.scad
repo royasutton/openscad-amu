@@ -1,35 +1,51 @@
-{OpenSCAD design script};
+//
+// Design Source File (*.scad)
+//
 
-/*
-    Begin_Scope document;
+/***************************************************************************//**
+  Doxygen documentation markup
+*******************************************************************************/
+
+/***************************************************************************//**
+    Begin_Scope A;
         Begin_OpenSCAD;
-            {Extracted OpenSCAD script};
+            //
+            // Modeling Script (*.scad)
+            //
         End_OpenSCAD;
 
         Begin_MFScript;
-            {Extracted Makefile Script};
+            //
+            // Build Script (*.bash)
+            //
         End_MFScript;
 
-        Begin_Scope internal;
+        Begin_Scope 1;
             Begin_OpenSCAD;
-                {Extracted OpenSCAD script};
+                //
+                // Modeling Script (*.scad)
+                //
             End_OpenSCAD;
 
             Begin_MFScript;
-                {Extracted Makefile Script};
+                //
+                // Build Script (*.bash)
+                //
             End_MFScript;
         End_Scope;
     End_Scope;
 
-    Begin_Scope example;
-        Begin_Scope ex1;
-            Begin_OpenSCAD;
-                {Extracted OpenSCAD script};
-            End_OpenSCAD;
+    Begin_Scope B;
+        Begin_OpenSCAD;
+            //
+            // Modeling Script (*.scad)
+            //
+        End_OpenSCAD;
 
-            Begin_MFScript;
-                {Extracted Makefile Script};
-            End_MFScript;
-        End_Scope;
+        Begin_MFScript;
+            //
+            // Build Script (*.bash)
+            //
+        End_MFScript;
     End_Scope;
-*/
+*******************************************************************************/

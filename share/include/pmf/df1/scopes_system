@@ -1,0 +1,101 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# System
+################################################################################
+
+#------------------------------------------------------------------------------#
+# Commands
+#------------------------------------------------------------------------------#
+
+path_openscad := $(call first_of,openscad-nightly openscad)
+path_openscad_seam := \
+  $(call first_of, \
+    $(AMU_TOOL_PREFIX)openscad-seam-$(AMU_TOOL_VERSION) \
+    $(AMU_TOOL_PREFIX)openscad-seam \
+  )
+path_bash := $(call first_of,bash)
+path_gnumake := $(call first_of,gnumake gmake make)
+
+#------------------------------------------------------------------------------#
+# OS Configuration
+#------------------------------------------------------------------------------#
+
+#------------------------------------------------------------------------------#
+# Configuration Check
+#------------------------------------------------------------------------------#
+
+# Commands
+scopes_commands_required := \
+  path_openscad \
+  path_openscad_seam \
+  path_bash \
+  path_gnumake
+
+# Warning list first, then error.
+$(call variable_list_check, \
+  $(scopes_commands_required),found,$(false),$(true))
+$(call variable_list_check, \
+  $(scopes_commands_required),found,$(false),$(false))
+
+#------------------------------------------------------------------------------#
+# References
+#------------------------------------------------------------------------------#
+
+#------------------------------------------------------------------------------#
+# Reference Check
+#------------------------------------------------------------------------------#
+
+scopes_commands_configured := \
+  $(scopes_commands_required)
+
+$(call variable_list_check, \
+  $(scopes_commands_configured),configured,$(true),$(false))
+
+#------------------------------------------------------------------------------#
+# System Constants
+#------------------------------------------------------------------------------#
+
+# Design flow tool versions
+openscadvn := $(word 3,$(shell $(path_openscad) 2>&1 --version))
+openscadvs := openscad$(openscadvn)
+
+amuseamvn := $(subst v,$(empty),$(shell $(path_openscad_seam) 2>&1 --version))
+amuseamvs := amuseam$(amuseamvn)
+
+#------------------------------------------------------------------------------#
+# Configuration Variable List
+#------------------------------------------------------------------------------#
+
+scopes_config_variables := \
+  openscadvs \
+  openscadvn \
+  \
+  amuseamvs \
+  amuseamvn \
+
+################################################################################
+# eof
+################################################################################

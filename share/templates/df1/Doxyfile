@@ -1,0 +1,38 @@
+##############################################################################
+#
+# Doxyfile
+#
+##############################################################################
+
+OPTIMIZE_OUTPUT_FOR_C  = YES
+
+STRIP_FROM_PATH        = .
+STRIP_FROM_INC_PATH    = .
+
+RECURSIVE              = NO
+EXAMPLE_RECURSIVE      = NO
+
+EXTRACT_PRIVATE        = YES
+INTERNAL_DOCS          = YES
+
+GENERATE_TODOLIST      = YES
+GENERATE_TESTLIST      = YES
+GENERATE_BUGLIST       = YES
+GENERATE_DEPRECATEDLIST= YES
+
+GENERATE_TREEVIEW      = YES
+SOURCE_BROWSER         = YES
+STRIP_CODE_COMMENTS    = NO
+
+COMPACT_LATEX          = YES
+LATEX_SOURCE_CODE      = NO
+PAPER_TYPE             = letter
+
+MAN_EXTENSION          = .3
+
+#HAVE_DOT               = YES
+#GENERATE_LEGEND        = YES
+
+##############################################################################
+# eof
+##############################################################################

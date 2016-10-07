@@ -65,8 +65,10 @@ namespace
   // program run mode constants.
   const size_t MODE_COUNT   = 1;
   const size_t MODE_EXTRACT = 2;
-  const size_t MODE_RETURN  = 4;
-  const size_t MODE_ALL     = 7;
+  const size_t MODE_LIST    = 4;
+  const size_t MODE_RETURN  = 8;
+  const size_t MODE_SCOPES  = 16;
+  const size_t MODE_ALL     = 31;
 }
 
 
@@ -298,10 +300,11 @@ main(int argc, char** argv)
     opts.add_options()
       ("mode,m",
           po::value<string>(&mode)->default_value(mode),
-          "Scanner mode: one of (count | extract | return). Count "
-          "outputs the number of scripts found in the input. Return "
-          "sets the command exit value to this count. Extract is the "
-          "default mode.\n")
+          "Mode: one of (count | extract | list | return | scopes). "
+          "Count outputs the number of scripts found in the input. List "
+          "enumerates the script names found. Return sets the command "
+          "exit value to the script count. Scopes enumerate the scope "
+          "names found. Extract write the scripts to separate files.\n")
       ("input,i",
           po::value<string>(&input)->required(),
           "Input file containing annotated script(s) embedded within "
@@ -443,7 +446,7 @@ main(int argc, char** argv)
         if ( vm.count("verbose") )
           cout << "reading configuration file: " << config << endl;
 
-        ifstream config_file ( config.c_str() );
+        std::ifstream config_file ( config.c_str() );
 
         if ( config_file.good() ) {
           po::store(po::parse_config_file(config_file, opts, true), vm);
@@ -481,11 +484,15 @@ main(int argc, char** argv)
       run_mode = MODE_COUNT;
     } else if ( mode.compare(0, mode.length(), "extract", 0, mode.length()) == 0 ) {
       run_mode = MODE_EXTRACT;
+    } else if ( mode.compare(0, mode.length(), "list", 0, mode.length()) == 0 ) {
+      run_mode = MODE_LIST;
     } else if ( mode.compare(0, mode.length(), "return", 0, mode.length()) == 0 ) {
       run_mode = MODE_RETURN;
+    } else if ( mode.compare(0, mode.length(), "scopes", 0, mode.length()) == 0 ) {
+      run_mode = MODE_SCOPES;
     } else {
       throw logic_error( string("invalid option '--mode=" )
-              + mode + "', may be one of ( count | extract | return )" );
+              + mode + "', may be one of ( count | extract | list | return | scopes )" );
     }
 
 
@@ -503,8 +510,8 @@ main(int argc, char** argv)
                 + "' requires option '--target=arg'" );
     }
 
-    // validate: 'count' or 'return' modes
-    if ( run_mode & (MODE_COUNT|MODE_RETURN) )
+    // validate: 'count', 'list', 'return', or 'scopes' modes
+    if ( run_mode & (MODE_COUNT|MODE_LIST|MODE_RETURN|MODE_SCOPES) )
     {
       vector<string> va_v;
 
@@ -533,8 +540,8 @@ main(int argc, char** argv)
         option_set_conflict( vm, it->c_str(), ", only valid for --mode='extract'");
     }
 
-    // validate: 'return' mode
-    if ( run_mode & MODE_RETURN )
+    // validate: 'list', 'return', or 'scopes' mode
+    if ( run_mode & (MODE_LIST|MODE_RETURN|MODE_SCOPES) )
     {
       vector<string> va_v;
 
@@ -543,7 +550,8 @@ main(int argc, char** argv)
 
      // make sure none of these options have been specified
       for( vector<string>::iterator it = va_v.begin(); it != va_v.end(); ++it )
-        option_set_conflict( vm, it->c_str(), ", not valid for --mode='return'");
+        option_set_conflict( vm, it->c_str(),
+          ", not valid for --mode='list'|'return'|'scopes'");
     }
 
 
@@ -669,9 +677,9 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
 
     //
-    // 'count' or 'return' mode
+    // 'count', 'list', 'return', or 'scopes' mode
     //
-    if ( run_mode & (MODE_COUNT|MODE_RETURN) )
+    if ( run_mode & (MODE_COUNT|MODE_LIST|MODE_RETURN|MODE_SCOPES) )
     {
       SEAM::SEAM_Scanner scanner( input, true, command_name + ": " );
 
@@ -690,9 +698,27 @@ main(int argc, char** argv)
 
       int script_count = scanner.get_script_count();
 
-      if ( run_mode & MODE_COUNT )
+      if ( run_mode & (MODE_COUNT|MODE_LIST|MODE_SCOPES) )
       {
-        cout << "script count = " <<  script_count << endl;
+
+        if ( run_mode & (MODE_COUNT) )
+        {
+          cout << "script count = " <<  script_count << endl;
+        }
+
+        if ( run_mode & (MODE_LIST) )
+        {
+          vector<string> sv = scanner.get_script_id();
+          for ( vector<string>::iterator it=sv.begin(); it != sv.end(); ++it)
+            cout << *it << endl;
+        }
+
+        if ( run_mode & (MODE_SCOPES) )
+        {
+          vector<string> sv = scanner.get_scope_id();
+          for ( vector<string>::iterator it=sv.begin(); it != sv.end(); ++it)
+            cout << *it << endl;
+        }
 
         if ( script_count == 0 )
           exit( ERROR_SCRIPT_COUNT_ZERO );
@@ -774,7 +800,7 @@ main(int argc, char** argv)
       if ( vm.count("verbose")  )
         cout << "writing configuration file: " << conf_path.string() << endl;
 
-      ofstream config_file ( conf_path.c_str() );
+      std::ofstream config_file ( conf_path.c_str() );
 
       if ( config_file.good() ) {
         format_options( config_file, "configuration:", "#", ov, run_mode, vm );

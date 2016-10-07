@@ -1,0 +1,89 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://github.com/royasutton/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Rules
+################################################################################
+
+# Instantiate rules for each makefile script form all source files.
+#  * foreach source file
+#    * foreach makefile-script
+#      * evaluate ( instantiated target rules )
+$(foreach s,$(src_files), \
+  $(foreach c,$(filter %$(mfs_ext), \
+    $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1))), \
+      $(eval $(call scopes_targets,$s,$(basename $c))) \
+  )\
+)
+
+#------------------------------------------------------------------------------#
+# Build Targets
+#------------------------------------------------------------------------------#
+
+.PHONY:	all-scopes
+all-scopes:	$(scopes_stamp)
+	$(call target_end)
+
+#------------------------------------------------------------------------------#
+# Clean Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: clean-scopes
+clean-scopes: $(scopes_mf)
+	$(call target_begin)
+	-list='$^'; for i in $$list ; do $(path_gnumake) -f $$i clean ; done
+	-$(rm_f) $(scopes_clean_files)
+
+#------------------------------------------------------------------------------#
+# Install / Uninstall Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: install-scopes
+install-scopes:
+	$(call target_end)
+
+.PHONY: uninstall-scopes
+uninstall-scopes:
+	$(call target_end)
+
+#------------------------------------------------------------------------------#
+# Information Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: info-scopes
+info-scopes: | silent
+	$(call heading1, Scope Information)
+	$(call list_variables,$(scopes_control_variables),$(true), control)
+	$(call list_variables,$(scopes_config_variables),$(false), variables)
+	$(call enumerate_variable,scopes_commands_configured,$(true),$(true))
+	$(foreach x, \
+		scopes_scripts \
+		scopes_mfs \
+		scopes_mf \
+		scopes_stamp \
+	,$(call enumerate_variable,$x,$(false),$(false)))
+
+################################################################################
+# eof
+################################################################################

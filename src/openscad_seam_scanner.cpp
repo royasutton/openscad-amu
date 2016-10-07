@@ -90,6 +90,9 @@ SEAM::SEAM_Scanner::init(void)
   if ( !rootscope.empty() )
     set_rootscope( rootscope );
 
+  // clear script_id vector
+  script_id.clear();
+
   if ( input_file.is_open() ) {
     if ( !scanner_count_mode )
       cout << ops << "resetting input file," << endl;
@@ -316,6 +319,9 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
 {
   scanner_script_count++;
 
+  // add script to script identifiers vector
+  script_id.push_back( get_filename( mfscript_ext ) );
+
   if (scanner_count_mode) {
     if ( verbose ) cout << ops << "(" << scanner_script_count << ") makefile script ["
                         << get_filename( mfscript_ext ) << "]" << endl;
@@ -326,6 +332,12 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
   string scope_openscad = get_filename( openscad_ext );
   string mfscript_init = "lib/bootloader.bash";
 
+  boost::filesystem::path include_path;
+
+  include_path  = lib_path;
+  include_path /= "include";
+  include_path /= "mf";
+
   switch_output( mfscript_ext );
 
   output_file << "#!" << bash_path << endl;
@@ -334,12 +346,14 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
   if ( verbose )
   output_file << "__VERBOSE__=true" << endl;
 
-  output_file << "__LIBPATH__=\"" << lib_path << "\""
-              << " && source \"${__LIBPATH__}/" << mfscript_init << "\"" << endl
+  output_file << "__LIB_PATH__=\"" << lib_path << "\""
+              << " && source \"${__LIB_PATH__}/" << mfscript_init << "\""
+              << " || exit 1" << endl
               << "__PREFIX__=\"" << output_prefix << "\"" << endl
               << "__SOURCE_FILE__=\"" << input_name << "\"" << endl
               << "__SCOPE_FILE__=\"" << scope_openscad << "\"" << endl
-              << "__MAKE_FILE__=\"" << scope_makefile << "\"" << endl;
+              << "__MAKE_FILE__=\"" << scope_makefile << "\"" << endl
+              << "__INCLUDE_PATH__=\"" << include_path.string() << "\"" << endl;
 
   if ( !openscad_path.empty() )
   output_file << "sc_openscad=" << openscad_path << endl;
@@ -364,7 +378,7 @@ SEAM::SEAM_Scanner::end_mfscript(void)
   switch_output( &std::cout );
 
   if ( show ) {
-    ifstream tmp_file( script_file.c_str() );
+    std::ifstream tmp_file( script_file.c_str() );
 
     cout << "### begin show file [" << script_file << "] ###" << endl;
     cout << tmp_file.rdbuf();
@@ -406,7 +420,15 @@ SEAM::SEAM_Scanner::end_mfscript(void)
   if ( make && !target.empty() ) {
     string scope_makefile = get_filename( makefile_ext );
 
-    string scmd = make_path + " --makefile=" + scope_makefile + " " + target;
+    boost::filesystem::path include_path;
+
+    include_path  = lib_path;
+    include_path /= "include";
+    include_path /= "mf";
+
+    string scmd = make_path
+                + " --include-dir=" + include_path.string()
+                + " --makefile=" + scope_makefile + " " + target;
 
     if ( verbose ) cout << ops << "executing make: " << scmd << endl;
 
@@ -425,6 +447,9 @@ void
 SEAM::SEAM_Scanner::begin_openscad(void)
 {
   scanner_script_count++;
+
+  // add script to script identifiers vector
+  script_id.push_back( get_filename( openscad_ext ) );
 
   if (scanner_count_mode) {
     if ( verbose ) cout << ops << "(" << scanner_script_count << ") openscad script ["
@@ -452,7 +477,7 @@ SEAM::SEAM_Scanner::end_openscad(void)
   switch_output( &std::cout );
 
   if ( show ) {
-    ifstream tmp_file( script_file.c_str() );
+    std::ifstream tmp_file( script_file.c_str() );
 
     cout << "### begin show file [" << script_file << "] ###" << endl;
     cout << tmp_file.rdbuf();

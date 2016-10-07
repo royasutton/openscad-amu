@@ -28,8 +28,6 @@
 #
 #     Core make makefile script functions. Many of these functions should
 #     not be used directlyin a script and, as such, are marked \c private.
-#     See the \ref quick_start for a introduction on how to use these
-#     functions.
 #
 #   \ingroup library_core
 ###############################################################################/
@@ -372,7 +370,7 @@ function add_target()
     # segregate log, if configured
     [[ -n $log_begin_rec ]] && \
     print_m -j cleanfiles${tcs} += \
-      \$\(shell ${__LIBPATH__}/scripts/segregate.bash --file $filename_log \
+      \$\(shell ${__LIB_PATH__}/scripts/segregate.bash --file $filename_log \
       --begin \"$log_begin_rec\" --end \"$log_end_rec\" \
       --list --ignore\)
   done
@@ -391,7 +389,7 @@ function add_target()
   # segregate log, if configured
   [[ -n $log_begin_rec ]] && \
   print_m -j -n " &&" \
-    ${__LIBPATH__}/scripts/segregate.bash \
+    ${__LIB_PATH__}/scripts/segregate.bash \
     --file $filename_log \
     --begin \"$log_begin_rec\" \
     --end \"$log_end_rec\"
@@ -1243,6 +1241,26 @@ function variables()
 
   return 0
 } # variables()
+
+
+#==============================================================================
+# protect functions
+#==============================================================================
+readonly -f \
+  makefile_titleblock_begin \
+  makefile_titleblock_end \
+  show_variable_summary \
+  show_opts_set_tables \
+  show_arg_list_status \
+  add_target \
+  add_target_convert \
+  generate_targets \
+  add_targets \
+  add_targets_dirs \
+  add_targets_menu \
+  script_redirect \
+  script \
+  variables
 
 
 #==============================================================================

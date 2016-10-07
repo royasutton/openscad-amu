@@ -33,6 +33,8 @@ install_path = $(version_path)/examples
 # targets
 ##############################################################################
 
+all-local: $(files_am)
+
 docs-local: examples.stamp
 
 CLEANFILES = \
@@ -47,8 +49,8 @@ examples.stamp: \
 		\
 		vehicle_document.stamp \
 		vehicle_test.stamp \
-		animate_move.stamp \
-		animate_rotate.stamp \
+		animate_move.makefile \
+		animate_rotate.makefile \
 		\
 		doxygen.stamp
 	touch $@
@@ -57,7 +59,7 @@ CLEANFILES += \
 	embedding_scheme.scripts
 
 embedding_scheme.scripts: $(srcdir)/embedding_scheme.scad $(openscad_seam)
-	$(openscad_seam) --mode count --input $< --scope source --verbose \
+	$(openscad_seam) --mode count  --joiner=- --input $< --scope root --verbose \
 		> embedding_scheme.scripts
 
 CLEANFILES += \
@@ -95,7 +97,6 @@ vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
 		--prefix build --prefix-ipp 0 --prefix-scripts no \
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
-		--define __INCLUDE_PATH__=\"$(srcdir)\" \
 		--write-config yes \
 		--verbose
 
@@ -113,7 +114,6 @@ animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
 		--prefix build --prefix-ipp 0 --prefix-scripts no \
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
-		--define __INCLUDE_PATH__=\"$(srcdir)\" \
 		--write-config yes \
 		--verbose
 
@@ -129,7 +129,7 @@ doxygen.stamp: vehicle.doxyfile Makefile $(srcdir)/vehicle.scad
 
 '$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
 
-install-data-local: | '$(install_path)'
+install-data-local: $(files_am) | '$(install_path)'
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_DATA) $$f '$(install_path)' \
