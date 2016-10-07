@@ -49,8 +49,8 @@ examples.stamp: \
 		\
 		vehicle_document.stamp \
 		vehicle_test.stamp \
-		animate_move.stamp \
-		animate_rotate.stamp \
+		animate_move.makefile \
+		animate_rotate.makefile \
 		\
 		doxygen.stamp
 	touch $@
