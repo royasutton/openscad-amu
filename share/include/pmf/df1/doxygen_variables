@@ -92,13 +92,18 @@ define doxygen_config_auto_text
     WARN_LOGFILE=$(doxygen_warn)
 endef
 
-# backup files
+# Backup files
 backup_files += $(doxygen_config)
 
-# documentation install identifier
+# Replace spaces in documentation group identifier with '-'
+docs_group_id := $(subst $(space),-,$(docs_group_id))
+
+# Documentation install identifier
 ifndef docs_install_id
   docs_install_id := $(project_name)-$(project_version)
 else
+  # replace spaces with '-'
+  docs_install_id := $(subst $(space),-,$(docs_install_id))
   $(call amu_pm_m,using pre-defined value for $$(docs_install_id))
 endif
 
@@ -117,6 +122,8 @@ doxygen_config_variables += \
   latex_output \
   man_output \
   man_subdir \
+  \
+  docs_group_id \
   docs_install_id \
   \
   latex_stamp \

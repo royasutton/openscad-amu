@@ -41,6 +41,9 @@ debug_dif_filter            := $(false)
 # Configuration input file
 doxygen_config              := Doxyfile
 
+# Documentation group identifier
+docs_group_id               := none
+
 # Additional paths (for controlled variables)
 example_path_add            :=
 image_path_add              :=

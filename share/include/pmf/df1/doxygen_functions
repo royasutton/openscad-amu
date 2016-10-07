@@ -41,23 +41,25 @@ define doxygen_index_html_update
   $(info updated: $(1)index.html)
 endef
 
-# doxygen_index_rows_html (arg1,arg2,arg3,arg4,arg5,arg6)
+# doxygen_index_rows_html (arg1,arg2,arg3,arg4,arg5,arg6,arg7)
 # arg1: docs_install_id.
-# arg2: library_install_subdir.
-# arg3: date.
-# arg4: project_name.
-# arg5: project_version.
-# arg6: project_brief.
+# arg2: docs_group_id.
+# arg3: library_install_subdir.
+# arg4: date.
+# arg5: project_name.
+# arg6: project_version.
+# arg7: project_brief.
 # returns formatted table row.
 define doxygen_index_rows_html
-  $(amu_pm_d6)
+  $(amu_pm_d7)
   <tr>
-    <td> <a href="$(strip $1)/index.html"> $(strip $1) </a> </td>
-    <td> $(strip $4) </td>
-    <td><center> $(strip $5) </center></td>
-    <td> $(strip $6) </td>
     <td> $(strip $2) </td>
-    <td><center> $(strip $3) </center></td>
+    <td> <a href="$(strip $1)/index.html"> $(strip $1) </a> </td>
+    <td> $(strip $5) </td>
+    <td><center> $(strip $6) </center></td>
+    <td> $(strip $7) </td>
+    <td> $(strip $3) </td>
+    <td><center> $(strip $4) </center></td>
   </tr>
 endef
 
@@ -76,23 +78,25 @@ define doxygen_index_pdf_update
   $(info updated: $(1)index.html)
 endef
 
-# doxygen_index_rows_pdf (arg1,arg2,arg3,arg4,arg5,arg6)
+# doxygen_index_rows_pdf (arg1,arg2,arg3,arg4,arg5,arg6,arg7)
 # arg1: docs_install_id.
-# arg2: library_install_subdir.
-# arg3: date.
-# arg4: project_name.
-# arg5: project_version.
-# arg6: project_brief.
+# arg2: docs_group_id.
+# arg3: library_install_subdir.
+# arg4: date.
+# arg5: project_name.
+# arg6: project_version.
+# arg7: project_brief.
 # returns formatted table row.
 define doxygen_index_rows_pdf
-  $(amu_pm_d6)
+  $(amu_pm_d7)
   <tr>
-    <td> <a href="$(strip $1)/$(strip $1).pdf"> $(strip $1) </a> </td>
-    <td> $(strip $4) </td>
-    <td><center> $(strip $5) </center></td>
-    <td> $(strip $6) </td>
     <td> $(strip $2) </td>
-    <td><center> $(strip $3) </center></td>
+    <td> <a href="$(strip $1)/$(strip $1).pdf"> $(strip $1) </a> </td>
+    <td> $(strip $5) </td>
+    <td><center> $(strip $6) </center></td>
+    <td> $(strip $7) </td>
+    <td> $(strip $3) </td>
+    <td><center> $(strip $4) </center></td>
   </tr>
 endef
 
@@ -108,6 +112,7 @@ define doxygen_index_write_info
   $(amu_pm_d2)
   $(file > $1$2$(dir_level_sep)index.info,
     $(call format_kv_variable,docs_install_id)
+    $(call format_kv_variable,docs_group_id)
     $(call format_kv_variable,library_install_subdir)
     $(call format_kv_variable,date)
     $(call format_kv_variable,project_name)
@@ -125,6 +130,7 @@ define doxygen_index_rows
   $(foreach f,$(wildcard $1*$(dir_level_sep)index.info),
     $(call doxygen_index_rows_$(2),
       $(call read_key_value,$f,docs_install_id),
+      $(call read_key_value,$f,docs_group_id),
       $(call read_key_value,$f,library_install_subdir),
       $(call read_key_value,$f,date),
       $(call read_key_value,$f,project_name),
@@ -175,7 +181,7 @@ define doxygen_index_header
     table {
       font-family: arial, sans-serif;
       border-collapse: collapse;
-      width: 80%;
+      width: 100%;
     }
     td, th {
       border: 1px solid #dddddd;
@@ -202,7 +208,8 @@ define doxygen_index_header
   <table>
   <caption>Table of Contents</caption>
   <tr>
-    <th>Library ID</th>
+    <th>Group</th>
+    <th>Library</th>
     <th>Name</th>
     <th><center>Version</center></th>
     <th>Description</th>
