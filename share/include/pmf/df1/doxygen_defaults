@@ -26,6 +26,9 @@
 # Defaults
 ################################################################################
 
+# Doxygen targets depend on scope targets
+doxygen_depends_scopes      := $(true)
+
 # Output formats
 generate_html               := $(true)
 generate_latex              := $(true)
@@ -61,6 +64,8 @@ doxygen_config_auto_name     = $(doxygen_config).auto
 #------------------------------------------------------------------------------#
 
 doxygen_control_variables := \
+  doxygen_depends_scopes \
+  \
   generate_html \
   generate_latex \
   generate_man \
