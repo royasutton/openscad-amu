@@ -7,9 +7,9 @@
 
 # Use library/tools from install path
 AMU_LIB_PATH            := @__LIB_PATH__@
-AMU_TOOL_PREFIX         := @bindir@/
+#AMU_TOOL_PREFIX        := @bindir@/
 
-# Use library/tools from source and build path
+# Use library/tools from source and build path (uncomment both)
 #AMU_LIB_PATH           := @abs_top_srcdir@/share
 #AMU_TOOL_PREFIX        := @abs_top_builddir@/src/
 
