@@ -13,6 +13,7 @@ files = \
 	base_variables \
 	\
 	doxygen_defaults \
+	doxygen_functions \
 	doxygen_rules \
 	doxygen_system \
 	doxygen_variables \
