@@ -104,6 +104,24 @@ To see a menu of makefile target options:
 
     $ make help
 
+To compile and install the template, type:
+
+    $ make install
+
+This will compile everything and install the library files to the OpenSCAD
+user library path. The design documentation will also be installed and
+added to an index that can be viewed with a web browser. To locate the
+user library path and the HTML documentation path, issue:
+
+    $ make print-install_prefix_scad
+    $ make print-install_prefix_html
+
+To view the library documentation index, open the __index.html__ located
+in the __install_prefix_html__ directory reported in the previous step.
+
+To remove everything that was installed, type:
+
+    $ make uninstall
 
 Selecting a Release
 -------------------
