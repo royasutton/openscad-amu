@@ -204,13 +204,13 @@ ODIF::ODIF_Scanner::bif_shell(void)
     The options are and their short codes are summarized in the following
     table.
 
-     options     | sc  | default | description
-    :-----------:|:---:|:-------:|:---------------------------------------
-      prefix     | p   |         | word prefix
-      suffix     | s   |         | word suffix
-      joiner     | j   | "_"     | set member joiner
-      separator  | f   | ","     | word separator
-      tokenizer  | t   | "\|, "  | set-members tokenizer characters
+     options     | sc  | default        | description
+    :-----------:|:---:|:--------------:|:--------------------------------
+      prefix     | p   |                | word prefix
+      suffix     | s   |                | word suffix
+      joiner     | j   | [_]            | set member joiner
+      separator  | f   | [,]            | word separator
+      tokenizer  | t   | [\|,[:space:]] | set-members tokenizer characters
 
     The tokenizer character are used to separate the lists of set members.
 
@@ -328,28 +328,29 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
     Output a table of images in in \c html or \c latex format. The options
     are and their short codes are summarized in the following table.
 
-     options            | sc  | default | description
-    :------------------:|:---:|:-------:|:----------------------------
-      type              | t   |         | table type (html or latex)
-      id                | i   |         | table id
-      table_width       | tw  |         | table width
-      table_heading     | th  |         | table heading
-      columns           | c   |    3    | number of columns
-      column_headings   | ch  |         | column headings list
-      image_width       | ix  |         | width for each image
-      image_height      | iy  |         | height for each image
-      image_files       | if  |         | image files list
-      image_titles      | it  |         | image file titles list
-      image_headings    | ih  |         | image cell heading list
-      image_urls        | iu  |         | image cell reference URL list
+     options            | sc  | default | tokenizer | description
+    :------------------:|:---:|:-------:|:---------:|:----------------------------
+      type              | t   |         |           | table type (html or latex)
+      id                | i   |         |           |  table id
+      table_width       | tw  |         |           |  table width
+      table_heading     | th  |         |           |  table heading
+      columns           | c   |    3    |           |  number of columns
+      column_headings   | ch  |         |  titles   |  column headings list
+      image_width       | ix  |         |           |  width for each image
+      image_height      | iy  |         |           |  height for each image
+      image_files       | if  |         |  files    |  image files list
+      image_titles      | it  |         |  titles   |  image file titles list
+      image_headings    | ih  |         |  titles   |  image cell heading list
+      image_urls        | iu  |         |  urls     |  image cell reference URL list
 
     The tokenizer character that separates lists are summarized in the
     following table.
 
-     type     | any of
-    :--------:|:------:
-     files    | ", "
-     titles   | "~^"
+     type   | any of
+    :------:|:---------------:
+     files  | [,[:space:]]
+     titles | [~^]
+     urls   | [^\|#[:space:]]
 
   \todo might be nice to use a more general way of added attributes to the
         table elements using an attributes database based on the environment
@@ -434,6 +435,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
   boost::char_separator<char> fsep(", ");   // file name separators
   boost::char_separator<char> tsep("~^");   // general text separators
+  boost::char_separator<char> usep("^|# "); // general text separators
 
   // list members [ column_headings ]
   tokenizer ct_tok( column_headings, tsep );
@@ -460,7 +462,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
     ih_v.push_back( boost::trim_copy( *it ) );
 
   // list members [ image_urls ]
-  tokenizer iu_tok( image_urls, tsep );
+  tokenizer iu_tok( image_urls, usep );
   vector<string> iu_v;
   for ( tokenizer::iterator it=iu_tok.begin(); it!=iu_tok.end(); ++it )
     iu_v.push_back( boost::trim_copy( *it ) );
@@ -951,9 +953,9 @@ ODIF::ODIF_Scanner::bif_make(void)
     following table.
 
      type     | any of
-    :--------:|:------:
-     files    | ", "
-     types    | ", "
+    :--------:|:------------:
+     files    | [,[:space:]]
+     types    | [,[:space:]]
 
 *******************************************************************************/
 string
