@@ -199,8 +199,8 @@
   here is a list of additional filter-provided ones that can be used for
   document markup:
 
-  | Additional Commands                                            | Description
-  |:---------------------------------------------------------------|:-------------------
+  | Internal Commands                                              | Description
+  |:---------------------------------------------------------------|:------------------------
   | \ref ODIF::ODIF_Scanner::bif_eval() "\\amu_eval"               | evaluate arguments
   | \ref ODIF::ODIF_Scanner::bif_shell() "\\amu_shell"             | execute shell command
   | \ref ODIF::ODIF_Scanner::bif_combine() "\\amu_combine"         | combine words
@@ -209,6 +209,15 @@
   | \ref ODIF::ODIF_Scanner::bif_make() "\\amu_make"               | make script interface
   | \ref ODIF::ODIF_Scanner::bif_copy() "\\amu_copy"               | copy references
   | <install-prefix>/functions/amu_<function>                      | external commands
+
+  Eternal commands also exists and can be found in the directory:
+  <tt><install-prefix>/functions/</tt>. For now, see the command itself for its
+  documentation. Here is a list:
+
+  | External Commands                 | Description
+  |:----------------------------------|:--------------------------------
+  | \\amu_date                        | current date and/or time
+  | \\amu_list                        | format arguments into a list
 
   \section openscad_markup_ex Example Markup
 
