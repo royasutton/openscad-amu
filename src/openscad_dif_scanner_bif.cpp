@@ -560,12 +560,9 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       bool found = false;
       if ( image_urls.length() )
         result.append( "<a href=\""
-                     + file_rl( iu_v[if_num], found, true, true, true, get_html_output(), false )
-                     + "\">" );
+                     + file_rl( iu_v[if_num], get_html_output(), found ) + "\">" );
 
-      result.append( "<img src=\""
-                   + file_rl( file, found, true, false, true, get_html_output(), false )
-                   + "\"" );
+      result.append( "<img src=\"" + file_rl( file, get_html_output(), found ) + "\"" );
 
       if ( image_titles.length() ) {
         result.append(" title=\"" + it_v[if_num] + "\"");
@@ -672,8 +669,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       bool found = false;
       if ( image_urls.length() )
         result.append( "\\href{"
-                     + file_rl( iu_v[if_num], found, true, true, true, get_latex_output(), false )
-                     + "}{" );
+                     + file_rl( iu_v[if_num], get_latex_output(), found ) + "}{" );
 
       result.append("\\includegraphics");
 
@@ -688,9 +684,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
       if ( attr.length() )            result.append( "[" + attr + "]" );
 
-      result.append( "{"
-                   + file_rl( file, found, false, false, true, get_latex_output(), false )
-                   + "}" );
+      result.append( "{" + file_rl( file, get_latex_output(), found, false ) + "}" );
 
       if ( image_urls.length() ) result.append( "}");
 
@@ -1082,7 +1076,7 @@ ODIF::ODIF_Scanner::bif_copy(void)
       string path( *pit );
 
       bool found=false;
-      string rl = file_rl(file, found, true, false, true, path, false);
+      string rl = file_rl( file, path, found );
 
       if ( found == false )
         result.append(" " + rl);

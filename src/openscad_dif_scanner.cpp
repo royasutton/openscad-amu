@@ -455,22 +455,20 @@ ODIF::ODIF_Scanner::filter_debug(
 /***************************************************************************//**
 
   \param file       file to locate.
+  \param outdir     destination directory for file copy.
   \param found      status of if the file was located.
   \param extension  return file name with file extension.
-  \param uri        return file name with URI formatting.
   \param copy       copy the found file to the specified outdir.
-  \param outdir     destination directory for file copy.
   \param rid        rename the copied file with an random identifier.
 
 *******************************************************************************/
 string
 ODIF::ODIF_Scanner::file_rl(
   const string& file,
+  const string& outdir,
         bool& found,
   const bool& extension,
-  const bool& uri,
   const bool& copy,
-  const string& outdir,
   const bool& rid
 )
 {
@@ -574,10 +572,6 @@ ODIF::ODIF_Scanner::file_rl(
       return_file = target.string();
     else
       return_file = target.stem().string();
-
-    // return file name with URI formating?
-    if ( uri == true )
-      return_file = "file://" + return_file;
   }
   else
   { // file not located, return original reference string.

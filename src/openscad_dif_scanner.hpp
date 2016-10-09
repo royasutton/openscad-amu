@@ -269,10 +269,9 @@ class ODIF_Scanner : public yyFlexLexer{
                        const bool& f=true, const bool& s=true);
 
     //! try to locate a file and copy it to an output directory.
-    std::string file_rl( const std::string& file, bool& found,
-                         const bool& extension=true, const bool& uri=false,
-                         const bool& copy=true, const std::string& outdir="",
-                         const bool& rid=false);
+    std::string file_rl( const std::string& file, const std::string& outdir,
+                         bool& found, const bool& extension=true,
+                         const bool& copy=true, const bool& rid=false);
 
 
     // built-in amu functions
