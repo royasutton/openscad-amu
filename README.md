@@ -95,6 +95,7 @@ Then follow these steps:
 
     $ mkdir project_name
     $ cd project_name
+
     $ cp ${LIB_PATH}/templates/df1/{Doxyfile,design.scad,library.scad} .
     $ cp ${LIB_PATH}/templates/df1/Project_Makefile Makefile
 
