@@ -155,6 +155,9 @@
 //
 
 /***************************************************************************//**
+  \example design_logo.bash extracted auxiliary build script.
+  \example design_logo.makefile generated scope makefile.
+
   \example design_scope1.bash extracted auxiliary build script.
   \example design_scope1.makefile generated scope makefile.
 
@@ -200,16 +203,35 @@ dm1(p1=design_str, p2=design_int);
 
 
 //
-// (openscad-amu) auxiliary build script, single scope.
+// (openscad-amu) auxiliary build script, two scopes.
 //
 
 /***************************************************************************//**
+Begin_Scope logo;
+  Begin_MFScript;
+    defines Name "str" Define "design_str" Strings "logo";
+    views   Name "views" Translate "650,180,50" Distance "1700" Views "top";
+    images  Name "sizes" Aspect "4:1" Xsizes "200";
+
+    variables
+      set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"
+      set_Source "${__SOURCE_FILE__}"  set_Prefix "${__PREFIX__}"
+
+      set_Ext "png"
+      set_Convert_Exts "eps"  set_Convert_Opts "-verbose"
+      set_Opts "--preview --projection=p"
+      set_Opts_Combine "str views sizes";
+
+    script Begin_Makefile Summary  Tables  Targets  Menu End_Makefile;
+  End_MFScript;
+End_Scope;
+
 Begin_Scope scope1;
   Begin_MFScript;
-    views   Name "views" Distance "100" Views "top bottom diag";
-    images  Name "sizes" Aspect "4:3" Wsizes "320";
     defines Name "str" Define "design_str" Strings "v10 v11 v12";
     defines Name "int" Define "design_int" Integers "1 2";
+    views   Name "views" Distance "100" Views "top bottom diag";
+    images  Name "sizes" Aspect "4:3" Wsizes "320";
 
     variables
       set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"

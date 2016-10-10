@@ -44,6 +44,9 @@ doxygen_config              := Doxyfile
 # Documentation group identifier
 docs_group_id               := none
 
+# Project logo (image should not exceed 200w by 55h pixels)
+project_logo                :=
+
 # Additional paths (for controlled variables)
 example_path_add            :=
 image_path_add              :=

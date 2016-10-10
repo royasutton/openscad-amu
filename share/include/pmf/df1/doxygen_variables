@@ -73,6 +73,7 @@ define doxygen_config_auto_text
     PROJECT_NAME=$(project_name)
     PROJECT_NUMBER=$(project_version)
     PROJECT_BRIEF="$(project_brief)"
+    PROJECT_LOGO=$(project_logo)
     EXTENSION_MAPPING=$(subst .,$(empty),$(scad_ext))=C
     INPUT=$(src_files)
     FILE_PATTERNS=*$(scad_ext)
@@ -107,6 +108,33 @@ else
   $(call amu_pm_m,using pre-defined value for $$(docs_install_id))
 endif
 
+# Project logo
+ifdef project_logo
+  # add default extension when not specified with file name
+  project_logo := $(if $(suffix $(project_logo)),$(project_logo),$(project_logo).png)
+
+  # add default path when not specified with file name
+  # follow mfscript target naming convention for original and converted images
+  # png, png2eps, png2tiff, etc.
+  project_logo := \
+    $(strip \
+      $(if $(call bool_decode, \
+        $(call sstrings_not_equal,$(notdir $(project_logo)),$(project_logo)) \
+      ), \
+        $(project_logo), \
+        $(call join_with,$(dir_level_sep), \
+          $(output_directory)$(strip $(subst .,$(empty), \
+            $(if $(call strings_equal,.png,$(suffix $(project_logo))), \
+              $(suffix $(project_logo)), \
+              png2$(suffix $(project_logo)) \
+            ) \
+          )) \
+          $(project_logo) \
+        ) \
+      ) \
+    )
+endif
+
 #------------------------------------------------------------------------------#
 # Configuration Variable List
 #------------------------------------------------------------------------------#
@@ -125,6 +153,8 @@ doxygen_config_variables += \
   \
   docs_group_id \
   docs_install_id \
+  \
+  project_logo \
   \
   latex_stamp \
   doxygen_stamp \

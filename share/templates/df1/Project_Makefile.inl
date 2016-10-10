@@ -32,6 +32,7 @@ include $(AMU_PM_PREFIX)amu_pm_init
 # Project
 #------------------------------------------------------------------------------#
 docs_group_id   := none
+project_logo    := design_logo_top_200x50
 
 project_name    := template
 project_version := 1.0

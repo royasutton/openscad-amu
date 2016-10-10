@@ -126,10 +126,10 @@ Begin_Scope scope2;
   End_OpenSCAD;
 
   Begin_MFScript;
-    views   Name "views" Distance "100" Views "top bottom diag";
-    images  Name "sizes" Aspect "4:3" Wsizes "320";
     defines Name "str" Define "aux_script_str" Strings "A B C D";
     defines Name "int" Define "aux_script_int" Integers "2";
+    views   Name "views" Distance "100" Views "top bottom diag";
+    images  Name "sizes" Aspect "4:3" Wsizes "320";
 
     variables
       set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"
