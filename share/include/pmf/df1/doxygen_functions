@@ -35,7 +35,7 @@
 # update 'index.html' (returns nothing).
 define doxygen_index_html_update
   $(amu_pm_d1)
-  $(file  > $(1)index.html,$(call doxygen_index_header,HTML))
+  $(file  > $(1)index.html,$(call doxygen_index_header,$1,HTML))
   $(file >> $(1)index.html,$(call doxygen_index_rows,$1,html))
   $(file >> $(1)index.html,$(call doxygen_index_footer,HTML))
   $(info updated: $(1)index.html)
@@ -72,7 +72,7 @@ endef
 # update 'index.html' (returns nothing).
 define doxygen_index_pdf_update
   $(amu_pm_d1)
-  $(file  > $(1)index.html,$(call doxygen_index_header,PDF))
+  $(file  > $(1)index.html,$(call doxygen_index_header,$1,PDF))
   $(file >> $(1)index.html,$(call doxygen_index_rows,$1,pdf))
   $(file >> $(1)index.html,$(call doxygen_index_footer,PDF))
   $(info updated: $(1)index.html)
@@ -140,8 +140,9 @@ define doxygen_index_rows
   )
 endef
 
-# doxygen_index_header (arg1)
-# arg1: Documentation format.
+# doxygen_index_header (arg1,arg2)
+# arg1: Documentation root directory.
+# arg2: Documentation format.
 # returns predefined index.html header.
 define doxygen_index_header
   $(amu_pm_d1)
@@ -149,7 +150,7 @@ define doxygen_index_header
   <html>
   <head>
 
-  <title>OpenSCAD Libraries Documentation ($1)</title>
+  <title>OpenSCAD Libraries Documentation ($2)</title>
   <meta name="updated" content="$(date)$(time)" />
 
   <style>
@@ -212,9 +213,31 @@ define doxygen_index_header
   <div id="container">
 
   <div id="header">
-    <div id="header-left"></div>
+    <div id="header-left">
+      <center>
+      $(if
+        $(wildcard $1$(call relative_path,$(install_prefix_html),$1)index.html), \
+        <a href="$(call relative_path,$(install_prefix_html),$1)index.html">(HTML)</a>,
+        (HTML) \
+      )
+      </center>
+      <center>
+      $(if
+        $(wildcard $1$(call relative_path,$(install_prefix_pdf),$1)index.html), \
+        <a href="$(call relative_path,$(install_prefix_pdf),$1)index.html">(PDF)</a>,
+        (PDF) \
+      )
+    </div>
     <div id="header-middle"><h1>OpenSCAD Libraries Documentation</h1></div>
-    <div id="header-right"><h3>($1)</h3></div>
+    <div id="header-right">
+      <center>
+      $(if
+        $(wildcard $1$(call relative_path,$(install_prefix_scad),$1)), \
+        <a href="$(call relative_path,$(install_prefix_scad),$1)">(Browse Library)</a>,
+        (Browse Library) \
+      )
+      </center>
+    </div>
   </div>
 
   <div id="body">
