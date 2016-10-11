@@ -175,6 +175,97 @@ bool_string = $(amu_pm_d1)$(if $(call bool_decode,$1),$$(true),$$(false))
 not = $(amu_pm_d1)$(if $(call bool_decode,$1),$(false),$(true))
 
 #------------------------------------------------------------------------------#
+# Path manipulation
+#------------------------------------------------------------------------------#
+
+# path_no_ldls (arg1)
+# arg1: A file path.
+# returns the file path without leading directory separator.
+path_no_ldls = $(amu_pm_d1)$(strip \
+  $(if $(call strings_equal,$1,$(patsubst $(dir_level_sep)%,%,$1)), \
+    $1, \
+    $(call path_no_ldls,$(patsubst $(dir_level_sep)%,%,$1)) \
+  ))
+
+# path_add_ldls (arg1)
+# arg1: A file path.
+# returns the file path with a single leading directory separator.
+path_add_ldls = $(amu_pm_d1)$(dir_level_sep)$(call path_no_ldls,$1)
+
+# path_no_tdls (arg1)
+# arg1: A file path.
+# returns the file path without trailing directory separator.
+path_no_tdls = $(amu_pm_d1)$(strip \
+  $(if $(call strings_equal,$1,$(patsubst %$(dir_level_sep),%,$1)), \
+    $1, \
+    $(call path_no_tdls,$(patsubst %$(dir_level_sep),%,$1)) \
+  ))
+
+# path_add_tdls (arg1)
+# arg1: A file path.
+# returns the file path with a single trailing directory separator.
+path_add_tdls = $(amu_pm_d1)$(call path_no_tdls,$1)$(dir_level_sep)
+
+# path_parent (arg1)
+# arg1: A file path.
+# returns the file path parent directory.
+path_parent = $(amu_pm_d1)$(strip \
+  $(patsubst \
+    %$(dir_level_sep)$(lastword $(subst $(dir_level_sep), \
+    $(space), \
+    $1)),%,$(call path_no_tdls,$1)) \
+  )
+
+# paths_common_ancestor (arg1,arg2)
+# arg1: An absolute path1.
+# arg2: An absolute path2.
+# returns the first ancestor path common to path1 and path2.
+paths_common_ancestor = $(amu_pm_d2)$(call __paths_common_ancestor,$1,$2,$1)
+
+# __paths_common_ancestor (arg1,arg2,arg3)
+# arg1: An absolute path1.
+# arg2: An absolute path2.
+# arg3: A path prefix.
+# returns returns path prefix if path1 and path2 both begin with the prefix,
+# otherwise recursively check the parent path of the path prefix.
+__paths_common_ancestor = $(amu_pm_d3)$(strip \
+  $(if $(or $(patsubst $3/%,,$1),$(patsubst $3/%,,$2)), \
+    $(call __paths_common_ancestor,$1,$2,$(call path_parent,$3)), \
+    $3 \
+  ))
+
+# relative_path (arg1,arg2)
+# arg1: An absolute path to make relative.
+# arg2: An absolute reference path.
+# returns the path relative to reference path.
+relative_path = $(amu_pm_d2)$(subst $(space),$(empty), \
+  $(call __relative_path,$(call path_add_ldls,$1),$(call path_add_ldls,$2)))
+
+# __relative_path (arg1,arg2)
+# arg1: A path to make relative.
+# arg2: A reference path.
+# returns the path relative to reference path.
+__relative_path = $(amu_pm_d2) \
+  $(patsubst \
+    %, \
+    ..$(dir_level_sep), \
+    $(subst \
+      $(dir_level_sep), \
+      $(space), \
+      $(patsubst \
+        $(call paths_common_ancestor,$1,$2)$(dir_level_sep)%, \
+        %, \
+        $2 \
+      ) \
+    ) \
+  ) \
+  $(patsubst \
+    $(call paths_common_ancestor,$1,$2)$(dir_level_sep)%, \
+    %, \
+    $1 \
+  )
+
+#------------------------------------------------------------------------------#
 # Text file variable I/O
 #------------------------------------------------------------------------------#
 
