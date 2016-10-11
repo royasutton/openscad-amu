@@ -228,7 +228,11 @@ define doxygen_index_header
         (PDF) \
       )
     </div>
-    <div id="header-middle"><h1>OpenSCAD Libraries Documentation</h1></div>
+    <div id="header-middle">
+      <h1>
+        <a href="http://www.openscad.org">OpenSCAD</a> Libraries Documentation
+      </h1>
+    </div>
     <div id="header-right">
       <center>
       $(if
