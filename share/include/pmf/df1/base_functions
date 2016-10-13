@@ -27,7 +27,7 @@
 ################################################################################
 
 #------------------------------------------------------------------------------#
-# Output Formatting
+# Output formatting
 #------------------------------------------------------------------------------#
 
 # horizontal_bar (arg1,arg2)
@@ -91,7 +91,7 @@ target_begin = $(amu_pm_d1)$(call target_heading,(begin) $@,$(or $1,1))
 target_end = $(amu_pm_d1)$(call target_heading,(end) $@,$(or $1,2))
 
 #------------------------------------------------------------------------------#
-# Variable Output
+# Variable output
 #------------------------------------------------------------------------------#
 
 # enumerate_variable (arg1,arg2,arg3)
@@ -149,6 +149,12 @@ strings_not_equal = $(amu_pm_d2)$(if $(subst x$1,$(empty),x$2)$(subst x$2,$(empt
 # arg2: String2 for comparison.
 # returns encoded boolean $(false) if striped string1 and striped string2 are identical.
 sstrings_not_equal = $(amu_pm_d2)$(call strings_not_equal,$(strip $1),$(strip $2))
+
+# strings_le (arg1,arg2)
+# arg1: String1 for comparison.
+# arg2: String2 for comparison.
+# returns encoded boolean $(true) if string1 sorts to less than string2.
+strings_le = $(amu_pm_d2)$(call strings_equal,$(word 1,$(sort $1 $2)),$1)
 
 #------------------------------------------------------------------------------#
 # Boolean
@@ -300,6 +306,127 @@ read_key_value = $(amu_pm_d2)$(shell \
   $(grep) $2 | \
   $(tail) -1 | \
   $(sed) 's/$(call format_key_value,$2,$(empty))//')
+
+#------------------------------------------------------------------------------#
+# Version string comparison
+#------------------------------------------------------------------------------#
+
+# check_version_list_digits (arg1)
+# arg1: An alphanumeric term without decimal.
+# returns a space-separated alphanumeric list of digits.
+check_version_list_digits = $(amu_pm_d1)$(strip \
+  $(eval __result := $1) \
+  $(foreach i, 0 1 2 3 4 5 6 7 8 9, \
+    $(eval __result := $$(subst $$i,$$i$(space),$(__result))) \
+  )$(__result) \
+  $(eval undefine __result))
+
+# check_version_compare_terms (arg1,arg2)
+# arg1: An alphanumeric version term1 without decimal.
+# arg2: An alphanumeric version term2 without decimal.
+# returns $(true) if term1 is less than term2.
+check_version_compare_terms = $(amu_pm_d2)$(strip \
+  $(eval __digit_list1 := $(call check_version_list_digits,$1)) \
+  $(eval __digit_list2 := $(call check_version_list_digits,$2)) \
+  $(if $(call strings_equal,$(words $(__digit_list1)),$(words $(__digit_list2))), \
+    $(call strings_le,$1,$2), \
+    $(call strings_le,$(words $(__digit_list1)),$(words $(__digit_list2))) \
+  ) \
+  $(eval undefine __digit_list1) \
+  $(eval undefine __digit_list2))
+
+# check_version_compare_strings (arg1,arg2)
+# arg1: A decimal-separated version string1.
+# arg2: A decimal-separated version string2.
+# returns: 'lt': iff version-string1 < version-string2.
+#          'gt': iff version-string1 > version-string2.
+#      $(empty): iff version-string1 = version-string2.
+check_version_compare_strings = $(amu_pm_d2)$(word 1, \
+  $(eval __term_list2 := $(subst .,$(space),$2)) \
+  $(foreach i,$(subst .,$(space),$1), \
+    $(eval j := $(word 1,$(__term_list2))) \
+    $(if $j, \
+      $(if $(call strings_equal,$i,$j), \
+        $(empty), \
+        $(if $(call check_version_compare_terms,$i,$j), \
+          lt, \
+          gt \
+        ) \
+      ), \
+      gt \
+    ) \
+    $(eval __term_list2 := $$(wordlist 2,$(words $(__term_list2)),$(__term_list2))) \
+  ) \
+  $(if $(__term_list2),lt) \
+  $(eval undefine __term_list2))
+
+# check_version_compare (arg1,arg2,arg3)
+# arg1: A decimal-separated version string1.
+# arg2: A condition check identifier of (ge,gt,le,lt,eq,ne).
+# arg3: A decimal-separated version string2.
+check_version_compare = $(amu_pm_d3)$(strip \
+  $(if $(call sstrings_equal,$2,gt), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),gt) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,ge), \
+    $(or \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),gt) \
+    ), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),$(empty)) \
+    ) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,lt), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),lt) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,le), \
+    $(or \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),lt) \
+    ), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),$(empty)) \
+    ) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,eq), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),$(empty)) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,ne), \
+    $(call bool_decode, \
+    $(call not, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),$(empty)) \
+    ) \
+    ) \
+  ) \
+  )
+
+# check_version (arg1,arg2,arg3,arg4,arg5)
+# arg1: A tool version string name (without the ending 'vn').
+# arg2: A condition check identifier of (ge,gt,le,lt,eq,ne).
+# arg3: A version string requirement (of the form 'n.n.n.n').
+# arg4: An encoded boolean; version check condition pass required.
+# arg5: A fail message.
+# returns .
+define check_version
+  $(amu_pm_d5) \
+  $(call amu_pm_m,$1 version check $$($(1)vn)=[$($(1)vn)] $2 [$3] \
+    $(if $(call bool_decode,$4),(required),(recommended)).) \
+  $(if $(call check_version_compare,$($(1)vn),$2,$3), \
+    $(call amu_pm_m,$1 version check passed.), \
+    $(warning $1 version check failed ($(if $(call bool_decode,$4),,non-)critical).) \
+    $(warning $5) \
+    $(if $(call bool_decode,$4),$(error $0: aborting)) \
+  )
+endef
 
 #------------------------------------------------------------------------------#
 # Other
