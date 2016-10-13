@@ -35,12 +35,16 @@
 # Use parallel execution
 parallel_jobs := $(false)
 
+# Perform tool version checks
+version_checks := $(true)
+
 #------------------------------------------------------------------------------#
 # System Control Variable List
 #------------------------------------------------------------------------------#
 
 system_control_variables := \
   parallel_jobs \
+  version_checks
 
 #------------------------------------------------------------------------------#
 # Project
