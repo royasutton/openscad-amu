@@ -82,9 +82,16 @@ scopes_config_variables += \
 #------------------------------------------------------------------------------#
 # Version Checks
 #------------------------------------------------------------------------------#
-#ifeq ($(version_checks),$(true))
+ifeq ($(version_checks),$(true))
 
-#endif
+# openscad-seam v1.5 or later required to auto-extract scope names
+$(call check_version,amuseam,ge,1.5,$(true), \
+$(newline) \
+$(newline)$(space3)openscad-seam '--mode scopes' option required to auto-extract scope \
+$(newline)$(space3)names. Option introduced in version v1.5. \
+$(newline))
+
+endif
 
 #------------------------------------------------------------------------------#
 # Help text
