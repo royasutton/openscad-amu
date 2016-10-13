@@ -422,7 +422,8 @@ define check_version
     $(if $(call bool_decode,$4),(required),(recommended)).) \
   $(if $(call check_version_compare,$($(1)vn),$2,$3), \
     $(call amu_pm_m,$1 version check passed.), \
-    $(warning $1 version check failed ($(if $(call bool_decode,$4),,non-)critical).) \
+    $(warning $1 version check [$($(1)vn)] $2 [$3] failed \
+              ($(if $(call bool_decode,$4),,non-)critical).) \
     $(warning $5) \
     $(if $(call bool_decode,$4),$(error $0: aborting)) \
   )
