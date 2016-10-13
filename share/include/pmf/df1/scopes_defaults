@@ -43,6 +43,12 @@ debug_seam_scanner    := $(false)
 # Scope joiner
 scopes_joiner         := _
 
+# Scopes include filter
+scopes_include        :=
+
+# Scopes exclude filter
+scopes_exclude        :=
+
 #------------------------------------------------------------------------------#
 # Control Variable List
 #------------------------------------------------------------------------------#
