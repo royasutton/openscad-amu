@@ -27,7 +27,7 @@
 ################################################################################
 
 # Parallel Execution
-ifeq ($(amu_pm_parallel_jobs),$(true))
+ifeq ($(parallel_jobs),$(true))
   MAKEFLAGS += --jobs=$(cpu_cnt)
 endif
 

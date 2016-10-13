@@ -23,7 +23,7 @@ include $(AMU_PM_PREFIX)amu_pm_init
 #------------------------------------------------------------------------------#
 # Default Overrides
 #------------------------------------------------------------------------------#
-#amu_pm_parallel_jobs   := $(true)
+#parallel_jobs          := $(true)
 #target_headings        := $(false)
 #verbose_seam           := $(false)
 #debug_dif_filter       := $(true)

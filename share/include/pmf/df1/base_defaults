@@ -33,14 +33,14 @@
 .DEFAULT_GOAL := help
 
 # Use parallel execution
-amu_pm_parallel_jobs := $(false)
+parallel_jobs := $(false)
 
 #------------------------------------------------------------------------------#
 # System Control Variable List
 #------------------------------------------------------------------------------#
 
 system_control_variables := \
-  amu_pm_parallel_jobs
+  parallel_jobs \
 
 #------------------------------------------------------------------------------#
 # Project
