@@ -27,7 +27,7 @@
 ################################################################################
 
 # auxiliary script output path prefix
-script_prefix := $(if $(call bool_decode,$(prefix_scopes_scripts)),$(output_directory))
+scopes_prefix := $(if $(call bool_decode,$(prefix_scopes_scripts)),$(output_directory))
 
 # openscad_seam_opts1: for modes=(extract|list)
 openscad_seam_opts1 := \
@@ -59,7 +59,7 @@ openscad_seam_opts2 := \
 
 # scopes auxiliary scripts for all source files
 scopes_scripts := \
-  $(addprefix $(script_prefix), \
+  $(addprefix $(scopes_prefix), \
     $(foreach s,$(src_files), \
       $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
     ) \
@@ -73,9 +73,10 @@ scopes_clean_files := $(filter %$(scad_ext),$(scopes_scripts))
 #------------------------------------------------------------------------------#
 
 scopes_config_variables += \
+  scopes_prefix \
+  \
   scopes_joiner \
   \
-  script_prefix \
   openscad_seam_opts1 \
   openscad_seam_opts2
 
