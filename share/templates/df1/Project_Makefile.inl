@@ -24,9 +24,20 @@ include $(AMU_PM_PREFIX)amu_pm_init
 # Default Overrides
 #------------------------------------------------------------------------------#
 #parallel_jobs          := $(true)
+#version_checks         := $(false)
 #target_headings        := $(false)
 #verbose_seam           := $(false)
 #debug_dif_filter       := $(true)
+
+#------------------------------------------------------------------------------#
+# Version Checks
+#------------------------------------------------------------------------------#
+#ifeq ($(version_checks),$(true))
+#$(call check_version,doxygen,ge,1.8.12,$(false),designed for v1.8.12.)
+#$(call check_version,openscad,gt,2016.08,$(true),uses new feature.)
+#$(call check_version,amuseam,eq,1.5,$(true),works only with v1.5.)
+#$(call check_version,amudif,lt,1.5,$(true),depreciated feature required.)
+#endif
 
 #------------------------------------------------------------------------------#
 # Project
