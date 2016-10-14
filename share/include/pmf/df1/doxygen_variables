@@ -171,11 +171,20 @@ ifeq ($(version_checks),$(true))
 
 # Doxygen bug #504305 fixed in release 1.8.12
 $(call check_version,doxygen,ge,1.8.12,$(false), \
-$(newline) \
-$(newline)$(space3)The Doxygen FILTER_PATTERNS bug #504305 has been fixed in Doxygen version \
-$(newline)$(space3)1.8.12. For prior versions use FILTER_PATTERNS="*.ext=\"filter opts\"". \
-$(newline)$(space3)For later versions use FILTER_PATTERNS=*.ext="filter options". \
-$(newline))
+$(newline)# \
+$(newline)#$(space3)The Doxygen FILTER_PATTERNS bug #504305 has been fixed in Doxygen version \
+$(newline)#$(space3)1.8.12. For prior versions use FILTER_PATTERNS="*.ext=\"filter opts\"". \
+$(newline)#$(space3)For later versions use FILTER_PATTERNS=*.ext="filter options". \
+$(newline)#)
+
+# Doxygen caption (mis)handling fixed in release 1.8.11
+$(call check_version,doxygen,ge,1.8.11,$(false), \
+$(newline)# \
+$(newline)#$(space3)An issue with translating HTML captions to latex was corrected \
+$(newline)#$(space3)in Doxygen version 1.8.11. Avoid using the 'table_heading' option \
+$(newline)#$(space3)of \amu_table() with prior Doxygen versions when using \
+$(newline)#$(space3)latex-generated pdf documentation. \
+$(newline)#)
 
 endif
 
