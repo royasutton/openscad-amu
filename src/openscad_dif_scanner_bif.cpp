@@ -325,8 +325,234 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
 /***************************************************************************//**
   \details
 
-    Output a table of images in in \c html or \c latex format. The options
-    are and their short codes are summarized in the following table.
+
+    Output a table formated from a list of text phrases. The options
+    and their short codes are summarized in the following table.
+
+     options            | sc  | default | tokenizer | description
+    :------------------:|:---:|:-------:|:---------:|:----------------------------
+      id                | i   |         |           |  table id
+      table_width       | tw  |         |           |  table width
+      table_heading     | th  |         |           |  table heading
+      columns           | c   |    6    |           |  number of columns
+      column_headings   | ch  |         |  titles   |  column headings list
+      cell_text         | xt  |         |  titles   |  cell text list
+      cell_headings     | xh  |         |  titles   |  cell heading list
+      cell_urls         | xu  |         |  urls     |  cell reference URL list
+
+    The tokenizer character that separates lists are summarized in the
+    following table.
+
+     type   | any of
+    :------:|:---------------:
+     titles | [~^]
+     urls   | [^\|#[:space:]]
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_table(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "id",               "i",
+  "table_width",      "tw",
+  "table_heading",    "th",
+  "columns",          "c",
+  "column_headings",  "ch",
+  "cell_text",        "xt",
+  "cell_headings",    "xh",
+  "cell_urls",        "xu"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  size_t ap=0;
+  string id               = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string table_width      = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string table_heading    = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string columns          = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string column_headings  = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string cell_text        = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string cell_headings    = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string cell_urls        = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  // validate named arguments: (must be one of the declared options).
+  vector<string> av = fx_argv.names_v(true, false);
+  for ( vector<string>::iterator it=av.begin(); it!=av.end(); ++it )
+    if ( vans.find( *it ) == vans.end() )
+      return( amu_error_msg(*it + " invalid option. " + help) );
+
+  //
+  // general argument validation:
+  //
+
+  // enforce zero positional arguments (except arg0).
+  if ( fx_argv.size(false, true) != 1 )
+    return(amu_error_msg("requires zero positional argument. " + help));
+
+  // update column count default when specified.
+  size_t columns_cnt = 6;
+  if ( columns.length() ) columns_cnt = atoi( columns.c_str() );
+
+  //
+  // tokenize arguments with list members to vectors
+  //
+  typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+
+  boost::char_separator<char> tsep("~^");   // general text separators
+  boost::char_separator<char> usep("^|# "); // url text separators
+
+  // list members [ column_headings ]
+  tokenizer ch_tok( column_headings, tsep );
+  vector<string> ch_v;
+  for ( tokenizer::iterator it=ch_tok.begin(); it!=ch_tok.end(); ++it )
+    ch_v.push_back( boost::trim_copy( *it ) );
+
+  // list members [ cell_text ]
+  tokenizer xt_tok( cell_text, tsep );
+  vector<string> xt_v;
+  for ( tokenizer::iterator it=xt_tok.begin(); it!=xt_tok.end(); ++it )
+    xt_v.push_back( boost::trim_copy( *it ) );
+
+  // list members [ cell_headings ]
+  tokenizer xh_tok( cell_headings, tsep );
+  vector<string> xh_v;
+  for ( tokenizer::iterator it=xh_tok.begin(); it!=xh_tok.end(); ++it )
+    xh_v.push_back( boost::trim_copy( *it ) );
+
+  // list members [ cell_urls ]
+  tokenizer xu_tok( cell_urls, usep );
+  vector<string> xu_v;
+  for ( tokenizer::iterator it=xu_tok.begin(); it!=xu_tok.end(); ++it )
+    xu_v.push_back( boost::trim_copy( *it ) );
+
+  // if specified, their must be a title for every column (vana[ column_headings ])
+  if ( (ch_v.size() >0) && (ch_v.size() != columns_cnt) )
+    return( amu_error_msg("mismatched " + vana[8] + ": " + to_string(ch_v.size()) +
+                          " titles for " + to_string(columns_cnt) + " columns.") );
+
+  // if specified, their must be a heading for every cell (vana[ cell_headings ])
+  if ( (xh_v.size() >0) && (xh_v.size() != xt_v.size()) )
+    return( amu_error_msg("mismatched " + vana[12] + ": " + to_string(xh_v.size()) +
+                          " headings for " + to_string(xt_v.size()) + " cells.") );
+
+  // if specified, their must be a url for every cell (vana[ cell_urls ])
+  if ( (xu_v.size() >0) && (xu_v.size() != xt_v.size()) )
+    return( amu_error_msg("mismatched " + vana[14] + ": " + to_string(xu_v.size()) +
+                          " URLs for " + to_string(xt_v.size()) + " cells.") );
+
+
+  // embedded newline output control for debugging.
+  // when set to true, while useful for visually debugging the output
+  // of this filter, may cause Doxygen to produce erroneous results.
+  #define IDINL if(_NLE_) result.append("\n")
+  bool _NLE_ = false;
+
+  string result;
+
+  // ----------------------------------------------------------------- //
+  //                            html table
+  // ----------------------------------------------------------------- //
+
+  string table_attr           = " border=\"1\"";
+  string column_heading_attr  = " bgcolor=\"#E2E8F2\"";
+
+  // begin table
+  result.append("<table align=\"center\"");
+  if ( table_width.length() ) result.append(" style=\"width:" + table_width + "\"");
+  result.append( table_attr );
+  result.append(">");
+  IDINL;
+
+  // table heading and id
+  if( table_heading.length() ) {
+    result.append("<caption");
+    if ( id.length() ) result.append(" id=\"" + id + "\"");
+    result.append(">" + table_heading + "</caption>");
+    IDINL;
+  }
+
+  // column headings
+  if( column_headings.length() ) {
+    result.append("<tr>");
+    for( size_t i=0; i<columns_cnt; ++i )
+      result.append("<th" + column_heading_attr + ">" + ch_v[i] + "</th>");
+    result.append("</tr>");
+    IDINL;
+  }
+
+  // iterate over cell list
+  int xt_num = 0;
+  for ( vector<string>::const_iterator it=xt_v.begin(); it!=xt_v.end(); ++it )
+  {
+    const string text = *it;
+
+    // check new row
+    if ( (xt_num%columns_cnt) == 0 ) {
+
+      // cell headings
+      if( cell_headings.length() ) {
+        result.append("<tr>");
+        for( size_t i=0; i<columns_cnt; ++i )
+          if( (xt_num + i) < xt_v.size() )
+            result.append("<th>" + xh_v[xt_num + i] + "</th>");
+        result.append("</tr>");
+        IDINL;
+      }
+
+      // begin row
+      result.append("<tr>");
+      IDINL;
+    }
+
+    // begin cell text
+    result.append("<td>");
+
+    bool found = false;
+    if ( cell_urls.length() )
+      result.append( "<a href=\""
+                   + file_rl( xu_v[xt_num], get_html_output(), found ) + "\">" );
+
+    result.append( text );
+
+    if ( cell_urls.length() ) result.append("</a>");
+
+    // end cell
+    result.append("</td>");
+    IDINL;
+
+    // end row
+    if ( (xt_num%columns_cnt) == (columns_cnt-1) ) {
+      result.append("</tr>");
+      IDINL;
+    }
+
+    xt_num++;
+  }
+
+  // end table
+  result.append("</table>");
+
+  return( result );
+}
+
+/***************************************************************************//**
+  \details
+
+    Output a table of images in \c html or \c latex format. The options
+    and their short codes are summarized in the following table.
 
      options            | sc  | default | tokenizer | description
     :------------------:|:---:|:-------:|:---------:|:----------------------------
@@ -351,10 +577,6 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
      files  | [,[:space:]]
      titles | [~^]
      urls   | [^\|#[:space:]]
-
-  \todo might be nice to use a more general way of added attributes to the
-        table elements using an attributes database based on the environment
-        variables. each tag checks the database for existing attributes.
 
 *******************************************************************************/
 string
@@ -435,13 +657,13 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
   boost::char_separator<char> fsep(", ");   // file name separators
   boost::char_separator<char> tsep("~^");   // general text separators
-  boost::char_separator<char> usep("^|# "); // general text separators
+  boost::char_separator<char> usep("^|# "); // url text separators
 
   // list members [ column_headings ]
-  tokenizer ct_tok( column_headings, tsep );
-  vector<string> ct_v;
-  for ( tokenizer::iterator it=ct_tok.begin(); it!=ct_tok.end(); ++it )
-    ct_v.push_back( boost::trim_copy( *it ) );
+  tokenizer ch_tok( column_headings, tsep );
+  vector<string> ch_v;
+  for ( tokenizer::iterator it=ch_tok.begin(); it!=ch_tok.end(); ++it )
+    ch_v.push_back( boost::trim_copy( *it ) );
 
   // list members [ image_files ]
   tokenizer if_tok( image_files, fsep );
@@ -467,22 +689,22 @@ ODIF::ODIF_Scanner::bif_image_table(void)
   for ( tokenizer::iterator it=iu_tok.begin(); it!=iu_tok.end(); ++it )
     iu_v.push_back( boost::trim_copy( *it ) );
 
-  // if specified, their must be a title for every column (vana[column titles])
-  if ( (ct_v.size() >0) && (ct_v.size() != columns_cnt) )
-    return( amu_error_msg("mismatched " + vana[10] + ": " + to_string(ct_v.size()) +
+  // if specified, their must be a title for every column (vana[ column_headings ])
+  if ( (ch_v.size() >0) && (ch_v.size() != columns_cnt) )
+    return( amu_error_msg("mismatched " + vana[10] + ": " + to_string(ch_v.size()) +
                           " titles for " + to_string(columns_cnt) + " columns.") );
 
-  // if specified, their must be a title for every file (vana[image titles])
+  // if specified, their must be a title for every file (vana[ image_titles ])
   if ( (it_v.size() >0) && (it_v.size() != if_v.size()) )
     return( amu_error_msg("mismatched " + vana[18] + ": " + to_string(it_v.size()) +
                           " titles for " + to_string(if_v.size()) + " files.") );
 
-  // if specified, their must be a heading for every file (vana[image headings])
+  // if specified, their must be a heading for every file (vana[ image_headings ])
   if ( (ih_v.size() >0) && (ih_v.size() != if_v.size()) )
     return( amu_error_msg("mismatched " + vana[20] + ": " + to_string(ih_v.size()) +
                           " headings for " + to_string(if_v.size()) + " files.") );
 
-  // if specified, their must be a url for every file (vana[image urls])
+  // if specified, their must be a url for every file (vana[ image_urls ])
   if ( (iu_v.size() >0) && (iu_v.size() != if_v.size()) )
     return( amu_error_msg("mismatched " + vana[22] + ": " + to_string(iu_v.size()) +
                           " URLs for " + to_string(if_v.size()) + " files.") );
@@ -519,12 +741,11 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       IDINL;
     }
 
-
     // column headings
     if( column_headings.length() ) {
       result.append("<tr>");
       for( size_t i=0; i<columns_cnt; ++i )
-        result.append("<th" + column_heading_attr + ">" + ct_v[i] + "</th>");
+        result.append("<th" + column_heading_attr + ">" + ch_v[i] + "</th>");
       result.append("</tr>");
       IDINL;
     }
@@ -631,7 +852,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       result.append("\\hline ");
       IDINL;
       for( size_t i=0; i<columns_cnt; ++i ) {
-        result.append( ct_v[i] );
+        result.append( ch_v[i] );
         if ( i < (columns_cnt-1) ) result.append( "&" );
         else                       result.append( "\\\\" );
         IDINL;
@@ -747,7 +968,6 @@ ODIF::ODIF_Scanner::bif_image_table(void)
     result.append("\\end{center}"); IDINL;
     result.append("\\end{table}");
   }
-
 
   return( result );
 }

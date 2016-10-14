@@ -204,11 +204,11 @@
   | \ref ODIF::ODIF_Scanner::bif_eval() "\\amu_eval"               | evaluate arguments
   | \ref ODIF::ODIF_Scanner::bif_shell() "\\amu_shell"             | execute shell command
   | \ref ODIF::ODIF_Scanner::bif_combine() "\\amu_combine"         | combine words
+  | \ref ODIF::ODIF_Scanner::bif_table() "\\amu_table"             | generate a text table
   | \ref ODIF::ODIF_Scanner::bif_image_table() "\\amu_image_table" | generate an image table
   | \ref ODIF::ODIF_Scanner::bif_viewer() "\\amu_viewer"           | file viewer
   | \ref ODIF::ODIF_Scanner::bif_make() "\\amu_make"               | make script interface
   | \ref ODIF::ODIF_Scanner::bif_copy() "\\amu_copy"               | copy references
-  | <install-prefix>/functions/amu_<function>                      | external commands
 
   Eternal commands also exists and can be found in the directory:
   <tt><install-prefix>/functions/</tt>. For now, see the command itself for its

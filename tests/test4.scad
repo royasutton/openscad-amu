@@ -79,13 +79,13 @@ ep = 0.02;
       "     a title 1^     a title 2^a title 3^a title 4^
        title 5~title 6~title 7~title 8"
     image_urls="
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
       http://www.google.com
     "
   )
@@ -116,13 +116,53 @@ ep = 0.02;
       "     a title 1^     a title 2^a title 3^a title 4^
        title 5~title 6~title 7~title 8"
     image_urls="
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+    "
+  )
+
+  \amu_table (
+    id=my_text_table
+    table_heading="Know is the time to return to text."
+    columns=4
+    column_headings="
+      one^  two  ^
+      three^four
+    "
+    cell_text="
+      one^
+      two^
+      three^
+      four^
+      five^
+      six^
+      seven^
+      eight
+    "
+    cell_headings="
+      heading 1^
+      heading 2^
+      heading 3^
+      heading 4^
+      heading 5^
+      heading 6^
+      heading 7^
+      heading 8
+    "
+    cell_urls="
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
       http://www.google.com
     "
   )

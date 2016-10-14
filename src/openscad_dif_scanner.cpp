@@ -197,6 +197,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_combine();
   }
+  else if (fx_name.compare("table")==0)
+  {
+    has_result=true;
+    result=bif_table();
+  }
   else if (fx_name.compare("image_table")==0)
   {
     has_result=true;
@@ -251,7 +256,7 @@ ODIF::ODIF_Scanner::fx_pend(void)
     else
     {
       /* built-in not matched and external function does not exists */
-      result = "unknown function.";
+      result = "unknown function [amu_" + fx_name + "].";
     }
   }
 

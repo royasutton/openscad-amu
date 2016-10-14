@@ -286,6 +286,8 @@ class ODIF_Scanner : public yyFlexLexer{
                        const std::string &p, const std::string &s,
                        const std::string &j, const std::string &ws,
                        const std::string &t );
+    //! generate a table from a list of text phrases.
+    std::string bif_table(void);
     //! generate an image table for a list of images.
     std::string bif_image_table(void);
     //! generate a file viewer for various file formates (png, svg, stl, video, etc.).
