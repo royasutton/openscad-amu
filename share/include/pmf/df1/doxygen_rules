@@ -41,9 +41,9 @@ $(doxygen_config_auto): $(MAKEFILE_LIST) $(scopes_mf) | $(output_directory)
 	$(file >$(doxygen_config_auto),$(doxygen_config_auto_text))
 
 # Doxygen
-$(doxygen_stamp): $(src_files) $(doxygen_config) $(doxygen_config_auto)
+$(doxygen_stamp): $(src_files) $(doxygen_src) $(doxygen_config_auto)
 	$(call target_begin)
-	cat $(doxygen_config) $(doxygen_config_auto) | $(path_doxygen) - \
+	cat $(doxygen_config_auto) $(doxygen_config) | $(path_doxygen) - \
 	&& touch $(doxygen_stamp)
 
 # Make depend on scope targets as configured

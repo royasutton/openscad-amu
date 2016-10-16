@@ -41,6 +41,14 @@ debug_dif_filter            := $(false)
 # Configuration input file
 doxygen_config              := Doxyfile
 
+# Output header, footer, and stylesheet source files
+doxygen_html_header         :=
+doxygen_html_footer         :=
+doxygen_html_css            :=
+
+# Output page layout source files
+doxygen_layout              :=
+
 # Documentation group identifier
 docs_group_id               := none
 

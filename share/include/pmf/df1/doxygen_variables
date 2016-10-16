@@ -91,10 +91,22 @@ define doxygen_config_auto_text
     MAN_SUBDIR=$(man_subdir)
     GENERATE_TAGFILE=$(doxygen_tag)
     WARN_LOGFILE=$(doxygen_warn)
+    HTML_HEADER=$(doxygen_html_header)
+    HTML_FOOTER=$(doxygen_html_footer)
+    HTML_EXTRA_STYLESHEET=$(doxygen_html_css)
+    LAYOUT_FILE=$(doxygen_layout)
 endef
 
+# Doxygen source files
+doxygen_src := \
+  $(doxygen_config) \
+  $(doxygen_html_header) \
+  $(doxygen_html_footer) \
+  $(doxygen_html_css) \
+  $(doxygen_layout)
+
 # Backup files
-backup_files += $(doxygen_config)
+backup_files += $(doxygen_src)
 
 # Replace spaces in documentation group identifier with '-'
 docs_group_id := $(subst $(space),-,$(docs_group_id))
@@ -141,6 +153,11 @@ endif
 
 doxygen_config_variables += \
   doxygen_config \
+  \
+  doxygen_html_header \
+  doxygen_html_footer \
+  doxygen_html_css \
+  doxygen_layout \
   \
   example_path_add \
   image_path_add \
