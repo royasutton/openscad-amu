@@ -17,14 +17,16 @@
     Long design description.
 
     \amu_make png_files ( append=scope1 extension=png ++pstarget )
+    \amu_shell file_cnt ( "echo ${png_files} | wc -w" )
+    \amu_shell   labels ( "seq -f '(%g)' -s '^' ${file_cnt}" )
+
     \htmlonly
       \amu_image_table
         (
-          type=html
-          table_heading="Design Examples"
-          columns=6
-          image_files="${png_files}"
-          image_width="160"
+          type=html columns=6 image_width="160"
+          table_caption="Design Examples"
+          cell_files="${png_files}"
+          cell_captions="${labels}"
         )
     \endhtmlonly
 
@@ -32,11 +34,10 @@
     \latexonly
       \amu_image_table
         (
-          type=latex
-          table_heading="Design Examples"
-          columns=6
-          image_files="${eps_files}"
-          image_width="1.00in"
+          type=latex columns=6 image_width="1.00in"
+          table_caption="Design Examples"
+          cell_files="${eps_files}"
+          cell_captions="${labels}"
         )
     \endlatexonly
 
@@ -56,24 +57,22 @@
 
   \subsection design Design
 
-    \ref design.scad "Documentation."
+    \ref design.scad "Design Documentation."
 
-    \amu_combine    titles ( prefix="v" "10 11 12" "x1 x2" joiner="" separator="^" )
+    \amu_combine    titles ( "v10 v11 v12" "x" "1 2" joiner=" " separator="^" )
     \amu_make    stl_files ( append=scope1 extension=stl ++pstarget )
 
     \amu_combine png_files ( prefix="design" "v10 v11 v12" "1 2" "diag_320x240.png" )
     \htmlonly
       \amu_image_table
         (
-          type=html
-          table_heading="Downloadable STL"
-          columns=2
-          column_headings="scale 1^scale 2"
-          image_width="160"
-          image_files="${png_files}"
-          image_titles="${titles}"
-          image_headings="${titles}"
-          image_urls="${stl_files}"
+          type=html columns=2 image_width="160"
+          table_caption="Downloadable STL"
+          column_headings="Scale=1^Scale=2"
+          cell_files="${png_files}"
+          cell_titles="${titles}"
+          cell_captions="${titles}"
+          cell_urls="${stl_files}"
         )
     \endhtmlonly
 
@@ -81,39 +80,35 @@
     \latexonly
       \amu_image_table
         (
-          type=latex
-          table_heading="Downloadable STL"
-          columns=2
-          column_headings="scale 1^scale 2"
-          image_width="1.00in"
-          image_files="${eps_files}"
-          image_titles="${titles}"
-          image_headings="${titles}"
-          image_urls="${stl_files}"
+          type=latex columns=2 image_width="1.00in"
+          table_caption="Downloadable STL"
+          column_headings="Scale=1^Scale=2"
+          cell_files="${eps_files}"
+          cell_titles="${titles}"
+          cell_captions="${titles}"
+          cell_urls="${stl_files}"
         )
     \endlatexonly
 
   \subsection library Library
 
-    \ref library.scad "Documentation."
+    \ref library.scad "Library Documentation."
 
     \amu_shell        seq4 ( "seq -f '(%g)' -s '^' 4" )
-    \amu_combine    titles ( prefix="example" "A B C D" suffix="." joiner=" " separator="^" )
+    \amu_combine    titles ( prefix="Example" "A B C D" suffix="." joiner=" " separator="^" )
     \amu_make    stl_files ( set="library" append=scope1 extension=stl )
 
     \amu_combine png_files ( prefix="library_scope2" "A B C D" "2" "diag_320x240.png" )
     \htmlonly
       \amu_image_table
         (
-          type=html
-          table_heading="Downloadable STL"
-          columns=4
+          type=html columns=4 image_width="160"
+          table_caption="Downloadable STL"
           column_headings="${seq4}"
-          image_width="160"
-          image_files="${png_files}"
-          image_titles="${titles}"
-          image_headings="${titles}"
-          image_urls="${stl_files}"
+          cell_files="${png_files}"
+          cell_titles="${titles}"
+          cell_captions="${titles}"
+          cell_urls="${stl_files}"
         )
     \endhtmlonly
 
@@ -121,19 +116,34 @@
     \latexonly
       \amu_image_table
         (
-          type=latex
-          table_heading="Downloadable STL"
-          columns=4
+          type=latex columns=4 image_width="1.00in"
+          table_caption="Downloadable STL"
           column_headings="${seq4}"
-          image_width="1.00in"
-          image_files="${eps_files}"
-          image_titles="${titles}"
-          image_headings="${titles}"
-          image_urls="${stl_files}"
+          cell_files="${eps_files}"
+          cell_titles="${titles}"
+          cell_captions="${titles}"
+          cell_urls="${stl_files}"
         )
     \endlatexonly
 
-  \section section Section
+  \section references References
+
+    \amu_table
+      (
+        id="textid" columns="2"
+        column_headings="Left^Right"
+        cell_texts="
+          OpenSCAD Home Page^
+          openscad-amu on Github^
+          Doxygen Home Page^
+          GNU Make Documentation"
+        cell_urls="
+          http://www.openscad.org
+          https://github.com/royasutton/openscad-amu
+          http://www.stack.nl/~dimitri/doxygen
+          https://www.gnu.org/software/make
+        "
+      )
 
     \amu_date compiled ( Day dash Month dash year
                          space string at space

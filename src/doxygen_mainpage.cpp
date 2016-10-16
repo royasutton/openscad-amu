@@ -253,11 +253,11 @@
      *
      * \htmlonly
      *   \amu_image_table ( type=html
-     *                      id="${var1}" table_heading="${var3}"
+     *                      id="${var1}" table_caption="${var3}"
      *                      columns="10" column_headings="${var2}"
-     *                      image_headings="${var4}"
-     *                      image_files="${var6}" image_width="92"
-     *                      image_titles="${var5}" )
+     *                      cell_captions="${var4}"
+     *                      cell_files="${var6}" image_width="92"
+     *                      cell_titles="${var5}" )
      * \endhtmlonly
     ******************************************************************/
 

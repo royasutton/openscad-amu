@@ -181,7 +181,7 @@ $(newline)#)
 $(call check_version,doxygen,ge,1.8.11,$(false), \
 $(newline)# \
 $(newline)#$(space3)An issue with translating HTML captions to latex was corrected \
-$(newline)#$(space3)in Doxygen version 1.8.11. Avoid using the 'table_heading' option \
+$(newline)#$(space3)in Doxygen version 1.8.11. Avoid using the 'table_caption' option \
 $(newline)#$(space3)of \amu_table() with prior Doxygen versions when using \
 $(newline)#$(space3)latex-generated pdf documentation. \
 $(newline)#)
