@@ -81,7 +81,6 @@
     \li \subpage scripts "Support Scripts"
 
 
-  \todo debug missing double dash on cygwin doxygen builds.
   \todo work on an example that demonstrates dimensioning.
   \todo work on an example that demonstrates animation creation.
   \todo create include makefile for creating videos (may need to export
