@@ -355,9 +355,13 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
   }
 
   // get the current value of the variable from the environment variable map
-  long old_val;
-  if ( varm.exists( vn ) )      old_val = atoi( varm.expand("${" + vn + "}").c_str() );
-  else                          old_val = 0;
+  long old_val = 0;
+  if ( varm.exists( vn ) ) {
+    string old_val_string = varm.expand("${" + vn + "}");
+
+    if ( UTIL::is_number( old_val_string ) )
+      old_val = atoi( old_val_string.c_str() );
+  }
 
   // update the variable value
   long new_val;

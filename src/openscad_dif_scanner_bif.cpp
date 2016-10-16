@@ -402,9 +402,14 @@ ODIF::ODIF_Scanner::bif_table(void)
   if ( fx_argv.size(false, true) != 1 )
     return(amu_error_msg("requires zero positional argument. " + help));
 
-  // update column count default when specified.
+  // apply default: columns.
   size_t columns_cnt = 6;
-  if ( columns.length() ) columns_cnt = atoi( columns.c_str() );
+  if ( columns.length() ) {
+    if ( is_number( columns ) )
+      columns_cnt = atoi( columns.c_str() );
+    else
+      return( amu_error_msg(vana[6] + "=[" + columns + "] is invalid.") );
+  }
 
   //
   // tokenize arguments with list members to vectors
@@ -646,9 +651,14 @@ ODIF::ODIF_Scanner::bif_image_table(void)
   else if ( type.compare("html") && type.compare("latex") )
     return( amu_error_msg( "type " + type + " is invalid. may be (html|latex).") );
 
-  // update column count default when specified.
+  // apply default: columns.
   size_t columns_cnt = 3;
-  if ( columns.length() ) columns_cnt = atoi( columns.c_str() );
+  if ( columns.length() ) {
+    if ( is_number( columns ) )
+      columns_cnt = atoi( columns.c_str() );
+    else
+      return( amu_error_msg(vana[6] + "=[" + columns + "] is invalid.") );
+  }
 
   //
   // tokenize arguments with list members to vectors
