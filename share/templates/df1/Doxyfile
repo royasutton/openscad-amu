@@ -33,6 +33,11 @@ MAN_EXTENSION          = .3
 #HAVE_DOT               = YES
 #GENERATE_LEGEND        = YES
 
+#HTML_HEADER            =
+#HTML_FOOTER            =
+#HTML_EXTRA_STYLESHEET  =
+#LAYOUT_FILE            =
+
 ##############################################################################
 # eof
 ##############################################################################
