@@ -334,6 +334,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
       id                | i   |          |           |  table id
       table_caption     | t   |          |           |  table caption
       columns           | c   |    6     |           |  number of columns
+      table_class       | sc  | doxtable |           |  table css class
       column_headings   | chl |          |  titles   |  column headings list
       cell_texts        | cdl |          |  titles   |  cell text list
       cell_captions     | ccl |          |  titles   |  cell caption list
@@ -360,6 +361,7 @@ ODIF::ODIF_Scanner::bif_table(void)
   "id",               "i",
   "table_caption",    "t",
   "columns",          "c",
+  "table_class",      "sc",
   "column_headings",  "chl",
   "cell_texts",       "cdl",
   "cell_captions",    "ccl",
@@ -372,6 +374,7 @@ ODIF::ODIF_Scanner::bif_table(void)
   string id               = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
   string table_caption    = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
   string columns          = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string table_class      = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
   string column_headings  = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
   string cell_texts       = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
   string cell_captions    = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
@@ -405,8 +408,11 @@ ODIF::ODIF_Scanner::bif_table(void)
     if ( is_number( columns ) )
       columns_cnt = atoi( columns.c_str() );
     else
-      return( amu_error_msg(vana[6] + "=[" + columns + "] is invalid.") );
+      return( amu_error_msg(vana[4] + "=[" + columns + "] is invalid.") );
   }
+
+  // apply default: table_class
+  if ( table_class.empty() ) table_class = "doxtable";
 
   //
   // tokenize arguments with list members to vectors
@@ -442,17 +448,17 @@ ODIF::ODIF_Scanner::bif_table(void)
 
   // must be a heading for every column (vana[ column_headings ])
   if ( (chl_v.size() >0) && (chl_v.size() != columns_cnt) )
-    return( amu_error_msg("mismatched " + vana[6] + ": " + to_string(chl_v.size()) +
+    return( amu_error_msg("mismatched " + vana[8] + ": " + to_string(chl_v.size()) +
                           " headings for " + to_string(columns_cnt) + " columns.") );
 
   // must be a caption for every cell (vana[ cell_captions ])
   if ( (ccl_v.size() >0) && (ccl_v.size() != cdl_v.size()) )
-    return( amu_error_msg("mismatched " + vana[10] + ": " + to_string(ccl_v.size()) +
+    return( amu_error_msg("mismatched " + vana[12] + ": " + to_string(ccl_v.size()) +
                           " captions for " + to_string(cdl_v.size()) + " cells.") );
 
   // must be a url for every cell (vana[ cell_urls ])
   if ( (cul_v.size() >0) && (cul_v.size() != cdl_v.size()) )
-    return( amu_error_msg("mismatched " + vana[12] + ": " + to_string(cul_v.size()) +
+    return( amu_error_msg("mismatched " + vana[14] + ": " + to_string(cul_v.size()) +
                           " URLs for " + to_string(cdl_v.size()) + " cells.") );
 
 
@@ -470,7 +476,7 @@ ODIF::ODIF_Scanner::bif_table(void)
 
   // begin table
   IDINL;
-  result.append("<table>");
+  result.append("<table class=\"" + table_class + "\">");
   IDINL;
 
   // table_caption and optional id
@@ -822,7 +828,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
     result.append("\\begin{table}[h]");
     IDINL;
 
-    // SKIPPING: table_class, formatting required.
+    // SKIPPING: table_class, local formatting required here.
 
     // table caption
     if( table_caption.length() ) {
