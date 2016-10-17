@@ -206,8 +206,8 @@ module dm1( p1="X", p2=10 ) {
 // (openscad) globals.
 //
 
-design_str="A";
-design_int=10;
+design_str="A";   ///< A string with the text to render.
+design_int=10;    ///< An integer scaling factor for the text.
 
 dm1(p1=design_str, p2=design_int);
 
