@@ -20,8 +20,8 @@
   \subsection segregate_bash segregate.bash
     \li \subpage segregate_bash_ht "Command line help"
 
-  \todo update bootstrap.bash to allow the design flow to be specified when
-        installing prerequisites and creating project templates.
+  \todo update bootstrap.bash to allow a template set to be specified when
+        populating new projects with template files.
 ###############################################################################/
 
 
