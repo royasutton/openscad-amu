@@ -158,6 +158,7 @@ info-project: | silent
 	$(call heading1, Project Information)
 	$(call list_variables,$(project_control_variables),$(true), control)
 	$(call list_variables,$(project_config_variables),$(false), variables)
+	$(call list_variables,$(project_config_derived),$(false), derived)
 	$(foreach x, \
 		src_files \
 		backup_files \

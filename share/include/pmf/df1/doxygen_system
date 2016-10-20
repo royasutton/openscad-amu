@@ -85,7 +85,7 @@ amudifvs := amudif$(amudifvn)
 # Configuration Variable List
 #------------------------------------------------------------------------------#
 
-doxygen_config_variables := \
+doxygen_config_derived := \
   doxygenvs \
   doxygenvn \
   \

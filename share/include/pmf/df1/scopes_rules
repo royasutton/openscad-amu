@@ -76,6 +76,7 @@ info-scopes: | silent
 	$(call heading1, Scope Information)
 	$(call list_variables,$(scopes_control_variables),$(true), control)
 	$(call list_variables,$(scopes_config_variables),$(false), variables)
+	$(call list_variables,$(scopes_config_derived),$(false), derived)
 	$(call enumerate_variable,scopes_commands_configured,$(true),$(true))
 	$(foreach x, \
 		scopes_scripts \

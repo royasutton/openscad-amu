@@ -227,6 +227,7 @@ info-doxygen: | silent
 	$(call heading1, Doxygen Information)
 	$(call list_variables,$(doxygen_control_variables),$(true), control)
 	$(call list_variables,$(doxygen_config_variables),$(false), variables)
+	$(call list_variables,$(doxygen_config_derived),$(false), derived)
 	$(call enumerate_variable,doxygen_commands_configured,$(true),$(true))
 	$(call heading2, [ auto-configuration [$(doxygen_config_auto)] ] *,=,*)
 	$(info $(doxygen_config_auto_text))

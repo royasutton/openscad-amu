@@ -104,15 +104,17 @@ project_config_variables := \
   library_prefix \
   library \
   \
-  output_directory \
-  backup_basename \
   backup_files_add \
-  library_install_subdir \
   \
   scad_ext  \
   mfs_ext \
   mf_ext \
   stamp_ext
+
+project_config_derived := \
+  output_directory \
+  backup_basename \
+  library_install_subdir
 
 #------------------------------------------------------------------------------#
 # Version Checks

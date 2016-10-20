@@ -151,7 +151,7 @@ endif
 # Configuration Variable List
 #------------------------------------------------------------------------------#
 
-doxygen_config_variables += \
+doxygen_config_variables := \
   doxygen_config \
   \
   doxygen_html_header \
@@ -168,7 +168,9 @@ doxygen_config_variables += \
   man_output \
   man_subdir \
   \
-  docs_group_id \
+  docs_group_id
+
+doxygen_config_derived += \
   docs_install_id \
   \
   project_logo \

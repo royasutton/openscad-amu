@@ -102,14 +102,16 @@ scopes_clean_files := $(filter %$(scad_ext),$(scopes_scripts))
 # Configuration Variable List
 #------------------------------------------------------------------------------#
 
-scopes_config_variables += \
-  scopes_prefix \
-  \
+scopes_config_variables := \
   scopes_joiner \
   \
   scopes_include \
+  scopes_exclude
+
+scopes_config_derived += \
+  scopes_prefix \
+  \
   scopes_include_filter \
-  scopes_exclude \
   scopes_exclude_filter \
   \
   openscad_seam_opts1 \

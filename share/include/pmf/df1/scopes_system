@@ -89,7 +89,7 @@ amuseamvs := amuseam$(amuseamvn)
 # Configuration Variable List
 #------------------------------------------------------------------------------#
 
-scopes_config_variables := \
+scopes_config_derived := \
   openscadvs \
   openscadvn \
   \
