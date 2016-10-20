@@ -43,48 +43,81 @@ if [[ $BASH_VERSINFO -lt 4 ]] ; then
 fi
 
 ###############################################################################
-# prerequisite package lists
+# design flow: (1) prerequisite packages and (2) template files
 ###############################################################################
 
-declare packages_Common="
-  doxygen
-  texlive
-  graphviz
-  git
-  autoconf
-  automake
-  libtool
-  bash
-"
+function update_design_flow_variables() {
+  declare local packages_Common
+  declare local packages_Linux
+  declare local packages_CYGWIN_NT
 
-declare packages_Linux="
-  openscad
-  texlive-latex-extra
-  libboost-all-dev
-  imagemagick
-"
+  case "${design_flow}" in
+    df1)
+      packages_Common="
+        doxygen
+        texlive
+        graphviz
+        git
+        autoconf
+        automake
+        libtool
+        bash
+      "
 
-declare packages_CYGWIN_NT="
-  texlive-collection-basic
-  texlive-collection-bibtexextra
-  texlive-collection-binextra
-  texlive-collection-fontsrecommended
-  texlive-collection-fontutils
-  texlive-collection-latex
-  texlive-collection-latexextra
-  texlive-collection-latexrecommended
-  texlive-collection-mathextra
-  texlive-collection-pictures
-  libboost-devel
-  ImageMagick
-"
+      packages_Linux="
+        openscad
+        texlive-latex-extra
+        libboost-all-dev
+        imagemagick
+      "
+
+      packages_CYGWIN_NT="
+        texlive-collection-basic
+        texlive-collection-bibtexextra
+        texlive-collection-binextra
+        texlive-collection-fontsrecommended
+        texlive-collection-fontutils
+        texlive-collection-latex
+        texlive-collection-latexextra
+        texlive-collection-latexrecommended
+        texlive-collection-mathextra
+        texlive-collection-pictures
+        libboost-devel
+        ImageMagick
+      "
+
+      templates="
+        Project_Makefile
+        Doxyfile
+        design.scad
+        library.scad
+      "
+    ;;
+    *)
+      print_m "Design flow [$design_flow] not supported."
+      exit 1
+    ;;
+  esac
+
+  case "${sysname}" in
+    Linux)
+      packages="${packages_Common} ${packages_Linux}"
+    ;;
+    CYGWIN_NT)
+      packages="${packages_Common} ${packages_CYGWIN_NT}"
+    ;;
+    *)
+      print_m "Configuration for [$sysname] required."
+      exit 1
+    ;;
+  esac
+}
 
 ###############################################################################
 # message printing
 ###############################################################################
 
-function print_m()
-{
+function print_m() {
   declare    local nl
   declare    local es
   declare -i local rn=1
@@ -156,6 +189,8 @@ function print_h2 () {
 # variables
 ###############################################################################
 
+declare design_flow="df1"
+
 declare git_fetch_opts="--verbose"
 
 declare repo_cache_root="cache"
@@ -168,15 +203,11 @@ declare repo_url="https://github.com/royasutton/openscad-amu"
 declare repo_cache
 declare repo_branch="master"
 
+declare templates
+
 declare packages
 declare packages_installed
 declare packages_missing
-
-case "${sysname}" in
-  Linux)        packages="${packages_Common} ${packages_Linux}"           ;;
-  CYGWIN_NT)    packages="${packages_Common} ${packages_CYGWIN_NT}"       ;;
-  *)            print_m "Configuration for [$sysname] required." ; exit 1 ;;
-esac
 
 declare openscad_amu_builddir
 
@@ -188,7 +219,7 @@ declare force_reconfigure="no"
 declare configure_opts
 declare configure_opts_add
 
-function update_variables() {
+function update_build_variables() {
   repo_cache_apt_cyg=${repo_cache_root}/apt_cyg
   repo_cache=${repo_cache_root}/openscad-amu
 
@@ -319,6 +350,7 @@ function check_update() {
   packages_installed=""
   packages_missing=""
 
+  update_design_flow_variables
   for r in ${packages} ; do
     if check.${sysname} $r
     then
@@ -430,7 +462,7 @@ function remove_build_directory() {
 function prep_openscad_amu() {
   print_m "${FUNCNAME} begin"
 
-  update_variables
+  update_build_variables
 
   # check missing
   check_update
@@ -494,7 +526,8 @@ function make_openscad_amu() {
 function create_template() {
   print_m "${FUNCNAME} begin"
 
-  update_variables
+  update_design_flow_variables
+  update_build_variables
 
   declare local dirname="$1"
   declare local cmd_name="openscad-seam"
@@ -513,8 +546,19 @@ function create_template() {
       mkdir -v ${dirname}
 
       print_m "copying template files to: [${dirname}]."
-      cp -v ${LIB_PATH}/templates/df1/{Doxyfile,design.scad,library.scad} ${dirname}
-      cp -v ${LIB_PATH}/templates/df1/Project_Makefile ${dirname}/Makefile
+      for f in ${templates}
+      do
+        declare local file="${LIB_PATH}/templates/${design_flow}/$f"
+        if [[ -e ${file} ]] ; then
+          cp -v ${file} ${dirname}
+        else
+          print_m "template file [${file}] does not exists."
+        fi
+      done
+      if [[ -e ${dirname}/Project_Makefile ]] ; then
+        print_m "renaming project makefile."
+        mv -v ${dirname}/Project_Makefile ${dirname}/Makefile
+      fi
     fi
 
   else
@@ -530,6 +574,16 @@ function create_template() {
 function process_commands() {
   while [[ $# -gt 0 ]]; do
       case $1 in
+      --flow)
+        if [[ -z "$2" ]] ; then
+          print_m "syntax: ${base_name} $1 <name>"
+          print_m "missing design flow name. aborting..."
+          exit 1
+        fi
+        design_flow="$2"
+        print_h2 "setting: design flow [${design_flow}]"
+        shift 1
+      ;;
       --check)
         print_h1 "Prerequisite Check"
         check_update
@@ -542,13 +596,14 @@ function process_commands() {
       ;;
       --list)
         print_h1 "Prerequisite List"
+        update_design_flow_variables
         for r in ${packages} ; do
           print_m -j $r
         done
       ;;
 
       -r|--reconfigure)
-        print_h2 "forcing source reconfigure"
+        print_h2 "setting: force source reconfiguration"
         force_reconfigure="yes"
       ;;
       -v|--branch)
@@ -558,11 +613,11 @@ function process_commands() {
           exit 1
         fi
         repo_branch="$2"
-        print_h2 "compiling source branch [${repo_branch}]"
+        print_h2 "setting: source branch [${repo_branch}]"
         shift 1
       ;;
       -c|--cache)
-        print_h2 "configure source for [cache install]"
+        print_h2 "setting: configure source to install to cache"
         cache_install="yes"
       ;;
 
@@ -613,12 +668,12 @@ function process_commands() {
 
       --fetch)
         print_h1 "Updating openscad-amu source cache"
-        update_variables
+        update_build_variables
         update_repo "${repo_url}" "${repo_cache}"
       ;;
       --remove)
         print_h1 "Remove source build directory"
-        update_variables
+        update_build_variables
         remove_build_directory "${openscad_amu_builddir}"
       ;;
 
@@ -653,12 +708,14 @@ install the utilities. Detected missing prerequisites are installed prior
 when possible. This script may also be used to start new design projects
 from a template.
 
+      --flow <name>    : Use design flow <name> default=(df1).
+
       --check          : Check for installed prerequisites.
       --required       : Install missing prerequisites.
       --list           : List prerequisites.
 
  -r | --reconfigure    : Force source reconfiguration.
- -v | --branch <name>  : Use branch <name> default=(master)
+ -v | --branch <name>  : Use branch <name> default=(master).
  -c | --cache          : Configure source for cache install.
 
  -b | --build          : Build all.
@@ -678,8 +735,10 @@ from a template.
       --examples       : Show some examples uses.
 
  NOTES:
-  * When using a branch other than the default, the --branch option
-    must be used with each command invokation.
+  * When using a flow or branch other than the default, the --flow
+    and/or --branch option must be used with each command invokation
+    or set in the configuration file.
+  * If used, --flow must be the precede all other options.
   * If used, {--branch|--cache|--reconfigure} must precede --build
     (et al.), --install, and --template.
   * When changing {--branch|--cache}, force source reconfiguration
@@ -771,7 +830,8 @@ EOF
 # parse configuration file
 if [[ -e ${conf_file} ]] ; then
   print_m "reading configuration file: ${conf_file}"
-  parse_configuration "${conf_file}" " \
+  parse_configuration "${conf_file}" "
+    design_flow
     repo_cache_root
     repo_url
     repo_branch
