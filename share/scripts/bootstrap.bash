@@ -31,6 +31,7 @@ declare base_path="${0%/*}"
 declare base_name="${0##*/}"
 declare root_name="${base_name%.*}"
 declare work_path="${PWD}"
+declare conf_file="${root_name}.conf"
 
 declare kernel=$(uname -s)
 declare sysname=${kernel%%-*}
@@ -160,11 +161,11 @@ declare git_fetch_opts="--verbose"
 declare repo_cache_root="cache"
 
 declare repo_url_apt_cyg="https://github.com/transcode-open/apt-cyg"
-declare repo_cache_apt_cyg=${repo_cache_root}/apt_cyg
+declare repo_cache_apt_cyg
 declare apt_cyg_path
 
 declare repo_url="https://github.com/royasutton/openscad-amu"
-declare repo_cache=${repo_cache_root}/openscad-amu
+declare repo_cache
 declare repo_branch="master"
 
 declare packages
@@ -185,17 +186,56 @@ declare cache_bindir
 
 declare force_reconfigure="no"
 declare configure_opts
+declare configure_opts_add
 
-function update_cache_paths() {
+function update_variables() {
+  repo_cache_apt_cyg=${repo_cache_root}/apt_cyg
+  repo_cache=${repo_cache_root}/openscad-amu
+
   openscad_amu_builddir="${repo_cache}/build/${repo_branch}/${sysname}"
 
   if [[ ${cache_install} == "yes" ]] ; then
     cache_prefix="${work_path}/${repo_cache_root}/local"
     cache_bindir="${cache_prefix}/bin/${sysname}"
     configure_opts="--prefix=${cache_prefix} --bindir=${cache_bindir}"
-
-    print_m configure_opts: [${configure_opts}]
   fi
+
+  if [[ -n "${configure_opts_add}" ]] ; then
+    [[ -n "${configure_opts}" ]] && configure_opts+=" ${configure_opts_add}"
+    [[ -z "${configure_opts}" ]] && configure_opts="${configure_opts_add}"
+  fi
+}
+
+function parse_configuration() {
+  declare local file="$1"
+  declare local varl="$2"
+
+  function read_key()
+  {
+    declare local file="$1"
+    declare local key="$2"
+
+    # support line gobbling
+    while IFS= read line || [[ -n $line ]]; do
+      echo "$line"
+    done < "${file}" |
+    sed -e '/^[[:space:]]*$/d' \
+        -e '/^[[:space:]]*#/d' \
+        -e 's/^[[:space:]\t]*//' |
+    grep "${key}=" |
+    tail -1 |
+    sed -e "s/${key}=//"
+  }
+
+  for v in  ${varl} ; do
+    declare local t
+
+    printf -v t '%s' "$(read_key ${file} $v)"
+    if [[ -n $t ]] ; then
+      printf -v $v '%s' "$t"
+      print_m "setting $v=$t"
+    fi
+  done
 }
 
 ###############################################################################
@@ -254,7 +294,7 @@ function set_apt_cyg_path() {
       print_m "found: ${cmd_name}=${apt_cyg_path}"
     else
       print_m "fetching apt-cyg git repository to ${repo_cache_apt_cyg}"
-      update_repo ${repo_url_apt_cyg} ${repo_cache_apt_cyg}
+      update_repo "${repo_url_apt_cyg}" "${repo_cache_apt_cyg}"
 
       if [[ -e "${cmd_cache}" ]] ; then
         [[ ! -x "${cmd_cache}" ]] && chmod --verbose +x ${cmd_cache}
@@ -329,8 +369,11 @@ function install_missing() {
 # clone or update a Git repository
 #
 function update_repo() {
-  declare local gitrepo=$1
-  declare local out_dir=$2
+  declare local gitrepo="$1"
+  declare local out_dir="$2"
+
+  print_m "source: [${gitrepo}]"
+  print_m " cache: [${out_dir}]"
 
   declare local git=$(which 2>/dev/null git)
   if [[ ! -x "${git}" ]] ; then
@@ -347,14 +390,14 @@ function update_repo() {
 
   if [[ -d ${out_dir} ]] ; then
     if ( cd ${out_dir} 2>/dev/null && git rev-parse 2>/dev/null ) ; then
-      print_m "updating: Git repository [${gitrepo}]"
+      print_m "updating: Git repository cache"
       ( cd ${out_dir} && ${git} pull ${git_fetch_opts} )
     else
-      print_m "target directory [${out_dir}] exists and is not a repository. aborting..."
+      print_m "directory [${out_dir}] exists and is not a repository. aborting..."
       exit 1
     fi
   else
-    print_m "cloning: Git repository [${gitrepo}]"
+    print_m "cloning: Git repository to cache"
     ${git} clone ${gitrepo} ${out_dir} ${git_fetch_opts}
   fi
 
@@ -371,18 +414,14 @@ function update_repo() {
 # remove source build directory
 #
 function remove_build_directory() {
-  print_m "${FUNCNAME} begin"
+  declare local builddir="$1"
 
-  update_cache_paths
-
-  if [[ -x ${openscad_amu_builddir} ]] ; then
-    print_m "removing source build directory."
-    rm -rfv ${openscad_amu_builddir}
+  if [[ -x ${builddir} ]] ; then
+    print_m "removing source build directory [${builddir}]."
+    rm -rfv ${builddir}
   else
-    print_m "source build directory [${openscad_amu_builddir}] does not exists."
+    print_m "source build directory [${builddir}] does not exists."
   fi
-
-  print_m "${FUNCNAME} end"
 }
 
 #
@@ -391,7 +430,7 @@ function remove_build_directory() {
 function prep_openscad_amu() {
   print_m "${FUNCNAME} begin"
 
-  update_cache_paths
+  update_variables
 
   # check missing
   check_update
@@ -400,7 +439,7 @@ function prep_openscad_amu() {
   # check for source
   if ! ( cd ${repo_cache} 2>/dev/null && git rev-parse 2>/dev/null ) ; then
     print_m "fetching repository cache."
-    update_repo ${repo_url} ${repo_cache}
+    update_repo "${repo_url}" "${repo_cache}"
   fi
 
   # checkout branch
@@ -428,6 +467,7 @@ function prep_openscad_amu() {
     print_m "root Makefile exists."
   else
     print_m "generating Makefiles and configuring source."
+    print_m configure_opts: [${configure_opts}]
     ( cd ${openscad_amu_builddir} && ../../../configure ${configure_opts} )
   fi
 
@@ -454,7 +494,7 @@ function make_openscad_amu() {
 function create_template() {
   print_m "${FUNCNAME} begin"
 
-  update_cache_paths
+  update_variables
 
   declare local dirname="$1"
   declare local cmd_name="openscad-seam"
@@ -482,6 +522,122 @@ function create_template() {
   fi
 
   print_m "${FUNCNAME} end"
+}
+
+#
+# process commands
+#
+function process_commands() {
+  while [[ $# -gt 0 ]]; do
+      case $1 in
+      --check)
+        print_h1 "Prerequisite Check"
+        check_update
+        check_show_status
+      ;;
+      --required)
+        print_h1 "Install Missing"
+        check_update
+        install_missing
+      ;;
+      --list)
+        print_h1 "Prerequisite List"
+        for r in ${packages} ; do
+          print_m -j $r
+        done
+      ;;
+
+      -r|--reconfigure)
+        print_h2 "forcing source reconfigure"
+        force_reconfigure="yes"
+      ;;
+      -v|--branch)
+        if [[ -z "$2" ]] ; then
+          print_m "syntax: ${base_name} $1 <name>"
+          print_m "missing repository branch name. aborting..."
+          exit 1
+        fi
+        repo_branch="$2"
+        print_h2 "compiling source branch [${repo_branch}]"
+        shift 1
+      ;;
+      -c|--cache)
+        print_h2 "configure source for [cache install]"
+        cache_install="yes"
+      ;;
+
+      -b|--build)
+        declare local targets="all docs tests"
+        print_h1 "Building openscad-amu [${targets}]"
+        make_openscad_amu ${targets}
+      ;;
+      --programs)
+        declare local targets="all"
+        print_h1 "Building openscad-amu [${targets}]"
+        make_openscad_amu ${targets}
+      ;;
+      --docs)
+        declare local targets="docs"
+        print_h1 "Building openscad-amu [${targets}]"
+        make_openscad_amu ${targets}
+      ;;
+      --tests)
+        declare local targets="tests"
+        print_h1 "Building openscad-amu [${targets}]"
+        make_openscad_amu ${targets}
+      ;;
+
+      -i|--install)
+        declare local targets="install"
+        print_h1 "Building openscad-amu [${targets}]"
+        make_openscad_amu ${targets}
+      ;;
+      -u|--uninstall)
+        declare local targets="uninstall"
+        print_h1 "Building openscad-amu [${targets}]"
+        make_openscad_amu ${targets}
+      ;;
+
+      -t|--template)
+        if [[ -z "$2" ]] ; then
+          print_m "syntax: ${base_name} $1 <dir>"
+          print_m "missing project directory name. aborting..."
+          exit 1
+        fi
+        declare local dirname="$2"
+        shift 1
+
+        print_h1 "Creating new project template in [${dirname}]"
+        create_template ${dirname}
+      ;;
+
+      --fetch)
+        print_h1 "Updating openscad-amu source cache"
+        update_variables
+        update_repo "${repo_url}" "${repo_cache}"
+      ;;
+      --remove)
+        print_h1 "Remove source build directory"
+        update_variables
+        remove_build_directory "${openscad_amu_builddir}"
+      ;;
+
+      -h|--help)
+        print_help
+        exit 0
+      ;;
+      --examples)
+        print_examples
+        exit 0
+      ;;
+
+      *)
+        print_m "invalid command [$1]. aborting..."
+        exit 1
+      ;;
+      esac
+      shift 1
+  done
 }
 
 ###############################################################################
@@ -612,121 +768,39 @@ EOF
 ###############################################################################
 ###############################################################################
 
-# show help if no arguments
-if [[ $# == 0 ]] ; then
-  print_help
-  exit 0
+# parse configuration file
+if [[ -e ${conf_file} ]] ; then
+  print_m "reading configuration file: ${conf_file}"
+  parse_configuration "${conf_file}" " \
+    repo_cache_root
+    repo_url
+    repo_branch
+    repo_url_apt_cyg
+    apt_cyg_path
+    configure_opts_add
+    force_reconfigure
+    cache_install
+    git_fetch_opts
+    commands
+  "
+fi
+
+# parse configuration file commands
+if [[ -n ${commands} ]] ; then
+  print_m "processing configuration file commands."
+  process_commands ${commands}
 fi
 
 # parse command line arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-    --check)
-      print_h1 "Prerequisite Check"
-      check_update
-      check_show_status
-    ;;
-    --required)
-      print_h1 "Install Missing"
-      check_update
-      install_missing
-    ;;
-    --list)
-      print_h1 "Prerequisite List"
-      for r in ${packages} ; do
-        print_m -j $r
-      done
-    ;;
+if [[ $# -ne 0 ]] ; then
+  print_m "processing command line arguments."
+  process_commands $*
+fi
 
-    -r|--reconfigure)
-      print_h2 "forcing source reconfigure"
-      force_reconfigure="yes"
-    ;;
-    -v|--branch)
-      if [[ -z "$2" ]] ; then
-        print_m "syntax: ${base_name} $1 <name>"
-        print_m "missing repository branch name. aborting..."
-        exit 1
-      fi
-      repo_branch="$2"
-      print_h2 "compiling source branch [${repo_branch}]"
-      shift 1
-    ;;
-    -c|--cache)
-      print_h2 "configure source for [cache install]"
-      cache_install="yes"
-    ;;
-
-    -b|--build)
-      declare local targets="all docs tests"
-      print_h1 "Building openscad-amu [${targets}]"
-      make_openscad_amu ${targets}
-    ;;
-    --programs)
-      declare local targets="all"
-      print_h1 "Building openscad-amu [${targets}]"
-      make_openscad_amu ${targets}
-    ;;
-    --docs)
-      declare local targets="docs"
-      print_h1 "Building openscad-amu [${targets}]"
-      make_openscad_amu ${targets}
-    ;;
-    --tests)
-      declare local targets="tests"
-      print_h1 "Building openscad-amu [${targets}]"
-      make_openscad_amu ${targets}
-    ;;
-
-    -i|--install)
-      declare local targets="install"
-      print_h1 "Building openscad-amu [${targets}]"
-      make_openscad_amu ${targets}
-    ;;
-    -u|--uninstall)
-      declare local targets="uninstall"
-      print_h1 "Building openscad-amu [${targets}]"
-      make_openscad_amu ${targets}
-    ;;
-
-    -t|--template)
-      if [[ -z "$2" ]] ; then
-        print_m "syntax: ${base_name} $1 <dir>"
-        print_m "missing project directory name. aborting..."
-        exit 1
-      fi
-      declare local dirname="$2"
-      shift 1
-
-      print_h1 "Creating new project template in [${dirname}]"
-      create_template ${dirname}
-    ;;
-
-    --fetch)
-      print_h1 "Updating openscad-amu source cache"
-      update_repo ${repo_url} ${repo_cache}
-    ;;
-    --remove)
-      print_h1 "Remove source build directory"
-      remove_build_directory
-    ;;
-
-    -h|--help)
-      print_help
-      exit 0
-    ;;
-    --examples)
-      print_examples
-      exit 0
-    ;;
-
-    *)
-      print_m "invalid command line option at [$1]. aborting..."
-      exit 1
-    ;;
-    esac
-    shift 1
-done
+# show help if no command line arguments or configuration file commands
+if [[ $# == 0 && -z ${commands} ]] ; then
+  print_help
+fi
 
 ###############################################################################
 # eof
