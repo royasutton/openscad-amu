@@ -5,6 +5,9 @@
 #
 ################################################################################
 
+# AMU_TOOL_PREFIX and AMU_TOOL_VERSION may be commented to use the default
+# version found in the shell search path.
+
 # Use library/tools from install path
 AMU_LIB_PATH            := @__LIB_PATH__@
 AMU_TOOL_PREFIX         := @bindir@/
@@ -16,7 +19,7 @@ AMU_TOOL_PREFIX         := @bindir@/
 AMU_PM_PREFIX           := $(AMU_LIB_PATH)/include/pmf/
 #AMU_PM_VERBOSE         := defined
 #AMU_PM_DEBUG           := defined
-#AMU_TOOL_VERSION       := @__PACKAGE_VERSION__@
+AMU_TOOL_VERSION        := @__PACKAGE_VERSION__@
 
 include $(AMU_PM_PREFIX)amu_pm_init
 
