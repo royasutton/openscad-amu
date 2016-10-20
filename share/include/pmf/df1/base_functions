@@ -301,11 +301,11 @@ write_key_value = $(amu_pm_d3)$(file >> $1,$(call format_key_value,$2,$3))
 # lines that begin with the hash/comment character).
 read_key_value = $(amu_pm_d2)$(shell \
   $(sed) -e '/^[[:space:]]*$(dollar)/d' \
-         -e '/^[[:space:]]*$(hash)/d' $1 \
-         -e 's/^[[:space:]\t]*//' | \
+         -e '/^[[:space:]]*$(hash)/d' \
+         -e 's/^[[:space:]\t]*//' $1 | \
   $(grep) $2 | \
   $(tail) -1 | \
-  $(sed) 's/$(call format_key_value,$2,$(empty))//')
+  $(sed) -e 's/$(call format_key_value,$2,$(empty))//')
 
 #------------------------------------------------------------------------------#
 # Version string comparison
