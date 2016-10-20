@@ -4,19 +4,26 @@
 #
 ##############################################################################
 
+files = \
+	bootstrap.bash
+
 files_am = \
 	doxygen_mainpage.bash \
 	segregate.bash
 
 scripts_help = \
+	bootstrap.help \
 	segregate.help
+
+SUFFIXES = .bash .help
+
+EXTRA_DIST = \
+	$(files)
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
 
 install_path = $(version_path)/scripts
-
-SUFFIXES = .bash .help
 
 ##############################################################################
 # targets
@@ -41,6 +48,11 @@ doxygen.stamp: Doxyfile Makefile $(files_am) $(scripts_help)
 '$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
 
 install-data-local: $(files_am) | '$(install_path)'
+	( cd ${srcdir} && \
+		for f in $(files); do \
+			$(INSTALL_SCRIPT) $$f '$(install_path)' \
+		; done \
+	) && \
 	( cd ${builddir} && \
 		for f in $(files_am); do \
 			$(INSTALL_SCRIPT) $$f '$(install_path)' \
@@ -48,7 +60,7 @@ install-data-local: $(files_am) | '$(install_path)'
 	)
 
 uninstall-local:
-	for f in $(files_am); do \
+	for f in $(files) $(files_am); do \
 		rm -fv $(install_path)/$$f \
 	; done
 	-rmdir -v '$(install_path)'

@@ -1,5 +1,4 @@
 #/##############################################################################
-
   \mainpage Support Scripts
 
   \dot
@@ -15,17 +14,25 @@
 
   \section scripts Scripts
 
-  \subsection segregate_bash segregate.bash
+  \subsection bootstrap_bash bootstrap.bash
+    \li \subpage bootstrap_bash_ht "Command line help"
 
+  \subsection segregate_bash segregate.bash
     \li \subpage segregate_bash_ht "Command line help"
 
+  \todo update bootstrap.bash to allow the design flow to be specified when
+        installing prerequisites and creating project templates.
 ###############################################################################/
 
 
 #/##############################################################################
   \page segregate_bash_ht Command line help: segregate.bash
   \include segregate.help
+
+  \page bootstrap_bash_ht Command line help: bootstrap.bash
+  \include bootstrap.help
 ###############################################################################/
+
 
 #
 # eof
