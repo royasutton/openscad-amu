@@ -58,7 +58,7 @@ openscad_seam_opts2 := \
   )
 
 # scopes auxiliary scripts for all source files
-scopes_scripts := \
+scopes_scripts_source := \
   $(addprefix $(scopes_prefix), \
     $(foreach s,$(src_files), \
       $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
@@ -67,36 +67,37 @@ scopes_scripts := \
 
 # scopes include filter
 ifndef scopes_include_filter
-  scopes_include_filter := $(strip $(foreach s, $(scopes_include), \
-    %$(scopes_joiner)$(s)$(scad_ext) %$(scopes_joiner)$(s)$(mfs_ext)))
+  ifdef scopes_include
+    scopes_include_filter := $(strip $(foreach s, $(scopes_include), \
+      %$(scopes_joiner)$(s)$(scad_ext) %$(scopes_joiner)$(s)$(mfs_ext)))
+  else
+    scopes_include_filter := %
+  endif
 else
   $(call amu_pm_m,using pre-defined value for $$(scopes_include_filter))
 endif
 
-ifdef scopes_include_filter
-  $(call amu_pm_m,applying scopes include filter [$(scopes_include_filter)])
-  scopes_scripts := $(filter $(scopes_include_filter),$(scopes_scripts))
-else
-  $(call amu_pm_m,no scopes include filtering)
-endif
-
 # scopes exclude filter
 ifndef scopes_exclude_filter
-  scopes_exclude_filter := $(strip $(foreach s, $(scopes_exclude), \
-    %$(scopes_joiner)$(s)$(scad_ext) %$(scopes_joiner)$(s)$(mfs_ext)))
+  ifdef scopes_exclude
+    scopes_exclude_filter := $(strip $(foreach s, $(scopes_exclude), \
+      %$(scopes_joiner)$(s)$(scad_ext) %$(scopes_joiner)$(s)$(mfs_ext)))
+  else
+    scopes_exclude_filter := $(empty)
+  endif
 else
   $(call amu_pm_m,using pre-defined value for $$(scopes_exclude_filter))
 endif
 
-ifdef scopes_exclude_filter
-  $(call amu_pm_m,applying scopes exclude filter [$(scopes_exclude_filter)])
-  scopes_scripts := $(filter-out $(scopes_exclude_filter),$(scopes_scripts))
-else
-  $(call amu_pm_m,no scopes exclude filtering)
-endif
+# apply include and exclude filter
+scopes_scripts_selected := \
+  $(filter $(scopes_include_filter), \
+  $(filter-out $(scopes_exclude_filter), \
+    $(scopes_scripts_source) \
+  ))
 
-# assign modeling scripts to clean-files
-scopes_clean_files := $(filter %$(scad_ext),$(scopes_scripts))
+# assign all source auxiliary scripts to clean-files
+scopes_clean_files := $(scopes_scripts_source)
 
 #------------------------------------------------------------------------------#
 # Configuration Variable List
