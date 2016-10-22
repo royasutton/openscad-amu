@@ -95,24 +95,18 @@ doxygen.stamp: Doxyfile Makefile $(doxygen_stamp_other_dependacies)
 $(programs_help): $(bin_PROGRAMS)
 	./$* --help > $@
 
-bash_dif_lexer.cc: bash_dif_lexer.hh
-bash_dif_lexer.hh \
 bash_dif_lexer.cc: bash_dif_lexer.ll
 	${LEX} \
 		--outfile=bash_dif_lexer.cc \
 		--header-file=bash_dif_lexer.hh \
 		$(srcdir)/bash_dif_lexer.ll
 
-openscad_dif_lexer.cc: openscad_dif_lexer.hh
-openscad_dif_lexer.hh \
 openscad_dif_lexer.cc: openscad_dif_lexer.ll
 	${LEX} \
 		--outfile=openscad_dif_lexer.cc \
 		--header-file=openscad_dif_lexer.hh \
 		$(srcdir)/openscad_dif_lexer.ll
 
-openscad_seam_lexer.cc: openscad_seam_lexer.hh
-openscad_seam_lexer.hh \
 openscad_seam_lexer.cc: openscad_seam_lexer.ll
 	${LEX} \
 		--outfile=openscad_seam_lexer.cc \
