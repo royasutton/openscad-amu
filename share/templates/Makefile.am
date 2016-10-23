@@ -17,7 +17,7 @@ install_path = $(version_path)/templates
 ##############################################################################
 
 uninstall-local:
-	-rmdir -v '$(install_path)'
+	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 
 ##############################################################################
 # eof

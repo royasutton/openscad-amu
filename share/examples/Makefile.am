@@ -26,6 +26,11 @@ root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
 install_path = $(version_path)/examples
 
+install_path_doc = $(version_path)/doc/share/examples
+install_path_html = $(install_path_doc)/build/html
+install_path_pdf = $(install_path_doc)/build/latex
+install_path_man = $(install_path_doc)/build/man
+
 SUFFIXES = .bash .makefile .stamp
 
 ##############################################################################
@@ -34,11 +39,13 @@ SUFFIXES = .bash .makefile .stamp
 
 all-local: $(files_am)
 
+docs-local: html-local pdf-local man-local
+
 html-local: examples.stamp
 
-man-local: examples.stamp
-
 pdf-local: examples.stamp
+
+man-local: examples.stamp
 
 CLEANFILES = \
 	examples.stamp
@@ -143,11 +150,26 @@ install-data-local: $(files_am) | '$(install_path)'
 		; done \
 	)
 
+install-docs-local: install-html-local install-pdf-local install-man-local
+
+'$(install_path_html)': ; $(MKDIR_P) -v '$(install_path_html)'
+install-html-local: html-local | '$(install_path_html)'
+	( cd build && cp -av html/* '$(install_path_html)' )
+
+'$(install_path_pdf)': ; $(MKDIR_P) -v '$(install_path_pdf)'
+install-pdf-local: pdf-local | '$(install_path_pdf)'
+	( cd build && cp -av latex/refman.pdf '$(install_path_pdf)' )
+
+'$(install_path_man)': ; $(MKDIR_P) -v '$(install_path_man)'
+install-man-local: man-local | '$(install_path_man)'
+	( cd build && cp -av man/* '$(install_path_man)' )
+
 uninstall-local:
 	for f in $(files) $(files_am); do \
-		rm -fv $(install_path)/$$f \
+		rm -fv "$(install_path)/$$f" \
 	; done
-	-rmdir -v '$(install_path)'
+	-test -d '$(install_path)' && rmdir -v '$(install_path)'
+	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
 
 clean-local:
 	-make -f vehicle_document.makefile clean
@@ -159,7 +181,7 @@ clean-local:
 	-make -f animate_rotate.makefile clean
 	-rm -fv animate_rotate.makefile
 	-rm -rfv build/html build/latex build/man
-	-rmdir build
+	-test -d build && rmdir -v build
 
 ##############################################################################
 # eof

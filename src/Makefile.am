@@ -77,22 +77,32 @@ doxygen_stamp_other_dependacies = \
 	$(openscad_seam_SOURCES) \
 	$(programs_help)
 
+root_path = $(DESTDIR)$(pkgdatadir)
+version_path = $(root_path)/$(PACKAGE_VERSION)
+install_path = $(version_path)
+
+install_path_doc = $(version_path)/doc/src
+install_path_html = $(install_path_doc)/doxygen/html
+install_path_pdf = $(install_path_doc)/doxygen/latex
+install_path_man = $(install_path_doc)/doxygen/man
+
 SUFFIXES = .bash .makefile .stamp .help
 
 ##############################################################################
 # targets
 ##############################################################################
 
+docs-local: html-local pdf-local man-local
+
 html-local: doxygen.stamp
 
-man-local: doxygen.stamp
-
 pdf-local: doxygen.stamp doxygen/latex/refman.pdf
+
+man-local: doxygen.stamp
 
 doxygen/latex/refman.pdf:
 	( cd doxygen/latex && make refman.pdf )
 
-# run doxygen and update timestamp
 doxygen.stamp: Doxyfile Makefile $(doxygen_stamp_other_dependacies)
 	( cat Doxyfile ; \
 		echo "INPUT=$(srcdir)" ; \
@@ -132,6 +142,20 @@ install-exec-hook:
 		; done \
 	)
 
+install-docs-local: install-html-local install-pdf-local install-man-local
+
+'$(install_path_html)': ; $(MKDIR_P) -v '$(install_path_html)'
+install-html-local: html-local | '$(install_path_html)'
+	( cd doxygen && cp -av html/* '$(install_path_html)' )
+
+'$(install_path_pdf)': ; $(MKDIR_P) -v '$(install_path_pdf)'
+install-pdf-local: pdf-local | '$(install_path_pdf)'
+	( cd doxygen && cp -av latex/refman.pdf '$(install_path_pdf)' )
+
+'$(install_path_man)': ; $(MKDIR_P) -v '$(install_path_man)'
+install-man-local: man-local | '$(install_path_man)'
+	( cd doxygen && cp -av man/* '$(install_path_man)' )
+
 uninstall-local:
 	@list='$(bin_PROGRAMS)' ; test -n "$(EXEEXT)" && \
 	  list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
@@ -141,6 +165,7 @@ uninstall-local:
 			rm -fv $$p-$(PACKAGE_VERSION)$(EXEEXT) \
 		; done \
 	)
+	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
 
 CLEANFILES = \
 	doxygen.stamp \
@@ -155,9 +180,7 @@ CLEANFILES = \
 	$(programs_help)
 
 clean-local:
-	-test -d doxygen \
-		&& ( cd doxygen && rm -rfv html latex man ) \
-		&& rmdir -v doxygen
+	-test -d doxygen && rm -rfv doxygen
 
 ##############################################################################
 # eof

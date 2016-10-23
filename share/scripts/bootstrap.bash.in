@@ -633,6 +633,11 @@ function process_commands() {
         print_h1 "Building openscad-amu: make target=[${targets}]"
         make_openscad_amu ${targets}
       ;;
+      --installdocs)
+        declare local targets="install-docs"
+        print_h1 "Building openscad-amu: make target=[${targets}]"
+        make_openscad_amu ${targets}
+      ;;
       -u|--uninstall)
         declare local targets="uninstall"
         print_h1 "Building openscad-amu: make target=[${targets}]"
@@ -719,7 +724,8 @@ from a template.
 
  -b | --build          : Build programs.
  -i | --install        : Install programs.
- -u | --uninstall      : Uninstall programs.
+      --installdocs    : Build and install documentation.
+ -u | --uninstall      : Uninstall everything.
 
  -m | --make <name>    : Run make with target <name>.
 

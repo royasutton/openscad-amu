@@ -24,7 +24,6 @@ AM_INIT_AUTOMAKE([
   foreign
   dist-xz
   dist-zip
-  no-installman
 ])
 
 ##############################################################################
@@ -134,7 +133,10 @@ AC_CHECK_FUNCS([popen])
 AC_CONFIG_HEADERS([src/config.h])
 
 AM_EXTRA_RECURSIVE_TARGETS([
+docs
+install-docs
 man
+install-man
 ])
 
 ##############################################################################
@@ -204,6 +206,9 @@ configuration:
 
     all, install, uninstall:
     - build/(un)install all programs and scripts.
+
+    docs, install-docs:
+    - build/install documentation in all format.
 
     html, pdf, man, install-html, install-pdf, install-man:
     - build/install documentation in html, pdf, or man format.

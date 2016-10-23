@@ -62,9 +62,10 @@ install-data-local: $(files_am) $(files_am_local) | '$(install_path)'
 
 uninstall-local:
 	for f in $(files) $(files_am) $(files_am_local); do \
-		rm -fv $(install_path)/$$f \
+		rm -fv "$(install_path)/$$f" \
 	; done
-	-rmdir -v '$(install_path)'
+	-test -d '$(install_path)' && rmdir -v '$(install_path)'
+
 
 ##############################################################################
 # eof
