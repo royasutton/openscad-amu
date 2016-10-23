@@ -145,8 +145,8 @@ backup_file_spec := \
   date \
   time
 
-# default backup file extension
-backup_file_ext := .tar.xz
+# default backup file extension list
+backup_exts := .tar.xz
 
 # File extensions
 scad_ext  := .scad

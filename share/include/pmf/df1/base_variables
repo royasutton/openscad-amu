@@ -104,6 +104,7 @@ project_config_variables := \
   library_prefix \
   library \
   \
+  backup_exts \
   backup_files_add \
   \
   scad_ext  \

@@ -169,7 +169,7 @@ info-project: | silent
 #------------------------------------------------------------------------------#
 
 .PHONY: backup
-backup: $(backup_basename)$(backup_file_ext)
+backup: $(addprefix $(backup_basename),$(backup_exts))
 	$(call target_end)
 
 $(backup_basename).tar.xz: $(backup_files) | $(backup_root)
