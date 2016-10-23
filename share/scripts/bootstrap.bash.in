@@ -477,9 +477,11 @@ function prep_openscad_amu() {
 
   # checkout branch
   if ! ( cd ${repo_cache} && git checkout ${repo_branch} ) ; then
-    echo "good"
     print_m "failed to checkout branch [${repo_branch}]. aborting..."
     exit 1
+  else
+    print_m -n "repository branch description: "
+    ( cd ${repo_cache} && git describe --tags --long --dirty )
   fi
 
   if [[ -x ${repo_cache}/configure && ${force_reconfigure} == "no" ]] ; then
