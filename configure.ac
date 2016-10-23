@@ -163,6 +163,7 @@ AC_CONFIG_FILES([
 
   share/scripts/Makefile
   share/scripts/Doxyfile
+  share/scripts/bootstrap.bash
   share/scripts/doxygen_mainpage.bash
   share/scripts/segregate.bash
 

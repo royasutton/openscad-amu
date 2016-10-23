@@ -4,10 +4,10 @@
 #
 ##############################################################################
 
-files = \
-	bootstrap.bash
+files =
 
 files_am = \
+	bootstrap.bash
 	doxygen_mainpage.bash \
 	segregate.bash
 

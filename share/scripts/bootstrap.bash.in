@@ -1,3 +1,4 @@
+#!@BASH_PATH@
 #!/usr/bin/env bash
 #/##############################################################################
 #
@@ -677,6 +678,10 @@ function process_commands() {
         print_examples
         exit 0
       ;;
+      --version)
+        print_version
+        exit 0
+      ;;
 
       *)
         print_m "invalid command [$1]. aborting..."
@@ -688,7 +693,7 @@ function process_commands() {
 }
 
 ###############################################################################
-# help and examples
+# version, help and examples
 ###############################################################################
 function print_help() {
 print_m -j "${base_name}: (Help)" -l
@@ -723,6 +728,7 @@ from a template.
 
  -h | --help           : Show this help message.
       --examples       : Show some examples uses.
+      --version        : Show version information.
 
  NOTES:
   * When using a flow or branch other than the default, the --flow
@@ -805,6 +811,18 @@ cat << EOF
     $ bootstrap.bash \\
         --fetch --reconfigure \\
         --cache --branch develop --install --template my_project
+
+EOF
+}
+
+function print_version() {
+print_m -j "${base_name}: (Version)" -l
+
+cat << EOF
+     package: @PACKAGE_NAME@
+     version: @PACKAGE_VERSION@
+  bug report: @PACKAGE_BUGREPORT@
+    site url: @PACKAGE_URL@
 
 EOF
 }
