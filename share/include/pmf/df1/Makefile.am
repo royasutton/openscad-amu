@@ -39,9 +39,8 @@ install_path = $(version_path)/include/pmf/df1
 
 all-local: $(files_am)
 
-installdirs-local: ; $(MKDIR_P) -v '$(install_path)'
-
-install-data-local: $(files_am) | installdirs-local
+'$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
+install-data-local: $(files_am) | '$(install_path)'
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_DATA) $$f '$(install_path)' \

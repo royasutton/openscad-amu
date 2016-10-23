@@ -50,9 +50,8 @@ doxygen.stamp: Doxyfile Makefile $(files_am) $(scripts_help)
 .bash.help:
 	$(BASH_PATH) --norc --noprofile $< --help > $@
 
-installdirs-local: ; $(MKDIR_P) -v '$(install_path)'
-
-install-data-local: $(files_am) | installdirs-local
+'$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
+install-data-local: $(files_am) | '$(install_path)'
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_SCRIPT) $$f '$(install_path)' \

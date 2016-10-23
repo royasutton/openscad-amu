@@ -47,9 +47,8 @@ Project_Makefile: $(srcdir)/Project_Makefile.inl Makefile
 
 all-local: $(files_am) $(files_am_local)
 
-installdirs-local: ; $(MKDIR_P) -v '$(install_path)'
-
-install-data-local: $(files_am) $(files_am_local) | installdirs-local
+'$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
+install-data-local: $(files_am) $(files_am_local) | '$(install_path)'
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_DATA) $$f '$(install_path)' \
