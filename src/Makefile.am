@@ -4,6 +4,8 @@
 #
 ##############################################################################
 
+AUTOMAKE_OPTIONS = --warnings=no-portability
+
 bin_PROGRAMS = \
 	bash-dif \
 	openscad-dif \
@@ -62,8 +64,6 @@ openscad_seam_SOURCES = \
 	openscad_seam_scanner.cpp \
 	openscad_seam_main.cpp
 
-SUFFIXES = .bash .makefile .stamp .help
-
 EXTRA_DIST = \
 	doxygen_mainpage.cpp \
 	bash_dif_lexer.ll \
@@ -77,11 +77,20 @@ doxygen_stamp_other_dependacies = \
 	$(openscad_seam_SOURCES) \
 	$(programs_help)
 
+SUFFIXES = .bash .makefile .stamp .help
+
 ##############################################################################
 # targets
 ##############################################################################
 
-docs-local: doxygen.stamp
+html-local: doxygen.stamp
+
+man-local: doxygen.stamp
+
+pdf-local: doxygen.stamp doxygen/latex/refman.pdf
+
+doxygen/latex/refman.pdf:
+	( cd doxygen/latex && make refman.pdf )
 
 # run doxygen and update timestamp
 doxygen.stamp: Doxyfile Makefile $(doxygen_stamp_other_dependacies)
@@ -90,7 +99,6 @@ doxygen.stamp: Doxyfile Makefile $(doxygen_stamp_other_dependacies)
 		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: C++ Programs\"" ; \
 	) | $(DOXYGEN_PATH) - \
 	&& touch doxygen.stamp
-#	&& ( cd doxygen/latex && make )
 
 $(programs_help): $(bin_PROGRAMS)
 	./$* --help > $@

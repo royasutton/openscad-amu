@@ -9,6 +9,8 @@ files = \
 	design.scad \
 	library.scad
 
+files_am =
+
 # am_local: source files
 files_am_local_src = \
 	Project_Makefile.inl
@@ -16,8 +18,6 @@ files_am_local_src = \
 # am_local: output files
 files_am_local = \
 	Project_Makefile
-
-files_am =
 
 CLEANFILES = \
 	$(files_am_local)
@@ -27,7 +27,6 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-
 install_path = $(version_path)/templates/df1
 
 ##############################################################################
@@ -48,9 +47,9 @@ Project_Makefile: $(srcdir)/Project_Makefile.inl Makefile
 
 all-local: $(files_am) $(files_am_local)
 
-'$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
+installdirs-local: ; $(MKDIR_P) -v '$(install_path)'
 
-install-data-local: $(files_am) $(files_am_local) | '$(install_path)'
+install-data-local: $(files_am) $(files_am_local) | installdirs-local
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_DATA) $$f '$(install_path)' \

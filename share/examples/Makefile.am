@@ -16,8 +16,6 @@ files_am = \
 	log_segregate.bash \
 	vehicle.doxyfile
 
-SUFFIXES = .bash .makefile .stamp
-
 EXTRA_DIST = \
 	$(files)
 
@@ -26,8 +24,9 @@ openscad_seam = ${top_builddir}/src/openscad-seam$(EXEEXT)
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-
 install_path = $(version_path)/examples
+
+SUFFIXES = .bash .makefile .stamp
 
 ##############################################################################
 # targets
@@ -35,7 +34,11 @@ install_path = $(version_path)/examples
 
 all-local: $(files_am)
 
-docs-local: examples.stamp
+html-local: examples.stamp
+
+man-local: examples.stamp
+
+pdf-local: examples.stamp
 
 CLEANFILES = \
 	examples.stamp
@@ -127,9 +130,9 @@ doxygen.stamp: vehicle.doxyfile Makefile $(srcdir)/vehicle.scad
 	&& touch doxygen.stamp \
 	&& ( cd build/latex && make )
 
-'$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
+installdirs-local: ; $(MKDIR_P) -v '$(install_path)'
 
-install-data-local: $(files_am) | '$(install_path)'
+install-data-local: $(files_am) | installdirs-local
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_DATA) $$f '$(install_path)' \

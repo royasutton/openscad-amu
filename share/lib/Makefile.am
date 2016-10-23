@@ -15,12 +15,13 @@ files = \
 	print_textbox.bash \
 	utility.bash
 
+files_am =
+
 EXTRA_DIST = \
 	$(files)
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-
 install_path = $(version_path)/lib
 
 doxygen_stamp_other_dependacies = \
@@ -32,7 +33,14 @@ doxygen_stamp_other_dependacies = \
 # targets
 ##############################################################################
 
-docs-local: doxygen.stamp
+html-local: doxygen.stamp
+
+man-local: doxygen.stamp
+
+pdf-local: doxygen.stamp doxygen/latex/refman.pdf
+
+doxygen/latex/refman.pdf:
+	( cd doxygen/latex && make refman.pdf )
 
 # run doxygen and update timestamp
 doxygen.stamp: Doxyfile Makefile $(files) $(doxygen_stamp_other_dependacies)
@@ -41,19 +49,23 @@ doxygen.stamp: Doxyfile Makefile $(files) $(doxygen_stamp_other_dependacies)
 		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: Makefile Script Library\"" ; \
 	) | $(DOXYGEN_PATH) - \
 	&& touch doxygen.stamp
-#	&& ( cd doxygen/latex && make )
 
-'$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
+installdirs-local: ; $(MKDIR_P) -v '$(install_path)'
 
-install-data-local: | '$(install_path)'
+install-data-local: $(files_am) | installdirs-local
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_DATA) $$f '$(install_path)' \
 		; done \
+	) && \
+	( cd ${builddir} && \
+		for f in $(files_am); do \
+			$(INSTALL_SCRIPT) $$f '$(install_path)' \
+		; done \
 	)
 
 uninstall-local:
-	for f in $(files); do \
+	for f in $(files) $(files_am); do \
 		rm -fv $(install_path)/$$f \
 	; done
 	-rmdir -v '$(install_path)'

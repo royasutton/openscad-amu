@@ -31,7 +31,6 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-
 install_path = $(version_path)/include/pmf/df1
 
 ##############################################################################
@@ -40,9 +39,9 @@ install_path = $(version_path)/include/pmf/df1
 
 all-local: $(files_am)
 
-'$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
+installdirs-local: ; $(MKDIR_P) -v '$(install_path)'
 
-install-data-local: $(files_am) | '$(install_path)'
+install-data-local: $(files_am) | installdirs-local
 	( cd ${srcdir} && \
 		for f in $(files); do \
 			$(INSTALL_DATA) $$f '$(install_path)' \

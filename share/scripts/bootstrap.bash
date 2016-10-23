@@ -529,7 +529,7 @@ function create_template() {
   update_design_flow_variables
   update_build_variables
 
-  declare local dirname="$1"
+  declare local dir_name="$1"
   declare local cmd_name="openscad-seam"
   declare local cmd_cache="${cache_bindir}/${cmd_name}"
   declare local cmd_path
@@ -539,25 +539,25 @@ function create_template() {
     declare local LIB_PATH=$(${cmd_path} --version --verbose  | grep "lib path" | awk '{print $4}')
     print_m using: LIB_PATH = ${LIB_PATH}
 
-    if [[ -d ${dirname} ]] ; then
-      print_m "directory: [${dirname}] exists. not creating..."
+    if [[ -d ${dir_name} ]] ; then
+      print_m "directory: [${dir_name}] exists. not creating..."
     else
-      print_m "creating project directory: [${dirname}]."
-      mkdir -v ${dirname}
+      print_m "creating project directory: [${dir_name}]."
+      mkdir -v ${dir_name}
 
-      print_m "copying template files to: [${dirname}]."
+      print_m "copying template files to: [${dir_name}]."
       for f in ${templates}
       do
         declare local file="${LIB_PATH}/templates/${design_flow}/$f"
         if [[ -e ${file} ]] ; then
-          cp -v ${file} ${dirname}
+          cp -v ${file} ${dir_name}
         else
           print_m "template file [${file}] does not exists."
         fi
       done
-      if [[ -e ${dirname}/Project_Makefile ]] ; then
+      if [[ -e ${dir_name}/Project_Makefile ]] ; then
         print_m "renaming project makefile."
-        mv -v ${dirname}/Project_Makefile ${dirname}/Makefile
+        mv -v ${dir_name}/Project_Makefile ${dir_name}/Makefile
       fi
     fi
 
@@ -580,22 +580,22 @@ function process_commands() {
           print_m "missing design flow name. aborting..."
           exit 1
         fi
-        design_flow="$2"
+        design_flow="$2" ; shift 1
         print_h2 "setting: design flow [${design_flow}]"
-        shift 1
       ;;
+
       --check)
-        print_h1 "Prerequisite Check"
+        print_h1 "Checking for installed prerequisites"
         check_update
         check_show_status
       ;;
       --required)
-        print_h1 "Install Missing"
+        print_h1 "Installing missing prerequisites"
         check_update
         install_missing
       ;;
       --list)
-        print_h1 "Prerequisite List"
+        print_h1 "Listing prerequisites"
         update_design_flow_variables
         for r in ${packages} ; do
           print_m -j $r
@@ -612,9 +612,8 @@ function process_commands() {
           print_m "missing repository branch name. aborting..."
           exit 1
         fi
-        repo_branch="$2"
+        repo_branch="$2" ; shift 1
         print_h2 "setting: source branch [${repo_branch}]"
-        shift 1
       ;;
       -c|--cache)
         print_h2 "setting: configure source to install to cache"
@@ -622,34 +621,29 @@ function process_commands() {
       ;;
 
       -b|--build)
-        declare local targets="all docs tests"
-        print_h1 "Building openscad-amu [${targets}]"
-        make_openscad_amu ${targets}
-      ;;
-      --programs)
         declare local targets="all"
-        print_h1 "Building openscad-amu [${targets}]"
+        print_h1 "Building openscad-amu: make target=[${targets}]"
         make_openscad_amu ${targets}
       ;;
-      --docs)
-        declare local targets="docs"
-        print_h1 "Building openscad-amu [${targets}]"
-        make_openscad_amu ${targets}
-      ;;
-      --tests)
-        declare local targets="tests"
-        print_h1 "Building openscad-amu [${targets}]"
-        make_openscad_amu ${targets}
-      ;;
-
       -i|--install)
         declare local targets="install"
-        print_h1 "Building openscad-amu [${targets}]"
+        print_h1 "Building openscad-amu: make target=[${targets}]"
         make_openscad_amu ${targets}
       ;;
       -u|--uninstall)
         declare local targets="uninstall"
-        print_h1 "Building openscad-amu [${targets}]"
+        print_h1 "Building openscad-amu: make target=[${targets}]"
+        make_openscad_amu ${targets}
+      ;;
+
+      -m|--make)
+        if [[ -z "$2" ]] ; then
+          print_m "syntax: ${base_name} $1 <name>"
+          print_m "missing make target name. aborting..."
+          exit 1
+        fi
+        declare local targets="$2" ; shift 1
+        print_h1 "Building openscad-amu: make target=[${targets}]"
         make_openscad_amu ${targets}
       ;;
 
@@ -659,11 +653,9 @@ function process_commands() {
           print_m "missing project directory name. aborting..."
           exit 1
         fi
-        declare local dirname="$2"
-        shift 1
-
-        print_h1 "Creating new project template in [${dirname}]"
-        create_template ${dirname}
+        declare local dir_name="$2" ; shift 1
+        print_h1 "Creating new project template in [${dir_name}]"
+        create_template ${dir_name}
       ;;
 
       --fetch)
@@ -704,8 +696,8 @@ print_m -j "${base_name}: (Help)" -l
 cat << EOF
 This script attempts to bootstrap the openscad-amu development environment.
 It downloads the latest source from the development repository, builds, and
-install the utilities. Detected missing prerequisites are installed prior
-when possible. This script may also be used to start new design projects
+install the utilities (detected missing prerequisites are installed prior
+when possible). This script may also be used to start new design projects
 from a template.
 
       --flow <name>    : Use design flow <name> default=(df1).
@@ -718,13 +710,11 @@ from a template.
  -v | --branch <name>  : Use branch <name> default=(master).
  -c | --cache          : Configure source for cache install.
 
- -b | --build          : Build all.
-      --programs       : Build programs.
-      --docs           : Build documentation.
-      --tests          : Build tests.
+ -b | --build          : Build programs.
+ -i | --install        : Install programs.
+ -u | --uninstall      : Uninstall programs.
 
- -i | --install        : Install openscad-amu.
- -u | --uninstall      : Uninstall openscad-amu.
+ -m | --make <name>    : Run make with target <name>.
 
  -t | --template <dir> : Create new project directory with templates.
 
@@ -739,8 +729,8 @@ from a template.
     and/or --branch option must be used with each command invokation
     or set in the configuration file.
   * If used, --flow must be the precede all other options.
-  * If used, {--branch|--cache|--reconfigure} must precede --build
-    (et al.), --install, and --template.
+  * If used, {--reconfigure|--branch|--cache} must precede --build
+    (et al.), --install, --make, and --template.
   * When changing {--branch|--cache}, force source reconfiguration
     by prefixing --reconfigure.
 
@@ -774,7 +764,7 @@ cat << EOF
 (2) Build and install the default source branch to the default system
     location (--fetch will update an existing source cache prior to building).
 
-    $ bootstrap.bash --fetch --programs
+    $ bootstrap.bash --fetch --build
     $ sudo ./bootstrap.bash --install
 
     To uninstall from the default system location and remove the local
@@ -801,7 +791,7 @@ cat << EOF
 
 (5) Build release 'v1.6' and install to the default system location.
 
-    $ bootstrap.bash --branch v1.6 --programs
+    $ bootstrap.bash --branch v1.6 --build
     $ ./bootstrap.bash --branch v1.6 --install
 
 (6) Create a new project using the most recently install version.

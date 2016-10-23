@@ -16,6 +16,7 @@ SUBDIRS = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
+install_path = $(version_path)
 
 ##############################################################################
 # targets

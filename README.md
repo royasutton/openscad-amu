@@ -62,11 +62,11 @@ build using the default install prefix issue:
 To runs a few basic post-build sanity checks in the tests sub-directory
 issue:
 
-    $ make tests
+    $ make check
 
-The openscad-amu documentation can be built and viewed by:
+The openscad-amu html documentation can be built and viewed by:
 
-    $ make docs
+    $ make html
     $ firefox share/lib/doxygen/html/index.html
 
 To install or uninstall openscad-amu, issue:
