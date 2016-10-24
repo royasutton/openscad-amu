@@ -26,28 +26,32 @@
 # Defaults
 ################################################################################
 
-# Preferred openscad-amu tools version to use (if available).
+# preferred openscad-amu tools version to use (if available).
 # must be specified in Makefile prior to including amu_pm_init.
 # AMU_TOOL_VERSION := v1.0
 
-# Prefix output path to auxiliary scope scripts
-prefix_scopes_scripts := $(true)
+# prefix output path to auxiliary scope scripts
+prefix_scopes_scripts                   := $(true)
 
-# Verbosity
-verbose_seam          := $(true)
-verbose_seam_show     := $(false)
+# add scope output to release directory/archive
+release_scopes                          := $(false)
+release_archive_scopes                  := $(false)
 
-# Debugging
-debug_seam_scanner    := $(false)
+# verbosity
+verbose_seam                            := $(true)
+verbose_seam_show                       := $(false)
 
-# Scope joiner
-scopes_joiner         := _
+# debugging
+debug_seam_scanner                      := $(false)
 
-# Scopes include filter
-scopes_include        :=
+# scope joiner
+scopes_joiner                           := _
 
-# Scopes exclude filter
-scopes_exclude        :=
+# scopes include filter
+scopes_include                          :=
+
+# scopes exclude filter
+scopes_exclude                          :=
 
 #------------------------------------------------------------------------------#
 # Control Variable List
@@ -55,6 +59,9 @@ scopes_exclude        :=
 
 scopes_control_variables := \
   prefix_scopes_scripts \
+  \
+  release_scopes \
+  release_archive_scopes \
   \
   verbose_seam \
   verbose_seam_show \

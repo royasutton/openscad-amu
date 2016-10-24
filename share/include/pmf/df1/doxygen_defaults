@@ -26,52 +26,56 @@
 # Defaults
 ################################################################################
 
-# Doxygen targets depend on scope targets
-doxygen_depends_scopes      := $(true)
+# doxygen targets depend on scope targets
+doxygen_depends_scopes                  := $(true)
 
-# Output formats
-generate_html               := $(true)
-generate_latex              := $(true)
-generate_man                := $(true)
+# output formats
+generate_html                           := $(true)
+generate_latex                          := $(true)
+generate_man                            := $(true)
 
-# Debugging
-debug_dif_scanner           := $(false)
-debug_dif_filter            := $(false)
+# add doxygen output to release directory/archive
+release_doxygen                         := $(false)
+release_archive_doxygen                 := $(false)
 
-# Configuration input file
-doxygen_config              := Doxyfile
+# debugging
+debug_dif_scanner                       := $(false)
+debug_dif_filter                        := $(false)
 
-# Output header, footer, and stylesheet source files
-doxygen_html_header         :=
-doxygen_html_footer         :=
-doxygen_html_css            :=
+# configuration input file
+doxygen_config                          := Doxyfile
 
-# Output page layout source files
-doxygen_layout              :=
+# output header, footer, and stylesheet source files
+doxygen_html_header                     :=
+doxygen_html_footer                     :=
+doxygen_html_css                        :=
 
-# Documentation group identifier
-docs_group_id               := none
+# output page layout source files
+doxygen_layout                          :=
 
-# Project logo (image should not exceed 200w by 55h pixels)
-project_logo                :=
+# documentation group identifier
+docs_group_id                           := none
 
-# Additional paths (for controlled variables)
-example_path_add            :=
-image_path_add              :=
-enabled_sections_add        :=
+# project logo (image should not exceed 200w by 55h pixels)
+project_logo                            :=
 
-# Output sub-directory names
-html_output                 := html
-latex_output                := latex
-man_output                  := man
-man_subdir                  := man3
+# additions (for derived variables)
+example_path_add                        :=
+image_path_add                          :=
+enabled_sections_add                    :=
 
-# Output file names
-latex_stamp_name             = latex$(stamp_ext)
-doxygen_stamp_name           = doxygen$(stamp_ext)
-doxygen_tag_name            := doxygen.tags
-doxygen_warn_name           := doxygen.warnings
-doxygen_config_auto_name     = $(doxygen_config).auto
+# output sub-directory names
+html_output                             := html
+latex_output                            := latex
+man_output                              := man
+man_subdir                              := man3
+
+# output file names
+latex_stamp_name                         = latex$(stamp_ext)
+doxygen_stamp_name                       = doxygen$(stamp_ext)
+doxygen_tag_name                        := doxygen.tags
+doxygen_warn_name                       := doxygen.warnings
+doxygen_config_auto_name                 = $(doxygen_config).auto
 
 #------------------------------------------------------------------------------#
 # Control Variable List
@@ -83,6 +87,9 @@ doxygen_control_variables := \
   generate_html \
   generate_latex \
   generate_man \
+  \
+  release_doxygen \
+  release_archive_doxygen \
   \
   debug_dif_scanner \
   debug_dif_filter

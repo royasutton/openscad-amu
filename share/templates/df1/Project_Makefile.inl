@@ -9,28 +9,28 @@
 # version found in the shell search path.
 
 # Use library/tools from install path
-AMU_LIB_PATH            := @__LIB_PATH__@
-AMU_TOOL_PREFIX         := @bindir@/
+AMU_LIB_PATH        := @__LIB_PATH__@
+AMU_TOOL_PREFIX     := @bindir@/
 
 # Use library/tools from source and build path (uncomment both)
-#AMU_LIB_PATH           := @abs_top_srcdir@/share
-#AMU_TOOL_PREFIX        := @abs_top_builddir@/src/
+#AMU_LIB_PATH       := @abs_top_srcdir@/share
+#AMU_TOOL_PREFIX    := @abs_top_builddir@/src/
 
-AMU_PM_PREFIX           := $(AMU_LIB_PATH)/include/pmf/
-#AMU_PM_VERBOSE         := defined
-#AMU_PM_DEBUG           := defined
-AMU_TOOL_VERSION        := @__PACKAGE_VERSION__@
+AMU_PM_PREFIX       := $(AMU_LIB_PATH)/include/pmf/
+#AMU_PM_VERBOSE     := defined
+#AMU_PM_DEBUG       := defined
+AMU_TOOL_VERSION    := @__PACKAGE_VERSION__@
 
 include $(AMU_PM_PREFIX)amu_pm_init
 
 #------------------------------------------------------------------------------#
 # Default Overrides
 #------------------------------------------------------------------------------#
-#parallel_jobs          := $(true)
-#version_checks         := $(false)
-#target_headings        := $(false)
-#verbose_seam           := $(false)
-#debug_dif_filter       := $(true)
+#parallel_jobs                          := $(true)
+#version_checks                         := $(false)
+#target_headings                        := $(false)
+#verbose_seam                           := $(false)
+#debug_dif_filter                       := $(true)
 
 #------------------------------------------------------------------------------#
 # Version Checks
@@ -45,20 +45,20 @@ include $(AMU_PM_PREFIX)amu_pm_init
 #------------------------------------------------------------------------------#
 # Project
 #------------------------------------------------------------------------------#
-docs_group_id   := none
-project_logo    := design_logo_top_200x50
+project_name        := template
+project_version     := 1.0
+project_brief       := openscad-amu Project Template (df1).
 
-project_name    := template
-project_version := 1.0
-project_brief   := openscad-amu Project Template (df1).
+docs_group_id       := none
+project_logo        := design_logo_top_200x50
 
-#design_prefix  := ./
-#library_prefix := ./
+#design_prefix      := ./
+#library_prefix     := ./
 
-design          := design
-library         := library
+design              := design
+library             := library
 
-doxygen_config  := Doxyfile
+doxygen_config      := Doxyfile
 
 #------------------------------------------------------------------------------#
 include $(AMU_PM_PREFIX)amu_pm_rules

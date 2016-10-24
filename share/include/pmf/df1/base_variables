@@ -82,6 +82,27 @@ endif
 # backup files
 backup_files := $(src_files) $(word 1,$(MAKEFILE_LIST)) $(backup_files_add)
 
+# Release directory
+ifndef release_path
+  release_path := \
+    $(call join_with,$(if $(release_path_use_dir_sep),$(dir_level_sep),$(release_path_term_joiner)), \
+      $(strip $(foreach x,$(release_path_spec), \
+        $(if $(call bool_decode,$(release_path_add_$x)),$($x)))))$(dir_level_sep)
+else
+  $(call amu_pm_m,using pre-defined value for $$(release_path))
+endif
+
+# Release archive basename
+ifndef release_archive_basename
+  release_archive_basename := \
+    $(call join_with,$(empty),$(release_path) \
+    $(call join_with,$(if $(release_archive_file_use_dir_sep),$(dir_level_sep),$(release_archive_file_term_joiner)), \
+      $(strip $(foreach x,$(release_archive_file_spec), \
+        $(if $(call bool_decode,$(release_archive_file_add_$x)),$($x))))))
+else
+  $(call amu_pm_m,using pre-defined value for $$(release_archive_basename))
+endif
+
 # library install sub-directory
 ifndef library_install_subdir
   library_install_subdir := $(project_name)-$(project_version)$(dir_level_sep)
@@ -104,17 +125,23 @@ project_config_variables := \
   library_prefix \
   library \
   \
-  backup_exts \
-  backup_files_add \
-  \
   scad_ext  \
   mfs_ext \
   mf_ext \
-  stamp_ext
+  stamp_ext \
+  \
+  backup_files_add \
+  backup_exts \
+  \
+  release_add \
+  release_archive_add \
+  release_archive_exts
 
 project_config_derived := \
   output_path \
   backup_basename \
+  release_path \
+  release_archive_basename \
   library_install_subdir
 
 #------------------------------------------------------------------------------#
