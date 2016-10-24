@@ -34,8 +34,8 @@
 all: $(addprefix all-,$(AMU_PM_COMPONENTS))
 	$(call target_end)
 
-# output directory
-$(output_directory): ; $(mkdir_p) $@
+# output directory path
+$(output_path): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Clean Targets
@@ -48,8 +48,8 @@ clean: $(addprefix clean-,$(AMU_PM_COMPONENTS) base)
 .PHONY: clean-base
 clean-base:
 	$(call target_begin)
-	-@$(test) -d $(output_directory) && \
-	$(rmdir) $(output_directory)
+	-@$(test) -d $(output_path) && \
+	$(rmdir) $(output_path)
 
 #------------------------------------------------------------------------------#
 # Install / Uninstall Targets

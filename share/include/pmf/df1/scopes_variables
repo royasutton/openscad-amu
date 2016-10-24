@@ -27,7 +27,7 @@
 ################################################################################
 
 # auxiliary script output path prefix
-scopes_prefix := $(if $(call bool_decode,$(prefix_scopes_scripts)),$(output_directory))
+scopes_prefix := $(if $(call bool_decode,$(prefix_scopes_scripts)),$(output_path))
 
 # openscad_seam_opts1: for modes=(extract|list)
 openscad_seam_opts1 := \
@@ -41,7 +41,7 @@ openscad_seam_opts1 := \
 # openscad_seam_opts1: for modes=(extract)
 openscad_seam_opts2 := \
   $(strip \
-    --prefix $(output_directory) \
+    --prefix $(output_path) \
     --prefix-ipp 0 \
     --prefix-scripts $(if $(call bool_decode,$(prefix_scopes_scripts)),yes,no) \
     --comments yes \

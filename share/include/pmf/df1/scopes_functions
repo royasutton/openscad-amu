@@ -77,7 +77,7 @@ endef
 define scopes_extract_mfs
 $(amu_pm_d2)
 # makefile-script
-$(scopes_prefix)$2$(mfs_ext): $1 $(MAKEFILE_LIST) | $(output_directory)
+$(scopes_prefix)$2$(mfs_ext): $1 $(MAKEFILE_LIST) | $(output_path)
 	$$(call target_begin)
 	$(path_openscad_seam) \
 		--mode extract --input $1 $(openscad_seam_opts1) $(openscad_seam_opts2)
