@@ -1,5 +1,4 @@
 #!@BASH_PATH@
-#!/usr/bin/env bash
 #/##############################################################################
 #
 #   \file   bootstrap.bash
@@ -192,6 +191,8 @@ function print_h2 () {
 
 declare design_flow="df1"
 
+declare skip_check="no"
+
 declare git_fetch_opts="--verbose"
 
 declare repo_cache_root="cache"
@@ -226,7 +227,7 @@ function update_build_variables() {
 
   openscad_amu_builddir="${repo_cache}/build/${repo_branch}/${sysname}"
 
-  if [[ ${cache_install} == "yes" ]] ; then
+  if [[ "${cache_install}" == "yes" ]] ; then
     cache_prefix="${work_path}/${repo_cache_root}/local"
     cache_bindir="${cache_prefix}/bin/${sysname}"
     configure_opts="--prefix=${cache_prefix} --bindir=${cache_bindir}"
@@ -351,6 +352,11 @@ function check_update() {
   packages_installed=""
   packages_missing=""
 
+  if [[ "${skip_check}" == "yes" ]] ; then
+    print_m "skipping prerequisite checks."
+    return
+  fi
+
   update_design_flow_variables
   for r in ${packages} ; do
     if check.${sysname} $r
@@ -367,7 +373,11 @@ function check_update() {
 #
 function check_show_status() {
   print_h2 "[ Installed ]"
-  show.${sysname} $packages_installed
+  if [[ -n "${packages_installed}" ]] ; then
+    show.${sysname} $packages_installed
+  else
+    print_m -j "installed prerequisite list is empty."
+  fi
 
   print_h2 "[ Missing ]"
   if [[ -n "${packages_missing}" ]] ; then
@@ -375,7 +385,7 @@ function check_show_status() {
       print_m -j $r
     done
   else
-    print_m -j "no missing prerequisites."
+    print_m -j "missing prerequisite list is empty."
   fi
   print_hb "="
 }
@@ -484,7 +494,7 @@ function prep_openscad_amu() {
     ( cd ${repo_cache} && git describe --tags --long --dirty )
   fi
 
-  if [[ -x ${repo_cache}/configure && ${force_reconfigure} == "no" ]] ; then
+  if [[ -x ${repo_cache}/configure && "${force_reconfigure}" == "no" ]] ; then
     print_m "configure script exists."
   else
     print_m "generating configure script."
@@ -498,7 +508,7 @@ function prep_openscad_amu() {
     mkdir -pv ${openscad_amu_builddir}
   fi
 
-  if [[ -r ${openscad_amu_builddir}/Makefile && ${force_reconfigure} == "no" ]] ; then
+  if [[ -r ${openscad_amu_builddir}/Makefile && "${force_reconfigure}" == "no" ]] ; then
     print_m "root Makefile exists."
   else
     print_m "generating Makefiles and configuring source."
@@ -595,6 +605,10 @@ function process_commands() {
         print_h2 "setting: design flow [${design_flow}]"
       ;;
 
+      --skip)
+        print_h2 "setting: skip prerequisite check"
+        skip_check="yes"
+      ;;
       --check)
         print_h1 "Checking for installed prerequisites"
         check_update
@@ -726,6 +740,7 @@ from a template.
 
       --flow <name>    : Use design flow <name> default=(df1).
 
+      --skip           : Skip prerequisites check.
       --check          : Check for installed prerequisites.
       --required       : Install missing prerequisites.
       --list           : List prerequisites.
@@ -755,7 +770,7 @@ from a template.
   * When using a flow or branch other than the default, the --flow
     and/or --branch option must be used with each command invokation
     or set in the configuration file.
-  * If used, --flow must be the precede all other options.
+  * If used, --flow and --skip must be the precede all other options.
   * If used, {--reconfigure|--branch|--cache} must precede --build
     (et al.), --install, --make, and --template.
   * When changing {--branch|--cache}, force source reconfiguration
@@ -861,6 +876,7 @@ if [[ -e ${conf_file} ]] ; then
   print_m "reading configuration file: ${conf_file}"
   parse_configuration "${conf_file}" "
     design_flow
+    skip_check
     repo_cache_root
     repo_url
     repo_branch
