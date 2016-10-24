@@ -533,7 +533,7 @@ function create_template() {
   update_build_variables
 
   declare local dir_name="$1"
-  declare local def_name_prefix="pm_"
+  declare local def_name_prefix="pm"
   declare local cmd_name="openscad-seam"
   declare local cmd_cache="${cache_bindir}/${cmd_name}"
   declare local cmd_path
@@ -547,14 +547,14 @@ function create_template() {
     print_m using: VERSION = ${LIB_VERSION}
 
     if [[ -z "${dir_name}" ]] ; then
-      dir_name="${def_name_prefix}${LIB_VERSION}"
+      dir_name="${def_name_prefix}/${LIB_VERSION}"
     fi
 
     if [[ -d ${dir_name} ]] ; then
       print_m "directory: [${dir_name}] exists. not creating..."
     else
       print_m "creating project directory: [${dir_name}]."
-      mkdir -v ${dir_name}
+      mkdir -pv ${dir_name}
 
       print_m "copying template files to: [${dir_name}]."
       for f in ${templates}
