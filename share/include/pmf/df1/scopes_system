@@ -47,14 +47,14 @@ path_gnumake := $(call first_of,gnumake gmake make)
 # Configuration Check
 #------------------------------------------------------------------------------#
 
-# Commands
+# commands
 scopes_commands_required := \
   path_openscad \
   path_openscad_seam \
   path_bash \
   path_gnumake
 
-# Warning list first, then error.
+# warning list first, then error.
 $(call variable_list_check, \
   $(scopes_commands_required),found,$(false),$(true))
 $(call variable_list_check, \
@@ -78,7 +78,7 @@ $(call variable_list_check, \
 # System Constants
 #------------------------------------------------------------------------------#
 
-# Design flow tool versions
+# design flow tool versions
 openscadvn := $(word 3,$(shell $(path_openscad) 2>&1 --version))
 openscadvs := openscad$(openscadvn)
 

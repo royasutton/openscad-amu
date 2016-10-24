@@ -62,7 +62,7 @@ path_tail   := $(call first_of,tail)
 
 __os_found      := $(false)
 
-# Linux
+# linux
 ifeq (${os},Linux)
   opts_mkdir    := --verbose
   opts_mkdir_p  := --parents --verbose
@@ -96,7 +96,7 @@ ifeq (${os},Linux)
   __os_found    := $(true)
 endif
 
-# CYGWIN - compare prefix only (ie: CYGWIN_NT-10.0 --> CYGWIN_NT)
+# cygwin - compare prefix only (ie: CYGWIN_NT-10.0 --> CYGWIN_NT)
 # Using OpenSCAD compiled for Windows.
 ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
   os            := CYGWIN_NT
@@ -137,14 +137,14 @@ endif
 # Configuration Check
 #------------------------------------------------------------------------------#
 
-# OS
+# os
 ifeq ($(__os_found),$(false))
   $(error OS [$(os)] needs to be configured in [$(lastword $(MAKEFILE_LIST))])
 else
   undefine __os_found
 endif
 
-# Commands
+# commands
 base_commands_required := \
   path_mkdir \
   path_rmdir \
@@ -221,7 +221,7 @@ $(call variable_list_check, \
 # System Constants
 #------------------------------------------------------------------------------#
 
-# Determine number of columns for terminal
+# determine number of columns for terminal
 terminal_columns := $(shell $(tput_c))
 
 #------------------------------------------------------------------------------#

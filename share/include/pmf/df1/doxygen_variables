@@ -26,14 +26,14 @@
 # Variables
 ################################################################################
 
-# Output file names in output directory
+# output file names in output directory
 latex_stamp         := $(addprefix $(output_path),$(latex_stamp_name))
 doxygen_stamp       := $(addprefix $(output_path),$(doxygen_stamp_name))
 doxygen_tag         := $(addprefix $(output_path),$(doxygen_tag_name))
 doxygen_warn        := $(addprefix $(output_path),$(doxygen_warn_name))
 doxygen_config_auto := $(addprefix $(output_path),$(notdir $(doxygen_config_auto_name)))
 
-# Clean Files
+# clean Files
 doxygen_clean_files := \
   $(doxygen_stamp) \
   $(doxygen_tag) \
@@ -41,17 +41,17 @@ doxygen_clean_files := \
   $(doxygen_config_auto) \
   $(if $(generate_latex),$(latex_stamp))
 
-# Path: autoconf_path, example_path
+# path: autoconf_path, example_path
 # $(prefix_scopes_scripts) requires:[scopes]
 autoconf_path := $(if $(prefix_scopes_scripts),$(output_path),.)
 example_path  := $(if $(prefix_scopes_scripts),$(output_path)) $(example_path_add)
 
-# Path: image_path
+# path: image_path
 # $(scopes_targetsdir) requires:[scopes]
 # run-time evaluation required, use function rather than simple assignment.
 image_path = $(call scopes_targetsdir) $(image_path_add)
 
-# Filter configuration
+# filter configuration
 openscad_dif_opts := \
   $(strip \
     $(if $(call bool_decode,$(generate_html)),--html-output $(html_output)) \
@@ -68,7 +68,7 @@ enabled_sections := \
     $(enabled_sections_add) \
   )
 
-# Doxygen auto-configuration file variables
+# doxygen auto-configuration file variables
 define doxygen_config_auto_text
     PROJECT_NAME=$(project_name)
     PROJECT_NUMBER=$(project_version)
@@ -97,7 +97,7 @@ define doxygen_config_auto_text
     LAYOUT_FILE=$(doxygen_layout)
 endef
 
-# Doxygen source files
+# doxygen source files
 doxygen_src := \
   $(doxygen_config) \
   $(doxygen_html_header) \
@@ -105,13 +105,13 @@ doxygen_src := \
   $(doxygen_html_css) \
   $(doxygen_layout)
 
-# Backup files
+# backup files
 backup_files += $(doxygen_src)
 
-# Replace spaces in documentation group identifier with '-'
+# replace spaces in documentation group identifier with '-'
 docs_group_id := $(subst $(space),-,$(docs_group_id))
 
-# Documentation install identifier
+# documentation install identifier
 ifndef docs_install_id
   docs_install_id := $(project_name)-$(project_version)
 else
@@ -120,7 +120,7 @@ else
   $(call amu_pm_m,using pre-defined value for $$(docs_install_id))
 endif
 
-# Project logo
+# project logo
 ifdef project_logo
   # add default extension when not specified with file name
   project_logo := $(if $(suffix $(project_logo)),$(project_logo),$(project_logo).png)
@@ -188,7 +188,7 @@ doxygen_config_derived += \
 #------------------------------------------------------------------------------#
 ifeq ($(version_checks),$(true))
 
-# Doxygen bug #504305 fixed in release 1.8.12
+# doxygen bug #504305 fixed in release 1.8.12
 $(call check_version,doxygen,ge,1.8.12,$(false), \
 $(newline)# \
 $(newline)#$(space3)The Doxygen FILTER_PATTERNS bug #504305 has been fixed in Doxygen version \
@@ -196,7 +196,7 @@ $(newline)#$(space3)1.8.12. For prior versions use FILTER_PATTERNS="*.ext=\"filt
 $(newline)#$(space3)For later versions use FILTER_PATTERNS=*.ext="filter options". \
 $(newline)#)
 
-# Doxygen caption (mis)handling fixed in release 1.8.11
+# doxygen caption (mis)handling fixed in release 1.8.11
 $(call check_version,doxygen,ge,1.8.11,$(false), \
 $(newline)# \
 $(newline)#$(space3)An issue with translating HTML captions to latex was corrected \
@@ -208,7 +208,7 @@ $(newline)#)
 endif
 
 #------------------------------------------------------------------------------#
-# Help text
+# Help Text
 #------------------------------------------------------------------------------#
 
 define help_text_doxygen

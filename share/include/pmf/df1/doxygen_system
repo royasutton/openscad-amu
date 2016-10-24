@@ -45,12 +45,12 @@ path_openscad_dif := \
 # Configuration Check
 #------------------------------------------------------------------------------#
 
-# Commands
+# commands
 doxygen_commands_required := \
   path_doxygen \
   path_openscad_dif
 
-# Warning list first, then error.
+# warning list first, then error.
 $(call variable_list_check, \
   $(doxygen_commands_required),found,$(false),$(true))
 $(call variable_list_check, \
@@ -74,7 +74,7 @@ $(call variable_list_check, \
 # System Constants
 #------------------------------------------------------------------------------#
 
-# Design flow tool versions
+# design flow tool versions
 doxygenvn := $(shell $(path_doxygen) 2>&1 --version)
 doxygenvs := doxygen$(doxygenvn)
 
