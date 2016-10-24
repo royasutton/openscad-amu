@@ -43,7 +43,7 @@ docs-local: html-local pdf-local man-local
 
 html-local: examples.stamp
 
-pdf-local: examples.stamp
+pdf-local: examples.stamp doxygen.stamp build/latex/refman.pdf
 
 man-local: examples.stamp
 
@@ -132,10 +132,12 @@ CLEANFILES += \
 	doxygen.tagfile \
 	doxygen.warn
 
+build/latex/refman.pdf:
+	( cd build/latex && make refman.pdf )
+
 doxygen.stamp: vehicle.doxyfile Makefile $(srcdir)/vehicle.scad
 	$(DOXYGEN_PATH) vehicle.doxyfile \
-	&& touch doxygen.stamp \
-	&& ( cd build/latex && make )
+	&& touch doxygen.stamp
 
 '$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
 install-data-local: $(files_am) | '$(install_path)'
