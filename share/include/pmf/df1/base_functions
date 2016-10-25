@@ -281,20 +281,55 @@ __relative_path = $(amu_pm_d2) \
 # returns formated keyword-value assignment.
 format_key_value = $(amu_pm_d2)$1 = $2
 
-# format_kv_variable (arg1)
-# arg1: Variable.
-# returns formated keyword-value assignment for a variable and its value.
-format_kv_variable = $(amu_pm_d1)$(call format_key_value,$1,$($1))
-
 # write_key_value (arg1,arg2,arg3)
-# arg1: File.
+# arg1: File name.
 # arg2: Keyword.
 # arg3: Value.
 # returns nothing.
 write_key_value = $(amu_pm_d3)$(file >> $1,$(call format_key_value,$2,$3))
 
+# format_kv_variable (arg1)
+# arg1: Variable.
+# returns formated keyword-value assignment for a variable and its value.
+format_kv_variable = $(amu_pm_d1)$(call format_key_value,$1,$($1))
+
+# format_kv_variable_list (arg1,arg2)
+# arg1: A space separated list of variables.
+# arg2: An encoded boolean; enumerate multi-word variable values
+# returns formated keyword-value assignment for each variable in the list.
+# for each variable named '-' a black line is outputted.
+define format_kv_variable_list
+  $(amu_pm_d2) \
+  $(foreach v,$1, \
+    $(if $(call bool_decode,$(call sstrings_equal,$v,-)), \
+      $(newline), \
+      $(if $(call bool_decode,$2), \
+        $(if $(call bool_decode,$(call sstrings_equal,$(words $($v)),1)), \
+          $(newline)$(call format_kv_variable,$v), \
+          $(newline)[$v] \
+          $(foreach x,$($v),$(newline)$(space3)$x) \
+        ), \
+        $(newline)$(call format_kv_variable,$v) \
+      ) \
+    ) \
+  )
+endef
+
+# write_kv_variable_list (arg1,arg2,arg3)
+# arg1: File name.
+# arg2: A space separated list of variables.
+# arg3: An encoded boolean; enumerate multi-word variable values
+# arg4: An encoded boolean; append or overwrite file
+# writes formated keyword-value assignment for each variable in the list
+# to the file. for each variable named '-' a black line is outputted.
+write_kv_variable_list = $(amu_pm_d4) \
+  $(if $(call bool_decode,$4), \
+    $(file >> $1,$(call format_kv_variable_list,$2,$3)), \
+    $(file  > $1,$(call format_kv_variable_list,$2,$3)) \
+  )
+
 # read_key_value (arg1,arg2)
-# arg1: File.
+# arg1: File name.
 # arg2: Keyword.
 # returns the value of the last keyword found in the file and returns the
 # empty string when the keyword is not found (skips over empty lines and
