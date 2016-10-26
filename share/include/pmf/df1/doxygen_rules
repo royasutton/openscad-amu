@@ -43,8 +43,8 @@ $(doxygen_config_auto): $(MAKEFILE_LIST) $(scopes_mf) | $(output_path)
 # doxygen
 $(doxygen_stamp): $(src_files) $(doxygen_src) $(doxygen_config_auto)
 	$(call target_begin)
-	cat $(doxygen_config_auto) $(doxygen_config) | $(path_doxygen) - \
-	&& touch $(doxygen_stamp)
+	$(cat) $(doxygen_config_auto) $(doxygen_config) | $(path_doxygen) - \
+	&& $(touch) $(doxygen_stamp)
 
 # make depend on scope targets as configured
 ifeq ($(doxygen_depends_scopes),$(true))
@@ -55,7 +55,7 @@ endif
 $(latex_stamp): $(doxygen_stamp)
 	$(call target_begin)
 	( cd $(output_path)$(latex_output) && make ) \
-	&& touch $(latex_stamp)
+	&& $(touch) $(latex_stamp)
 
 #------------------------------------------------------------------------------#
 # Clean Targets

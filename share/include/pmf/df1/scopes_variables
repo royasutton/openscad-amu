@@ -99,6 +99,16 @@ scopes_scripts_selected := \
 # assign all source auxiliary scripts to clean-files
 scopes_clean_files := $(scopes_scripts_source)
 
+# release files
+ifeq ($(release_scopes),$(true))
+  release_files += $(call scopes_targetsdir)
+endif
+
+# release archive files
+ifeq ($(release_archive_scopes),$(true))
+  release_archive_files += $(call scopes_targetsdir)
+endif
+
 #------------------------------------------------------------------------------#
 # Configuration Variable List
 #------------------------------------------------------------------------------#

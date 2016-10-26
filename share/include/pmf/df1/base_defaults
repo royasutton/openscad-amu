@@ -57,9 +57,11 @@ target_headings                         := $(true)
 debug_secondary                         := $(false)
 
 # add design/library source to release directory/archive
+release_project                         := $(true)
 release_design                          := $(true)
 release_library                         := $(true)
 
+release_archive_project                 := $(true)
 release_archive_design                  := $(true)
 release_archive_library                 := $(true)
 
@@ -182,7 +184,7 @@ release_path_term_joiner                := _
 release_path_use_dir_sep                := $(false)
 
 # directory terms
-release_path_add_release_root           := $(true)
+release_path_add_release_root           := $(false)
 release_path_add_project_name           := $(false)
 release_path_add_project_version        := $(true)
 release_path_add_os                     := $(false)
@@ -213,7 +215,7 @@ release_path_spec := \
   time
 
 # additions (for derived variables)
-release_add                             :=
+release_files_add                       :=
 
 #
 # Release archive file
@@ -261,7 +263,7 @@ release_archive_file_spec := \
 release_archive_exts                    := .zip
 
 # additions (for derived variables)
-release_archive_add                     :=
+release_archive_files_add               :=
 
 #------------------------------------------------------------------------------#
 # Project Control Variable List
@@ -271,9 +273,11 @@ project_control_variables := \
   target_headings \
   debug_secondary \
   \
+  release_project \
   release_design \
   release_library \
   \
+  release_archive_project \
   release_archive_design \
   release_archive_library
 

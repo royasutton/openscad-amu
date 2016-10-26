@@ -162,6 +162,8 @@ info-project: | silent
 	$(foreach x, \
 		src_files \
 		backup_files \
+		release_files \
+		release_archive_files \
 	,$(call enumerate_variable,$x,$(false),$(false)))
 
 #------------------------------------------------------------------------------#
@@ -186,6 +188,55 @@ $(backup_basename).zip: $(backup_files) | $(backup_root)
 
 # backup directory
 $(backup_root): ; $(mkdir_p) $@
+
+#------------------------------------------------------------------------------#
+# Release Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: release
+release: all $(release_stamp)
+	$(call target_end)
+	@$(ls_l) $(release_stamp) $(release_path)
+
+# copy files and create stamp
+$(release_stamp): $(addprefix $(release_archive_basename),$(release_archive_exts)) \
+                  $(release_manifest) \
+                  $(release_files) | $(release_path)
+	$(call target_begin)
+	$(foreach p,$(release_files), \
+		$(call execute_command, \
+			$(mkdir_p) $(dir $(release_path)$p) \
+			&& $(cp_a) $p $(release_path)$p \
+		) \
+	)
+	$(chmod_R) -w $(release_path)
+	$(touch) $@ && $(chmod) -w $@
+
+# generate manifest
+$(release_manifest): $(release_files) | $(release_path)
+	$(call target_begin)
+	$(call write_kv_variable_list,$@, \
+		project_name project_version project_brief - os arch - date time, \
+		$(false),$(false))
+	$(call write_kv_variable_list,$@, \
+		release_files - release_archive_files, \
+		$(true),$(true))
+
+# archive files
+$(release_archive_basename).tar.xz: $(release_archive_files) | $(release_path)
+	$(call target_begin)
+	$(tar_c) --file $@ $(release_archive_files)
+
+$(release_archive_basename).tar.gz: $(release_archive_files) | $(release_path)
+	$(call target_begin)
+	$(tar_c) --file $@ $(release_archive_files)
+
+$(release_archive_basename).zip: $(release_archive_files) | $(release_path)
+	$(call target_begin)
+	$(zip_c) $@ $(release_archive_files)
+
+# release directory
+$(release_path): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Help Targets

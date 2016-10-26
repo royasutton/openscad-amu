@@ -79,15 +79,13 @@ else
   $(call amu_pm_m,using pre-defined value for $$(backup_basename))
 endif
 
-# backup files
-backup_files := $(src_files) $(word 1,$(MAKEFILE_LIST)) $(backup_files_add)
-
 # release directory
 ifndef release_path
   release_path := \
+    $(call join_with,$(empty),$(release_root)$(dir_level_sep) \
     $(call join_with,$(if $(release_path_use_dir_sep),$(dir_level_sep),$(release_path_term_joiner)), \
       $(strip $(foreach x,$(release_path_spec), \
-        $(if $(call bool_decode,$(release_path_add_$x)),$($x)))))$(dir_level_sep)
+        $(if $(call bool_decode,$(release_path_add_$x)),$($x))))))$(dir_level_sep)
 else
   $(call amu_pm_m,using pre-defined value for $$(release_path))
 endif
@@ -110,6 +108,43 @@ else
   $(call amu_pm_m,using pre-defined value for $$(library_install_subdir))
 endif
 
+# backup files
+backup_files := $(src_files) $(word 1,$(MAKEFILE_LIST)) $(backup_files_add)
+
+# release stamps
+release_manifest := $(addprefix $(release_path),manifest$(stamp_ext))
+release_stamp := $(addsuffix $(stamp_ext),$(call path_no_tdls,$(release_path)))
+
+# release files (use recursive assignment)
+release_files = $(release_files_add)
+
+ifeq ($(release_project),$(true))
+  release_files += $(word 1,$(MAKEFILE_LIST))
+endif
+
+ifeq ($(release_design),$(true))
+  release_files += $(design_files)
+endif
+
+ifeq ($(release_library),$(true))
+  release_files += $(library_files)
+endif
+
+# release archive files (use recursive assignment)
+release_archive_files = $(release_archive_files_add)
+
+ifeq ($(release_archive_project),$(true))
+  release_archive_files += $(word 1,$(MAKEFILE_LIST))
+endif
+
+ifeq ($(release_archive_design),$(true))
+  release_archive_files += $(design_files)
+endif
+
+ifeq ($(release_archive_library),$(true))
+  release_archive_files += $(library_files)
+endif
+
 #------------------------------------------------------------------------------#
 # Configuration Variable List
 #------------------------------------------------------------------------------#
@@ -130,11 +165,15 @@ project_config_variables := \
   mf_ext \
   stamp_ext \
   \
+  output_root \
+  \
+  backup_root \
   backup_files_add \
   backup_exts \
   \
-  release_add \
-  release_archive_add \
+  release_root \
+  release_files_add \
+  release_archive_files_add \
   release_archive_exts
 
 project_config_derived := \
@@ -179,6 +218,9 @@ define help_text_base
 
  backup:
      create backup of source files.
+
+ release:
+     create a project release.
 
  list-x, listv-x, slist-x, slistv-x, info-x, print-x:
      show information for the variable named x.

@@ -116,7 +116,7 @@ $(scopes_prefix)$2$(stamp_ext): $(scopes_prefix)$2$(mf_ext)
 		$(if $(library_prefix),$(library_prefix)) \
 		,$(true))" \
 	$(path_gnumake) --makefile=$(scopes_prefix)$2$(mf_ext) all \
-	&& touch $(scopes_prefix)$2$(stamp_ext)
+	&& $(touch) $(scopes_prefix)$2$(stamp_ext)
 
 scopes_stamp += $(scopes_prefix)$2$(stamp_ext)
 scopes_clean_files += $(scopes_prefix)$2$(stamp_ext)

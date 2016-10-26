@@ -97,17 +97,6 @@ define doxygen_config_auto_text
     LAYOUT_FILE=$(doxygen_layout)
 endef
 
-# doxygen source files
-doxygen_src := \
-  $(doxygen_config) \
-  $(doxygen_html_header) \
-  $(doxygen_html_footer) \
-  $(doxygen_html_css) \
-  $(doxygen_layout)
-
-# backup files
-backup_files += $(doxygen_src)
-
 # replace spaces in documentation group identifier with '-'
 docs_group_id := $(subst $(space),-,$(docs_group_id))
 
@@ -145,6 +134,39 @@ ifdef project_logo
         ) \
       ) \
     )
+endif
+
+# doxygen source files
+doxygen_src := \
+  $(doxygen_config) \
+  $(doxygen_html_header) \
+  $(doxygen_html_footer) \
+  $(doxygen_html_css) \
+  $(doxygen_layout)
+
+# backup files
+backup_files += $(doxygen_src)
+
+# release files
+ifeq ($(release_doxygen),$(true))
+  ifeq ($(release_project),$(true))
+    release_files += $(doxygen_src)
+  endif
+  release_files += \
+    $(if $(generate_html),$(output_path)$(html_output)) \
+    $(if $(generate_latex),$(output_path)$(latex_output)) \
+    $(if $(generate_man),$(output_path)$(man_output))
+endif
+
+# release archive files
+ifeq ($(release_archive_doxygen),$(true))
+  ifeq ($(release_archive_project),$(true))
+    release_archive_files += $(doxygen_src)
+  endif
+  release_archive_files += \
+    $(if $(generate_html),$(output_path)$(html_output)) \
+    $(if $(generate_latex),$(output_path)$(latex_output)) \
+    $(if $(generate_man),$(output_path)$(man_output))
 endif
 
 #------------------------------------------------------------------------------#
