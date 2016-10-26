@@ -31,6 +31,8 @@ include $(AMU_PM_PREFIX)amu_pm_init
 #target_headings                        := $(false)
 #verbose_seam                           := $(false)
 #debug_dif_filter                       := $(true)
+#release_archive_doxygen                := $(true)
+#release_archive_scopes                 := $(true)
 
 #------------------------------------------------------------------------------#
 # Version Checks
@@ -53,9 +55,9 @@ docs_group_id       := none
 project_logo        := design_logo_top_200x50
 
 #design_prefix      := ./
-#library_prefix     := ./
-
 design              := design
+
+#library_prefix     := ./
 library             := library
 
 doxygen_config      := Doxyfile

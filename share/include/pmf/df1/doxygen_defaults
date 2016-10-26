@@ -37,6 +37,7 @@ generate_man                            := $(true)
 # add doxygen output to release directory/archive
 release_doxygen                         := $(false)
 release_archive_doxygen                 := $(false)
+release_latex_refman_only               := $(true)
 
 # debugging
 debug_dif_scanner                       := $(false)
@@ -90,6 +91,7 @@ doxygen_control_variables := \
   \
   release_doxygen \
   release_archive_doxygen \
+  release_latex_refman_only \
   \
   debug_dif_scanner \
   debug_dif_filter

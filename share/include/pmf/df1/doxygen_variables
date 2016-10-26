@@ -147,6 +147,13 @@ doxygen_src := \
 # backup files
 backup_files += $(doxygen_src)
 
+# release latex path filter
+ifeq ($(release_latex_refman_only),$(true))
+  release_latex_path_filter := $(dir_level_sep)refman.pdf
+else
+  release_latex_path_filter :=
+endif
+
 # release files
 ifeq ($(release_doxygen),$(true))
   ifeq ($(release_project),$(true))
@@ -154,7 +161,7 @@ ifeq ($(release_doxygen),$(true))
   endif
   release_files += \
     $(if $(generate_html),$(output_path)$(html_output)) \
-    $(if $(generate_latex),$(output_path)$(latex_output)) \
+    $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
     $(if $(generate_man),$(output_path)$(man_output))
 endif
 
@@ -165,7 +172,7 @@ ifeq ($(release_archive_doxygen),$(true))
   endif
   release_archive_files += \
     $(if $(generate_html),$(output_path)$(html_output)) \
-    $(if $(generate_latex),$(output_path)$(latex_output)) \
+    $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
     $(if $(generate_man),$(output_path)$(man_output))
 endif
 
