@@ -62,16 +62,23 @@ function update_design_flow_variables() {
         automake
         libtool
         bash
+        make
+        flex
+        zip
       "
 
       packages_Linux="
         openscad
-        texlive-latex-extra
         libboost-all-dev
         imagemagick
+        texlive-latex-extra
       "
 
       packages_CYGWIN_NT="
+        gcc-g++
+        time
+        libboost-devel
+        ImageMagick
         texlive-collection-basic
         texlive-collection-bibtexextra
         texlive-collection-binextra
@@ -82,8 +89,6 @@ function update_design_flow_variables() {
         texlive-collection-latexrecommended
         texlive-collection-mathextra
         texlive-collection-pictures
-        libboost-devel
-        ImageMagick
       "
 
       templates="
@@ -280,12 +285,15 @@ function parse_configuration() {
 #==============================================================================
 
 function check.Linux() {
-  dpkg --list $1 &> /dev/null && return 0
+  dpkg-query --show --showformat='${Status}\n' $1 2>/dev/null |
+    grep -q "install ok installed" &&
+      return 0
+
   return 1
 }
 
 function show.Linux() {
-  dpkg --list $*
+  dpkg-query --list $*
 }
 
 function install.Linux() {
@@ -300,7 +308,11 @@ function install.Linux() {
 #==============================================================================
 
 function check.CYGWIN_NT() {
-  cygcheck --check-setup --dump-only $1 | tail -1 | grep -q $1 && return 0
+  cygcheck --check-setup --dump-only $1 |
+    tail -1 |
+    grep -q $1 &&
+      return 0
+
   return 1
 }
 
@@ -333,6 +345,8 @@ function set_apt_cyg_path() {
         [[ ! -x "${cmd_cache}" ]] && chmod --verbose +x ${cmd_cache}
         apt_cyg_path=$(which 2>/dev/null ${cmd_name} ${cmd_cache} | head -1)
         print_m "using cached: ${cmd_name}=${apt_cyg_path}"
+        print_m "adding [${apt_cyg_path%/*}] to shell path"
+        PATH=${apt_cyg_path%/*}:${PATH}
       else
         print_m "unable to locate or cache ${cmd_name}. aborting..."
         exit 1
@@ -400,8 +414,13 @@ function install_missing() {
       print_m -j $r
     done
 
+    update_build_variables
     print_h2 "[ Installing ]"
-    install.${sysname} ${packages_missing}
+    for r in ${packages_missing} ; do
+      print_h2 "installing: [ $r ]"
+      print_m -j $r
+      install.${sysname} $r
+    done
     print_hb "="
   else
     print_m -j "no missing prerequisites."
