@@ -215,16 +215,16 @@ define doxygen_index_header
   <div id="header">
     <div id="header-left">
       <center>
-      $(if
+      $(if \
         $(wildcard $1$(call relative_path,$(install_prefix_html),$1)index.html), \
-        <a href="$(call relative_path,$(install_prefix_html),$1)index.html">(HTML)</a>,
+        <a href="$(call relative_path,$(install_prefix_html),$1)index.html">(HTML)</a>, \
         (HTML) \
       )
       </center>
       <center>
-      $(if
+      $(if \
         $(wildcard $1$(call relative_path,$(install_prefix_pdf),$1)index.html), \
-        <a href="$(call relative_path,$(install_prefix_pdf),$1)index.html">(PDF)</a>,
+        <a href="$(call relative_path,$(install_prefix_pdf),$1)index.html">(PDF)</a>, \
         (PDF) \
       )
     </div>
@@ -235,9 +235,9 @@ define doxygen_index_header
     </div>
     <div id="header-right">
       <center>
-      $(if
+      $(if \
         $(wildcard $1$(call relative_path,$(install_prefix_scad),$1)), \
-        <a href="$(call relative_path,$(install_prefix_scad),$1)">(Browse Library)</a>,
+        <a href="$(call relative_path,$(install_prefix_scad),$1)">(Browse Library)</a>, \
         (Browse Library) \
       )
       </center>
