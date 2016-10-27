@@ -30,8 +30,9 @@ include $(AMU_PM_PREFIX)amu_pm_init
 #version_checks                         := $(false)
 #target_headings                        := $(false)
 #verbose_seam                           := $(false)
+generate_latex                          := $(false)
 #debug_dif_filter                       := $(true)
-#release_archive_doxygen                := $(true)
+release_archive_doxygen                 := $(true)
 #release_archive_scopes                 := $(true)
 
 #------------------------------------------------------------------------------#
