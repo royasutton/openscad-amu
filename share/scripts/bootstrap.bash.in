@@ -1,4 +1,5 @@
 #!@BASH_PATH@
+#!/usr/bin/env bash
 #/##############################################################################
 #
 #   \file   bootstrap.bash
@@ -197,6 +198,7 @@ function print_h2 () {
 declare design_flow="df1"
 
 declare skip_check="no"
+declare apt_get_opts="--verbose-versions"
 
 declare git_fetch_opts="--verbose"
 
@@ -297,7 +299,8 @@ function show.Linux() {
 }
 
 function install.Linux() {
-  if ! sudo apt-get install $* ; then
+  print_m "apt-get install options: [${apt_get_opts}]"
+  if ! sudo apt-get install ${apt_get_opts} $* ; then
     print_m "install failed. aborting..."
     exit 1
   fi
@@ -628,6 +631,12 @@ function process_commands() {
         print_h2 "setting: skip prerequisite check"
         skip_check="yes"
       ;;
+      --yes)
+        declare local opt="--assume-yes"
+        print_h2 "adding: apt-get install option [${opt}]"
+        [[ -n "${apt_get_opts}" ]] && apt_get_opts+=" ${opt}"
+        [[ -z "${apt_get_opts}" ]] && apt_get_opts="${opt}"
+      ;;
       --check)
         print_h1 "Checking for installed prerequisites"
         check_update
@@ -760,6 +769,7 @@ from a template.
       --flow <name>    : Use design flow <name> default=(df1).
 
       --skip           : Skip prerequisites check.
+      --yes            : Automatic yes to apt-get install prompts.
       --check          : Check for installed prerequisites.
       --required       : Install missing prerequisites.
       --list           : List prerequisites.
@@ -896,6 +906,7 @@ if [[ -e ${conf_file} ]] ; then
   parse_configuration "${conf_file}" "
     design_flow
     skip_check
+    apt_get_opts
     repo_cache_root
     repo_url
     repo_branch
