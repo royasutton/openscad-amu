@@ -61,7 +61,7 @@ doxygen.stamp: Doxyfile Makefile $(files_am) $(scripts_help)
 install-data-local: $(files_am) | '$(install_path)'
 	( cd ${srcdir} && \
 		for f in $(files); do \
-			$(INSTALL_SCRIPT) $$f '$(install_path)' \
+			$(INSTALL_DATA) $$f '$(install_path)' \
 		; done \
 	) && \
 	( cd ${builddir} && \
