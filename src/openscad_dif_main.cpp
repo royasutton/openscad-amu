@@ -189,10 +189,10 @@ main(int argc, char** argv)
     string input;
     bool search           = true;
     vector<string> include_path;
-    string html_output    = "html";
-    string latex_output   = "latex";
-    string docbook_output = "docbook";
-    string rtf_output     = "rtf";
+    string html_output    = ODIF::NO_FORMAT_OUTPUT;
+    string latex_output   = ODIF::NO_FORMAT_OUTPUT;
+    string docbook_output = ODIF::NO_FORMAT_OUTPUT;
+    string rtf_output     = ODIF::NO_FORMAT_OUTPUT;
     string lib_path       = __LIB_PATH__;
     string auto_config;
     string config;
@@ -223,16 +223,28 @@ main(int argc, char** argv)
           "One or more directories to search for files references.\n")
       ("html-output",
           po::value<string>(&html_output)->default_value(html_output),
-          "Directory where filter functions will copy HTML documents.")
+          string(
+            "Directory where filter will copy HTML documents "
+            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
+          ).c_str())
       ("latex-output",
           po::value<string>(&latex_output)->default_value(latex_output),
-          "Directory where filter functions will copy Latex documents.")
+          string(
+            "Directory where filter will copy Latex documents "
+            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
+          ).c_str())
       ("docbook-output",
           po::value<string>(&docbook_output)->default_value(docbook_output),
-          "Directory where filter functions will copy Docbook documents.")
+          string(
+            "Directory where filter will copy Docbook documents "
+            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
+          ).c_str())
       ("rtf-output",
           po::value<string>(&rtf_output)->default_value(rtf_output),
-          "Directory where filter functions will copy RTF documents.\n")
+          string(
+            "Directory where filter will copy RTF documents "
+            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
+          ).c_str())
       ("lib-path",
           po::value<string>(&lib_path)->default_value(lib_path),
           "Makefile script library path.\n")

@@ -470,6 +470,28 @@ ODIF::ODIF_Scanner::filter_debug(
   \param copy       copy the found file to the specified outdir.
   \param rid        rename the copied file with an random identifier.
 
+  \returns  a string with (a) \p file when not located, (b) path to the
+            target file when located and copied, or (c) path to the source
+            file when located and not copied.
+
+  \details
+
+    Attempt to locate the named \p file in each include path. A check is
+    performed (1) without and (2) with the files' path prefix in each include
+    path successively. If the file is not located then \p found = \p false and
+    the original \p file string is returned.
+
+    When located, \p found = \p true, the file is copied to the \p outdir
+    (if \p copy == \p true), and the path to the target file is returned.
+    If \p rid == \p true, then the target file name is assigned a random
+    target file name. When \p copy == \p false, the located source file
+    path is returned. For located files, the file reference can be returned
+    with or without a file name extension as indicated by the \p extension
+    parameter.
+
+    When \p outdir == \p ODIF::NO_FORMAT_OUTPUT, a copy will not be
+    performed for any located file regarded of the parameter \p copy.
+
 *******************************************************************************/
 string
 ODIF::ODIF_Scanner::file_rl(
@@ -523,18 +545,26 @@ ODIF::ODIF_Scanner::file_rl(
   {
     filter_debug( " found.", false, false, false);
 
-    // target is found file name without a prefixed path.
-    bfs::path target( found_file.filename() );
+    // target is found file where located.
+    bfs::path target( found_file );
 
-    if ( copy )
+    if ( outdir.compare(NO_FORMAT_OUTPUT) == 0 )
+      filter_debug( " format output disabled.", false, false, false);
+
+    // copy iff: (copy == true) and (outdir != NO_FORMAT_OUTPUT)
+    if ( copy && (outdir.compare(NO_FORMAT_OUTPUT) != 0) )
     {
       // source file
       bfs::path source( found_file );
 
-      // generate rid for target file?
+      // target file
       if ( rid == true ) {
+        // generate rid for target file keeping extension.
         target = bfs::unique_path( bfs::path("%%%%-%%%%-%%%%-%%%%-%%%%-%%%%") );
         target += found_file.extension();
+      } else {
+        // found file without a prefixed path.
+        target = found_file.filename();
       }
 
       // handle configuration prefix if not current directory (or empty)

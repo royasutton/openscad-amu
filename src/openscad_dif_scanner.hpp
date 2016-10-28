@@ -50,6 +50,9 @@
 
 namespace ODIF{
 
+  //! Output path name when no output is desired for a format.
+  static const std::string NO_FORMAT_OUTPUT = "<off>";
+
 //! Class that implements the OpenSCAD Doxygen input filter scanner.
 class ODIF_Scanner : public yyFlexLexer{
   public:
