@@ -10,7 +10,6 @@ SUBDIRS = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-
 install_path = $(version_path)/templates
 
 ##############################################################################
@@ -18,7 +17,7 @@ install_path = $(version_path)/templates
 ##############################################################################
 
 uninstall-local:
-	-rmdir -v '$(install_path)'
+	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 
 ##############################################################################
 # eof

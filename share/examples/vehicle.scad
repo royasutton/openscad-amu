@@ -105,10 +105,10 @@
     \amu_shell   tcols3 ( "seq -f 'Column (%g)' -s '^' 3" )
 
     \htmlonly
-      \amu_image_table ( t=html if="${hfiles}" ix="320" th="${theadt}" it="${ititle}" ih="${ititle}" ch="${tcols3}" iu="${ifurls}" )
+      \amu_image_table ( f=html cdl="${hfiles}" iw="320" t="${theadt}" ctl="${ititle}" ccl="${ititle}" chl="${tcols3}" cul="${ifurls}" )
     \endhtmlonly
     \latexonly
-      \amu_image_table ( t=latex if="${lfiles}" ix="2.00in" th="${theadt}" it="${count6}" ih="${ititle}" ch="${tcols3}" iu="${ifurls}" )
+      \amu_image_table ( f=latex cdl="${lfiles}" iw="2.00in" t="${theadt}" ctl="${count6}" ccl="${ititle}" chl="${tcols3}" cul="${ifurls}" )
     \endlatexonly
 
     Click on an image above to follow its hyperlink.
@@ -129,10 +129,10 @@
     \amu_combine lfiles ( p="vehicle_test" s=".eps" "car truck van" "12" "green blue" "diag" "320x240" )
 
     \htmlonly
-      \amu_image_table ( t=html if="${hfiles}" ix="320" th="${theadt}" it="${ititle}" ih="${ititle}" ch="${tcols3}" )
+      \amu_image_table ( f=html cdl="${hfiles}" iw="320" t="${theadt}" ctl="${ititle}" ccl="${ititle}" chl="${tcols3}" )
     \endhtmlonly
     \latexonly
-      \amu_image_table ( t=latex if="${lfiles}" ix="2.00in" th="${theadt}" it="${count6}" ih="${ititle}" ch="${tcols3}" )
+      \amu_image_table ( f=latex cdl="${lfiles}" iw="2.00in" t="${theadt}" ctl="${count6}" ccl="${ititle}" chl="${tcols3}" )
     \endlatexonly
 
   \subsection example_17 Vehicles with 17in Wheels
@@ -142,10 +142,10 @@
     \amu_combine lfiles ( p="vehicle_test" s=".eps" "car truck van" "17" "green blue" "diag" "320x240" )
 
     \htmlonly
-      \amu_image_table ( t=html if="${hfiles}" ix="320" th="${theadt}" it="${ititle}" ih="${ititle}" ch="${tcols3}" )
+      \amu_image_table ( f=html cdl="${hfiles}" iw="320" t="${theadt}" ctl="${ititle}" ccl="${ititle}" chl="${tcols3}" )
     \endhtmlonly
     \latexonly
-      \amu_image_table ( t=latex if="${lfiles}" ix="2.00in" th="${theadt}" it="${count6}" ih="${ititle}" ch="${tcols3}" )
+      \amu_image_table ( f=latex cdl="${lfiles}" iw="2.00in" t="${theadt}" ctl="${count6}" ccl="${ititle}" chl="${tcols3}" )
     \endlatexonly
 
   \section downloads Downloads
@@ -191,20 +191,20 @@
 
     \htmlonly
       \amu_image_table ( type=html
-                         id="${id}" table_heading="${theadt}"
+                         id="${id}" table_caption="${theadt}"
                          columns="10" column_headings="${tcolsw}"
-                         image_headings="${iheadt}"
-                         image_files="${hfiles}" image_width="92"
-                         image_titles="${ititle}" )
+                         cell_captions="${iheadt}"
+                         cell_files="${hfiles}" image_width="92"
+                         cell_titles="${ititle}" )
     \endhtmlonly
 
     \latexonly
       \amu_image_table ( type=latex
-                         id="${id}" table_heading="${theadt}"
+                         id="${id}" table_caption="${theadt}"
                          columns="10" column_headings="${tcolsw}"
-                         image_headings="${iheadt}"
-                         image_files="${lfiles}" image_width="0.50in"
-                         image_titles="${countw}" )
+                         cell_captions="${iheadt}"
+                         cell_files="${lfiles}" image_width="0.50in"
+                         cell_titles="${countw}" )
     \endlatexonly
 
     The images above were created by OpenSCAD with invocations driven from a
@@ -255,10 +255,10 @@
     \amu_make    lfiles ( append=document extension=png2eps )
 
     \htmlonly
-      \amu_image_table ( t=html if="${hfiles}" ix="320" it="${titles}" ih="${titles}" ch="${tcols3}" )
+      \amu_image_table ( f=html cdl="${hfiles}" iw="320" ctl="${titles}" ccl="${titles}" chl="${tcols3}" )
     \endhtmlonly
     \latexonly
-      \amu_image_table ( t=latex if="${lfiles}" ix="2.00in" it="${count6}" ih="${titles}" ch="${tcols3}" )
+      \amu_image_table ( f=latex cdl="${lfiles}" iw="2.00in" ctl="${count6}" ccl="${titles}" chl="${tcols3}" )
     \endlatexonly
 
   \protected

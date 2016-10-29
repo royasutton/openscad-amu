@@ -4,6 +4,8 @@
 #
 ##############################################################################
 
+OUTPUT_LANGUAGE        = English
+
 OPTIMIZE_OUTPUT_FOR_C  = YES
 
 STRIP_FROM_PATH        = .
@@ -20,6 +22,12 @@ GENERATE_TESTLIST      = YES
 GENERATE_BUGLIST       = YES
 GENERATE_DEPRECATEDLIST= YES
 
+HTML_COLORSTYLE_HUE    =
+HTML_COLORSTYLE_SAT    =
+HTML_COLORSTYLE_GAMMA  =
+HTML_TIMESTAMP         = YES
+HTML_DYNAMIC_SECTIONS  = NO
+DISABLE_INDEX          = NO
 GENERATE_TREEVIEW      = YES
 SOURCE_BROWSER         = YES
 STRIP_CODE_COMMENTS    = NO

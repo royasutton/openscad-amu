@@ -301,6 +301,8 @@ namespace UTIL{
   //! convert a long integer to a string.
   std::string to_string(const long v);
 
+  //! test if a string only contains digits.
+  bool is_number(const std::string &s);
 
 } /* end namespace UTIL */
 

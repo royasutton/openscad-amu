@@ -29,11 +29,21 @@
 # Instantiate rules for each makefile script form all source files.
 #  * foreach source file
 #    * foreach makefile-script
-#      * evaluate ( instantiated target rules )
-$(foreach s,$(src_files), \
-  $(foreach c,$(filter %$(mfs_ext), \
-    $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1))), \
-      $(eval $(call scopes_targets,$s,$(basename $c))) \
+#      * selected makefile script
+#        = filter makefile-scripts
+#        + filter scopes-includes
+#        + filter-out scopes-excludes
+#          + get list of all auxiliary scripts in file
+#      * evaluate ( instantiated target rules for scope name )
+$(foreach s,\
+  $(src_files), \
+  $(foreach c, \
+    $(filter %$(mfs_ext), \
+    $(filter $(scopes_include_filter), \
+    $(filter-out $(scopes_exclude_filter), \
+      $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
+    ))), \
+    $(eval $(call scopes_targets,$s,$(basename $c))) \
   )\
 )
 
@@ -76,9 +86,11 @@ info-scopes: | silent
 	$(call heading1, Scope Information)
 	$(call list_variables,$(scopes_control_variables),$(true), control)
 	$(call list_variables,$(scopes_config_variables),$(false), variables)
+	$(call list_variables,$(scopes_config_derived),$(false), derived)
 	$(call enumerate_variable,scopes_commands_configured,$(true),$(true))
 	$(foreach x, \
-		scopes_scripts \
+		scopes_scripts_source \
+		scopes_scripts_selected \
 		scopes_mfs \
 		scopes_mf \
 		scopes_stamp \

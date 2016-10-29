@@ -150,6 +150,12 @@ strings_not_equal = $(amu_pm_d2)$(if $(subst x$1,$(empty),x$2)$(subst x$2,$(empt
 # returns encoded boolean $(false) if striped string1 and striped string2 are identical.
 sstrings_not_equal = $(amu_pm_d2)$(call strings_not_equal,$(strip $1),$(strip $2))
 
+# strings_le (arg1,arg2)
+# arg1: String1 for comparison.
+# arg2: String2 for comparison.
+# returns encoded boolean $(true) if string1 sorts to less than string2.
+strings_le = $(amu_pm_d2)$(call strings_equal,$(word 1,$(sort $1 $2)),$1)
+
 #------------------------------------------------------------------------------#
 # Boolean
 #------------------------------------------------------------------------------#
@@ -175,7 +181,98 @@ bool_string = $(amu_pm_d1)$(if $(call bool_decode,$1),$$(true),$$(false))
 not = $(amu_pm_d1)$(if $(call bool_decode,$1),$(false),$(true))
 
 #------------------------------------------------------------------------------#
-# Text file variable I/O
+# Path Manipulation
+#------------------------------------------------------------------------------#
+
+# path_no_ldls (arg1)
+# arg1: A file path.
+# returns the file path without leading directory separator.
+path_no_ldls = $(amu_pm_d1)$(strip \
+  $(if $(call strings_equal,$1,$(patsubst $(dir_level_sep)%,%,$1)), \
+    $1, \
+    $(call path_no_ldls,$(patsubst $(dir_level_sep)%,%,$1)) \
+  ))
+
+# path_add_ldls (arg1)
+# arg1: A file path.
+# returns the file path with a single leading directory separator.
+path_add_ldls = $(amu_pm_d1)$(dir_level_sep)$(call path_no_ldls,$1)
+
+# path_no_tdls (arg1)
+# arg1: A file path.
+# returns the file path without trailing directory separator.
+path_no_tdls = $(amu_pm_d1)$(strip \
+  $(if $(call strings_equal,$1,$(patsubst %$(dir_level_sep),%,$1)), \
+    $1, \
+    $(call path_no_tdls,$(patsubst %$(dir_level_sep),%,$1)) \
+  ))
+
+# path_add_tdls (arg1)
+# arg1: A file path.
+# returns the file path with a single trailing directory separator.
+path_add_tdls = $(amu_pm_d1)$(call path_no_tdls,$1)$(dir_level_sep)
+
+# path_parent (arg1)
+# arg1: A file path.
+# returns the file path parent directory.
+path_parent = $(amu_pm_d1)$(strip \
+  $(patsubst \
+    %$(dir_level_sep)$(lastword $(subst $(dir_level_sep), \
+    $(space), \
+    $1)),%,$(call path_no_tdls,$1)) \
+  )
+
+# paths_common_ancestor (arg1,arg2)
+# arg1: An absolute path1.
+# arg2: An absolute path2.
+# returns the first ancestor path common to path1 and path2.
+paths_common_ancestor = $(amu_pm_d2)$(call __paths_common_ancestor,$1,$2,$1)
+
+# __paths_common_ancestor (arg1,arg2,arg3)
+# arg1: An absolute path1.
+# arg2: An absolute path2.
+# arg3: A path prefix.
+# returns returns path prefix if path1 and path2 both begin with the prefix,
+# otherwise recursively check the parent path of the path prefix.
+__paths_common_ancestor = $(amu_pm_d3)$(strip \
+  $(if $(or $(patsubst $3/%,,$1),$(patsubst $3/%,,$2)), \
+    $(call __paths_common_ancestor,$1,$2,$(call path_parent,$3)), \
+    $3 \
+  ))
+
+# relative_path (arg1,arg2)
+# arg1: An absolute path to make relative.
+# arg2: An absolute reference path.
+# returns the path relative to reference path.
+relative_path = $(amu_pm_d2)$(subst $(space),$(empty), \
+  $(call __relative_path,$(call path_add_ldls,$1),$(call path_add_ldls,$2)))
+
+# __relative_path (arg1,arg2)
+# arg1: A path to make relative.
+# arg2: A reference path.
+# returns the path relative to reference path.
+__relative_path = $(amu_pm_d2) \
+  $(patsubst \
+    %, \
+    ..$(dir_level_sep), \
+    $(subst \
+      $(dir_level_sep), \
+      $(space), \
+      $(patsubst \
+        $(call paths_common_ancestor,$1,$2)$(dir_level_sep)%, \
+        %, \
+        $2 \
+      ) \
+    ) \
+  ) \
+  $(patsubst \
+    $(call paths_common_ancestor,$1,$2)$(dir_level_sep)%, \
+    %, \
+    $1 \
+  )
+
+#------------------------------------------------------------------------------#
+# Text File Variable I/O
 #------------------------------------------------------------------------------#
 
 # format_key_value (arg1,arg2)
@@ -184,31 +281,188 @@ not = $(amu_pm_d1)$(if $(call bool_decode,$1),$(false),$(true))
 # returns formated keyword-value assignment.
 format_key_value = $(amu_pm_d2)$1 = $2
 
-# format_kv_variable (arg1)
-# arg1: Variable.
-# returns formated keyword-value assignment for a variable and its value.
-format_kv_variable = $(amu_pm_d1)$(call format_key_value,$1,$($1))
-
 # write_key_value (arg1,arg2,arg3)
-# arg1: File.
+# arg1: File name.
 # arg2: Keyword.
 # arg3: Value.
 # returns nothing.
 write_key_value = $(amu_pm_d3)$(file >> $1,$(call format_key_value,$2,$3))
 
+# format_kv_variable (arg1)
+# arg1: Variable.
+# returns formated keyword-value assignment for a variable and its value.
+format_kv_variable = $(amu_pm_d1)$(call format_key_value,$1,$($1))
+
+# format_kv_variable_list (arg1,arg2)
+# arg1: A space separated list of variables.
+# arg2: An encoded boolean; enumerate multi-word variable values
+# returns formated keyword-value assignment for each variable in the list.
+# for each variable named '-' a black line is outputted.
+define format_kv_variable_list
+  $(amu_pm_d2) \
+  $(foreach v,$1, \
+    $(if $(call bool_decode,$(call sstrings_equal,$v,-)), \
+      $(newline), \
+      $(if $(call bool_decode,$2), \
+        $(if $(call bool_decode,$(call sstrings_equal,$(words $($v)),1)), \
+          $(newline)$(call format_kv_variable,$v), \
+          $(newline)[$v] \
+          $(foreach x,$($v),$(newline)$(space3)$x) \
+        ), \
+        $(newline)$(call format_kv_variable,$v) \
+      ) \
+    ) \
+  )
+endef
+
+# write_kv_variable_list (arg1,arg2,arg3)
+# arg1: File name.
+# arg2: A space separated list of variables.
+# arg3: An encoded boolean; enumerate multi-word variable values
+# arg4: An encoded boolean; append or overwrite file
+# writes formated keyword-value assignment for each variable in the list
+# to the file. for each variable named '-' a black line is outputted.
+write_kv_variable_list = $(amu_pm_d4) \
+  $(if $(call bool_decode,$4), \
+    $(file >> $1,$(call format_kv_variable_list,$2,$3)), \
+    $(file  > $1,$(call format_kv_variable_list,$2,$3)) \
+  )
+
 # read_key_value (arg1,arg2)
-# arg1: File.
+# arg1: File name.
 # arg2: Keyword.
 # returns the value of the last keyword found in the file and returns the
 # empty string when the keyword is not found (skips over empty lines and
 # lines that begin with the hash/comment character).
 read_key_value = $(amu_pm_d2)$(shell \
   $(sed) -e '/^[[:space:]]*$(dollar)/d' \
-         -e '/^[[:space:]]*$(hash)/d' $1 \
-         -e 's/^[[:space:]\t]*//' | \
+         -e '/^[[:space:]]*$(hash)/d' \
+         -e 's/^[[:space:]\t]*//' $1 | \
   $(grep) $2 | \
   $(tail) -1 | \
-  $(sed) 's/$(call format_key_value,$2,$(empty))//')
+  $(sed) -e 's/$(call format_key_value,$2,$(empty))//')
+
+#------------------------------------------------------------------------------#
+# Version String Comparison
+#------------------------------------------------------------------------------#
+
+# check_version_list_digits (arg1)
+# arg1: An alphanumeric term without decimal.
+# returns a space-separated alphanumeric list of digits.
+check_version_list_digits = $(amu_pm_d1)$(strip \
+  $(eval __result := $1) \
+  $(foreach i, 0 1 2 3 4 5 6 7 8 9, \
+    $(eval __result := $$(subst $$i,$$i$(space),$(__result))) \
+  )$(__result) \
+  $(eval undefine __result))
+
+# check_version_compare_terms (arg1,arg2)
+# arg1: An alphanumeric version term1 without decimal.
+# arg2: An alphanumeric version term2 without decimal.
+# returns $(true) if term1 is less than term2.
+check_version_compare_terms = $(amu_pm_d2)$(strip \
+  $(eval __digit_list1 := $(call check_version_list_digits,$1)) \
+  $(eval __digit_list2 := $(call check_version_list_digits,$2)) \
+  $(if $(call strings_equal,$(words $(__digit_list1)),$(words $(__digit_list2))), \
+    $(call strings_le,$1,$2), \
+    $(call strings_le,$(words $(__digit_list1)),$(words $(__digit_list2))) \
+  ) \
+  $(eval undefine __digit_list1) \
+  $(eval undefine __digit_list2))
+
+# check_version_compare_strings (arg1,arg2)
+# arg1: A decimal-separated version string1.
+# arg2: A decimal-separated version string2.
+# returns: 'lt': iff version-string1 < version-string2.
+#          'gt': iff version-string1 > version-string2.
+#      $(empty): iff version-string1 = version-string2.
+check_version_compare_strings = $(amu_pm_d2)$(word 1, \
+  $(eval __term_list2 := $(subst .,$(space),$2)) \
+  $(foreach i,$(subst .,$(space),$1), \
+    $(eval j := $(word 1,$(__term_list2))) \
+    $(if $j, \
+      $(if $(call strings_equal,$i,$j), \
+        $(empty), \
+        $(if $(call check_version_compare_terms,$i,$j), \
+          lt, \
+          gt \
+        ) \
+      ), \
+      gt \
+    ) \
+    $(eval __term_list2 := $$(wordlist 2,$(words $(__term_list2)),$(__term_list2))) \
+  ) \
+  $(if $(__term_list2),lt) \
+  $(eval undefine __term_list2))
+
+# check_version_compare (arg1,arg2,arg3)
+# arg1: A decimal-separated version string1.
+# arg2: A condition check identifier of (ge,gt,le,lt,eq,ne).
+# arg3: A decimal-separated version string2.
+check_version_compare = $(amu_pm_d3)$(strip \
+  $(if $(call sstrings_equal,$2,gt), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),gt) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,ge), \
+    $(or \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),gt) \
+    ), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),$(empty)) \
+    ) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,lt), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),lt) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,le), \
+    $(or \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),lt) \
+    ), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),$(empty)) \
+    ) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,eq), \
+    $(call bool_decode, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),$(empty)) \
+    ) \
+  ) \
+  $(if $(call sstrings_equal,$2,ne), \
+    $(call bool_decode, \
+    $(call not, \
+      $(call strings_equal,$(call check_version_compare_strings,$1,$3),$(empty)) \
+    ) \
+    ) \
+  ) \
+  )
+
+# check_version (arg1,arg2,arg3,arg4,arg5)
+# arg1: A tool version string name (without the ending 'vn').
+# arg2: A condition check identifier of (ge,gt,le,lt,eq,ne).
+# arg3: A version string requirement (of the form 'n.n.n.n').
+# arg4: An encoded boolean; version check condition pass required.
+# arg5: A fail message.
+# returns .
+define check_version
+  $(amu_pm_d5) \
+  $(call amu_pm_m,$1 version check $$($(1)vn)=[$($(1)vn)] $2 [$3] \
+    $(if $(call bool_decode,$4),(required),(recommended)).) \
+  $(if $(call check_version_compare,$($(1)vn),$2,$3), \
+    $(call amu_pm_m,$1 version check passed.), \
+    $(warning $1 version check [$($(1)vn)] $2 [$3] failed \
+              ($(if $(call bool_decode,$4),,non-)critical).) \
+    $(warning $5) \
+    $(if $(call bool_decode,$4),$(error $0: aborting)) \
+  )
+endef
 
 #------------------------------------------------------------------------------#
 # Other

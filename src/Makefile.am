@@ -4,6 +4,8 @@
 #
 ##############################################################################
 
+AUTOMAKE_OPTIONS = --warnings=no-portability
+
 bin_PROGRAMS = \
 	bash-dif \
 	openscad-dif \
@@ -62,8 +64,6 @@ openscad_seam_SOURCES = \
 	openscad_seam_scanner.cpp \
 	openscad_seam_main.cpp
 
-SUFFIXES = .bash .makefile .stamp .help
-
 EXTRA_DIST = \
 	doxygen_mainpage.cpp \
 	bash_dif_lexer.ll \
@@ -77,42 +77,54 @@ doxygen_stamp_other_dependacies = \
 	$(openscad_seam_SOURCES) \
 	$(programs_help)
 
+root_path = $(DESTDIR)$(pkgdatadir)
+version_path = $(root_path)/$(PACKAGE_VERSION)
+install_path = $(version_path)
+
+install_path_doc = $(version_path)/doc/src
+install_path_html = $(install_path_doc)/doxygen/html
+install_path_pdf = $(install_path_doc)/doxygen/latex
+install_path_man = $(install_path_doc)/doxygen/man
+
+SUFFIXES = .bash .makefile .stamp .help
+
 ##############################################################################
 # targets
 ##############################################################################
 
-docs-local: doxygen.stamp
+docs-local: html-local pdf-local man-local
 
-# run doxygen and update timestamp
+html-local: doxygen.stamp
+
+pdf-local: doxygen.stamp doxygen/latex/refman.pdf
+
+man-local: doxygen.stamp
+
+doxygen/latex/refman.pdf:
+	( cd doxygen/latex && make refman.pdf )
+
 doxygen.stamp: Doxyfile Makefile $(doxygen_stamp_other_dependacies)
 	( cat Doxyfile ; \
 		echo "INPUT=$(srcdir)" ; \
 		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: C++ Programs\"" ; \
 	) | $(DOXYGEN_PATH) - \
 	&& touch doxygen.stamp
-#	&& ( cd doxygen/latex && make )
 
 $(programs_help): $(bin_PROGRAMS)
 	./$* --help > $@
 
-bash_dif_lexer.cc: bash_dif_lexer.hh
-bash_dif_lexer.hh \
 bash_dif_lexer.cc: bash_dif_lexer.ll
 	${LEX} \
 		--outfile=bash_dif_lexer.cc \
 		--header-file=bash_dif_lexer.hh \
 		$(srcdir)/bash_dif_lexer.ll
 
-openscad_dif_lexer.cc: openscad_dif_lexer.hh
-openscad_dif_lexer.hh \
 openscad_dif_lexer.cc: openscad_dif_lexer.ll
 	${LEX} \
 		--outfile=openscad_dif_lexer.cc \
 		--header-file=openscad_dif_lexer.hh \
 		$(srcdir)/openscad_dif_lexer.ll
 
-openscad_seam_lexer.cc: openscad_seam_lexer.hh
-openscad_seam_lexer.hh \
 openscad_seam_lexer.cc: openscad_seam_lexer.ll
 	${LEX} \
 		--outfile=openscad_seam_lexer.cc \
@@ -130,6 +142,20 @@ install-exec-hook:
 		; done \
 	)
 
+install-docs-local: install-html-local install-pdf-local install-man-local
+
+'$(install_path_html)': ; $(MKDIR_P) -v '$(install_path_html)'
+install-html-local: html-local | '$(install_path_html)'
+	( cd doxygen && cp -av html/* '$(install_path_html)' )
+
+'$(install_path_pdf)': ; $(MKDIR_P) -v '$(install_path_pdf)'
+install-pdf-local: pdf-local | '$(install_path_pdf)'
+	( cd doxygen && cp -av latex/refman.pdf '$(install_path_pdf)' )
+
+'$(install_path_man)': ; $(MKDIR_P) -v '$(install_path_man)'
+install-man-local: man-local | '$(install_path_man)'
+	( cd doxygen && cp -av man/* '$(install_path_man)' )
+
 uninstall-local:
 	@list='$(bin_PROGRAMS)' ; test -n "$(EXEEXT)" && \
 	  list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
@@ -139,6 +165,7 @@ uninstall-local:
 			rm -fv $$p-$(PACKAGE_VERSION)$(EXEEXT) \
 		; done \
 	)
+	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
 
 CLEANFILES = \
 	doxygen.stamp \
@@ -153,9 +180,7 @@ CLEANFILES = \
 	$(programs_help)
 
 clean-local:
-	-test -d doxygen \
-		&& ( cd doxygen && rm -rfv html latex man ) \
-		&& rmdir -v doxygen
+	-test -d doxygen && rm -rfv doxygen
 
 ##############################################################################
 # eof

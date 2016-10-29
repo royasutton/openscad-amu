@@ -30,58 +30,83 @@
 # System
 #------------------------------------------------------------------------------#
 
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL                           := help
 
-# Use parallel execution
-amu_pm_parallel_jobs := $(false)
+# use parallel execution
+parallel_jobs                           := $(false)
+
+# perform tool version checks
+version_checks                          := $(true)
 
 #------------------------------------------------------------------------------#
 # System Control Variable List
 #------------------------------------------------------------------------------#
 
 system_control_variables := \
-  amu_pm_parallel_jobs
+  parallel_jobs \
+  version_checks
 
 #------------------------------------------------------------------------------#
 # Project
 #------------------------------------------------------------------------------#
 
-# Output title headings for make targets
-target_headings := $(true)
+# output title headings for make targets
+target_headings                         := $(true)
 
-# Keep secondary files for implicit rules
-debug_secondary := $(false)
+# keep secondary files for implicit rules
+debug_secondary                         := $(false)
 
-# Project name, version, and brief
-project_name    := project
-project_version := 1.0
-project_brief   := A Project Template.
+# add design/library source to release directory/archive
+release_project                         := $(true)
+release_design                          := $(true)
+release_library                         := $(true)
+
+release_archive_project                 := $(true)
+release_archive_design                  := $(true)
+release_archive_library                 := $(true)
+
+# project name, version, and brief
+project_name                            := project
+project_version                         := 1.0
+project_brief                           := A Project Template.
+
+# project design and library directory prefix and files base names
+design_prefix                           :=
+design                                  :=
+library_prefix                          :=
+library                                 :=
+
+# file extensions
+scad_ext                                := .scad
+mfs_ext                                 := .bash
+mf_ext                                  := .makefile
+stamp_ext                               := .stamp
 
 #
 # Output directory
 #
 
 # root directory
-output_root := build
+output_root                             := build
 
 # directory term separator
-output_path_term_joiner := _
-output_path_use_dir_sep := $(false)
+output_path_term_joiner                 := _
+output_path_use_dir_sep                 := $(false)
 
 # directory terms
-output_path_add_output_root     := $(true)
-output_path_add_project_name    := $(false)
-output_path_add_project_version := $(true)
-output_path_add_os              := $(false)
-output_path_add_arch            := $(false)
-output_path_add_host            := $(false)
-output_path_add_amuseamvs       := $(false)
-output_path_add_amudifvs        := $(false)
-output_path_add_openscadvs      := $(false)
-output_path_add_doxygenvs       := $(false)
-output_path_add_datetime        := $(false)
-output_path_add_date            := $(false)
-output_path_add_time            := $(false)
+output_path_add_output_root             := $(true)
+output_path_add_project_name            := $(false)
+output_path_add_project_version         := $(true)
+output_path_add_os                      := $(false)
+output_path_add_arch                    := $(false)
+output_path_add_host                    := $(false)
+output_path_add_amuseamvs               := $(false)
+output_path_add_amudifvs                := $(false)
+output_path_add_openscadvs              := $(false)
+output_path_add_doxygenvs               := $(false)
+output_path_add_datetime                := $(false)
+output_path_add_date                    := $(false)
+output_path_add_time                    := $(false)
 
 # directory terms and ordering
 output_path_spec := \
@@ -104,26 +129,26 @@ output_path_spec := \
 #
 
 # root directory
-backup_root := backups
+backup_root                             := backups
 
 # directory term separator
-backup_file_term_joiner := _
-backup_file_use_dir_sep := $(false)
+backup_file_term_joiner                 := _
+backup_file_use_dir_sep                 := $(false)
 
 # directory terms
-backup_file_add_backup_root     := $(false)
-backup_file_add_project_name    := $(true)
-backup_file_add_project_version := $(true)
-backup_file_add_os              := $(false)
-backup_file_add_arch            := $(false)
-backup_file_add_host            := $(false)
-backup_file_add_amuseamvs       := $(false)
-backup_file_add_amudifvs        := $(false)
-backup_file_add_openscadvs      := $(false)
-backup_file_add_doxygenvs       := $(false)
-backup_file_add_datetime        := $(true)
-backup_file_add_date            := $(false)
-backup_file_add_time            := $(false)
+backup_file_add_backup_root             := $(false)
+backup_file_add_project_name            := $(true)
+backup_file_add_project_version         := $(true)
+backup_file_add_os                      := $(false)
+backup_file_add_arch                    := $(false)
+backup_file_add_host                    := $(false)
+backup_file_add_amuseamvs               := $(false)
+backup_file_add_amudifvs                := $(false)
+backup_file_add_openscadvs              := $(false)
+backup_file_add_doxygenvs               := $(false)
+backup_file_add_datetime                := $(true)
+backup_file_add_date                    := $(false)
+backup_file_add_time                    := $(false)
 
 # directory terms and ordering
 backup_file_spec := \
@@ -141,14 +166,104 @@ backup_file_spec := \
   date \
   time
 
-# default backup file extension
-backup_file_ext := .tar.xz
+# default backup file extension list
+backup_exts                             := .tar.xz
 
-# File extensions
-scad_ext  := .scad
-mfs_ext   := .bash
-mf_ext    := .makefile
-stamp_ext := .stamp
+# additions (for derived variables)
+backup_files_add                        :=
+
+#
+# Release directory
+#
+
+# root directory
+release_root                            := release
+
+# directory term separator
+release_path_term_joiner                := _
+release_path_use_dir_sep                := $(false)
+
+# directory terms
+release_path_add_release_root           := $(false)
+release_path_add_project_name           := $(false)
+release_path_add_project_version        := $(true)
+release_path_add_os                     := $(false)
+release_path_add_arch                   := $(false)
+release_path_add_host                   := $(false)
+release_path_add_amuseamvs              := $(false)
+release_path_add_amudifvs               := $(false)
+release_path_add_openscadvs             := $(false)
+release_path_add_doxygenvs              := $(false)
+release_path_add_datetime               := $(false)
+release_path_add_date                   := $(true)
+release_path_add_time                   := $(false)
+
+# directory terms and ordering
+release_path_spec := \
+  release_root \
+  project_name \
+  project_version \
+  os \
+  arch \
+  host \
+  amuseamvs \
+  amudifvs \
+  openscadvs \
+  doxygenvs \
+  datetime \
+  date \
+  time
+
+# additions (for derived variables)
+release_files_add                       :=
+
+#
+# Release archive file
+#
+
+# root name
+release_archive_root                    := archive
+
+# directory term separator
+release_archive_file_term_joiner        := _
+release_archive_file_use_dir_sep        := $(false)
+
+# directory terms
+release_archive_file_add_release_archive_root := $(false)
+release_archive_file_add_project_name   := $(true)
+release_archive_file_add_project_version := $(true)
+release_archive_file_add_os             := $(false)
+release_archive_file_add_arch           := $(false)
+release_archive_file_add_host           := $(false)
+release_archive_file_add_amuseamvs      := $(false)
+release_archive_file_add_amudifvs       := $(false)
+release_archive_file_add_openscadvs     := $(false)
+release_archive_file_add_doxygenvs      := $(false)
+release_archive_file_add_datetime       := $(false)
+release_archive_file_add_date           := $(true)
+release_archive_file_add_time           := $(false)
+
+# directory terms and ordering
+release_archive_file_spec := \
+  release_archive_root \
+  project_name \
+  project_version \
+  os \
+  arch \
+  host \
+  amuseamvs \
+  amudifvs \
+  openscadvs \
+  doxygenvs \
+  datetime \
+  date \
+  time
+
+# default release archive extension list
+release_archive_exts                    := .zip
+
+# additions (for derived variables)
+release_archive_files_add               :=
 
 #------------------------------------------------------------------------------#
 # Project Control Variable List
@@ -156,7 +271,15 @@ stamp_ext := .stamp
 
 project_control_variables := \
   target_headings \
-  debug_secondary
+  debug_secondary \
+  \
+  release_project \
+  release_design \
+  release_library \
+  \
+  release_archive_project \
+  release_archive_design \
+  release_archive_library
 
 ################################################################################
 # eof

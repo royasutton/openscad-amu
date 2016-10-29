@@ -26,14 +26,14 @@
 # Variables
 ################################################################################
 
-# Output file names in output directory
-latex_stamp         := $(addprefix $(output_directory),$(latex_stamp_name))
-doxygen_stamp       := $(addprefix $(output_directory),$(doxygen_stamp_name))
-doxygen_tag         := $(addprefix $(output_directory),$(doxygen_tag_name))
-doxygen_warn        := $(addprefix $(output_directory),$(doxygen_warn_name))
-doxygen_config_auto := $(addprefix $(output_directory),$(notdir $(doxygen_config_auto_name)))
+# output file names in output directory
+latex_stamp         := $(addprefix $(output_path),$(latex_stamp_name))
+doxygen_stamp       := $(addprefix $(output_path),$(doxygen_stamp_name))
+doxygen_tag         := $(addprefix $(output_path),$(doxygen_tag_name))
+doxygen_warn        := $(addprefix $(output_path),$(doxygen_warn_name))
+doxygen_config_auto := $(addprefix $(output_path),$(notdir $(doxygen_config_auto_name)))
 
-# Clean Files
+# clean Files
 doxygen_clean_files := \
   $(doxygen_stamp) \
   $(doxygen_tag) \
@@ -41,17 +41,17 @@ doxygen_clean_files := \
   $(doxygen_config_auto) \
   $(if $(generate_latex),$(latex_stamp))
 
-# Path: autoconf_path, example_path
+# path: autoconf_path, example_path
 # $(prefix_scopes_scripts) requires:[scopes]
-autoconf_path := $(if $(prefix_scopes_scripts),$(output_directory),.)
-example_path  := $(if $(prefix_scopes_scripts),$(output_directory)) $(example_path_add)
+autoconf_path := $(if $(prefix_scopes_scripts),$(output_path),.)
+example_path  := $(if $(prefix_scopes_scripts),$(output_path)) $(example_path_add)
 
-# Path: image_path
+# path: image_path
 # $(scopes_targetsdir) requires:[scopes]
 # run-time evaluation required, use function rather than simple assignment.
 image_path = $(call scopes_targetsdir) $(image_path_add)
 
-# Filter configuration
+# filter configuration
 openscad_dif_opts := \
   $(strip \
     $(if $(call bool_decode,$(generate_html)),--html-output $(html_output)) \
@@ -68,11 +68,12 @@ enabled_sections := \
     $(enabled_sections_add) \
   )
 
-# Doxygen auto-configuration file variables
+# doxygen auto-configuration file variables
 define doxygen_config_auto_text
     PROJECT_NAME=$(project_name)
     PROJECT_NUMBER=$(project_version)
     PROJECT_BRIEF="$(project_brief)"
+    PROJECT_LOGO=$(project_logo)
     EXTENSION_MAPPING=$(subst .,$(empty),$(scad_ext))=C
     INPUT=$(src_files)
     FILE_PATTERNS=*$(scad_ext)
@@ -80,7 +81,7 @@ define doxygen_config_auto_text
     ENABLED_SECTIONS=$(enabled_sections)
     EXAMPLE_PATH=$(example_path)
     IMAGE_PATH=$(image_path)
-    OUTPUT_DIRECTORY=$(output_directory)
+    OUTPUT_DIRECTORY=$(output_path)
     GENERATE_HTML=$(if $(generate_html),YES,NO)
     HTML_OUTPUT=$(html_output)
     GENERATE_LATEX=$(if $(generate_latex),YES,NO)
@@ -90,15 +91,16 @@ define doxygen_config_auto_text
     MAN_SUBDIR=$(man_subdir)
     GENERATE_TAGFILE=$(doxygen_tag)
     WARN_LOGFILE=$(doxygen_warn)
+    HTML_HEADER=$(doxygen_html_header)
+    HTML_FOOTER=$(doxygen_html_footer)
+    HTML_EXTRA_STYLESHEET=$(doxygen_html_css)
+    LAYOUT_FILE=$(doxygen_layout)
 endef
 
-# Backup files
-backup_files += $(doxygen_config)
-
-# Replace spaces in documentation group identifier with '-'
+# replace spaces in documentation group identifier with '-'
 docs_group_id := $(subst $(space),-,$(docs_group_id))
 
-# Documentation install identifier
+# documentation install identifier
 ifndef docs_install_id
   docs_install_id := $(project_name)-$(project_version)
 else
@@ -107,12 +109,84 @@ else
   $(call amu_pm_m,using pre-defined value for $$(docs_install_id))
 endif
 
+# project logo
+ifdef project_logo
+  # add default extension when not specified with file name
+  project_logo := $(if $(suffix $(project_logo)),$(project_logo),$(project_logo).png)
+
+  # add default path when not specified with file name
+  # follow mfscript target naming convention for original and converted images
+  # png, png2eps, png2tiff, etc.
+  project_logo := \
+    $(strip \
+      $(if $(call bool_decode, \
+        $(call sstrings_not_equal,$(notdir $(project_logo)),$(project_logo)) \
+      ), \
+        $(project_logo), \
+        $(call join_with,$(dir_level_sep), \
+          $(output_path)$(strip $(subst .,$(empty), \
+            $(if $(call strings_equal,.png,$(suffix $(project_logo))), \
+              $(suffix $(project_logo)), \
+              png2$(suffix $(project_logo)) \
+            ) \
+          )) \
+          $(project_logo) \
+        ) \
+      ) \
+    )
+endif
+
+# doxygen source files
+doxygen_src := \
+  $(doxygen_config) \
+  $(doxygen_html_header) \
+  $(doxygen_html_footer) \
+  $(doxygen_html_css) \
+  $(doxygen_layout)
+
+# backup files
+backup_files += $(doxygen_src)
+
+# release latex path filter
+ifeq ($(release_latex_refman_only),$(true))
+  release_latex_path_filter := $(dir_level_sep)refman.pdf
+else
+  release_latex_path_filter :=
+endif
+
+# release files
+ifeq ($(release_doxygen),$(true))
+  ifeq ($(release_project),$(true))
+    release_files += $(doxygen_src)
+  endif
+  release_files += \
+    $(if $(generate_html),$(output_path)$(html_output)) \
+    $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
+    $(if $(generate_man),$(output_path)$(man_output))
+endif
+
+# release archive files
+ifeq ($(release_archive_doxygen),$(true))
+  ifeq ($(release_archive_project),$(true))
+    release_archive_files += $(doxygen_src)
+  endif
+  release_archive_files += \
+    $(if $(generate_html),$(output_path)$(html_output)) \
+    $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
+    $(if $(generate_man),$(output_path)$(man_output))
+endif
+
 #------------------------------------------------------------------------------#
 # Configuration Variable List
 #------------------------------------------------------------------------------#
 
-doxygen_config_variables += \
+doxygen_config_variables := \
   doxygen_config \
+  \
+  doxygen_html_header \
+  doxygen_html_footer \
+  doxygen_html_css \
+  doxygen_layout \
   \
   example_path_add \
   image_path_add \
@@ -123,8 +197,12 @@ doxygen_config_variables += \
   man_output \
   man_subdir \
   \
-  docs_group_id \
+  docs_group_id
+
+doxygen_config_derived += \
   docs_install_id \
+  \
+  project_logo \
   \
   latex_stamp \
   doxygen_stamp \
@@ -135,7 +213,32 @@ doxygen_config_variables += \
   openscad_dif_opts
 
 #------------------------------------------------------------------------------#
-# Help text
+# Version Checks
+#------------------------------------------------------------------------------#
+ifeq ($(version_checks),$(true))
+
+# doxygen bug #504305 fixed in release 1.8.12
+$(call check_version,doxygen,ge,1.8.12,$(false), \
+$(newline)# \
+$(newline)#$(space3)The Doxygen FILTER_PATTERNS bug #504305 has been fixed in Doxygen version \
+$(newline)#$(space3)1.8.12. For prior versions use FILTER_PATTERNS="*.ext=\"filter opts\"". \
+$(newline)#$(space3)For later versions use FILTER_PATTERNS=*.ext="filter opts". Or use \
+$(newline)#$(space3)INPUT_FILTER="filter opts" when possible. \
+$(newline)#)
+
+# doxygen caption (mis)handling fixed in release 1.8.11
+$(call check_version,doxygen,ge,1.8.11,$(false), \
+$(newline)# \
+$(newline)#$(space3)An issue with translating HTML captions to latex was corrected \
+$(newline)#$(space3)in Doxygen version 1.8.11. Avoid using the 'table_caption' option \
+$(newline)#$(space3)of \amu_table() with prior Doxygen versions when using \
+$(newline)#$(space3)latex-generated pdf documentation. \
+$(newline)#)
+
+endif
+
+#------------------------------------------------------------------------------#
+# Help Text
 #------------------------------------------------------------------------------#
 
 define help_text_doxygen

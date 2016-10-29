@@ -101,6 +101,12 @@ $(this_guard) := $(notdir $(this_file))
 	# openscad-amu lib-path (leave blank to use default)
 	# AMU_LIB_PATH
 
+	# where to search for amu tools (leave blank to use default)
+	# AMU_TOOL_PREFIX
+
+	# preferred tool version (leave blank to use default)
+	# AMU_TOOL_VERSION
+
 	# Include file directory prefix.
   ifndef AMU_PM_PREFIX
     AMU_PM_PREFIX	:= $(dir $(this_file))

@@ -199,16 +199,25 @@
   here is a list of additional filter-provided ones that can be used for
   document markup:
 
-  | Additional Commands                                            | Description
-  |:---------------------------------------------------------------|:-------------------
+  | Internal Commands                                              | Description
+  |:---------------------------------------------------------------|:------------------------
   | \ref ODIF::ODIF_Scanner::bif_eval() "\\amu_eval"               | evaluate arguments
   | \ref ODIF::ODIF_Scanner::bif_shell() "\\amu_shell"             | execute shell command
   | \ref ODIF::ODIF_Scanner::bif_combine() "\\amu_combine"         | combine words
+  | \ref ODIF::ODIF_Scanner::bif_table() "\\amu_table"             | generate a text table
   | \ref ODIF::ODIF_Scanner::bif_image_table() "\\amu_image_table" | generate an image table
   | \ref ODIF::ODIF_Scanner::bif_viewer() "\\amu_viewer"           | file viewer
   | \ref ODIF::ODIF_Scanner::bif_make() "\\amu_make"               | make script interface
   | \ref ODIF::ODIF_Scanner::bif_copy() "\\amu_copy"               | copy references
-  | <install-prefix>/functions/amu_<function>                      | external commands
+
+  Eternal commands also exists and can be found in the directory:
+  <tt><install-prefix>/functions/</tt>. For now, see the command itself for its
+  documentation. Here is a list:
+
+  | External Commands                 | Description
+  |:----------------------------------|:--------------------------------
+  | \\amu_date                        | current date and/or time
+  | \\amu_list                        | format arguments into a list
 
   \section openscad_markup_ex Example Markup
 
@@ -244,11 +253,11 @@
      *
      * \htmlonly
      *   \amu_image_table ( type=html
-     *                      id="${var1}" table_heading="${var3}"
+     *                      id="${var1}" table_caption="${var3}"
      *                      columns="10" column_headings="${var2}"
-     *                      image_headings="${var4}"
-     *                      image_files="${var6}" image_width="92"
-     *                      image_titles="${var5}" )
+     *                      cell_captions="${var4}"
+     *                      cell_files="${var6}" image_width="92"
+     *                      cell_titles="${var5}" )
      * \endhtmlonly
     ******************************************************************/
 

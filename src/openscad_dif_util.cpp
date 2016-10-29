@@ -581,13 +581,11 @@ UTIL::unquote(const string &s)
   return( r );
 }
 
-
 string
 UTIL::unquote_trim(const string &s)
 {
   return ( boost::trim_copy( unquote( s ) ) );
 }
-
 
 string
 UTIL::to_string(const long v)
@@ -597,6 +595,17 @@ UTIL::to_string(const long v)
   os << dec << v;
 
   return ( os.str() );
+}
+
+bool
+UTIL::is_number(const std::string& s)
+{
+  string::const_iterator it = s.begin();
+
+  while ( it != s.end() && isdigit(*it) )
+    ++it;
+
+  return ( !s.empty() && it == s.end() );
 }
 
 

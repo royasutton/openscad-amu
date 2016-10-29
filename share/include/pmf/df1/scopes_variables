@@ -27,7 +27,7 @@
 ################################################################################
 
 # auxiliary script output path prefix
-script_prefix := $(if $(call bool_decode,$(prefix_scopes_scripts)),$(output_directory))
+scopes_prefix := $(if $(call bool_decode,$(prefix_scopes_scripts)),$(output_path))
 
 # openscad_seam_opts1: for modes=(extract|list)
 openscad_seam_opts1 := \
@@ -41,7 +41,7 @@ openscad_seam_opts1 := \
 # openscad_seam_opts1: for modes=(extract)
 openscad_seam_opts2 := \
   $(strip \
-    --prefix $(output_directory) \
+    --prefix $(output_path) \
     --prefix-ipp 0 \
     --prefix-scripts $(if $(call bool_decode,$(prefix_scopes_scripts)),yes,no) \
     --comments yes \
@@ -58,29 +58,92 @@ openscad_seam_opts2 := \
   )
 
 # scopes auxiliary scripts for all source files
-scopes_scripts := \
-  $(addprefix $(script_prefix), \
+scopes_scripts_source := \
+  $(addprefix $(scopes_prefix), \
     $(foreach s,$(src_files), \
       $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
     ) \
   )
 
-# assign modeling scripts to clean-files
-scopes_clean_files := $(filter %$(scad_ext),$(scopes_scripts))
+# scopes include filter
+ifndef scopes_include_filter
+  ifdef scopes_include
+    scopes_include_filter := $(strip $(foreach s, $(scopes_include), \
+      %$(scopes_joiner)$(s)$(scad_ext) %$(scopes_joiner)$(s)$(mfs_ext)))
+  else
+    scopes_include_filter := %
+  endif
+else
+  $(call amu_pm_m,using pre-defined value for $$(scopes_include_filter))
+endif
+
+# scopes exclude filter
+ifndef scopes_exclude_filter
+  ifdef scopes_exclude
+    scopes_exclude_filter := $(strip $(foreach s, $(scopes_exclude), \
+      %$(scopes_joiner)$(s)$(scad_ext) %$(scopes_joiner)$(s)$(mfs_ext)))
+  else
+    scopes_exclude_filter := $(empty)
+  endif
+else
+  $(call amu_pm_m,using pre-defined value for $$(scopes_exclude_filter))
+endif
+
+# apply include and exclude filter
+scopes_scripts_selected := \
+  $(filter $(scopes_include_filter), \
+  $(filter-out $(scopes_exclude_filter), \
+    $(scopes_scripts_source) \
+  ))
+
+# assign all source auxiliary scripts to clean-files
+scopes_clean_files := $(scopes_scripts_source)
+
+# release files
+ifeq ($(release_scopes),$(true))
+  release_files += $(call scopes_targetsdir)
+endif
+
+# release archive files
+ifeq ($(release_archive_scopes),$(true))
+  release_archive_files += $(call scopes_targetsdir)
+endif
 
 #------------------------------------------------------------------------------#
 # Configuration Variable List
 #------------------------------------------------------------------------------#
 
-scopes_config_variables += \
+scopes_config_variables := \
   scopes_joiner \
   \
-  script_prefix \
+  scopes_include \
+  scopes_exclude
+
+scopes_config_derived += \
+  scopes_prefix \
+  \
+  scopes_include_filter \
+  scopes_exclude_filter \
+  \
   openscad_seam_opts1 \
   openscad_seam_opts2
 
 #------------------------------------------------------------------------------#
-# Help text
+# Version Checks
+#------------------------------------------------------------------------------#
+ifeq ($(version_checks),$(true))
+
+# openscad-seam v1.5 or later required to auto-extract scope names
+$(call check_version,amuseam,ge,1.5,$(true), \
+$(newline)# \
+$(newline)#$(space3)openscad-seam '--mode scopes' option required to auto-extract scope \
+$(newline)#$(space3)names. Option introduced in version v1.5. \
+$(newline)#)
+
+endif
+
+#------------------------------------------------------------------------------#
+# Help Text
 #------------------------------------------------------------------------------#
 
 define help_text_scopes

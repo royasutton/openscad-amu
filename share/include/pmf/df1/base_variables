@@ -26,20 +26,20 @@
 # Variables
 ################################################################################
 
-# Parallel Execution
-ifeq ($(amu_pm_parallel_jobs),$(true))
+# parallel Execution
+ifeq ($(parallel_jobs),$(true))
   MAKEFLAGS += --jobs=$(cpu_cnt)
 endif
 
-# Remove any file extension from design and library
+# remove any file extension from design and library
 design  := $(basename $(design))
 library := $(basename $(library))
 
-# Remove spaces from project name and version
+# remove spaces from project name and version
 project_name    := $(subst $(space),$(empty),$(project_name))
 project_version := $(subst $(space),$(empty),$(project_version))
 
-# Input source files
+# input source files
 ifdef design
   ifdef design_prefix
     design_files += $(addprefix $(design_prefix),$(addsuffix $(scad_ext),$(design)))
@@ -58,17 +58,17 @@ ifdef library
   src_files += $(library_files)
 endif
 
-# Output directory
-ifndef output_directory
-  output_directory := \
+# output directory
+ifndef output_path
+  output_path := \
     $(call join_with,$(if $(output_path_use_dir_sep),$(dir_level_sep),$(output_path_term_joiner)), \
       $(strip $(foreach x,$(output_path_spec), \
         $(if $(call bool_decode,$(output_path_add_$x)),$($x)))))$(dir_level_sep)
 else
-  $(call amu_pm_m,using pre-defined value for $$(output_directory))
+  $(call amu_pm_m,using pre-defined value for $$(output_path))
 endif
 
-# Backup basename
+# backup basename
 ifndef backup_basename
   backup_basename := \
     $(call join_with,$(empty),$(backup_root)$(dir_level_sep) \
@@ -79,14 +79,70 @@ else
   $(call amu_pm_m,using pre-defined value for $$(backup_basename))
 endif
 
-# backup files
-backup_files := $(src_files) $(word 1,$(MAKEFILE_LIST)) $(backup_files_add)
+# release directory
+ifndef release_path
+  release_path := \
+    $(call join_with,$(empty),$(release_root)$(dir_level_sep) \
+    $(call join_with,$(if $(release_path_use_dir_sep),$(dir_level_sep),$(release_path_term_joiner)), \
+      $(strip $(foreach x,$(release_path_spec), \
+        $(if $(call bool_decode,$(release_path_add_$x)),$($x))))))$(dir_level_sep)
+else
+  $(call amu_pm_m,using pre-defined value for $$(release_path))
+endif
+
+# release archive basename
+ifndef release_archive_basename
+  release_archive_basename := \
+    $(call join_with,$(empty),$(release_path) \
+    $(call join_with,$(if $(release_archive_file_use_dir_sep),$(dir_level_sep),$(release_archive_file_term_joiner)), \
+      $(strip $(foreach x,$(release_archive_file_spec), \
+        $(if $(call bool_decode,$(release_archive_file_add_$x)),$($x))))))
+else
+  $(call amu_pm_m,using pre-defined value for $$(release_archive_basename))
+endif
 
 # library install sub-directory
 ifndef library_install_subdir
   library_install_subdir := $(project_name)-$(project_version)$(dir_level_sep)
 else
   $(call amu_pm_m,using pre-defined value for $$(library_install_subdir))
+endif
+
+# backup files
+backup_files := $(src_files) $(word 1,$(MAKEFILE_LIST)) $(backup_files_add)
+
+# release stamps
+release_manifest := $(addprefix $(release_path),manifest$(stamp_ext))
+release_stamp := $(addsuffix $(stamp_ext),$(call path_no_tdls,$(release_path)))
+
+# release files (use recursive assignment)
+release_files = $(release_files_add)
+
+ifeq ($(release_project),$(true))
+  release_files += $(word 1,$(MAKEFILE_LIST))
+endif
+
+ifeq ($(release_design),$(true))
+  release_files += $(design_files)
+endif
+
+ifeq ($(release_library),$(true))
+  release_files += $(library_files)
+endif
+
+# release archive files (use recursive assignment)
+release_archive_files = $(release_archive_files_add)
+
+ifeq ($(release_archive_project),$(true))
+  release_archive_files += $(word 1,$(MAKEFILE_LIST))
+endif
+
+ifeq ($(release_archive_design),$(true))
+  release_archive_files += $(design_files)
+endif
+
+ifeq ($(release_archive_library),$(true))
+  release_archive_files += $(library_files)
 endif
 
 #------------------------------------------------------------------------------#
@@ -104,18 +160,38 @@ project_config_variables := \
   library_prefix \
   library \
   \
-  output_directory \
-  backup_basename \
-  backup_files_add \
-  library_install_subdir \
-  \
   scad_ext  \
   mfs_ext \
   mf_ext \
-  stamp_ext
+  stamp_ext \
+  \
+  output_root \
+  \
+  backup_root \
+  backup_files_add \
+  backup_exts \
+  \
+  release_root \
+  release_files_add \
+  release_archive_files_add \
+  release_archive_exts
+
+project_config_derived := \
+  output_path \
+  backup_basename \
+  release_path \
+  release_archive_basename \
+  library_install_subdir
 
 #------------------------------------------------------------------------------#
-# Help text
+# Version Checks
+#------------------------------------------------------------------------------#
+#ifeq ($(version_checks),$(true))
+
+#endif
+
+#------------------------------------------------------------------------------#
+# Help Text
 #------------------------------------------------------------------------------#
 
 define help_text_base
@@ -142,6 +218,9 @@ define help_text_base
 
  backup:
      create backup of source files.
+
+ release:
+     create a project release.
 
  list-x, listv-x, slist-x, slistv-x, info-x, print-x:
      show information for the variable named x.

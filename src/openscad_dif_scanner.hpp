@@ -50,6 +50,9 @@
 
 namespace ODIF{
 
+  //! Output path name when no output is desired for a format.
+  static const std::string NO_FORMAT_OUTPUT = "<off>";
+
 //! Class that implements the OpenSCAD Doxygen input filter scanner.
 class ODIF_Scanner : public yyFlexLexer{
   public:
@@ -269,10 +272,9 @@ class ODIF_Scanner : public yyFlexLexer{
                        const bool& f=true, const bool& s=true);
 
     //! try to locate a file and copy it to an output directory.
-    std::string file_rl( const std::string& file, bool& found,
-                         const bool& extension=true, const bool& uri=false,
-                         const bool& copy=true, const std::string& outdir="",
-                         const bool& rid=false);
+    std::string file_rl( const std::string& file, const std::string& outdir,
+                         bool& found, const bool& extension=true,
+                         const bool& copy=true, const bool& rid=false);
 
 
     // built-in amu functions
@@ -287,6 +289,8 @@ class ODIF_Scanner : public yyFlexLexer{
                        const std::string &p, const std::string &s,
                        const std::string &j, const std::string &ws,
                        const std::string &t );
+    //! generate a table from a list of text phrases.
+    std::string bif_table(void);
     //! generate an image table for a list of images.
     std::string bif_image_table(void);
     //! generate a file viewer for various file formates (png, svg, stl, video, etc.).

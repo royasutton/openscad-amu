@@ -55,6 +55,9 @@ path_grep   := $(call first_of,grep)
 path_cat    := $(call first_of,cat)
 path_sed    := $(call first_of,sed)
 path_tail   := $(call first_of,tail)
+path_touch  := $(call first_of,touch)
+path_chmod  := $(call first_of,chmod)
+path_ls     := $(call first_of,ls)
 
 #------------------------------------------------------------------------------#
 # OS Configuration
@@ -62,7 +65,7 @@ path_tail   := $(call first_of,tail)
 
 __os_found      := $(false)
 
-# Linux
+# linux
 ifeq (${os},Linux)
   opts_mkdir    := --verbose
   opts_mkdir_p  := --parents --verbose
@@ -72,7 +75,7 @@ ifeq (${os},Linux)
   opts_rm_rf    := --recursive --force --verbose
   opts_cp_a     := --archive --verbose
   opts_tar_c    := --create --verbose --auto-compress
-  opts_zip_c    := -v
+  opts_zip_c    := --recurse-paths --verbose
   opts_tput_c   := cols
   opts_seq      :=
   opts_test     :=
@@ -83,6 +86,11 @@ ifeq (${os},Linux)
   opts_cat      :=
   opts_sed      :=
   opts_tail     :=
+  opts_touch    :=
+  opts_chmod    := --verbose
+  opts_chmod_R  := --recursive --verbose
+  opts_ls       :=
+  opts_ls_l     := -l
 
   cpu_cnt       := $(shell nproc)
   dir_level_sep := /
@@ -96,7 +104,7 @@ ifeq (${os},Linux)
   __os_found    := $(true)
 endif
 
-# CYGWIN - compare prefix only (ie: CYGWIN_NT-10.0 --> CYGWIN_NT)
+# cygwin - compare prefix only (ie: CYGWIN_NT-10.0 --> CYGWIN_NT)
 # Using OpenSCAD compiled for Windows.
 ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
   os            := CYGWIN_NT
@@ -109,7 +117,7 @@ ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
   opts_rm_rf    := --recursive --force --verbose
   opts_cp_a     := --archive --verbose
   opts_tar_c    := --create --verbose --auto-compress
-  opts_zip_c    := -v
+  opts_zip_c    := --recurse-paths --verbose
   opts_tput_c   := cols
   opts_seq      :=
   opts_test     :=
@@ -120,6 +128,11 @@ ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
   opts_cat      :=
   opts_sed      :=
   opts_tail     :=
+  opts_touch    :=
+  opts_chmod    := --verbose
+  opts_chmod_R  := --recursive --verbose
+  opts_ls       :=
+  opts_ls_l     := -l
 
   cpu_cnt       := $(shell nproc)
   dir_level_sep := /
@@ -137,14 +150,14 @@ endif
 # Configuration Check
 #------------------------------------------------------------------------------#
 
-# OS
+# os
 ifeq ($(__os_found),$(false))
   $(error OS [$(os)] needs to be configured in [$(lastword $(MAKEFILE_LIST))])
 else
   undefine __os_found
 endif
 
-# Commands
+# commands
 base_commands_required := \
   path_mkdir \
   path_rmdir \
@@ -159,7 +172,10 @@ base_commands_required := \
   path_grep \
   path_cat \
   path_sed \
-  path_tail
+  path_tail \
+  path_touch \
+  path_chmod \
+  path_ls
 
 $(call variable_list_check, \
   $(base_commands_required),found,$(false),$(false))
@@ -187,6 +203,11 @@ grep_v  := $(path_grep) $(opts_grep_v)
 cat     := $(path_cat) $(opts_cat)
 sed     := $(path_sed) $(opts_sed)
 tail    := $(path_tail) $(opts_tail)
+touch   := $(path_touch) $(opts_touch)
+chmod   := $(path_chmod) $(opts_chmod)
+chmod_R := $(path_chmod) $(opts_chmod_R)
+ls      := $(path_ls) $(opts_ls)
+ls_l    := $(path_ls) $(opts_ls_l)
 
 #------------------------------------------------------------------------------#
 # Reference Check
@@ -212,7 +233,12 @@ base_commands_configured := \
   grep_v \
   cat \
   sed \
-  tail
+  tail \
+  touch \
+  chmod \
+  chmod_R \
+  ls \
+  ls_l
 
 $(call variable_list_check, \
   $(base_commands_configured),configured,$(true),$(false))
@@ -221,7 +247,7 @@ $(call variable_list_check, \
 # System Constants
 #------------------------------------------------------------------------------#
 
-# Determine number of columns for terminal
+# determine number of columns for terminal
 terminal_columns := $(shell $(tput_c))
 
 #------------------------------------------------------------------------------#

@@ -65,8 +65,7 @@ ep = 0.02;
 
   \amu_image_table (
     type=html
-    table_width="75%"
-    table_heading="Know is the time."
+    table_caption="Know is the time."
     columns=3
     column_headings="
       one^  two  ^
@@ -74,18 +73,18 @@ ep = 0.02;
     "
     image_width=200
     image_height=100
-    image_files="${files5}"
-    image_titles=
+    cell_files="${files5}"
+    cell_titles=
       "     a title 1^     a title 2^a title 3^a title 4^
        title 5~title 6~title 7~title 8"
-    image_urls="
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
+    cell_urls="
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
       http://www.google.com
     "
   )
@@ -93,7 +92,7 @@ ep = 0.02;
   \amu_image_table (
     type=latex
     id=my_latex_table
-    table_heading="Know is the time."
+    table_caption="Know is the time."
     columns=4
     column_headings="
       one^  two  ^
@@ -101,8 +100,8 @@ ep = 0.02;
     "
     image_width=2in
     image_height=1in
-    image_files="${files5}"
-    image_headings="
+    cell_files="${files5}"
+    cell_captions="
       heading 1^
       heading 2^
       heading 3^
@@ -112,17 +111,57 @@ ep = 0.02;
       heading 7^
       heading 8
     "
-    image_titles=
+    cell_titles=
       "     a title 1^     a title 2^a title 3^a title 4^
        title 5~title 6~title 7~title 8"
-    image_urls="
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
-      http://www.google.com^
+    cell_urls="
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+    "
+  )
+
+  \amu_table (
+    id=my_text_table
+    table_caption="Know is the time to return to text."
+    columns=4
+    column_headings="
+      one^  two  ^
+      three^four
+    "
+    cell_texts="
+      one^
+      two^
+      three^
+      four^
+      five^
+      six^
+      seven^
+      eight
+    "
+    cell_captions="
+      heading 1^
+      heading 2^
+      heading 3^
+      heading 4^
+      heading 5^
+      heading 6^
+      heading 7^
+      heading 8
+    "
+    cell_urls="
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
+      http://www.google.com
       http://www.google.com
     "
   )

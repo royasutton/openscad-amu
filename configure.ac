@@ -5,25 +5,26 @@
 ##############################################################################
 AC_PREREQ(2.50)
 
-# obtain the configure script version tags from git
+# obtain source versions from git
 AC_REVISION([m4_esyscmd_s([git describe --tags --dirty --always])])
 
-AC_INIT([openscad-amu],
-        [m4_esyscmd_s([git describe --tags --dirty --always])],
-        [royasutton@hotmail.com],
-        [openscad-amu],[https://github.com/royasutton/openscad-amu])
+AC_INIT(
+  [openscad-amu],
+  [m4_esyscmd_s([git describe --tags --dirty --always])],
+  [royasutton@hotmail.com],
+  [openscad-amu],
+  [https://github.com/royasutton/openscad-amu])
+
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])
 
-# omitting files: AUTHORS, ChangeLog, NEWS, and README
-# therefore does not conform to the typical gnu standards
-# using init option [foreign]
-AM_INIT_AUTOMAKE([foreign])
-
-##############################################################################
-# default: install prefix
-##############################################################################
-#AC_PREFIX_DEFAULT($HOME/projects/cnc)
+AM_INIT_AUTOMAKE([
+  --warnings=all
+  --warnings=error
+  foreign
+  dist-xz
+  dist-zip
+])
 
 ##############################################################################
 # check: required build tools
@@ -36,9 +37,9 @@ AC_PROG_LIBTOOL
 AC_MSG_CHECKING([fast lexical analyser generator (flex)])
 AC_PROG_LEX
 if test "x$LEX" != xflex; then
-	LEX="$SHELL $missing_dir/missing flex"
-	AC_SUBST([LEX_OUTPUT_ROOT], [lex.yy])
-	AC_SUBST([LEXLIB], [''])
+  LEX="$SHELL $missing_dir/missing flex"
+  AC_SUBST([LEX_OUTPUT_ROOT], [lex.yy])
+  AC_SUBST([LEXLIB], [''])
 fi
 
 ##############################################################################
@@ -133,45 +134,48 @@ AC_CONFIG_HEADERS([src/config.h])
 
 AM_EXTRA_RECURSIVE_TARGETS([
 docs
-tests
+install-docs
+man
+install-man
 ])
 
 ##############################################################################
 # create: configured files
 ##############################################################################
 AC_CONFIG_FILES([
-Makefile
+  Makefile
 
-share/Makefile
+  share/Makefile
 
-share/examples/Makefile
-share/examples/convert.bash
-share/examples/hello_world.bash
-share/examples/log_segregate.bash
-share/examples/vehicle.doxyfile
+  share/examples/Makefile
+  share/examples/convert.bash
+  share/examples/hello_world.bash
+  share/examples/log_segregate.bash
+  share/examples/vehicle.doxyfile
 
-share/functions/Makefile
+  share/functions/Makefile
 
-share/include/Makefile
-share/include/mf/Makefile
-share/include/pmf/Makefile
-share/include/pmf/df1/Makefile
+  share/include/Makefile
+  share/include/mf/Makefile
+  share/include/pmf/Makefile
+  share/include/pmf/df1/Makefile
 
-share/lib/Makefile
-share/lib/Doxyfile
+  share/lib/Makefile
+  share/lib/Doxyfile
 
-share/scripts/Makefile
-share/scripts/Doxyfile
-share/scripts/doxygen_mainpage.bash
-share/scripts/segregate.bash
+  share/scripts/Makefile
+  share/scripts/Doxyfile
+  share/scripts/bootstrap.bash
+  share/scripts/doxygen_mainpage.bash
+  share/scripts/segregate.bash
 
-share/templates/Makefile
-share/templates/df1/Makefile
+  share/templates/Makefile
+  share/templates/df1/Makefile
 
-src/Makefile
-src/Doxyfile
+  src/Makefile
+  src/Doxyfile
 
-tests/Makefile
+  tests/Makefile
 ])
 
 AC_OUTPUT
@@ -182,13 +186,13 @@ AC_OUTPUT
 AC_MSG_NOTICE([
 **************************************************************************
 configuration:
+  source version            $PACKAGE_VERSION
 
-  C++ compiler:             $CXX
-  Lexical analyser:         $LEX
+  c++ compiler:             $CXX
+  lexical analyser:         $LEX
 
   install \${prefix}:        $prefix
   install \${exec_prefix}:   $exec_prefix
-  system config root dir:   $sysconfdir
   system data root dir:     $datarootdir
   binaries dir:             $bindir
 
@@ -198,13 +202,21 @@ configuration:
   doxygen path:             $DOXYGEN_PATH
   pdflatex path:            $PDFLATEX_PATH
 
-  run 'make' to build.
-
   make targets:
 
-    'all'     build all programs and scripts
-    'docs'    build the documentation.
-    'tests'   build the tests.
+    all, install, uninstall:
+    - build/(un)install all programs and scripts.
+
+    docs, install-docs:
+    - build/install documentation in all format.
+
+    html, pdf, man, install-html, install-pdf, install-man:
+    - build/install documentation in html, pdf, or man format.
+
+    check:
+    - run the build tests.
+
+  run 'make' or 'make all' to build.
 
 **************************************************************************
 ])

@@ -77,14 +77,13 @@ endef
 define scopes_extract_mfs
 $(amu_pm_d2)
 # makefile-script
-$(script_prefix)$2$(mfs_ext): $1 $(MAKEFILE_LIST) | $(output_directory)
+$(scopes_prefix)$2$(mfs_ext): $1 $(MAKEFILE_LIST) | $(output_path)
 	$$(call target_begin)
 	$(path_openscad_seam) \
 		--mode extract --input $1 $(openscad_seam_opts1) $(openscad_seam_opts2)
 
-scopes_mfs += $(script_prefix)$2$(mfs_ext)
-scopes_clean_files += $(script_prefix)$2$(mfs_ext)
-scopes_clean_files += $(script_prefix)$(notdir $(basename $1)).conf
+scopes_mfs += $(scopes_prefix)$2$(mfs_ext)
+scopes_clean_files += $(scopes_prefix)$(notdir $(basename $1)).conf
 endef
 
 # scopes_generate_mf (arg1)
@@ -93,12 +92,12 @@ endef
 define scopes_generate_mf
 $(amu_pm_d1)
 # makefile
-$(script_prefix)$1$(mf_ext): $(script_prefix)$1$(mfs_ext)
+$(scopes_prefix)$1$(mf_ext): $(scopes_prefix)$1$(mfs_ext)
 	$$(call target_begin)
-	$(path_bash) --norc --noprofile $(script_prefix)$1$(mfs_ext)
+	$(path_bash) --norc --noprofile $(scopes_prefix)$1$(mfs_ext)
 
-scopes_mf += $(script_prefix)$1$(mf_ext)
-scopes_clean_files += $(script_prefix)$1$(mf_ext)
+scopes_mf += $(scopes_prefix)$1$(mf_ext)
+scopes_clean_files += $(scopes_prefix)$1$(mf_ext)
 endef
 
 # scopes_run_mf (arg1,arg2)
@@ -108,7 +107,7 @@ endef
 define scopes_run_mf
 $(amu_pm_d2)
 # build-stamp
-$(script_prefix)$2$(stamp_ext): $(script_prefix)$2$(mf_ext)
+$(scopes_prefix)$2$(stamp_ext): $(scopes_prefix)$2$(mf_ext)
 	$$(call target_begin)
 	OPENSCADPATH="$(call join_with,$(env_field_sep), \
 		. \
@@ -116,11 +115,11 @@ $(script_prefix)$2$(stamp_ext): $(script_prefix)$2$(mf_ext)
 		$(if $(design_prefix),$(design_prefix)) \
 		$(if $(library_prefix),$(library_prefix)) \
 		,$(true))" \
-	$(path_gnumake) --makefile=$(script_prefix)$2$(mf_ext) all \
-	&& touch $(script_prefix)$2$(stamp_ext)
+	$(path_gnumake) --makefile=$(scopes_prefix)$2$(mf_ext) all \
+	&& $(touch) $(scopes_prefix)$2$(stamp_ext)
 
-scopes_stamp += $(script_prefix)$2$(stamp_ext)
-scopes_clean_files += $(script_prefix)$2$(stamp_ext)
+scopes_stamp += $(scopes_prefix)$2$(stamp_ext)
+scopes_clean_files += $(scopes_prefix)$2$(stamp_ext)
 endef
 
 ################################################################################

@@ -34,8 +34,8 @@
 all: $(addprefix all-,$(AMU_PM_COMPONENTS))
 	$(call target_end)
 
-# output directory
-$(output_directory): ; $(mkdir_p) $@
+# output directory path
+$(output_path): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Clean Targets
@@ -48,8 +48,8 @@ clean: $(addprefix clean-,$(AMU_PM_COMPONENTS) base)
 .PHONY: clean-base
 clean-base:
 	$(call target_begin)
-	-@$(test) -d $(output_directory) && \
-	$(rmdir) $(output_directory)
+	-@$(test) -d $(output_path) && \
+	$(rmdir) $(output_path)
 
 #------------------------------------------------------------------------------#
 # Install / Uninstall Targets
@@ -158,9 +158,12 @@ info-project: | silent
 	$(call heading1, Project Information)
 	$(call list_variables,$(project_control_variables),$(true), control)
 	$(call list_variables,$(project_config_variables),$(false), variables)
+	$(call list_variables,$(project_config_derived),$(false), derived)
 	$(foreach x, \
 		src_files \
 		backup_files \
+		release_files \
+		release_archive_files \
 	,$(call enumerate_variable,$x,$(false),$(false)))
 
 #------------------------------------------------------------------------------#
@@ -168,7 +171,7 @@ info-project: | silent
 #------------------------------------------------------------------------------#
 
 .PHONY: backup
-backup: $(backup_basename)$(backup_file_ext)
+backup: $(addprefix $(backup_basename),$(backup_exts))
 	$(call target_end)
 
 $(backup_basename).tar.xz: $(backup_files) | $(backup_root)
@@ -185,6 +188,55 @@ $(backup_basename).zip: $(backup_files) | $(backup_root)
 
 # backup directory
 $(backup_root): ; $(mkdir_p) $@
+
+#------------------------------------------------------------------------------#
+# Release Targets
+#------------------------------------------------------------------------------#
+
+.PHONY: release
+release: all $(release_stamp)
+	$(call target_end)
+	@$(ls_l) $(release_stamp) $(release_path)
+
+# copy files and create stamp
+$(release_stamp): $(addprefix $(release_archive_basename),$(release_archive_exts)) \
+                  $(release_manifest) \
+                  $(release_files) | $(release_path)
+	$(call target_begin)
+	$(foreach p,$(release_files), \
+		$(call execute_command, \
+			$(mkdir_p) $(dir $(release_path)$p) \
+			&& $(cp_a) $p $(release_path)$p \
+		) \
+	)
+	$(chmod_R) -w $(release_path)
+	$(touch) $@ && $(chmod) -w $@
+
+# generate manifest
+$(release_manifest): $(release_files) | $(release_path)
+	$(call target_begin)
+	$(call write_kv_variable_list,$@, \
+		project_name project_version project_brief - os arch - date time, \
+		$(false),$(false))
+	$(call write_kv_variable_list,$@, \
+		release_files - release_archive_files, \
+		$(true),$(true))
+
+# archive files
+$(release_archive_basename).tar.xz: $(release_archive_files) | $(release_path)
+	$(call target_begin)
+	$(tar_c) --file $@ $(release_archive_files)
+
+$(release_archive_basename).tar.gz: $(release_archive_files) | $(release_path)
+	$(call target_begin)
+	$(tar_c) --file $@ $(release_archive_files)
+
+$(release_archive_basename).zip: $(release_archive_files) | $(release_path)
+	$(call target_begin)
+	$(zip_c) $@ $(release_archive_files)
+
+# release directory
+$(release_path): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Help Targets

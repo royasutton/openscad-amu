@@ -14,12 +14,11 @@ EXTRA_DIST = \
 	test2.scad \
 	test3.scad
 
-
 ##############################################################################
 # targets
 ##############################################################################
 
-tests-local:	test1.bash-dif \
+check-local:	test1.bash-dif \
 							test1.scad-dif \
 							test1_doc.makefile.timestamp \
 							test2.count
