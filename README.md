@@ -52,6 +52,7 @@ as-is with a little modification.
     $ cp openscad-amu/share/scripts/bootstrap.{bash.in,conf} .
     $ sed '1d' bootstrap.bash.in > bootstrap.bash
     $ chmod +x bootstrap.bash
+    $ rm -rf openscad-amu
 
 To install the prerequisites, fetch and compile the source, install
 *openscad-amu* to a local cache directory, and create a project template type:
@@ -75,8 +76,9 @@ aspects of the design flow are set in this file. To see a menu of targets:
     $ cd my_project
     $ make help
 
-To compile and install the template example:
+To build and install the template example (in *my_project*):
 
+    $ cd my_project
     $ make install
 
 This will generate everything and install the library files to the OpenSCAD
@@ -96,8 +98,13 @@ To remove the installed library and documentation, type:
 Building the Source
 -------------------
 
-When all of the prerequisite packages exists, the source may be compiled by:
+The *bootstrap.bash* script is the most simple way to build the source.
+However, here are the steps to build it manually. When all of the
+prerequisite packages exists, the development source may be compiled by:
 
+    $ git clone https://github.com/royasutton/openscad-amu
+    $ cd openscad-amu
+    $ git checkout develop
     $ ./autogen.sh
     $ mkdir -p build && cd build
     $ ../configure
@@ -128,7 +135,7 @@ When the development branch reaches a stable point and is ready for
 release it is merged back into the master branch and tagged with a
 new version.
 
-To checkout and work with a specific version, for example release v1.3,
+To checkout and work with a specific version, for example release v1.6,
 the following can be used:
 
     $ git tag -l
