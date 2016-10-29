@@ -12,21 +12,6 @@ _pre-processor_ that allows __*.scad__ (and __*.bash__) to be documented
 using Doxygen.
 
 
-Downloading
------------
-
-You can find official source releases of the utilities at:
-
-    https://github.com/royasutton/openscad-amu/releases
-
-If you want the latest code from the development branch of the project,
-you can follow these steps for cloning the project repository:
-
-    $ git clone https://github.com/royasutton/openscad-amu
-    $ cd openscad-amu
-    $ git checkout develop
-
-
 Introduction
 ------------
 
@@ -34,33 +19,91 @@ Introduction
 and documentation markup of OpenSCAD language-based mechanical designs.
 
 It establishes a framework that allows auxiliary scripts to be written in
-structured comment blocks of __*.scad__ source code which are used to
-construct *Makefiles* that automate design compilation using [OpenSCAD].
+comment blocks of __*.scad__ source code which are used to construct
+*Makefiles* that automate design compilation using [OpenSCAD].
 
-With design documentation, it seems natural to leverage existing tools
-that extract code documentation from annotated sources. Inasmuch,
+As for documentation, it seems natural to leverage existing tools
+that extract coded documentation from annotated sources. Inasmuch,
 openscad-amu provides a __*.scad__ source code input-filter that may be
 used in conjunction with the widely used [Doxygen].
 
 
-Building and Installing
------------------------
+Repository
+----------
 
-To initialize the (GNU autotools) configuration script issue:
+To clone the repository and work with the _master_ source branch:
+
+    $ git clone https://github.com/royasutton/openscad-amu
+    $ cd openscad-amu
+
+To work with the latest development code from the _develop_ branch:
+
+    $ git checkout develop
+
+
+Bootstrap
+---------
+
+The source contains a script that may be used to setup the development
+environment. This script is normally built with the source, but can be used
+as-is with a little modification.
+
+    $ git clone https://github.com/royasutton/openscad-amu
+    $ cp openscad-amu/share/scripts/bootstrap.{bash.in,conf} .
+    $ sed '1d' bootstrap.bash.in > bootstrap.bash
+    $ chmod +x bootstrap.bash
+
+To install the prerequisites, fetch and compile the source, install
+*openscad-amu* to a local cache directory, and create a project template type:
+
+    $ ./bootstrap.bash --cache --yes --install --template my_project
+
+The argument *--yes* can be omitted if you prefer to confirm the installation
+of each package individually (help is available: *bootstrap.bash --help*).
+
+If all goes well, you will end up with two new directories: *cache* and
+*my_project*. The source will have been compiled and installed to *cache* and
+a template, with a *project makefile*, will have been copied to *my_project*.
+
+
+Project Makefile
+----------------
+
+The project makefile coordinates the design compilation flow. All controllable
+aspects of the design flow are set in this file. To see a menu of targets:
+
+    $ cd my_project
+    $ make help
+
+To compile and install the template example:
+
+    $ make install
+
+This will generate everything and install the library files to the OpenSCAD
+user library path. In addition, the documentation will be installed and
+added to an index that can be viewed with a web browser.
+
+    $ make print-install_prefix_html
+
+    $ firefox ${HOME}/.local/share/OpenSCAD/docs/html/index.html  # on Linux
+    $ firefox `cygpath --mydocs`/OpenSCAD/docs/html/index.html    # on Cygwin
+
+To remove the installed library and documentation, type:
+
+    $ make uninstall
+
+
+Building the Source
+-------------------
+
+When all of the prerequisite packages exists, the source may be compiled by:
 
     $ ./autogen.sh
-
-It is recommended, but not required, that you build openscad-amu in a
-separate directory apart from the repository source. To configure and
-build using the default install prefix issue:
-
-    $ mkdir -p build
-    $ cd build
+    $ mkdir -p build && cd build
     $ ../configure
     $ make
 
-To runs a few basic post-build sanity checks in the tests sub-directory
-issue:
+To runs post-build sanity checks:
 
     $ make check
 
@@ -71,75 +114,25 @@ The openscad-amu html documentation can be built and viewed by:
 
 To install or uninstall openscad-amu, issue:
 
-    $ make install
-    $ make uninstall
+    $ sudo make install
+    $ sudo make uninstall
 
 
-Project Template
-----------------
-
-Project templates are installed to the default library directory. To get
-started on a new project, copy the template files to a working directory
-and modify them as needed. The default library directory can be found
-by issuing the command:
-
-    $ openscad-seam --version --verbose
-
-To create a working copy assign LIB_PATH to the library directory reported
-from the above step:
-
-    $ LIB_PATH=`openscad-seam --version --verbose  | grep "lib path" | awk '{print $4}'`
-    $ echo ${LIB_PATH}
-
-Then follow these steps:
-
-    $ mkdir project_name
-    $ cd project_name
-
-    $ cp ${LIB_PATH}/templates/df1/{Doxyfile,design.scad,library.scad} .
-    $ cp ${LIB_PATH}/templates/df1/Project_Makefile Makefile
-
-    $ unset LIB_PATH
-
-To see a menu of makefile target options:
-
-    $ make help
-
-To compile and install the template, type:
-
-    $ make install
-
-This will compile everything and install the library files to the OpenSCAD
-user library path. The design documentation will also be installed and
-added to an index that can be viewed with a web browser. To locate the
-user library path and the HTML documentation path, issue:
-
-    $ make print-install_prefix_scad
-    $ make print-install_prefix_html
-
-To view the library documentation index, open the __index.html__ located
-in the __install_prefix_html__ directory reported in the previous step.
-
-To remove everything that was installed, type:
-
-    $ make uninstall
-
-Selecting a Release
--------------------
+Release Selection
+-----------------
 
 By convention, the *master* branch of the repository will normally be
 tagged with the most recent *release version* of the source code and
-the *develop* branch is were new development changes take place.
-
-When the the development branch reaches a stable point and is ready for
-release it is merged back into into the master branch and tagged with a
+the *develop* branch is where new development changes take place.
+When the development branch reaches a stable point and is ready for
+release it is merged back into the master branch and tagged with a
 new version.
 
 To checkout and work with a specific version, for example release v1.3,
 the following can be used:
 
     $ git tag -l
-    $ git checkout tags/v1.3
+    $ git checkout tags/v1.6
     $ git describe
 
 
