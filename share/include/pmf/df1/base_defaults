@@ -56,6 +56,9 @@ target_headings                         := $(true)
 # keep secondary files for implicit rules
 debug_secondary                         := $(false)
 
+# targets depend on project source/configuration files
+targets_depends_project                 := $(true)
+
 # add design/library source to release directory/archive
 release_project                         := $(true)
 release_design                          := $(true)
@@ -272,6 +275,7 @@ release_archive_files_add               :=
 project_control_variables := \
   target_headings \
   debug_secondary \
+  targets_depends_project \
   \
   release_project \
   release_design \

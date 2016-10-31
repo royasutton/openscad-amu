@@ -77,10 +77,15 @@ endef
 define scopes_extract_mfs
 $(amu_pm_d2)
 # makefile-script
-$(scopes_prefix)$2$(mfs_ext): $1 $(MAKEFILE_LIST) | $(output_path)
+$(scopes_prefix)$2$(mfs_ext): $1 | $(output_path)
 	$$(call target_begin)
 	$(path_openscad_seam) \
 		--mode extract --input $1 $(openscad_seam_opts1) $(openscad_seam_opts2)
+
+# make dependent on project files as configured
+ifeq ($(targets_depends_project),$(true))
+$(scopes_prefix)$2$(mfs_ext): $(MAKEFILE_LIST)
+endif
 
 scopes_mfs += $(scopes_prefix)$2$(mfs_ext)
 scopes_clean_files += $(scopes_prefix)$(notdir $(basename $1)).conf

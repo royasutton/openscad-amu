@@ -136,8 +136,8 @@ ifdef project_logo
     )
 endif
 
-# doxygen source files
-doxygen_src := \
+# doxygen configuration source files
+doxygen_config_src := \
   $(doxygen_config) \
   $(doxygen_html_header) \
   $(doxygen_html_footer) \
@@ -145,7 +145,7 @@ doxygen_src := \
   $(doxygen_layout)
 
 # backup files
-backup_files += $(doxygen_src)
+backup_files += $(doxygen_config_src)
 
 # release latex path filter
 ifeq ($(release_latex_refman_only),$(true))
@@ -157,7 +157,7 @@ endif
 # release files
 ifeq ($(release_doxygen),$(true))
   ifeq ($(release_project),$(true))
-    release_files += $(doxygen_src)
+    release_files += $(doxygen_config_src)
   endif
   release_files += \
     $(if $(generate_html),$(output_path)$(html_output)) \
@@ -168,7 +168,7 @@ endif
 # release archive files
 ifeq ($(release_archive_doxygen),$(true))
   ifeq ($(release_archive_project),$(true))
-    release_archive_files += $(doxygen_src)
+    release_archive_files += $(doxygen_config_src)
   endif
   release_archive_files += \
     $(if $(generate_html),$(output_path)$(html_output)) \
