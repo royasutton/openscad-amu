@@ -36,12 +36,12 @@ all-doxygen: $(doxygen_stamp) $(if $(generate_latex),$(latex_stamp))
 
 # auto-configuration file
 # depends on $(scopes_mf) since image_path=$(call scopes_targetsdir)
-$(doxygen_config_auto): $(MAKEFILE_LIST) $(scopes_mf) | $(output_path)
+$(doxygen_config_auto): $(src_files) $(doxygen_src) $(MAKEFILE_LIST) $(scopes_mf) | $(output_path)
 	$(call target_begin)
 	$(file >$(doxygen_config_auto),$(doxygen_config_auto_text))
 
 # doxygen
-$(doxygen_stamp): $(src_files) $(doxygen_src) $(doxygen_config_auto)
+$(doxygen_stamp): $(doxygen_config_auto)
 	$(call target_begin)
 	$(cat) $(doxygen_config_auto) $(doxygen_config) | $(path_doxygen) - \
 	&& $(touch) $(doxygen_stamp)
