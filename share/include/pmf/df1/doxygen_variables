@@ -60,6 +60,7 @@ openscad_dif_opts := \
     $(if $(autoconf_path),--auto-config $(autoconf_path)) \
     $(if $(call bool_decode,$(debug_dif_scanner)),--debug-scanner) \
     $(if $(call bool_decode,$(debug_dif_filter)),--debug-filter) \
+    $(if $(dif_opts_add),$(dif_opts_add)) \
   )
 
 enabled_sections := \
@@ -191,6 +192,8 @@ doxygen_config_variables := \
   example_path_add \
   image_path_add \
   enabled_sections_add \
+  \
+  dif_opts_add \
   \
   html_output \
   latex_output \

@@ -65,6 +65,9 @@ example_path_add                        :=
 image_path_add                          :=
 enabled_sections_add                    :=
 
+# addition options for openscad-dif
+dif_opts_add                            :=
+
 # output sub-directory names
 html_output                             := html
 latex_output                            := latex
