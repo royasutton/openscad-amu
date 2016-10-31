@@ -53,6 +53,12 @@ scopes_include                          :=
 # scopes exclude filter
 scopes_exclude                          :=
 
+# list of definitions to format and pass to openscad-seam
+seam_defines                            :=
+
+# addition options for openscad-seam
+seam_opts_add                           :=
+
 #------------------------------------------------------------------------------#
 # Control Variable List
 #------------------------------------------------------------------------------#
