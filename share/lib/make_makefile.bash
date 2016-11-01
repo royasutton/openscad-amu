@@ -1037,10 +1037,7 @@ function script()
           if [[ "$mode" ==  "begin_makefile_append" ]] ; then
             makefile_titleblock_begin >> $makefile_name "$title_info"
           else
-            # mkdir: should this be done here? Or left to the caller?
-            file_utility --mkdir $(file_utility --pathname $makefile_name)
-
-            makefile_titleblock_begin > $makefile_name "$title_info"
+            makefile_titleblock_begin  > $makefile_name "$title_info"
           fi
 
           ######################################
