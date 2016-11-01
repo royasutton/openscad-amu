@@ -353,7 +353,7 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
               << "__SOURCE_FILE__=\"" << input_name << "\"" << endl
               << "__SCOPE_FILE__=\"" << scope_openscad << "\"" << endl
               << "__MAKE_FILE__=\"" << scope_makefile << "\"" << endl
-              << "__INCLUDE_PATH__=\"" << include_path.string() << "\"" << endl;
+              << "__AMU_INCLUDE_PATH__=\"" << include_path.string() << "\"" << endl;
 
   if ( !openscad_path.empty() )
   output_file << "sc_openscad=" << openscad_path << endl;

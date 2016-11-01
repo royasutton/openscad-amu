@@ -254,7 +254,7 @@ Begin_Scope scope1;
 
     script
       Begin_Makefile_New
-        Include_Copy "${__INCLUDE_PATH__}/parallel_jobs.mk"
+        Include_Copy "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
         Summary  Tables  Targets  Menu_Ext
       End_Makefile;
 
