@@ -258,7 +258,7 @@ function file_utility()
   while [ $# -gt 0 ] ; do
     case $1 in
     --pathname)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         # check if has one or more '/'
         if [[ $2 =~ .*/.* ]] ; then
@@ -276,20 +276,20 @@ function file_utility()
         shift 2
     ;;
     --basename)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         echo "${2##*/}"
         shift 2
     ;;
     --rootname)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         declare local basename="$(file_utility --basename $2)"
         echo "${basename%.*}"
         shift 2
     ;;
     --extname)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         declare local basename="$(file_utility --basename $2)"
 
@@ -303,7 +303,7 @@ function file_utility()
         shift 2
     ;;
     --stemname)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         declare local pathname="$(file_utility --pathname $2)"
         declare local rootname="$(file_utility --rootname $2)"
@@ -314,7 +314,7 @@ function file_utility()
         shift 2
     ;;
     --addpathsep)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         declare local pathname="$2"
 
@@ -328,7 +328,7 @@ function file_utility()
         shift 2
     ;;
     --delrootsep)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         declare local pathname="$2"
 
@@ -342,7 +342,7 @@ function file_utility()
         shift 2
     ;;
     --delallpresep)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         declare local pathname="$2"
         declare -i local p=0
@@ -356,7 +356,7 @@ function file_utility()
         shift 2
     ;;
     --prefix)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
         [[ -z "$3" ]] && { echo "$2" ; break ; }
 
         declare local prefix="$2"
@@ -369,7 +369,7 @@ function file_utility()
         shift 3
     ;;
     --prefixstem)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
         [[ -z "$3" ]] && { echo "$2" ; break ; }
 
         declare local prefix="$2"
@@ -383,7 +383,7 @@ function file_utility()
         shift 3
     ;;
     --mkdir)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         declare local pathname="$2"
 
@@ -434,7 +434,7 @@ function include()
   while [ $# -gt 0 ] ; do
     case $1 in
     --path)
-        [[ -z "$2" ]] && break
+        [[ -z "$2" ]] && abort_error "$1 missing argument."
 
         path="$2"
         shift 2
@@ -445,9 +445,10 @@ function include()
       [[ -z $path ]] && file="$1"
       [[ -n $path ]] && file="$path/$1"
 
-      [[ -n $__VERBOSE__ ]] && \
+      [[ -n $__VERBOSE__ ]] &&
       echo "source $file"
 
+      [[ -r "$file" ]] || abort_error "Unable to read file [$file]."
       source $file
 
       shift 1
