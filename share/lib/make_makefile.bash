@@ -1178,10 +1178,14 @@ function variables()
     set_convert_exts)     convert_exts="$2"   ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
     set_convert_opts)     convert_opts="$2"   ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
 
-    add_opts)             opts_common+=" $2"  ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
-    add_opts_combine)     opts_sets+=" $2"    ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
-    add_convert_exts)     convert_exts+=" $2" ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
-    add_convert_opts)     convert_opts+=" $2" ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
+    add_opts)             [[ -n ${opts_common} ]] && opts_common+=" "
+                          opts_common+="$2"   ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
+    add_opts_combine)     [[ -n ${opts_sets} ]] && opts_sets+=" "
+                          opts_sets+="$2"     ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
+    add_convert_exts)     [[ -n ${convert_exts} ]] && convert_exts+=" "
+                          convert_exts+="$2"  ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
+    add_convert_opts)     [[ -n ${convert_opts} ]] && convert_opts+=" "
+                          convert_opts+="$2"  ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
 
     add_depend)
         depend_a[${#depend_a[@]}]="$2"        ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
