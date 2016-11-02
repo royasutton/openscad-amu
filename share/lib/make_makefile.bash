@@ -565,7 +565,11 @@ function generate_targets()
 
       declare local this_opt_val=$(table_getval_echo $this_opts $i)
 
-      declare local remain_opt_sets=$(echo ${opts_sets#${opts_sets_a[0]}})
+      # remove leading and trailing whitespace characters
+      opts_sets="${opts_sets#"${opts_sets%%[![:space:]]*}"}"
+      opts_sets="${opts_sets%"${opts_sets##*[![:space:]]}"}"
+
+      declare local remain_opt_sets=${opts_sets#${opts_sets_a[0]}}
 
       generate_targets \
         --out_stem "$out_stem$i" \
