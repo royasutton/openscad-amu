@@ -56,7 +56,7 @@ using namespace std;
 %option yylineno
 %option debug
 
-%s COMMENT AMUFUNC FUNCARG FUNCARGDQ FUNCARGSQ AMUMDEFINE DEFINEARG
+%s COMMENT READCL AMUFUNC FUNCARG FUNCARGDQ FUNCARGSQ AMUMDEFINE DEFINEARG
 
 comment_line                      "//"[/!]?
 comment_open                      "/*"[*!]?
@@ -82,7 +82,7 @@ amu_escaped                       "\\"[\\@]
       (2) output everything else unchanged */
 
 <INITIAL>{comment_open}           { scanner_echo(); yy_push_state(COMMENT); }
-<INITIAL>{comment_line}           { scanner_echo(); }
+<INITIAL>{comment_line}           { scanner_echo(); yy_push_state(READCL); }
 <INITIAL>include                  { scanner_output( "#include", 8 ); }
 <INITIAL>use                      { scanner_output( "#include", 8 ); }
 <INITIAL>{nr}                     { scanner_echo(); }
@@ -101,6 +101,12 @@ amu_escaped                       "\\"[\\@]
                                     scanner_output( mt.substr(1,mt.length()-1) ); }
 <COMMENT>{nr}                     { scanner_echo(); }
 <COMMENT>.                        { scanner_echo(); }
+
+  /* comment line: (outside of comment block)
+      (1) output everything unchanged until end of line */
+
+<READCL>{nr}                      { scanner_echo(); yy_pop_state(); }
+<READCL>.                         { scanner_echo(); }
 
   /* parse amu function:
       \amu_func1 var ( a1 a2 'a3' "a 4" file="all" ) */
