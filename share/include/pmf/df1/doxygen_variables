@@ -155,22 +155,26 @@ else
   release_latex_path_filter :=
 endif
 
-# release files
+# release project files
+ifeq ($(release_project),$(true))
+	release_files += $(doxygen_config_src)
+endif
+
+# release generated files
 ifeq ($(release_doxygen),$(true))
-  ifeq ($(release_project),$(true))
-    release_files += $(doxygen_config_src)
-  endif
   release_files += \
     $(if $(generate_html),$(output_path)$(html_output)) \
     $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
     $(if $(generate_man),$(output_path)$(man_output))
 endif
 
-# release archive files
+# archive project files
+ifeq ($(release_archive_project),$(true))
+	release_archive_files += $(doxygen_config_src)
+endif
+
+# archive generated files
 ifeq ($(release_archive_doxygen),$(true))
-  ifeq ($(release_archive_project),$(true))
-    release_archive_files += $(doxygen_config_src)
-  endif
   release_archive_files += \
     $(if $(generate_html),$(output_path)$(html_output)) \
     $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
