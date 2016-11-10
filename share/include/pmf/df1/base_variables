@@ -109,7 +109,7 @@ else
 endif
 
 # backup files
-backup_files := $(src_files) $(word 1,$(MAKEFILE_LIST)) $(backup_files_add)
+backup_files := $(src_files) $(word 1,$(MAKEFILE_LIST)) $(project_files_add) $(backup_files_add)
 
 # release stamps
 release_manifest := $(addprefix $(release_path),manifest$(stamp_ext))
@@ -119,7 +119,7 @@ release_stamp := $(addsuffix $(stamp_ext),$(call path_no_tdls,$(release_path)))
 release_files = $(release_files_add)
 
 ifeq ($(release_project),$(true))
-  release_files += $(word 1,$(MAKEFILE_LIST))
+  release_files += $(word 1,$(MAKEFILE_LIST)) $(project_files_add)
 endif
 
 ifeq ($(release_design),$(true))
@@ -134,7 +134,7 @@ endif
 release_archive_files = $(release_archive_files_add)
 
 ifeq ($(release_archive_project),$(true))
-  release_archive_files += $(word 1,$(MAKEFILE_LIST))
+  release_archive_files += $(word 1,$(MAKEFILE_LIST)) $(project_files_add)
 endif
 
 ifeq ($(release_archive_design),$(true))
@@ -164,6 +164,8 @@ project_config_variables := \
   mfs_ext \
   mf_ext \
   stamp_ext \
+  \
+  project_files_add \
   \
   output_root \
   \

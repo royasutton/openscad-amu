@@ -42,7 +42,7 @@ $(doxygen_config_auto): $(src_files) $(scopes_mf) | $(output_path)
 
 # make dependent on project files as configured
 ifeq ($(targets_depends_project),$(true))
-$(doxygen_config_auto): $(doxygen_config_src) $(MAKEFILE_LIST)
+$(doxygen_config_auto): $(doxygen_config_src) $(MAKEFILE_LIST) $(project_files_add)
 endif
 
 # doxygen

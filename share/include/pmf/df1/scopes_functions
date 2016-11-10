@@ -84,7 +84,7 @@ $(scopes_prefix)$2$(mfs_ext): $1 | $(output_path)
 
 # make dependent on project files as configured
 ifeq ($(targets_depends_project),$(true))
-$(scopes_prefix)$2$(mfs_ext): $(MAKEFILE_LIST)
+$(scopes_prefix)$2$(mfs_ext): $(MAKEFILE_LIST) $(project_files_add)
 endif
 
 scopes_mfs += $(scopes_prefix)$2$(mfs_ext)

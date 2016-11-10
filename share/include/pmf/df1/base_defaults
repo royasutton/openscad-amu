@@ -85,6 +85,9 @@ mfs_ext                                 := .bash
 mf_ext                                  := .makefile
 stamp_ext                               := .stamp
 
+# additions (project files)
+project_files_add                       :=
+
 #
 # Output directory
 #
