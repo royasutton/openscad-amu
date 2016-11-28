@@ -201,6 +201,7 @@
 
   | Internal Commands                                              | Description
   |:---------------------------------------------------------------|:------------------------
+  | \ref ODIF::ODIF_Scanner::def_init() "\\amu_define"             | define text macro
   | \ref ODIF::ODIF_Scanner::bif_eval() "\\amu_eval"               | evaluate arguments
   | \ref ODIF::ODIF_Scanner::bif_shell() "\\amu_shell"             | execute shell command
   | \ref ODIF::ODIF_Scanner::bif_combine() "\\amu_combine"         | combine words

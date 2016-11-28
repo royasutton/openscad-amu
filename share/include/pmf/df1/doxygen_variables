@@ -60,6 +60,7 @@ openscad_dif_opts := \
     $(if $(autoconf_path),--auto-config $(autoconf_path)) \
     $(if $(call bool_decode,$(debug_dif_scanner)),--debug-scanner) \
     $(if $(call bool_decode,$(debug_dif_filter)),--debug-filter) \
+    $(if $(dif_opts_add),$(dif_opts_add)) \
   )
 
 enabled_sections := \
@@ -136,8 +137,8 @@ ifdef project_logo
     )
 endif
 
-# doxygen source files
-doxygen_src := \
+# doxygen configuration source files
+doxygen_config_src := \
   $(doxygen_config) \
   $(doxygen_html_header) \
   $(doxygen_html_footer) \
@@ -145,7 +146,7 @@ doxygen_src := \
   $(doxygen_layout)
 
 # backup files
-backup_files += $(doxygen_src)
+backup_files += $(doxygen_config_src)
 
 # release latex path filter
 ifeq ($(release_latex_refman_only),$(true))
@@ -154,22 +155,26 @@ else
   release_latex_path_filter :=
 endif
 
-# release files
+# release project files
+ifeq ($(release_project),$(true))
+	release_files += $(doxygen_config_src)
+endif
+
+# release generated files
 ifeq ($(release_doxygen),$(true))
-  ifeq ($(release_project),$(true))
-    release_files += $(doxygen_src)
-  endif
   release_files += \
     $(if $(generate_html),$(output_path)$(html_output)) \
     $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
     $(if $(generate_man),$(output_path)$(man_output))
 endif
 
-# release archive files
+# archive project files
+ifeq ($(release_archive_project),$(true))
+	release_archive_files += $(doxygen_config_src)
+endif
+
+# archive generated files
 ifeq ($(release_archive_doxygen),$(true))
-  ifeq ($(release_archive_project),$(true))
-    release_archive_files += $(doxygen_src)
-  endif
   release_archive_files += \
     $(if $(generate_html),$(output_path)$(html_output)) \
     $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
@@ -191,6 +196,8 @@ doxygen_config_variables := \
   example_path_add \
   image_path_add \
   enabled_sections_add \
+  \
+  dif_opts_add \
   \
   html_output \
   latex_output \

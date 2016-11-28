@@ -44,6 +44,7 @@ openscad_seam_opts2 := \
     --prefix $(output_path) \
     --prefix-ipp 0 \
     --prefix-scripts $(if $(call bool_decode,$(prefix_scopes_scripts)),yes,no) \
+    $(if $(seam_defines),$(addprefix --define$(space),$(seam_defines))) \
     --comments yes \
     --show $(if $(call bool_decode,$(verbose_seam_show)),yes,no) \
     --run no \
@@ -55,6 +56,7 @@ openscad_seam_opts2 := \
     --write-config yes \
     $(if $(call bool_decode,$(debug_seam_scanner)),--debug) \
     $(if $(call bool_decode,$(verbose_seam)),--verbose) \
+    $(if $(seam_opts_add),$(seam_opts_add)) \
   )
 
 # scopes auxiliary scripts for all source files
@@ -117,7 +119,10 @@ scopes_config_variables := \
   scopes_joiner \
   \
   scopes_include \
-  scopes_exclude
+  scopes_exclude \
+  \
+  seam_defines \
+  seam_opts_add
 
 scopes_config_derived += \
   scopes_prefix \

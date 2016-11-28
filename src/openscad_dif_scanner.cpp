@@ -383,6 +383,15 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
 }
 
 
+/***************************************************************************//**
+
+  \details
+
+    Define a macro that expands to the specified text when used in other amu
+    function arguments. The macro is stored to the named variable. When
+    no variable is given, the text is immediately copied to the output.
+
+*******************************************************************************/
 void
 ODIF::ODIF_Scanner::def_init(void)
 {

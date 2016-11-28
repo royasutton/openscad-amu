@@ -366,6 +366,20 @@ function views_rotate()
 #    html     | 320 x 240
 #    pdf      | 640 x 480
 #    doc      | 640 x 480
+#    qqvga    | 160 x 120
+#    hqvga    | 240 x 160
+#    qvga     | 320 x 240
+#    wqvga    | 400 x 240
+#    hvga     | 480 x 320
+#    vga      | 640 × 480
+#    wvga     | 768 x 480
+#    svga     | 800 x 600
+#    wsvga    | 1024 x 600
+#    xga      | 1024 x 768
+#    wxga     | 1280 x 768
+#    sxga     | 1280 x 1024
+#    hd       | 1360 x 768
+#    uxga     | 1600 x 1200
 #
 #   Example:
 #   \dontinclude vehicle_document.bash
@@ -385,6 +399,22 @@ function images()
   ir_pdf="640,480"
   ir_doc="640,480"
 
+  # common graphics display resolutions
+  ir_qqvga="160,120"
+  ir_hqvga="240,160"
+  ir_qvga="320,240"
+  ir_wqvga="400,240"
+  ir_hvga="480,320"
+  ir_vga="640,480"
+  ir_wvga="768,480"
+  ir_svga="800,600"
+  ir_wsvga="1024,600"
+  ir_xga="1024,768"
+  ir_wxga="1280,768"
+  ir_sxga="1280,1024"
+  ir_hd="1360,768"
+  ir_uxga="1600,1200"
+
   while [ $# -gt 0 ] ; do
     case ${1,,} in
     name)
@@ -403,6 +433,9 @@ function images()
         for x in $types ; do
           case $x in
           html|pdf|doc)
+            table_set "$name" "_${x}" "--imgsize=\${ir_${x}}"
+          ;;
+          qqvga|hqvga|qvga|wqvga|hvga|vga|wvga|svga|wsvga|xga|wxga|sxga|hd|uxga)
             table_set "$name" "_${x}" "--imgsize=\${ir_${x}}"
           ;;
           *) abort_invalid_arg $x for $1 ;;

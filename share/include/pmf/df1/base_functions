@@ -347,7 +347,7 @@ read_key_value = $(amu_pm_d2)$(shell \
 #------------------------------------------------------------------------------#
 
 # check_version_list_digits (arg1)
-# arg1: An alphanumeric term without decimal.
+# arg1: An alphanumeric term without punctuation.
 # returns a space-separated alphanumeric list of digits.
 check_version_list_digits = $(amu_pm_d1)$(strip \
   $(eval __result := $1) \
@@ -357,8 +357,8 @@ check_version_list_digits = $(amu_pm_d1)$(strip \
   $(eval undefine __result))
 
 # check_version_compare_terms (arg1,arg2)
-# arg1: An alphanumeric version term1 without decimal.
-# arg2: An alphanumeric version term2 without decimal.
+# arg1: An alphanumeric version term1 without punctuation.
+# arg2: An alphanumeric version term2 without punctuation.
 # returns $(true) if term1 is less than term2.
 check_version_compare_terms = $(amu_pm_d2)$(strip \
   $(eval __digit_list1 := $(call check_version_list_digits,$1)) \
@@ -371,14 +371,14 @@ check_version_compare_terms = $(amu_pm_d2)$(strip \
   $(eval undefine __digit_list2))
 
 # check_version_compare_strings (arg1,arg2)
-# arg1: A decimal-separated version string1.
-# arg2: A decimal-separated version string2.
+# arg1: A punctuated version string1.
+# arg2: A punctuated version string2.
 # returns: 'lt': iff version-string1 < version-string2.
 #          'gt': iff version-string1 > version-string2.
 #      $(empty): iff version-string1 = version-string2.
 check_version_compare_strings = $(amu_pm_d2)$(word 1, \
-  $(eval __term_list2 := $(subst .,$(space),$2)) \
-  $(foreach i,$(subst .,$(space),$1), \
+  $(eval __term_list2 := $(call subst_list,$([punctv]),$([space]),$2)) \
+  $(foreach i,$(call subst_list,$([punctv]),$([space]),$1), \
     $(eval j := $(word 1,$(__term_list2))) \
     $(if $j, \
       $(if $(call strings_equal,$i,$j), \
@@ -474,6 +474,13 @@ endef
 unique = $(amu_pm_d1)$(strip \
   $(if $1,$(firstword $1) $(call unique,$(filter-out $(firstword $1),$1))) \
   )
+
+# subst_list (arg1,arg2)
+# arg1: A list of space separated key words.
+# arg2: A replacement string.
+# arg3: A text string.
+# returns the text string with all key words replaced with by the replacement string.
+subst_list = $(amu_pm_d3)$(if $1,$(subst $(firstword $1),$2,$(call subst_list,$(filter-out $(firstword $1),$1),$2,$3)),$3)
 
 # join_with (arg1,arg2,arg3)
 # arg1: A string that joins each member together.

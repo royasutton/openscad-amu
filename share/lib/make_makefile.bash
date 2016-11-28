@@ -565,7 +565,11 @@ function generate_targets()
 
       declare local this_opt_val=$(table_getval_echo $this_opts $i)
 
-      declare local remain_opt_sets=$(echo ${opts_sets#${opts_sets_a[0]}})
+      # remove leading and trailing whitespace characters
+      opts_sets="${opts_sets#"${opts_sets%%[![:space:]]*}"}"
+      opts_sets="${opts_sets%"${opts_sets##*[![:space:]]}"}"
+
+      declare local remain_opt_sets=${opts_sets#${opts_sets_a[0]}}
 
       generate_targets \
         --out_stem "$out_stem$i" \
@@ -1037,10 +1041,7 @@ function script()
           if [[ "$mode" ==  "begin_makefile_append" ]] ; then
             makefile_titleblock_begin >> $makefile_name "$title_info"
           else
-            # mkdir: should this be done here? Or left to the caller?
-            file_utility --mkdir $(file_utility --pathname $makefile_name)
-
-            makefile_titleblock_begin > $makefile_name "$title_info"
+            makefile_titleblock_begin  > $makefile_name "$title_info"
           fi
 
           ######################################
@@ -1181,10 +1182,14 @@ function variables()
     set_convert_exts)     convert_exts="$2"   ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
     set_convert_opts)     convert_opts="$2"   ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
 
-    add_opts)             opts_common+=" $2"  ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
-    add_opts_combine)     opts_sets+=" $2"    ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
-    add_convert_exts)     convert_exts+=" $2" ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
-    add_convert_opts)     convert_opts+=" $2" ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
+    add_opts)             [[ -n ${opts_common} ]] && opts_common+=" "
+                          opts_common+="$2"   ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
+    add_opts_combine)     [[ -n ${opts_sets} ]] && opts_sets+=" "
+                          opts_sets+="$2"     ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
+    add_convert_exts)     [[ -n ${convert_exts} ]] && convert_exts+=" "
+                          convert_exts+="$2"  ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
+    add_convert_opts)     [[ -n ${convert_opts} ]] && convert_opts+=" "
+                          convert_opts+="$2"  ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
 
     add_depend)
         depend_a[${#depend_a[@]}]="$2"        ; ((vcmd++)) ; ((parg+=2)) ; shift 2 ;;
