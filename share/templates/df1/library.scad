@@ -5,7 +5,7 @@
 /***************************************************************************//**
   \file   library.scad
   \author Designers' Name
-  \date   2016
+  \date   2016-2017
 
   \copyright
     Copyright notice.

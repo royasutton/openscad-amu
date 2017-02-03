@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.hpp
 
   \author Roy Allen Sutton
-  \date   2016
+  \date   2016-2017
 
   \copyright
 
