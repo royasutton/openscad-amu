@@ -75,4 +75,4 @@ you can contact the maintainer of the project or file an [issue].
 [git]: http://git-scm.com/
 [GitHub]: http://github.com/
 [forking]: http://help.github.com/forking/
-[pull requests]: http://help.github.com/pull-requests/
+[pull requests]: https://help.github.com/articles/about-pull-requests/
