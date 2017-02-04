@@ -139,7 +139,7 @@
           GNU Make Documentation"
         cell_urls="
           http://www.openscad.org
-          https://github.com/royasutton/openscad-amu
+          https://royasutton.github.io/openscad-amu
           http://www.stack.nl/~dimitri/doxygen
           https://www.gnu.org/software/make
         "
