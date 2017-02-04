@@ -85,82 +85,81 @@ module lm1( p1="X", p2=10 ) {
 //
 
 /*
-  in general, libraries should avoid (or a least minimize) the use of globals.
-  use functions and parameters to facilitate reuse.
+  This is a library. Avoid or minimize the use of globals.
+  Use functions and parameters to facilitate reuse.
 */
 
 
-//
-// (openscad-amu) auxiliary build and modeling scripts, two scopes.
-//
+//----------------------------------------------------------------------------//
+// openscad-amu auxiliary design flow scripts
+//----------------------------------------------------------------------------//
 
-/***************************************************************************//**
-Begin_Scope scope1;
-  Begin_OpenSCAD;
+/*
+BEGIN_SCOPE scope1;
+  BEGIN_OPENSCAD;
     use <library.scad>;
 
     aux_script_str="A";
     aux_script_int=10;
 
     lm1(p1=aux_script_str, p2=aux_script_int);
-  End_OpenSCAD;
+  END_OPENSCAD;
 
-  Begin_MFScript;
-    defines Name "str" Define "aux_script_str" Strings "A B C D";
-    defines Name "int" Define "aux_script_int" Integers "2";
+  BEGIN_MFSCRIPT;
+    defines name "str" define "aux_script_str" strings "A B C D";
+    defines name "int" define "aux_script_int" integers "2";
 
     variables
-      set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"
-      set_Source "${__SCOPE_FILE__}"   set_Prefix "${__PREFIX__}"
+      set_makefile "${__MAKE_FILE__}"  add_depend "${__MAKE_FILE__}"
+      set_source "${__SCOPE_FILE__}"   set_prefix "${__PREFIX__}"
 
-      Set_Ext "stl"
-      Clear_Convert
-      Set_Opts "--render"
-      Set_Opts_Combine "str int";
+      set_ext "stl"
+      clear_convert
+      set_opts "--render"
+      set_opts_combine "str int";
 
     script
-      Begin_Makefile_New
-        Include_Copy "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
-        Summary  Tables  Targets  Menu
-      End_Makefile;
-  End_MFScript;
-End_Scope;
+      begin_makefile_new
+        include_copy "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
+        summary  tables  targets  menu
+      end_makefile;
+  END_MFSCRIPT;
+END_SCOPE;
 
-Begin_Scope scope2;
-  Begin_OpenSCAD;
+BEGIN_SCOPE scope2;
+  BEGIN_OPENSCAD;
     use <library.scad>;
 
     aux_script_str="A";
     aux_script_int=10;
 
     lm1(p1=aux_script_str, p2=aux_script_int);
-  End_OpenSCAD;
+  END_OPENSCAD;
 
-  Begin_MFScript;
-    defines Name "str" Define "aux_script_str" Strings "A B C D";
-    defines Name "int" Define "aux_script_int" Integers "2";
-    views   Name "views" Distance "100" Views "top bottom diag";
-    images  Name "sizes" Aspect "4:3" Wsizes "320";
+  BEGIN_MFSCRIPT;
+    defines name "str" define "aux_script_str" strings "A B C D";
+    defines name "int" define "aux_script_int" integers "2";
+    views   name "views" distance "100" views "top bottom diag";
+    images  name "sizes" aspect "4:3" wsizes "320";
 
     variables
-      set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"
-      set_Source "${__SCOPE_FILE__}"   set_Prefix "${__PREFIX__}"
+      set_makefile "${__MAKE_FILE__}"  add_depend "${__MAKE_FILE__}"
+      set_source "${__SCOPE_FILE__}"   set_prefix "${__PREFIX__}"
 
-      set_Ext "png"
-      set_Convert_Exts "eps"  set_Convert_Opts "-verbose"
-      set_Opts "--preview --projection=o --viewall --autocenter"
-      set_Opts_Combine "str int views sizes";
+      set_ext "png"
+      set_convert_exts "eps"  set_convert_opts "-verbose"
+      set_opts "--preview --projection=o --viewall --autocenter"
+      set_opts_combine "str int views sizes";
 
     script
-      Begin_Makefile_New
-        Include_Copy "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
-        Summary  Tables  Targets  Menu
-      End_Makefile;
-  End_MFScript;
-End_Scope;
-*******************************************************************************/
+      begin_makefile_new
+        include_copy "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
+        summary  tables  targets  menu
+      end_makefile;
+  END_MFSCRIPT;
+END_SCOPE;
+*/
 
-
-////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------//
 // end of file
-////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------//
