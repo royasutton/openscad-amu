@@ -10,12 +10,12 @@ rootname="${basename%.*}"
 #   \file   segregate.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016
+#   \date   2016-2017
 #
 #   \copyright
 #
 #     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
-#     (https://github.com/royasutton/openscad-amu)).
+#     (https://royasutton.github.io/openscad-amu)).
 #
 #     openscad-amu is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ declare local number=0
 declare local ignore=0
 declare local list=0
 
-# part command line arguments
+# parse command line arguments
 while [ $# -gt 0 ] ; do
   case ${1,,} in
   --file)     file="$2"   ; shift 2 ;;

@@ -1,16 +1,16 @@
-#!@BASH_PATH@
+#!/bin/bash
 #!/usr/bin/env bash
 #/##############################################################################
 #
 #   \file   bootstrap.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2017
+#   \date   2016
 #
 #   \copyright
 #
 #     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
-#     (https://royasutton.github.io/openscad-amu)).
+#     (https://github.com/royasutton/openscad-amu)).
 #
 #     openscad-amu is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -884,10 +884,10 @@ function print_version() {
 print_m -j "${base_name}: (Version)" -l
 
 cat << EOF
-     package: @PACKAGE_NAME@
-     version: @PACKAGE_VERSION@
-  bug report: @PACKAGE_BUGREPORT@
-    site url: @PACKAGE_URL@
+     package: openscad-amu
+     version: v1.7
+  bug report: royasutton@hotmail.com
+    site url: https://github.com/royasutton/openscad-amu
 
 EOF
 }

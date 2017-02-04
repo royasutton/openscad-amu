@@ -13,7 +13,7 @@ AC_INIT(
   [m4_esyscmd_s([git describe --tags --dirty --always])],
   [royasutton@hotmail.com],
   [openscad-amu],
-  [https://github.com/royasutton/openscad-amu])
+  [https://royasutton.github.io/openscad-amu])
 
 AC_CONFIG_AUX_DIR([scripts])
 AC_CONFIG_MACRO_DIR([m4])

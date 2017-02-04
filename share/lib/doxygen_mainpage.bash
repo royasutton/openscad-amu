@@ -14,32 +14,34 @@
 
   \section what_is_amu What is it?
 
-    [openscad-amu](https://github.com/royasutton/openscad-amu) is a
-    collection of \ref programs "programs", a \ref mslibrary "script library"
-    written in [bash] (https://www.gnu.org/software/bash/), and support
+    [openscad-amu](https://royasutton.github.io/openscad-amu)
+    is being developed to support the construction of automated design
+    flows and documentation generation for OpenSCAD language-based
+    mechanical designs. It is a collection of \ref programs "programs",
+    a \ref mslibrary "scripting library", and support
     \ref scripts "scripts." It provides a framework that can be used to
-    structure the automated compilation of [OpenSCAD] (http://www.openscad.org/)
-    designs and provides utilities that allows *.scad source code to be documented
-    using [Doxygen](http://www.stack.nl/~dimitri/doxygen/index.html) markup
+    control the compilation of [OpenSCAD](http://www.openscad.org/)
+    designs and provides utilities that allows <tt>*.scad</tt> source
+    code to be documented using
+    [Doxygen](http://www.stack.nl/~dimitri/doxygen/index.html) markup
     commands.
 
-  \section have_a_look Have a look
 
-    To see what openscad-amu can do, we start with this \ref vehicle.scad
-    "source file" that represents a simplified but typical OpenSCAD
-    parameterized design library. It differs only in that it includes
-    (1) \em markups that document how to use the source library and
-    (2) comment-embedded \em auxiliary \em scripts that code how to
-    compile design targets. This augmented source example is able to
-    produce the images that are part of the library documentation and
-    render 96 targets of interest <tt>(*.png, *.stl, etc.)</tt>.
+  \section an_example Example
+
+    To see what openscad-amu can do, see this simplified but typical
+    example \ref vehicle.scad "source file" that represents an OpenSCAD
+    parameterized design library. It differs in that it includes: (1)
+    comment-embedded <em>special commands</em> that document the
+    library and (2) comment-embedded <em>auxiliary scripts</em> that
+    describe how to automatically compile targets.
 
     \dot
       digraph example {
         rankdir="LR";
         node [fontname=Helvetica fontsize=10];
         edge [arrowhead=vee];
-        a  [shape=note label="Augmented\nSource\n(vehicle.scad)" URL="\ref vehicle.scad"];
+        a  [shape=note label="Annotated\nSource\n(vehicle.scad)" URL="\ref vehicle.scad"];
         b  [shape=oval peripheries=2 label="Automatic\nDesign\nFlow" URL="\ref design_flow"];
         c  [shape=component label="Target (1)\n...\nTarget (96)" URL="../../../examples/build/html/vehicle_test_car_17.stl"];
         d  [shape=folder label="Design\nLibrary\nDocumentation" URL="../../../examples/build/html/index.html"];
@@ -47,8 +49,11 @@
       }
     \enddot
 
-    \em openscad-amu brings together several standard tools to automate
-    the production of \em OpenSCAD design targets and the design source
+    This simple example is able to produce the images that are part of
+    the library documentation and render 96 targets of interest
+    <tt>(*.png, *.stl, etc.)</tt>.  \em openscad-amu brings together
+    several common tools to automate the production of \em OpenSCAD
+    design targets and the design source
     <a href="../../../examples/build/html/index.html">documentation</a>
     <a href="../../../examples/build/latex/refman.pdf">(PDF)</a>.
 
@@ -60,19 +65,19 @@
     source filter that may be used in conjunction with the widely used
     Doxygen.
 
-    For automated target production, openscad-amu uses a framework that
-    allows auxiliary scripts to be written into structured comment blocks
-    of <tt>*.scad</tt> source. These scripts are later interpreted
-    to construct Makefiles that automate OpenSCAD design target renderings.
-    These embedded scripts may be used for general model rendering,
-    testing, documentation image production, use-case examples, animation,
-    etc.
+    For automated target rendering, openscad-amu uses a framework that
+    allows auxiliary scripts to be written into structured comment
+    blocks of the <tt>*.scad</tt> source. These scripts are later
+    extracted and interpreted to construct Makefiles that automate the
+    design flow. These embedded scripts may be used for general model
+    rendering, testing, documentation image production, use-case
+    examples, animation, etc.
 
-    \subpage augmenting_source
+    \subpage source_annotate
 
     \subpage design_flow
 
-    \subpage an_example "More on the Example"
+    \subpage an_example_more "The Example"
 
   \section framework_components Framework Components
 
@@ -81,7 +86,6 @@
     \li \subpage scripts "Support Scripts"
 
 
-  \todo work on an example that demonstrates dimensioning.
   \todo work on an example that demonstrates animation creation.
   \todo create include makefile for creating videos (may need to export
         stem name to a makefile variable).
@@ -94,45 +98,46 @@
 
 
 #/##############################################################################
-  \page augmenting_source Augmenting the Source
+  \page source_annotate Source annotation
 
-    To avoid interfering with the primary OpenSCAD design behavior,
-    auxiliary scripts and design documentation are placed inside
-    source code comment sections. A hierarchical scoping scheme is used
-    to track and identify them as shown the following diagram:
+    To avoid interfering with the primary OpenSCAD script, auxiliary
+    scripts and design documentation are placed inside source code
+    comment sections. The auxiliary script use a hierarchical scoping
+    scheme to track and identify them as shown the following diagram:
 
     \dotfile embedding_scheme.dot
 
-    In this way, the documentation and scripts may co-exists with the
-    design source. They are subsequently identified and extracted to
-    generate the design documentation and automate the design rendering.
+    Therefore, the documentation and scripts co-exists with the design
+    source. They are subsequently identified and extracted to generate
+    the design documentation and to automate the design flow process.
 
-    The design source augmentation looks like this:
+    The source annotation looks like this:
 
     \include embedding_scheme.scad
 
-    In the above example, there are three modeling and three build scripts.
-    The utility \ref openscad_seam is used to identify and extract them as
-    shown in this \ref embedding_scheme.scripts "output example." The
-    utility \ref openscad_dif is used to pre-process the embedded
-    documentation that is generated by Doxygen.
+    In this example, there are three modeling and three build scripts
+    embedded in the auxilary scopes: A, A_1, and B. The utility
+    \ref openscad_seam is used to identify and extract them as shown in
+    \ref embedding_scheme.scripts "here." The utility \ref openscad_dif
+    is used to pre-process the embedded special commands for Doxygen.
 ###############################################################################/
 
 
 #/##############################################################################
-  \page design_flow The Design Flow
+  \page design_flow Design flow automation
 
-    [openscad-amu](https://github.com/royasutton/openscad-amu) brings
+    [openscad-amu](https://royasutton.github.io/openscad-amu) brings
     together [OpenSCAD](http://www.openscad.org/),
     [Doxygen](http://www.stack.nl/~dimitri/doxygen/),
-    [make](https://www.gnu.org/software/make), and hierarchal scoped
-    \ref mslibrary "scripting" to automate the production of the design
-    documentation and design targets. A design project will typically
-    include a project Makefile, a project Doxygen configuration file
-    (Doxyfile), and the project source files. For each scope of each
-    source file there will be a modeling script, a build script, a
-    generated makefile, and targets, as shown in the design flow
-    diagram below.
+    [make](https://www.gnu.org/software/make), and
+    \ref mslibrary "custom scripting" to automate the generation of the
+    design documentation and design targets.
+
+    A project will typically include a project-Makefile, a Doxygen
+    configuration file (Doxyfile), and the project source files. Each source
+    file may include one or more modeling scripts and/or build scripts.
+    Each build scripts generates a makefile that controls the geneation
+    of the source scope-targets as summarized in the following diagram.
 
     \dot
       digraph example {
@@ -172,9 +177,9 @@
       }
     \enddot
 
-    The design flow is best automated using a makefile for the entire
-    project. A basic project makefile  example is shown below for a
-    project with two scopes.
+    The overall design flow is controlled using a top makefile for the
+    entire project. A basic project makefile example is shown below for
+    a simple project with two scopes.
 
   \section project_makefile Project Makefile
 
@@ -204,37 +209,39 @@
 
       build: ; mkdir -v build
     \endcode
-
 ###############################################################################/
 
 
 #/##############################################################################
-  \page an_example An Example
+  \page an_example_more More on the example
 
     Here is the \ref vehicle.scad "design example" that was introduced
-    in the section \ref have_a_look "\"Have a look.\"" As discussed, it
-    has had documentation markups and auxiliary scripts added to the
-    source. This source file together with a \ref vehicle.doxyfile
-    "configuration file" are used to generate the design documentation,
-    render the documentation images, and render the STL design models.
-    If there is ever a need to change the source, all 96 targets can be
-    updated as required by the scope makefiles generated from the accompanying
-    build scripts (typically invoked from the project makefile).
+    in the section \ref an_example "\"An example\"".
 
-    In this example, there are four auxliary scripts in two scopes: namely
-    (1) \em test and (2) \em document. The scripts are extracted with the
-    utility \ref openscad_seam and are used to create makefiles that control
-    the build process for each scope.
+    As discussed, has documentation special commands and auxiliary
+    scripts added to the source in comments. This source file together
+    with a \ref vehicle.doxyfile "configuration file" are used to
+    generate the design documentation, render the documentation images,
+    and render the STL design models. If and when there is a need to
+    change the source, all 96 targets can be updated as required by the
+    scope makefiles generated from the accompanying build scripts
+    (typically invoked from the project makefile).
+
+    In this example, there are four auxliary scripts in two scopes:
+    namely \em test and \em document. The scripts are extracted with
+    the utility \ref openscad_seam and are used to create makefiles
+    that control the build process for each scope.
 
     These scripts and makefiles are summarized in the following table:
 
-    Scope    | Modeling Script            | Build Script               | Makefile
-    :-------:|:--------------------------:|:--------------------------:|:------------------------------:
-    test     | \ref vehicle_test.scad     | \ref vehicle_test.bash     | \ref vehicle_test.makefile
-    document | \ref vehicle_document.scad | \ref vehicle_document.bash | \ref vehicle_document.makefile
+    | Scope    | Modeling Script            | Build Script               | Makefile                       |
+    |:--------:|:--------------------------:|:--------------------------:|:------------------------------:|
+    | test     | \ref vehicle_test.scad     | \ref vehicle_test.bash     | \ref vehicle_test.makefile     |
+    | document | \ref vehicle_document.scad | \ref vehicle_document.bash | \ref vehicle_document.makefile |
 
-    The following command extracts the scripts, generated the makefiles, and
-    builds the targets for all scopes of the input source file:
+    The following command extracts the scripts, generates the
+    makefiles, and builds the targets for all scopes of the input
+    source file:
 
     \verbatim
       $ openscad-seam \
@@ -246,10 +253,10 @@
           --verbose
     \endverbatim
 
-    To format the documentation, the source file is pre-processed using
-    \ref openscad_dif and passed to Doxygen. This is specified using the
-    \c INPUT_FILTER or \c FILTER_PATTERNS configuration option as shown
-    in the \ref vehicle.doxyfile.
+    To format the Doxygen special commands, the source file is
+    pre-processed using \ref openscad_dif and then passed to Doxygen.
+    This is specified using the \c INPUT_FILTER or \c FILTER_PATTERNS
+    configuration option as shown in the \ref vehicle.doxyfile.
 
     \warning The Doxygen \c FILTER_PATTERNS
              [bug \#504305](https://bugzilla.gnome.org/show_bug.cgi?id=504305)
@@ -274,7 +281,7 @@
 
 
 #/##############################################################################
-  \page mslibrary Makefile Script Library
+  \page mslibrary Makefile script library
 
   \dot
     digraph example {
@@ -289,8 +296,8 @@
 
   \section library_groups Groups
 
-    - \ref library_core "Core Members"
-    - \ref library_support "Support Members"
+    - \ref library_core "Core members"
+    - \ref library_support "Support members"
 
   \section library_files Files
 
@@ -313,26 +320,28 @@
 
     \includelineno hello_world.bash
 
-    This simple script will create a makefile with four targets. Line 11
+    This script will create a makefile with four targets. Line 11
     through 15 create two set tables, named \c view and \c size, that
-    contain command line option strings. Each entry has a table name,
-    a key name, and a key value string . Line 17 specified the basic
+    contain command line option strings. Each entry has a table name, a
+    key name, and a key value string . Line 17 specified the basic
     parameters of the makefile to be generated, including the two table
-    names that were created with the command line options. Line 25 begins
-    the creation of the makefile.
+    names that were created with the command line options. Line 25
+    begins the creation of the makefile.
 
-    When this script is run, it will generate a makefile named
-    \c hello_world.makefile with four targets. Each target will invoke OpenSCAD
-    once for the four resulting combinations of the two entries in the two
-    table. The commons OpenSCAD options set by \c set_opts on line 22 will
-    be used during the invokation all of the generated targets.
+    When this script is run, it will generate a makefile named \c
+    hello_world.makefile with four targets. Each target will invoke
+    OpenSCAD once for the four resulting combinations of the two
+    entries in the options table. The commons OpenSCAD options set by
+    \c set_opts on line 22 will be used during the invokation all of
+    the generated targets.
 
-    Here is the resulting \link hello_world.makefile makefile.\endlink
+    Here is the resulting generated
+    \link hello_world.makefile makefile.\endlink
 ###############################################################################/
 
 
 #/##############################################################################
-  \defgroup library_arguments Argument Naming Convention
+  \defgroup library_arguments Argument naming convention
 
     The library is written using the Bourne Again SHell (bash)
     scripting language. Bash variables are untyped and are all basically
@@ -343,7 +352,7 @@
     parameters.
 
     To help document the use of these functions, the following
-    conventions are made over five parameters characteristics:
+    conventions are made:
 
     - Required vs. optional,
     - Matching method,
@@ -383,7 +392,7 @@
 
 
 #/##############################################################################
-  \defgroup library_core Makefile Script Library Core
+  \defgroup library_core Makefile script library core
 
   \copydoc library_arguments
 
@@ -413,7 +422,7 @@
 
 
 #/##############################################################################
-  \defgroup library_support Makefile Script Library Support
+  \defgroup library_support Makefile script library support
 
   \copydoc library_arguments
 ###############################################################################/

@@ -5,7 +5,7 @@
 /***************************************************************************//**
   \file   design.scad
   \author Designers' Name
-  \date   2016
+  \date   2016-2017
 
   \copyright
     Copyright notice.
@@ -139,7 +139,7 @@
           GNU Make Documentation"
         cell_urls="
           http://www.openscad.org
-          https://github.com/royasutton/openscad-amu
+          https://royasutton.github.io/openscad-amu
           http://www.stack.nl/~dimitri/doxygen
           https://www.gnu.org/software/make
         "
@@ -212,67 +212,66 @@ design_int=10;    ///< An integer scaling factor for the text.
 dm1(p1=design_str, p2=design_int);
 
 
-//
-// (openscad-amu) auxiliary build script, two scopes.
-//
+//----------------------------------------------------------------------------//
+// openscad-amu auxiliary design flow scripts
+//----------------------------------------------------------------------------//
 
-/***************************************************************************//**
-Begin_Scope logo;
-  Begin_MFScript;
-    defines Name "str" Define "design_str" Strings "logo";
-    views   Name "views" Translate "650,180,50" Distance "1700" Views "top";
-    images  Name "sizes" Aspect "4:1" Xsizes "200";
-
-    variables
-      set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"
-      set_Source "${__SOURCE_FILE__}"  set_Prefix "${__PREFIX__}"
-
-      set_Ext "png"
-      set_Convert_Exts "eps"  set_Convert_Opts "-verbose"
-      set_Opts "--preview --projection=p"
-      set_Opts_Combine "str views sizes";
-
-    script Begin_Makefile Summary  Tables  Targets  Menu End_Makefile;
-  End_MFScript;
-End_Scope;
-
-Begin_Scope scope1;
-  Begin_MFScript;
-    defines Name "str" Define "design_str" Strings "v10 v11 v12";
-    defines Name "int" Define "design_int" Integers "1 2";
-    views   Name "views" Distance "100" Views "top bottom diag";
-    images  Name "sizes" Aspect "4:3" Wsizes "320";
+/*
+BEGIN_SCOPE logo;
+  BEGIN_MFSCRIPT;
+    defines name "str" define "design_str" strings "logo";
+    views   name "views" translate "650,180,50" distance "1700" Views "top";
+    images  name "sizes" aspect "4:1" xsizes "200";
 
     variables
-      set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"
-      set_Source "${__SOURCE_FILE__}"  set_Prefix "${__PREFIX__}"
+      set_makefile "${__MAKE_FILE__}"  add_depend "${__MAKE_FILE__}"
+      set_source "${__SOURCE_FILE__}"  set_prefix "${__PREFIX__}"
 
-      set_Ext "png"
-      set_Convert_Exts "eps"  set_Convert_Opts "-verbose"
-      set_Opts "--preview --projection=o --viewall --autocenter"
-      set_Opts_Combine "str int views sizes";
+      set_ext "png"
+      set_convert_exts "eps"  set_convert_opts "-verbose"
+      set_opts "--preview --projection=p"
+      set_opts_combine "str views sizes";
+
+    script begin_makefile summary  tables  targets  menu end_makefile;
+  END_MFSCRIPT;
+END_SCOPE;
+
+BEGIN_SCOPE scope1;
+  BEGIN_MFSCRIPT;
+    defines name "str" define "design_str" strings "v10 v11 v12";
+    defines name "int" define "design_int" integers "1 2";
+    views   name "views" distance "100" views "top bottom diag";
+    images  name "sizes" aspect "4:3" wsizes "320";
+
+    variables
+      set_makefile "${__MAKE_FILE__}"  add_depend "${__MAKE_FILE__}"
+      set_source "${__SOURCE_FILE__}"  set_prefix "${__PREFIX__}"
+
+      set_ext "png"
+      set_convert_exts "eps"  set_convert_opts "-verbose"
+      set_opts "--preview --projection=o --viewall --autocenter"
+      set_opts_combine "str int views sizes";
 
     script
-      Begin_Makefile_New
-        Include_Copy "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
-        Summary  Tables  Targets  Menu_Ext
-      End_Makefile;
+      begin_makefile_new
+        include_copy "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
+        summary  tables  targets  menu_ext
+      end_makefile;
 
     variables
-      Set_Ext "stl"
-      Clear_Convert
-      Set_Opts "--render"
-      Set_Opts_Combine "str int";
+      set_ext "stl"
+      clear_convert
+      set_opts "--render"
+      set_opts_combine "str int";
 
     script
-      Begin_Makefile_Append
-        Summary  Tables  Targets  Menu_Ext  Menu_Src  Menu_All
-      End_Makefile;
-  End_MFScript;
-End_Scope;
-*******************************************************************************/
+      begin_makefile_append
+        summary  tables  targets  menu_ext  menu_src  menu_all
+      end_makefile;
+  END_MFSCRIPT;
+END_SCOPE;
+*/
 
-
-////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------//
 // end of file
-////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------------------------------------------//

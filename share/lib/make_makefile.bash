@@ -4,11 +4,11 @@
 #   \file   make_makefile.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016
+#   \date   2016-2017
 #
 #   \copyright
 #     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
-#     (https://github.com/royasutton/openscad-amu)).
+#     (https://royasutton.github.io/openscad-amu)).
 #
 #     openscad-amu is free software: you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -157,12 +157,12 @@ function show_variable_summary()
   print_m -j
   print_textbox $mfs -bt \
       -ct "Variables Summary" -pl -hr -clr \
-      -rt "[source name]" -lt " $source_name" -pl \
-      -rt "[target ext]" -lt " $output_ext" -pl \
-      -rt "[output path]" -lt " $output_path" -pl \
-      -rt "[makefile name]" -lt " $makefile_name" -pl \
-      -rt "[output stempath]" -lt " $output_stempath" -pl \
-      -rt "[combination option sets]" -lt " $opts_sets" -pl
+      -rt "[source name] " -lt " $source_name" -pl \
+      -rt "[target ext] " -lt " $output_ext" -pl \
+      -rt "[output path] " -lt " $output_path" -pl \
+      -rt "[makefile name] " -lt " $makefile_name" -pl \
+      -rt "[output stempath] " -lt " $output_stempath" -pl \
+      -rt "[combination option sets] " -lt " $opts_sets" -pl
 
   if [[ ${#depend_a[@]} -gt 0 ]] ; then
     print_textbox $mfs -ct "[target depends]" -fc '-' -pl
@@ -175,7 +175,7 @@ function show_variable_summary()
     print_textbox $mfs -ct "[image convertion targets]" -fc '-' -pl
     for co in $convert_exts ; do
       print_textbox $mfs -lt " ${output_ext}2${co}" \
-        -ct "--> ${co}" -rt "[output path]" -pl
+        -ct "--> ${co}" -rt "[output path] " -pl
     done
   fi
 
@@ -188,9 +188,9 @@ function show_variable_summary()
 
   if [[ -n $log_begin_rec ]]; then
     print_textbox $mfs -ct "[log segregation filter]" -fc '-' -pl
-    print_textbox $mfs -lt " ${log_begin_rec}" -rt "[start new record text]" -pl
+    print_textbox $mfs -lt " ${log_begin_rec}" -rt "[start new record text] " -pl
     [[ -n $log_end_rec ]] && \
-    print_textbox $mfs -lt " ${log_end_rec}" -rt "[end record text]" -pl
+    print_textbox $mfs -lt " ${log_end_rec}" -rt "[end record text] " -pl
   fi
 
   print_textbox $mfs -bb

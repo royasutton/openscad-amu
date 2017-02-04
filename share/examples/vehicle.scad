@@ -3,12 +3,12 @@
   \file   vehicle.scad
 
   \author Roy Allen Sutton
-  \date   2016
+  \date   2016-2017
 
   \copyright
 
     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
-    (https://github.com/royasutton/openscad-amu)).
+    (https://royasutton.github.io/openscad-amu)).
 
     openscad-amu is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
