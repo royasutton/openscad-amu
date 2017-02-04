@@ -24,7 +24,7 @@ repository.
 
     $ mkdir tmp && cd tmp
 
-    $ wget https://raw.githubusercontent.com/royasutton/openscad-amu/master/snapshots/bootstrap.{bash.in,conf} .
+    $ wget https://raw.githubusercontent.com/royasutton/openscad-amu/master/snapshots/bootstrap.{bash,conf} .
     $ chmod +x bootstrap.bash
 
 To install the prerequisites, fetch and compile the source, install
