@@ -32,5 +32,14 @@ Makefile.in
 /work/
 
 #
+# GitHub docs related
+#
+
+/docs/Gemfile
+/docs/Gemfile.lock
+/docs/_site/
+/docs/_staging/
+
+#
 # eof
 #
