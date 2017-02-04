@@ -14,7 +14,7 @@
 
   \section what_is_amu What is it?
 
-    [openscad-amu](https://github.com/royasutton/openscad-amu) is a
+    [openscad-amu](https://royasutton.github.io/openscad-amu) is a
     collection of \ref programs "programs", a \ref mslibrary "script library"
     written in [bash] (https://www.gnu.org/software/bash/), and support
     \ref scripts "scripts." It provides a framework that can be used to
@@ -122,7 +122,7 @@
 #/##############################################################################
   \page design_flow The Design Flow
 
-    [openscad-amu](https://github.com/royasutton/openscad-amu) brings
+    [openscad-amu](https://royasutton.github.io/openscad-amu) brings
     together [OpenSCAD](http://www.openscad.org/),
     [Doxygen](http://www.stack.nl/~dimitri/doxygen/),
     [make](https://www.gnu.org/software/make), and hierarchal scoped
