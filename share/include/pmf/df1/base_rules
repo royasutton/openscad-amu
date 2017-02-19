@@ -199,9 +199,10 @@ release: all $(release_stamp)
 	@$(ls_l) $(release_stamp) $(release_path)
 
 # copy files and create stamp
-$(release_stamp): $(addprefix $(release_archive_basename),$(release_archive_exts)) \
-                  $(release_manifest) \
-                  $(release_files) | $(release_path)
+$(release_stamp): $(release_files) \
+                  $(if $(strip $(release_archive_files)), \
+                  $(addprefix $(release_archive_basename),$(release_archive_exts))) \
+                  $(release_manifest) | $(release_path)
 	$(call target_begin)
 	$(foreach p,$(release_files), \
 		$(call execute_command, \
@@ -220,7 +221,7 @@ $(release_manifest): $(release_files) | $(release_path)
 		project_name project_version project_brief - os arch - date time, \
 		$(false),$(false))
 	$(call write_kv_variable_list,$@, \
-		release_files - release_archive_files, \
+		release_files - release_archive_files -, \
 		$(true),$(true))
 
 # archive files
