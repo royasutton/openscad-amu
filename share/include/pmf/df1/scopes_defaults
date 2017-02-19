@@ -59,6 +59,9 @@ seam_defines                            :=
 # addition options for openscad-seam
 seam_opts_add                           :=
 
+# addition to user-defined library path
+scad_lib_path_add                       :=
+
 #------------------------------------------------------------------------------#
 # Control Variable List
 #------------------------------------------------------------------------------#
