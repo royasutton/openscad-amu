@@ -56,11 +56,11 @@ clean-base:
 #------------------------------------------------------------------------------#
 
 .PHONY: install
-install: $(addprefix install-,$(AMU_PM_COMPONENTS) library)
+install: $(addprefix install-,$(AMU_PM_COMPONENTS) $(if $(strip $(library_files)),library))
 	$(call target_end)
 
 .PHONY: uninstall
-uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS) library)
+uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS) $(if $(strip $(library_files)),library))
 	$(call target_end)
 
 .PHONY: install-library
