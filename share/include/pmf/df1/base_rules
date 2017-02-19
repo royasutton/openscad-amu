@@ -199,10 +199,12 @@ release: all $(release_stamp)
 	@$(ls_l) $(release_stamp) $(release_path)
 
 # copy files and create stamp
-$(release_stamp): $(release_files) \
-                  $(if $(strip $(release_archive_files)), \
-                  $(addprefix $(release_archive_basename),$(release_archive_exts))) \
-                  $(release_manifest) | $(release_path)
+$(release_stamp): \
+		$(release_files) \
+		$(if $(strip $(release_archive_files)), \
+			$(addprefix $(release_archive_basename),$(release_archive_exts)) \
+		) \
+		$(release_manifest) | $(release_path)
 	$(call target_begin)
 	$(foreach p,$(release_files), \
 		$(call execute_command, \
