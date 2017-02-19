@@ -68,6 +68,8 @@ release_archive_project                 := $(true)
 release_archive_design                  := $(true)
 release_archive_library                 := $(true)
 
+write_protect_release                   := $(true)
+
 # project name, version, and brief
 project_name                            := project
 project_version                         := 1.0
@@ -286,7 +288,9 @@ project_control_variables := \
   \
   release_archive_project \
   release_archive_design \
-  release_archive_library
+  release_archive_library \
+  \
+  write_protect_release
 
 ################################################################################
 # eof

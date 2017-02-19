@@ -209,8 +209,9 @@ $(release_stamp): $(addprefix $(release_archive_basename),$(release_archive_exts
 			&& $(cp_a) $p $(release_path)$p \
 		) \
 	)
-	$(chmod_R) -w $(release_path)
-	$(touch) $@ && $(chmod) -w $@
+	$(if $(call bool_decode,$(write_protect_release)),$(chmod_R) -w $(release_path))
+	$(touch) $@
+	$(if $(call bool_decode,$(write_protect_release)),$(chmod) -w $@)
 
 # generate manifest
 $(release_manifest): $(release_files) | $(release_path)
