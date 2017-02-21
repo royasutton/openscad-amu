@@ -196,15 +196,19 @@ $(backup_root): ; $(mkdir_p) $@
 .PHONY: release
 release: all $(release_stamp)
 	$(call target_end)
-	@$(ls_l) $(release_stamp) $(release_path)
+	$(if $(call bool_decode,$(write_release_stamp)), \
+		$(call execute_command, $(ls_l) $(release_stamp) $(release_path)) \
+	)
 
 # copy files and create stamp
-$(release_stamp): \
-		$(release_files) \
+$(release_stamp): $(release_files) \
 		$(if $(strip $(release_archive_files)), \
 			$(addprefix $(release_archive_basename),$(release_archive_exts)) \
 		) \
-		$(release_manifest) | $(release_path)
+		$(if $(call bool_decode,$(write_release_manifest)), \
+			$(release_manifest) \
+		) \
+		| $(release_path)
 	$(call target_begin)
 	$(foreach p,$(release_files), \
 		$(call execute_command, \
@@ -212,9 +216,17 @@ $(release_stamp): \
 			&& $(cp_a) $p $(release_path)$p \
 		) \
 	)
-	$(if $(call bool_decode,$(write_protect_release)),$(chmod_R) -w $(release_path))
-	$(touch) $@
-	$(if $(call bool_decode,$(write_protect_release)),$(chmod) -w $@)
+	$(if $(call bool_decode,$(write_protect_release)), \
+		$(call execute_command, $(chmod_R) -w $(release_path)), \
+		$(call amu_pm_m,not write-protecting release files.) \
+	)
+	$(if $(call bool_decode,$(write_release_stamp)), \
+		$(call execute_command, $(touch) $@) \
+		$(if $(call bool_decode,$(write_protect_release)), \
+			$(call execute_command, $(chmod) -w $@) \
+		), \
+		$(call amu_pm_m,not writing release stamp.) \
+	)
 
 # generate manifest
 $(release_manifest): $(release_files) | $(release_path)

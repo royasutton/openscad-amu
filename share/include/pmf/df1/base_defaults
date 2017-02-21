@@ -68,6 +68,9 @@ release_archive_project                 := $(true)
 release_archive_design                  := $(true)
 release_archive_library                 := $(true)
 
+# release generation
+write_release_manifest                  := $(true)
+write_release_stamp                     := $(true)
 write_protect_release                   := $(true)
 
 # project name, version, and brief
@@ -290,6 +293,8 @@ project_control_variables := \
   release_archive_design \
   release_archive_library \
   \
+  write_release_manifest \
+  write_release_stamp \
   write_protect_release
 
 ################################################################################
