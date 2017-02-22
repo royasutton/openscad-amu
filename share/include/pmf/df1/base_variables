@@ -224,7 +224,7 @@ define help_text_base
  release:
      create a project release.
 
- list-x, listv-x, slist-x, slistv-x, info-x, print-x:
+ echo-x, print-x, list-x, listv-x, slist-x, slistv-x, info-x:
      show information for the variable named x.
 
  help:

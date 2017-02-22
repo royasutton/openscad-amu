@@ -115,11 +115,8 @@ $(install_prefix_man):  ; $(mkdir_p) $@
 
 silent : ; @:
 
-info-%: | silent
-	$(info variable: $*)
-	$(info $(space)origin: $(origin $*))
-	$(info $(space)flavor: $(flavor $*))
-	$(info $(space) value: $(value $*))
+echo-%: | silent
+	$(info $($*))
 
 print-%: | silent
 	$(info $* = '$($*)')
@@ -135,6 +132,12 @@ slist-%: | silent
 
 slistv-%: | silent
 	$(call enumerate_variable,$*,$(true),$(true))
+
+info-%: | silent
+	$(info variable: $*)
+	$(info $(space)origin: $(origin $*))
+	$(info $(space)flavor: $(flavor $*))
+	$(info $(space) value: $(value $*))
 
 .PHONY: info
 info: info-makefile info-system info-project $(addprefix info-,$(AMU_PM_COMPONENTS))
