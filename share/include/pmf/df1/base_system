@@ -73,7 +73,7 @@ ifeq (${os},Linux)
   opts_rmdir_p  := --parents --verbose
   opts_rm_f     := --force --verbose
   opts_rm_rf    := --recursive --force --verbose
-  opts_cp_a     := --archive --verbose
+  opts_cp_a     := --no-target-directory --archive --verbose
   opts_tar_c    := --create --verbose --auto-compress
   opts_zip_c    := --recurse-paths --verbose
   opts_tput_c   := cols
@@ -115,7 +115,7 @@ ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
   opts_rmdir_p  := --parents --verbose
   opts_rm_f     := --force --verbose
   opts_rm_rf    := --recursive --force --verbose
-  opts_cp_a     := --archive --verbose
+  opts_cp_a     := --no-target-directory --archive --verbose
   opts_tar_c    := --create --verbose --auto-compress
   opts_zip_c    := --recurse-paths --verbose
   opts_tput_c   := cols

@@ -111,7 +111,9 @@ doxygen.stamp: Doxyfile Makefile $(doxygen_stamp_other_dependacies)
 	&& touch doxygen.stamp
 
 $(programs_help): $(bin_PROGRAMS)
-	./$* --help > $@
+	./$* --help \
+		| sed 's/--lib-path arg \(.*\)/--lib-path arg (=default)/' \
+		| cat > $@
 
 bash_dif_lexer.cc: bash_dif_lexer.ll
 	${LEX} \

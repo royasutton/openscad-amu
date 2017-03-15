@@ -114,12 +114,7 @@ $(amu_pm_d2)
 # build-stamp
 $(scopes_prefix)$2$(stamp_ext): $(scopes_prefix)$2$(mf_ext)
 	$$(call target_begin)
-	OPENSCADPATH="$(call join_with,$(env_field_sep), \
-		. \
-		$(if $(dir $1),$(dir $1)) \
-		$(if $(design_prefix),$(design_prefix)) \
-		$(if $(library_prefix),$(library_prefix)) \
-		,$(true))" \
+	OPENSCADPATH="$(scad_lib_path)" \
 	$(path_gnumake) --makefile=$(scopes_prefix)$2$(mf_ext) all \
 	&& $(touch) $(scopes_prefix)$2$(stamp_ext)
 

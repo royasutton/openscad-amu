@@ -58,7 +58,7 @@ ifdef library
   src_files += $(library_files)
 endif
 
-# output directory
+# output directory path
 ifndef output_path
   output_path := \
     $(call join_with,$(if $(output_path_use_dir_sep),$(dir_level_sep),$(output_path_term_joiner)), \
@@ -68,18 +68,18 @@ else
   $(call amu_pm_m,using pre-defined value for $$(output_path))
 endif
 
-# backup basename
-ifndef backup_basename
-  backup_basename := \
+# backup file basename
+ifndef backup_file
+  backup_file := \
     $(call join_with,$(empty),$(backup_root)$(dir_level_sep) \
     $(call join_with,$(if $(backup_file_use_dir_sep),$(dir_level_sep),$(backup_file_term_joiner)), \
       $(strip $(foreach x,$(backup_file_spec), \
         $(if $(call bool_decode,$(backup_file_add_$x)),$($x))))))
 else
-  $(call amu_pm_m,using pre-defined value for $$(backup_basename))
+  $(call amu_pm_m,using pre-defined value for $$(backup_file))
 endif
 
-# release directory
+# release directory path
 ifndef release_path
   release_path := \
     $(call join_with,$(empty),$(release_root)$(dir_level_sep) \
@@ -90,15 +90,15 @@ else
   $(call amu_pm_m,using pre-defined value for $$(release_path))
 endif
 
-# release archive basename
-ifndef release_archive_basename
-  release_archive_basename := \
+# release archive file basename
+ifndef release_archive_file
+  release_archive_file := \
     $(call join_with,$(empty),$(release_path) \
     $(call join_with,$(if $(release_archive_file_use_dir_sep),$(dir_level_sep),$(release_archive_file_term_joiner)), \
       $(strip $(foreach x,$(release_archive_file_spec), \
         $(if $(call bool_decode,$(release_archive_file_add_$x)),$($x))))))
 else
-  $(call amu_pm_m,using pre-defined value for $$(release_archive_basename))
+  $(call amu_pm_m,using pre-defined value for $$(release_archive_file))
 endif
 
 # library install sub-directory
@@ -180,9 +180,9 @@ project_config_variables := \
 
 project_config_derived := \
   output_path \
-  backup_basename \
+  backup_file \
   release_path \
-  release_archive_basename \
+  release_archive_file \
   library_install_subdir
 
 #------------------------------------------------------------------------------#
@@ -218,13 +218,16 @@ define help_text_base
  info-project:
      project information.
 
+ info-paths:
+     derived-path information.
+
  backup:
      create backup of source files.
 
  release:
      create a project release.
 
- list-x, listv-x, slist-x, slistv-x, info-x, print-x:
+ echo-x, print-x, list-x, listv-x, slist-x, slistv-x, info-x:
      show information for the variable named x.
 
  help:

@@ -227,7 +227,7 @@ SEAM::SEAM_Scanner::output_info_header(const std::string& cs)
 
   output_file
     << sl << endl
-    << sl << "THIS FILE HAS BEEN GENERATED, CHANGES WILL LIKELY BE OVERRIDDEN" << endl
+    << sl << "THIS FILE HAS BEEN GENERATED, CHANGES WILL LIKELY BE OVERWRITTEN" << endl
     << sl << endl
     << sl << "    package: " << PACKAGE_NAME << endl
     << sl << "    version: " << PACKAGE_VERSION << endl

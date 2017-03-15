@@ -59,6 +59,16 @@ openscad_seam_opts2 := \
     $(if $(seam_opts_add),$(seam_opts_add)) \
   )
 
+# user-defined library path
+scad_lib_path := $(call join_with,$(env_field_sep), \
+  . \
+  $(if $(dir $1),$(dir $1)) \
+  $(if $(library_prefix),$(library_prefix)) \
+  $(if $(design_prefix),$(design_prefix)) \
+  $(if $(scad_lib_path_add),$(scad_lib_path_add)) \
+  $(if $(OPENSCADPATH),$(OPENSCADPATH)) \
+  ,$(true))
+
 # scopes auxiliary scripts for all source files
 scopes_scripts_source := \
   $(addprefix $(scopes_prefix), \
@@ -122,7 +132,9 @@ scopes_config_variables := \
   scopes_exclude \
   \
   seam_defines \
-  seam_opts_add
+  seam_opts_add \
+  \
+  scad_lib_path_add
 
 scopes_config_derived += \
   scopes_prefix \
@@ -131,7 +143,9 @@ scopes_config_derived += \
   scopes_exclude_filter \
   \
   openscad_seam_opts1 \
-  openscad_seam_opts2
+  openscad_seam_opts2 \
+  \
+  scad_lib_path
 
 #------------------------------------------------------------------------------#
 # Version Checks
