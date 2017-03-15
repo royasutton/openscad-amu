@@ -1,0 +1,60 @@
+digraph example {
+
+  graph[fontname=Helvetica, fontsize=20, fontcolor=gray, style=dotted];
+  node [fontname=Helvetica, fontsize=12];
+  edge [arrowhead=vee];
+
+  subgraph cluster_template {
+    label="Template";
+
+    a1 [shape=note label="Project\nMakefile"];
+    a2 [shape=note label="Source\nFiles\n(*.scad)"];
+    a3 [shape=note label="Doxyfile"];
+
+    { rank=same; a1; a2; a3; }
+  }
+
+  subgraph cluster_flow {
+    label="Automated Design Flow";
+
+    b  [shape=box peripheries=2 label="Script Extractor"];
+    g  [shape=box peripheries=2 label="Doxygen filter"];
+    h  [shape=box peripheries=2 label="Doxygen"];
+    i  [shape=folder label="library X\nDocumentation\nhtml,pdf"];
+
+    subgraph cluster_scope {
+    graph[fontsize=14, style=dashed];
+    label="Source Scope";
+
+      c  [shape=note label="Modeling\nScript"];
+      d  [shape=note label="Build\nScript"];
+      e  [shape=note label="Scope\nMakefile"];
+      f1 [shape=component label="Targets 1"];
+      f2 [shape=component label="Targets 2"];
+      f3 [shape=none label="..."];
+      fn [shape=component label="Targets n"];
+
+      c->e; d->e;
+      e->f1; e->f2; e->f3 [style=invis]; e->fn;
+    }
+
+    b->{c d};
+    g->h; h->i;
+  }
+
+  subgraph cluster_docrepo {
+    label="OpenSCAD Library\nDocumentation Repository";
+
+    edge [style=invis];
+    d1 [shape=folder label="library 1\nDocumentation\nhtml,pdf"];
+    d2 [shape=folder label="library 2\nDocumentation\nhtml,pdf"];
+    d3 [shape=folder label="library 3\nDocumentation\nhtml,pdf"];
+    d4 [shape=none   label="..."];
+    d5 [shape=folder label="library X\nDocumentation\nhtml,pdf"];
+    d1->d2->d3->d4->d5;
+  }
+
+  a2->{b g};
+  a3->h;
+  i->d5;
+}

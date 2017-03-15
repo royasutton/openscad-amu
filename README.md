@@ -1,15 +1,14 @@
 openscad-amu
 ============
 
-> Utilities for build scripting and documenting OpenSCAD designs...
+> A design flow with build automation and Doxygen doc generation for OpenSCAD...
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
 
-OpenSCAD Automake Utilities (__openscad-amu__) provide a _framework_
-for scripting the compilation of [OpenSCAD] designs and a source code
-_pre-processor_ that allows __\*.scad__ and (__\*.bash__) to be documented
-using [Doxygen].
+Its a _framework_ and tools for automating the compilation of
+[OpenSCAD] designs with a _pre-processor_ that allows __\*.scad__ to be
+documented using [Doxygen].
 
 View live docs on [GitHib Pages](https://royasutton.github.io/openscad-amu).
 
@@ -17,7 +16,7 @@ View live docs on [GitHib Pages](https://royasutton.github.io/openscad-amu).
 Bootstrap
 ---------
 
-The source includes a script that may be used to setup the development
+The source includes a script that may be used to setup a development
 environment. This script is normally built with the source, however, a
 pre-built snapshot is available in the root directory of the
 repository.
@@ -28,8 +27,8 @@ repository.
     $ chmod +x bootstrap.bash
 
 To install the prerequisites, fetch and compile the source, install
-*openscad-amu* to a cache in the current directory, and create a
-project template type:
+*openscad-amu* to a cache in the current directory, and create an
+example project template type:
 
     $ ./bootstrap.bash --cache --yes --install --template my_project
 
@@ -46,23 +45,21 @@ copied to *my_project*.
 Project Makefile
 ----------------
 
-The project makefile coordinates the design flow. All configurable
-aspects of the design flow are set in this control file. To see a menu
-of targets:
+The project makefile coordinates all aspects of the design flow. All
+configurations are set in this control file. To see a menu of targets:
 
     $ cd my_project
     $ make help
 
-To build and install the template example (in *my_project*):
+To build and install the example (in *my_project*):
 
     $ cd my_project
     $ make install
 
 This will generate all targets described in the source scopes, build
-the documentation, and will install the library files to the
+the documentation, and install the library files to the
 system-dependent [OpenSCAD] user library path. In addition, the
-documentation will be installed and added to an index that can be
-viewed with a web browser.
+installed documentation will be added to a browsable index.
 
     $ make print-install_prefix_html
 
@@ -90,9 +87,9 @@ To work with the latest development code from the _develop_ branch:
 Building the Source
 -------------------
 
-The *bootstrap.bash* script is the most simple way to build the source.
-However, here are the steps to build it manually. When all of the
-prerequisite packages exists, the development source may be compiled
+The *bootstrap.bash* script is the easiest way to build the source.
+However, here are the steps to build it manually. Once all of the
+prerequisite packages exists, the development source can be compiled
 by:
 
     $ git clone https://github.com/royasutton/openscad-amu
