@@ -28,14 +28,14 @@ documentation generation for each [OpenSCAD] design source with
 embedded [Doxygen] content.
 
 <p align="center">
-<img src="{{ site.url }}/assets/flow_intro.svg" alt="" border="0"
+<img src="assets/flow_intro.svg" alt="" border="0"
      usemap="#adf.map"/>
 </p>
 
 <map name="adf.map" id="dot_inline_dotgraph_4.map">
-<area shape="rect" id="node1" href="{{ site.url }}/embedding.html"
+<area shape="rect" id="node1" href="embedding.html"
       title="Annotated\nSource\n(vehicle.scad)" alt="" coords="5,45,108,100"/>
-<area shape="poly" id="node2" href="{{ site.url }}/flow.html"
+<area shape="poly" id="node2" href="flow.html"
       title="Automatic\nDesign\nFlow" alt="" coords="282,73,279,59,270,47,256,37,238,31,219,29,199,31,182,37,168,47,159,59,156,73,159,86,168,99,182,108,199,115,219,117,238,115,256,108,270,99,279,86"/>
 <area shape="rect" id="node3" href="https://royasutton.github.io/omdl/examples/solar_mount/psptm_build_all.stl"
       title="Target (1)\n...\nTarget (96)" alt="" coords="342,5,428,60"/>

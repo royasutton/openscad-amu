@@ -2,7 +2,7 @@ The Design Flow
 ---------------
 
 <p align="center">
-<img src="{{ site.url }}/assets/flow.svg" alt="" border="0"/>
+<img src="assets/flow.svg" alt="" border="0"/>
 </p>
 
 [openscad-amu] brings together [OpenSCAD], [Doxygen], [GNU Make], and

@@ -2,7 +2,7 @@ Annotating the source
 ---------------------
 
 <p align="center">
-<img src="{{ site.url }}/assets/embedding.svg" alt="" border="0"/>
+<img src="assets/embedding.svg" alt="" border="0"/>
 </p>
 
 {% highlight c %}
