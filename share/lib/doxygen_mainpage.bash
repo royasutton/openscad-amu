@@ -57,8 +57,8 @@
 
     This simplified example produces the renditions that make up the
     library documentation and generates 96 targets of interest
-    <tt>(*.png, *.stl, etc.)</tt>.  \em openscad-amu brings together
-    several common tools to automate the production of \em OpenSCAD
+    <tt>(*.png, *.stl, etc.)</tt>.  [openscad-amu] brings together
+    numerous widely-used tools to automate the production of [OpenSCAD]
     design targets and the design source
     <a href="../../../examples/build/html/index.html">documentation</a>
     <a href="../../../examples/build/latex/refman.pdf">(PDF)</a>.
