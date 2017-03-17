@@ -1,7 +1,7 @@
 openscad-amu
 ============
 
-> A design flow with build automation and Doxygen doc generation for OpenSCAD...
+> A design flow with compile automation and Doxygen doc generation for OpenSCAD...
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
@@ -48,9 +48,9 @@ Getting Started
 ---------------
 
 [openscad-amu] incorporated two distinct but complementary features
-that may be used together or independantly: (1) design automation and
+that may be used together or independently: (1) design automation and
 (2) design documentation. In either case, a design source file is
-annotated with structued comments.
+annotated with structured comments.
 
 If you are already familiar with [Doxygen], adding basic documentation
 to your [OpenSCAD] designs using [openscad-amu] is effortless. Simply
@@ -59,7 +59,7 @@ file in the [Project Makefile], and type __make__ to generate your
 documentation. You can start from a ready-made template created by the
 [bootstrap], then customize as needed.
 
-Please see the GitHub source [repository] for setup instructions.
+See the GitHub source [repository] for setup instructions.
 
 
 Example
