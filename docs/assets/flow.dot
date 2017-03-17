@@ -5,7 +5,7 @@ digraph example {
   edge [arrowhead=vee];
 
   subgraph cluster_template {
-    label="Template";
+    label="Project";
 
     a1 [shape=note label="Project\nMakefile"];
     a2 [shape=note label="Source\nFiles\n(*.scad)"];
