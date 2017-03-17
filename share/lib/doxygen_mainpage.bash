@@ -133,16 +133,16 @@
 #/##############################################################################
   \page design_flow The Design flow
 
-    [openscad-amu] brings together [OpenSCAD], [Doxygen], [GNU Make],
-    and \ref mslibrary "custom scripting" (based on [GNU Bash]) to
-    automate the generation of the design documentation and design
-    targets.
-
     A project includes a Project Makefile, the project source files,
     and a documentation configuration file (Doxyfile). Any source file
     may be annotated with documentation and/or one or more automation
     scripts. Each script is extracted at compile time to generate a
     _scope_ makefile that controls the generation of corresponding
+    targets.
+
+    [openscad-amu] brings together [OpenSCAD], [Doxygen], [GNU Make],
+    and \ref mslibrary "custom scripting" (based on [GNU Bash]) to
+    automate the generation of the design documentation and design
     targets.
 
     \dot
