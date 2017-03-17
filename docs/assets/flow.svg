@@ -15,7 +15,7 @@
 </g>
 <g id="clust3" class="cluster"><title>cluster_flow</title>
 <polygon fill="none" stroke="black" stroke-dasharray="1,5" points="142,-139.303 142,-497.057 658.5,-497.057 658.5,-139.303 142,-139.303"/>
-<text text-anchor="middle" x="400.25" y="-477.057" font-family="Helvetica,sans-Serif" font-size="20.00" fill="gray">Automated Design Flow</text>
+<text text-anchor="middle" x="400.25" y="-477.057" font-family="Helvetica,sans-Serif" font-size="20.00" fill="gray">Automated</text>
 </g>
 <g id="clust4" class="cluster"><title>cluster_scope</title>
 <polygon fill="none" stroke="black" stroke-dasharray="5,2" points="300,-206.843 300,-456.955 650.5,-456.955 650.5,-206.843 300,-206.843"/>

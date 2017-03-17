@@ -15,7 +15,7 @@ digraph example {
   }
 
   subgraph cluster_flow {
-    label="Automated Design Flow";
+    label="Automated";
 
     b  [shape=box peripheries=2 label="Script Extractor"];
     g  [shape=box peripheries=2 label="Doxygen filter"];

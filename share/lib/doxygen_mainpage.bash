@@ -48,7 +48,7 @@
         node [fontname=Helvetica fontsize=10];
         edge [arrowhead=vee];
         a  [shape=note label="Annotated\nSource\n(vehicle.scad)" URL="\ref vehicle.scad"];
-        b  [shape=oval peripheries=2 label="Automatic\nDesign\nFlow" URL="\ref design_flow"];
+        b  [shape=oval peripheries=2 label="Automated\nDesign\nFlow" URL="\ref design_flow"];
         c  [shape=component label="Target (1)\n...\nTarget (96)" URL="../../../examples/build/html/vehicle_test_car_17.stl"];
         d  [shape=folder label="Design\nLibrary\nDocumentation" URL="../../../examples/build/html/index.html"];
         a->b; b->{c d};
