@@ -107,7 +107,7 @@ install-doxygen-html-files: $(doxygen_stamp) | $(install_prefix_html) $(install_
 	$(call target_begin)
 	( \
 		cd $(output_path) && \
-		$(cp_a) $(html_output)$(dir_level_sep)* $(install_prefix_html)$(docs_install_id) \
+		$(cp_a) $(html_output) $(install_prefix_html)$(docs_install_id) \
 	)
 
 # create toc entry and update index
