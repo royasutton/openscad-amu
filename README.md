@@ -128,7 +128,7 @@ To checkout and work with a specific version, for example release v1.6,
 the following can be used:
 
     $ git tag -l
-    $ git checkout tags/v1.6
+    $ git checkout v1.7
     $ git describe
 
 
