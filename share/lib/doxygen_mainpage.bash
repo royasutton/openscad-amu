@@ -23,7 +23,7 @@
     [openscad-amu] is being developed to support the construction of
     automated design flows and Doxygen-based documentation for
     [OpenSCAD] language-based mechanical designs. It establishes a
-    framework that allows auxiliary documentation- and build-scripts to
+    framework that allows documentation and auxiliary build-scripts to
     be embedded into the [OpenSCAD] design source.
 
     The build scripts are automatically extracted at compile-time to
