@@ -850,7 +850,7 @@ cat << EOF
     create and populate a new project with a template. Finally build and
     install the (example) project.
 
-    $ bootstrap.bash --cache --install --template my_project
+    $ ./bootstrap.bash --cache --install --template my_project
     $ cd ./my_project
     $ make install
 
@@ -869,7 +869,7 @@ cat << EOF
 (2) Build and install the default source branch to the default system
     location (--fetch will update an existing source cache prior to building).
 
-    $ bootstrap.bash --fetch --build
+    $ ./bootstrap.bash --fetch --build
     $ sudo ./bootstrap.bash --install
 
     To uninstall from the default system location and remove the local
@@ -881,7 +881,7 @@ cat << EOF
 (3) Build both the 'master' and 'develop' branch and install to the local
     cache, then create new project templates for each.
 
-    $ bootstrap.bash \\
+    $ ./bootstrap.bash \\
         --cache --branch master --install --template pt_master \\
         --reconfigure \\
         --cache --branch develop --install --template pt_develop
@@ -892,24 +892,24 @@ cat << EOF
 (4) Reconfigure an existing source cache for release 'v1.6' then build and
     install to the local cache.
 
-    $ bootstrap.bash --reconfigure --cache --branch v1.6 --install
+    $ ./bootstrap.bash --reconfigure --cache --branch v1.6 --install
 
 (5) Build release 'v1.6' and install to the default system location.
 
-    $ bootstrap.bash --branch v1.6 --build
+    $ ./bootstrap.bash --branch v1.6 --build
     $ ./bootstrap.bash --branch v1.6 --install
 
 (6) Create a new project using the most recently install version.
 
-    $ bootstrap.bash --template my_project
+    $ ./bootstrap.bash --template my_project
 
 (7) Fetch updates for and reconfigure an existing source cache for latest
-    develop branch then build and install to the local cache and create
-    a project template.
+    develop branch then rebuild and install with documentation to the local
+    cache and create a project template.
 
-    $ bootstrap.bash \\
-        --fetch --reconfigure \\
-        --cache --branch develop --install --template my_project
+    $ ./bootstrap.bash \\
+        --fetch --reconfigure --cache --branch develop \\
+        --install --installdocs --template my_project
 
 EOF
 }
