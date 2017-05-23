@@ -36,7 +36,7 @@ SUFFIXES = .bash .help
 
 all-local: $(files_am)
 
-docs-local: html-local pdf-local man-local
+docs-local: html-local
 
 html-local: doxygen.stamp
 

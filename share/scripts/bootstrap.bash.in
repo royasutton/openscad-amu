@@ -53,7 +53,7 @@ function update_design_flow_variables() {
   declare local packages_CYGWIN_NT
 
   case "${design_flow}" in
-    df1)
+    df1t)
       packages_Common="
         doxygen
         texlive
@@ -90,6 +90,40 @@ function update_design_flow_variables() {
         texlive-collection-latexrecommended
         texlive-collection-mathextra
         texlive-collection-pictures
+      "
+
+      templates="
+        Project_Makefile
+        Doxyfile
+        design.scad
+        library.scad
+      "
+    ;;
+    df1)
+      packages_Common="
+        doxygen
+        graphviz
+        git
+        autoconf
+        automake
+        libtool
+        bash
+        make
+        flex
+        zip
+      "
+
+      packages_Linux="
+        openscad
+        libboost-all-dev
+        imagemagick
+      "
+
+      packages_CYGWIN_NT="
+        gcc-g++
+        time
+        libboost-devel
+        ImageMagick
       "
 
       templates="
@@ -853,7 +887,7 @@ cat << EOF
         --cache --branch develop --install --template pt_develop
 
     When changing --branch and/or --cache on a configured source tree, use
-    the --reconfigure option to force reconfiguration of the source.
+    the --reconfigure option to force source reconfiguration.
 
 (4) Reconfigure an existing source cache for release 'v1.6' then build and
     install to the local cache.

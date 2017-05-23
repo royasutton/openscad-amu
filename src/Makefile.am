@@ -92,7 +92,7 @@ SUFFIXES = .bash .makefile .stamp .help
 # targets
 ##############################################################################
 
-docs-local: html-local pdf-local man-local
+docs-local: html-local
 
 html-local: doxygen.stamp
 

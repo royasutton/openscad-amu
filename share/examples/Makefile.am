@@ -39,7 +39,7 @@ SUFFIXES = .bash .makefile .stamp
 
 all-local: $(files_am)
 
-docs-local: html-local pdf-local man-local
+docs-local: html-local
 
 html-local: examples.stamp
 

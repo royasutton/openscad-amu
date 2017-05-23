@@ -66,7 +66,7 @@ file in the [Project Makefile], and type __make__ to generate your
 documentation. You can start from a ready-made template created by the
 [bootstrap], then customize as needed.
 
-### Setup
+### Setup ###
 
 See the GitHub source [repository] for setup instructions.
 

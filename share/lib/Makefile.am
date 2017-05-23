@@ -38,7 +38,7 @@ doxygen_stamp_other_dependacies = \
 # targets
 ##############################################################################
 
-docs-local: html-local pdf-local man-local
+docs-local: html-local
 
 html-local: doxygen.stamp
 
