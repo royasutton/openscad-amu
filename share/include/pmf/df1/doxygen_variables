@@ -233,6 +233,8 @@ $(newline)#$(space3)For later versions use FILTER_PATTERNS=*.ext="filter opts". 
 $(newline)#$(space3)INPUT_FILTER="filter opts" when possible. \
 $(newline)#)
 
+ifeq ($(generate_latex),$(true))
+
 # doxygen caption (mis)handling fixed in release 1.8.11
 $(call check_version,doxygen,ge,1.8.11,$(false), \
 $(newline)# \
@@ -241,6 +243,8 @@ $(newline)#$(space3)in Doxygen version 1.8.11. Avoid using the 'table_caption' o
 $(newline)#$(space3)of \amu_table() with prior Doxygen versions when using \
 $(newline)#$(space3)latex-generated pdf documentation. \
 $(newline)#)
+
+endif
 
 endif
 
