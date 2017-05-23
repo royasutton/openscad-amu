@@ -37,7 +37,8 @@ false := $(empty)
 
 dollar := $$
 hash   := \#
-tab    :=	#
+tab    := #
+comma  := ,
 
 # newline
 define newline
