@@ -892,40 +892,40 @@ install the utilities (detected missing prerequisites are installed prior
 when possible). This script may also be used to start new design projects
 from a template.
 
-      --flow <name>    : Use design flow <name> default=(df1).
+      --flow <name>         : Use design flow <name> default=(df1).
 
-      --skip-prep      : Skip source preparation (use with care).
-      --skip-check     : Skip system prerequisites check.
+      --skip-prep           : Skip source preparation (use with care).
+      --skip-check          : Skip system prerequisites check.
 
-      --yes            : Automatic yes to apt-get install prompts.
-      --check          : Check for installed prerequisites.
-      --required       : Install missing prerequisites.
-      --list           : List prerequisites.
+      --yes                 : Automatic yes to apt-get install prompts.
+      --check               : Check for installed prerequisites.
+      --required            : Install missing prerequisites.
+      --list                : List prerequisites.
 
- -r | --reconfigure    : Force source reconfiguration.
- -v | --branch <name>  : Use branch <name> default=(master).
- -l | --branch-list <list> : Iterate over list of branch versions
-                         use: tags      for all tagged releases.
-                              tagsN     for last 'N' tagged releases.
-                              v1.6,v1.7 for v1.6 and v1.7 tagged releases.
- -c | --cache          : Configure source for cache install.
+ -r | --reconfigure         : Force source reconfiguration.
+ -v | --branch <name>       : Use branch <name> default=(master).
+ -l | --branch-list <list>  : Iterate over list of branch versions
+                              use: tags      for all tagged releases.
+                                   tagsN     for last 'N' tagged releases.
+                                   v1.6,v1.7 for releases v1.6 and v1.7, etc.
+ -c | --cache               : Configure source for cache install.
 
- -b | --build          : Build programs.
- -i | --install        : Install programs.
-      --installdocs    : Build and install documentation.
- -u | --uninstall      : Uninstall everything.
+ -b | --build               : Build programs.
+ -i | --install             : Install programs.
+      --installdocs         : Build and install documentation.
+ -u | --uninstall           : Uninstall everything.
 
- -m | --make <name>    : Run make with target <name>.
+ -m | --make <name>         : Run make with target <name>.
 
- -t | --template <dir> : Create new project directory with templates.
-      --template-def   : Create new project/templates with default name.
+ -t | --template <dir>      : Create new project directory with templates.
+      --template-def        : Create new project/templates with default name.
 
-      --fetch          : Update source repository cache.
-      --remove         : Remove source build directory.
+      --fetch               : Update source repository cache.
+      --remove              : Remove source build directory.
 
- -h | --help           : Show this help message.
-      --examples       : Show some examples uses.
-      --version        : Show version information.
+ -h | --help                : Show this help message.
+      --examples            : Show some examples uses.
+      --version             : Show version information.
 
  NOTES:
   * When using a flow or branch other than the default, the --flow
