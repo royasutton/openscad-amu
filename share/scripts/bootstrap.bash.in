@@ -5,7 +5,7 @@
 #   \file   bootstrap.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2017
+#   \date   2016-2018
 #
 #   \copyright
 #
@@ -231,6 +231,7 @@ function print_h2 () {
 
 declare design_flow="df1"
 
+declare skip_prep="no"
 declare skip_check="no"
 declare apt_get_opts="--verbose-versions"
 
@@ -245,6 +246,7 @@ declare apt_cyg_path
 declare repo_url="https://github.com/royasutton/openscad-amu"
 declare repo_cache
 declare repo_branch="master"
+declare repo_branch_list
 
 declare templates
 
@@ -396,17 +398,12 @@ function set_apt_cyg_path() {
 # System Independent
 #==============================================================================
 
-#
+#------------------------------------------------------------------------------
 # update missing package list
-#
+#------------------------------------------------------------------------------
 function check_update() {
   packages_installed=""
   packages_missing=""
-
-  if [[ "${skip_check}" == "yes" ]] ; then
-    print_m "skipping prerequisite checks."
-    return
-  fi
 
   update_design_flow_variables
   for r in ${packages} ; do
@@ -419,9 +416,9 @@ function check_update() {
   done
 }
 
-#
+#------------------------------------------------------------------------------
 # show packages
-#
+#------------------------------------------------------------------------------
 function check_show_status() {
   print_h2 "[ Installed ]"
   if [[ -n "${packages_installed}" ]] ; then
@@ -441,9 +438,9 @@ function check_show_status() {
   print_hb "="
 }
 
-#
+#------------------------------------------------------------------------------
 # install missing packages
-#
+#------------------------------------------------------------------------------
 function install_missing() {
   if [[ -n "${packages_missing}" ]] ; then
     print_h2 "[ Missing ]"
@@ -464,9 +461,9 @@ function install_missing() {
   fi
 }
 
-#
+#------------------------------------------------------------------------------
 # clone or update a Git repository
-#
+#------------------------------------------------------------------------------
 function update_repo() {
   declare local gitrepo="$1"
   declare local out_dir="$2"
@@ -509,9 +506,9 @@ function update_repo() {
   fi
 }
 
-#
+#------------------------------------------------------------------------------
 # remove source build directory
-#
+#------------------------------------------------------------------------------
 function remove_build_directory() {
   declare local builddir="$1"
 
@@ -523,17 +520,11 @@ function remove_build_directory() {
   fi
 }
 
-#
+#------------------------------------------------------------------------------
 # prepare source for compile
-#
+#------------------------------------------------------------------------------
 function prep_openscad_amu() {
   print_m "${FUNCNAME} begin"
-
-  update_build_variables
-
-  # check missing
-  check_update
-  install_missing
 
   # check for source
   if ! ( cd ${repo_cache} 2>/dev/null && git rev-parse 2>/dev/null ) ; then
@@ -550,6 +541,7 @@ function prep_openscad_amu() {
     ( cd ${repo_cache} && git describe --tags --long --dirty )
   fi
 
+  [[ "${force_reconfigure}" == "yes" ]] && print_m "forcing configure."
   if [[ -x ${repo_cache}/configure && "${force_reconfigure}" == "no" ]] ; then
     print_m "configure script exists."
   else
@@ -564,6 +556,7 @@ function prep_openscad_amu() {
     mkdir -pv ${openscad_amu_builddir}
   fi
 
+  [[ "${force_reconfigure}" == "yes" ]] && print_m "forcing configure."
   if [[ -r ${openscad_amu_builddir}/Makefile && "${force_reconfigure}" == "no" ]] ; then
     print_m "root Makefile exists."
   else
@@ -575,13 +568,28 @@ function prep_openscad_amu() {
   print_m "${FUNCNAME} end"
 }
 
-#
+#------------------------------------------------------------------------------
 # run make with targets
-#
+#------------------------------------------------------------------------------
 function make_openscad_amu() {
   print_m "${FUNCNAME} begin"
 
-  prep_openscad_amu
+  update_build_variables
+
+  if [[ "${skip_check}" == "yes" ]] ; then
+    print_m "skipping system prerequisite checks."
+  else
+    print_m "checking system for prerequisites."
+    check_update
+    install_missing
+  fi
+
+  if [[ "${skip_prep}" == "yes" ]] ; then
+    print_m "skipping source preparation."
+  else
+    print_m "preparing source."
+    prep_openscad_amu
+  fi
 
   print_m "building [$*]."
   ( cd ${openscad_amu_builddir} && make $* )
@@ -589,9 +597,9 @@ function make_openscad_amu() {
   print_m "${FUNCNAME} end"
 }
 
-#
+#------------------------------------------------------------------------------
 # create project directory and copy template files
-#
+#------------------------------------------------------------------------------
 function create_template() {
   print_m "${FUNCNAME} begin"
 
@@ -645,9 +653,9 @@ function create_template() {
   print_m "${FUNCNAME} end"
 }
 
-#
+#------------------------------------------------------------------------------
 # process commands
-#
+#------------------------------------------------------------------------------
 function process_commands() {
   while [[ $# -gt 0 ]]; do
       case $1 in
@@ -661,7 +669,11 @@ function process_commands() {
         print_h2 "setting: design flow [${design_flow}]"
       ;;
 
-      --skip)
+      --skip-prep)
+        print_h2 "setting: skip source preparation"
+        skip_prep="yes"
+      ;;
+      --skip-check)
         print_h2 "setting: skip prerequisite check"
         skip_check="yes"
       ;;
@@ -787,9 +799,89 @@ function process_commands() {
   done
 }
 
-###############################################################################
+#------------------------------------------------------------------------------
+# process commands: branch lists handler
+#------------------------------------------------------------------------------
+function process_commands_handler() {
+  print_m "${FUNCNAME} begin"
+
+  declare local args
+
+  while [[ $# -gt 0 ]]; do
+      case $1 in
+      -l|--branch-list)
+        if [[ -z "$2" ]] ; then
+          print_m "syntax: ${base_name} $1 <list>"
+          print_m "missing repository branch list. aborting..."
+          exit 1
+        fi
+
+        # get list and tokenize with [,]
+        repo_branch_list="${2//,/ }" ; shift 1
+        print_h1 "setting: branch list [${repo_branch_list}]"
+      ;;
+
+      # add to command argument list
+      *)
+        [[ -n $args ]] && args+=" $1"
+        [[ -z $args ]] && args=$1
+      ;;
+      esac
+      shift 1
+  done
+
+  if [[ -z ${repo_branch_list} ]] ; then
+    # empty list, single pass on command arguments
+
+    process_commands $args
+  else
+    # list specified, process command arguments for each branch
+
+    # check for 'tags' keyword
+    if [[ ${repo_branch_list:0:4} == "tags" ]] ; then
+      # obtain list of tagged releases from git repository
+
+      # force imediate clone/update of source repository (if needed)
+      update_build_variables
+
+      # check for source
+      if ! ( cd ${repo_cache} 2>/dev/null && git rev-parse 2>/dev/null ) ; then
+        print_m "fetching repository cache."
+        update_repo "${repo_url}" "${repo_cache}"
+      fi
+
+      # check for 'tagsN', where 'N' indicates use last 'N' tags.
+      declare local repo_branch_list_cnt=${repo_branch_list:4}
+
+      if [[ -z ${repo_branch_list_cnt} ]] ; then
+        repo_branch_list=$( cd ${repo_cache} && git tag )
+        print_m tag limits = [all]
+      else
+        repo_branch_list=$( cd ${repo_cache} && git tag | tail -${repo_branch_list_cnt} )
+        print_m tag limits = last [${repo_branch_list_cnt}]
+      fi
+
+      print_m using tag list = [${repo_branch_list}]
+    fi
+
+    # handle command set for each branch
+    print_m "${FUNCNAME}.branch-list begin"
+    for tag in ${repo_branch_list} ; do
+      repo_branch="$tag"
+      print_h2 "setting: source branch [${repo_branch}]"
+
+      print_m $args
+      process_commands $args
+    done
+    print_m "${FUNCNAME}.branch-list end"
+  fi
+
+  print_m "${FUNCNAME} end"
+}
+
+#==============================================================================
 # version, help and examples
-###############################################################################
+#==============================================================================
 function print_help() {
 print_m -j "${base_name}: (Help)" -l
 
@@ -802,7 +894,9 @@ from a template.
 
       --flow <name>    : Use design flow <name> default=(df1).
 
-      --skip           : Skip prerequisites check.
+      --skip-prep      : Skip source preparation (use with care).
+      --skip-check     : Skip system prerequisites check.
+
       --yes            : Automatic yes to apt-get install prompts.
       --check          : Check for installed prerequisites.
       --required       : Install missing prerequisites.
@@ -810,6 +904,10 @@ from a template.
 
  -r | --reconfigure    : Force source reconfiguration.
  -v | --branch <name>  : Use branch <name> default=(master).
+ -l | --branch-list <list> : Iterate over list of branch versions
+                         use: tags      for all tagged releases.
+                              tagsN     for last 'N' tagged releases.
+                              v1.6,v1.7 for v1.6 and v1.7 tagged releases.
  -c | --cache          : Configure source for cache install.
 
  -b | --build          : Build programs.
@@ -833,7 +931,7 @@ from a template.
   * When using a flow or branch other than the default, the --flow
     and/or --branch option must be used with each command invokation
     or set in the configuration file.
-  * If used, --flow and --skip must be the precede all other options.
+  * If used, --flow and --skip-* must be the precede all other options.
   * If used, {--reconfigure|--branch|--cache} must precede --build
     (et al.), --install, --make, and --template.
   * When changing {--branch|--cache}, force source reconfiguration
@@ -842,6 +940,9 @@ from a template.
 EOF
 }
 
+#------------------------------------------------------------------------------
+# examples
+#------------------------------------------------------------------------------
 function print_examples() {
 print_m -j "${base_name}: (Examples)" -l
 
@@ -889,7 +990,7 @@ cat << EOF
     When changing --branch and/or --cache on a configured source tree, use
     the --reconfigure option to force source reconfiguration.
 
-(4) Reconfigure an existing source cache for release 'v1.6' then build and
+(4) Reconfigure an existing source tree for release 'v1.6' then build and
     install to the local cache.
 
     $ ./bootstrap.bash --reconfigure --cache --branch v1.6 --install
@@ -911,9 +1012,34 @@ cat << EOF
         --fetch --reconfigure --cache --branch develop \\
         --install --installdocs --template my_project
 
+(8) Compile select tagged release versions, installing to local cache and
+    creating project templates for each.
+
+    $ ./bootstrap.bash \\
+        --branch-list v1.5.1,v1.6,v1.7,v1.8.2 \\
+        --reconfigure --cache --install --template-def
+
+(9) Build and install the last six tagged releases to the default system
+    location.
+
+    $ ./bootstrap.bash --required
+    $ sudo ./bootstrap.bash \\
+        --branch-list tags6 --skip-check --reconfigure --install
+
+    or in a single step:
+
+    $ sudo ./bootstrap.bash --branch-list tags6 --reconfigure --install
+
+    to remove everything installed in the previous step, use:
+
+    $ sudo ./bootstrap.bash --branch-list tags6 --reconfigure --uninstall
+
 EOF
 }
 
+#------------------------------------------------------------------------------
+# version
+#------------------------------------------------------------------------------
 function print_version() {
 print_m -j "${base_name}: (Version)" -l
 
@@ -939,11 +1065,13 @@ if [[ -e ${conf_file} ]] ; then
   print_m "reading configuration file: ${conf_file}"
   parse_configuration "${conf_file}" "
     design_flow
+    skip_prep
     skip_check
     apt_get_opts
     repo_cache_root
     repo_url
     repo_branch
+    repo_branch_list
     repo_url_apt_cyg
     apt_cyg_path
     configure_opts_add
@@ -957,13 +1085,13 @@ fi
 # parse configuration file commands
 if [[ -n "${commands}" ]] ; then
   print_m "processing configuration file commands."
-  process_commands ${commands}
+  process_commands_handler ${commands}
 fi
 
 # parse command line arguments
 if [[ $# -ne 0 ]] ; then
   print_m "processing command line arguments."
-  process_commands $*
+  process_commands_handler $*
 fi
 
 # show help if no command line arguments or configuration file commands
