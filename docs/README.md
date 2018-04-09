@@ -128,8 +128,9 @@ you can contact the maintainer of the project or file an [issue].
 [openscad-amu]: https://royasutton.github.io/openscad-amu
 [repository]: https://github.com/royasutton/openscad-amu
 [issue]: https://github.com/royasutton/openscad-amu/issues
-[bootstrap]: https://github.com/royasutton/openscad-amu#bootstrap
-[Project Makefile]: https://github.com/royasutton/openscad-amu#project-makefile
+
+[bootstrap]: https://github.com/royasutton/openscad-amu#evaluation
+[Project Makefile]: https://github.com/royasutton/openscad-amu#example-project
 
 [omdl]: https://royasutton.github.io/omdl
 
