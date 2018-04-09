@@ -92,7 +92,7 @@ SUFFIXES = .bash .makefile .stamp .help
 # targets
 ##############################################################################
 
-docs-local: html-local pdf-local man-local
+docs-local: html-local
 
 html-local: doxygen.stamp
 
@@ -136,7 +136,7 @@ openscad_seam_lexer.cc: openscad_seam_lexer.ll
 install-exec-hook:
 	@list='$(bin_PROGRAMS)' ; test -n "$(EXEEXT)" && \
 	  list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
-	echo soft linking [$$list] v$(PACKAGE_VERSION) extension [$(EXEEXT)]; \
+	echo soft linking [$$list] version=[$(PACKAGE_VERSION)] extension=[$(EXEEXT)]; \
 	( cd '$(DESTDIR)$(bindir)' && \
 		for p in $$list; do \
 			$(am__mv) $$p$(EXEEXT) $$p-$(PACKAGE_VERSION)$(EXEEXT) && \
@@ -144,7 +144,7 @@ install-exec-hook:
 		; done \
 	)
 
-install-docs-local: install-html-local install-pdf-local install-man-local
+install-docs-local: install-html-local
 
 '$(install_path_html)': ; $(MKDIR_P) -v '$(install_path_html)'
 install-html-local: html-local | '$(install_path_html)'
@@ -161,7 +161,7 @@ install-man-local: man-local | '$(install_path_man)'
 uninstall-local:
 	@list='$(bin_PROGRAMS)' ; test -n "$(EXEEXT)" && \
 	  list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
-	echo unlinking [$$list] v$(PACKAGE_VERSION) extension [$(EXEEXT)]; \
+	echo unlinking [$$list] version=[$(PACKAGE_VERSION)] extension=[$(EXEEXT)]; \
 	( cd '$(DESTDIR)$(bindir)' && \
 		for p in $$list; do \
 			rm -fv $$p-$(PACKAGE_VERSION)$(EXEEXT) \

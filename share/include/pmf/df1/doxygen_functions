@@ -127,7 +127,7 @@ endef
 # returns table rows for each installed document id.
 define doxygen_index_rows
   $(amu_pm_d2)
-  $(foreach f,$(wildcard $1*$(dir_level_sep)index.info),
+  $(foreach f,$(sort $(wildcard $1*$(dir_level_sep)index.info)),
     $(call doxygen_index_rows_$(2),
       $(call read_key_value,$f,docs_install_id),
       $(call read_key_value,$f,docs_group_id),

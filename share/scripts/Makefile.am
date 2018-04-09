@@ -36,7 +36,7 @@ SUFFIXES = .bash .help
 
 all-local: $(files_am)
 
-docs-local: html-local pdf-local man-local
+docs-local: html-local
 
 html-local: doxygen.stamp
 
@@ -70,7 +70,7 @@ install-data-local: $(files_am) | '$(install_path)'
 		; done \
 	)
 
-install-docs-local: install-html-local install-pdf-local install-man-local
+install-docs-local: install-html-local
 
 '$(install_path_html)': ; $(MKDIR_P) -v '$(install_path_html)'
 install-html-local: html-local | '$(install_path_html)'

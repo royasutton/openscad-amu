@@ -31,8 +31,8 @@ doxygen_depends_scopes                  := $(true)
 
 # output formats
 generate_html                           := $(true)
-generate_latex                          := $(true)
-generate_man                            := $(true)
+generate_latex                          := $(false)
+generate_man                            := $(false)
 
 # add doxygen output to release directory/archive
 release_doxygen                         := $(false)
