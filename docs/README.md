@@ -15,17 +15,24 @@ Introduction
 ------------
 
 [openscad-amu] is being developed to support the construction of
-automated design flows and Doxygen-based documentation for [OpenSCAD]
-language-based mechanical designs. It establishes a framework that
-allows documentation and auxiliary build-scripts to be embedded into
-the [OpenSCAD] design source.
+automated design flows with Doxygen-based documentation for [OpenSCAD]
+language-based mechanical design. It establishes a framework that
+enables documentation and build-scripts to be embedded into the
+__\*.scad__ design source. It incorporates two distinct but
+complementary features that may be used together or independently:
 
-The build scripts are automatically extracted at compile-time to
-construct [Makefiles] that automate the design flow. It provides source
-code input-filters that extend [Doxygen], providing additional [special
-commands] with features useful in mechanical design. The flow automates
-documentation generation for each [OpenSCAD] design source with
-embedded [Doxygen] content.
+    (1) Design Compilation Automation, and
+    (2) Design Documentation Generation.
+
+In either case, design __\*.scad__ source files are augmented with
+structured auxiliary comments.
+
+Build scripts are automatically extracted at compile-time to construct
+[Makefiles] that manage the design compilation. [openscad-amu] provides
+source code filters that extend [Doxygen], and provides additional
+[special commands] with features useful in mechanical design. The
+design flow automates the documentation extraction and formatting for
+each __\*.scad__ source with embedded [Doxygen] content.
 
 <p align="center">
 <img src="assets/flow_intro.svg" alt="" border="0" usemap="#adf.map"/>
@@ -50,21 +57,32 @@ embedded [Doxygen] content.
       coords="330,84,440,139"/>
 </map>
 
+Any design with multiple components will significantly benefit when
+using [openscad-amu]. The *targets* in the above diagram represent
+design component parts or part variations. Compiling design targets
+one-by-one is times consuming and error prone and discourages design
+optimization and/or exploration.
+
+For larger design projects, [openscad-amu] frees designers from mundane
+dependency and part coherency tracking. Moreover, it greatly reduces
+total project rendering time on multi-processor systems via parallel
+invocations of the single-threaded [OpenSCAD] compiler. Once
+compilation flows are described, using a simple scripting scheme, each
+design target is kept current from source as needed via invocations of
+*make*.
+
 
 Getting Started
 ---------------
 
-[openscad-amu] incorporated two distinct but complementary features
-that may be used together or independently: (1) design automation and
-(2) design documentation. In either case, a design source file is
-annotated with structured comments.
-
 If you are already familiar with [Doxygen], adding basic documentation
-to your [OpenSCAD] designs using [openscad-amu] is effortless. Simply
-markup each of your design files with the [special commands], name each
-file in the [Project Makefile], and type __make__ to generate your
-documentation. You can start from a ready-made template created by the
-[bootstrap], then customize as needed.
+to your [OpenSCAD] designs using [openscad-amu] is straight forward.
+Simply markup each of your design files with the [special commands],
+name each file in the [Project Makefile], and type __make__ to generate
+your documentation.
+
+You can also start from a template created by the [bootstrap], then
+customize as needed.
 
 ### Setup ###
 
@@ -76,13 +94,13 @@ Example
 
 * [A Portable solar panel tripod mount](https://royasutton.github.io/omdl/examples/solar_mount/index.html):
 
-  Design took approximately 48 hours from concept to assembly and
-  documentation using [omdl] and [openscad-amu]. Demonstrates the fully
-  automated design flow. Change any design parameter, type **make
-  all**, then print resulting parts. In this design, parts are
-  automatically engraved with the version and part identifier using a
-  simple database scheme. Design is published on
-  [thingiverse](http://www.thingiverse.com/thing:2051608).
+  This design took approximately 48 hours from concept to assembly and
+  documentation using [omdl] and [openscad-amu]. It demonstrates the
+  fully automated design flow. One can change a design parameter, then
+  type **make all** to recompile all effected parts. In this design,
+  parts are automatically engraved with the version and part identifier
+  using a simple database scheme available in [omdl]. The design is
+  published on [thingiverse](http://www.thingiverse.com/thing:2051608).
 
 
 Contributing
