@@ -69,7 +69,7 @@ total project rendering time on multi-processor systems via parallel
 invocations of the single-threaded [OpenSCAD] compiler. Once
 compilation flows are described, using a simple scripting scheme, each
 design target is kept current from source as needed via invocations of
-*make*.
+`make`.
 
 
 Getting Started
@@ -78,11 +78,11 @@ Getting Started
 If you are already familiar with [Doxygen], adding basic documentation
 to your [OpenSCAD] designs using [openscad-amu] is straight forward.
 Simply markup each of your design files with the [special commands],
-name each file in the [Project Makefile], and type __make__ to generate
+name each file in the [Project Makefile], and type `make` to generate
 your documentation.
 
-You can also start from a template created by the [bootstrap], then
-customize as needed.
+You can also start from a template created by the [bootstrap] script,
+then customize as needed.
 
 ### Setup ###
 
@@ -97,7 +97,7 @@ Example
   This design took approximately 48 hours from concept to assembly and
   documentation using [omdl] and [openscad-amu]. It demonstrates the
   fully automated design flow. One can change a design parameter, then
-  type **make all** to recompile all effected parts. In this design,
+  type `make all` to recompile all effected parts. In this design,
   parts are automatically engraved with the version and part identifier
   using a simple database scheme available in [omdl]. The design is
   published on [thingiverse](http://www.thingiverse.com/thing:2051608).

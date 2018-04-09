@@ -27,8 +27,8 @@ example project, type:
 
     $ ./bootstrap.bash --cache --yes --install --template my_project
 
-The argument *--yes* can be omitted if you prefer to confirm the
-installation of each package individually (see: *bootstrap.bash --help*).
+The argument `--yes` can be omitted if you prefer to confirm the
+installation of each package individually (see: `bootstrap.bash --help`).
 
 If all goes well, you will end up with two new directories: *cache* and
 *my_project*. The source will have been compiled and installed to
@@ -49,7 +49,7 @@ configurations, and build and install this example:
     $ make all
     $ make install
 
-The third *make* step will compile (via [OpenSCAD]) numerous targets
+The third `make` step will compile (via [OpenSCAD]) numerous targets
 guided by scripts embedded in source comments, process the embedded
 documentation (via [Doxygen]), and the last will install the library
 files to the system-dependent [OpenSCAD] user library path. In
@@ -86,7 +86,7 @@ To install the last six release versions, use:
 
     $ sudo ./bootstrap.bash --branch-list tags6 --reconfigure --install
 
-To install a list of specific release versions, use (*comas without
+To install a list of specific release versions, use (*comas with no
 spaces separate versions*):
 
     $ sudo ./bootstrap.bash --branch-list v1.5.1,v1.6,v1.7,v1.8.2 --reconfigure --install
@@ -98,14 +98,14 @@ use. However, it may be installed by typing:
     $ sudo ./bootstrap.bash --branch develop --reconfigure --install
 
 To uninstall everything that was installed by any prior steps, rerun
-the step replacing *--install* by *--uninstall*. More help and examples
-are available (see: *bootstrap.bash --help* and *bootstrap.bash --examples*).
+the step replacing `--install` by `--uninstall`. More help and examples
+are available (see: `bootstrap.bash --help` and `bootstrap.bash --examples`).
 
 
 Manual Compilation
 ------------------
 
-The *bootstrap.bash* script is the easiest way to build and install the
+The `bootstrap.bash` script is the easiest way to build and install the
 source. However, here are the steps to build it manually. Once all of
 the prerequisite packages exists, the development source can be
 compiled by:
