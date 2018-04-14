@@ -95,12 +95,11 @@ Example
 * [A Portable solar panel tripod mount](http://www.thingiverse.com/thing:2051608):
 
   This design took approximately 48 hours from concept to assembly and
-  documentation using [omdl] and [openscad-amu]. It demonstrates the
-  fully automated design flow. One can change a design parameter, then
-  type `make all` to recompile all effected parts. In this design,
-  parts are automatically engraved with the version and part identifier
-  using a simple database scheme available in [omdl]. The design is
-  published on [thingiverse](http://www.thingiverse.com/thing:2051608).
+  documentation using [omdl] and [openscad-amu]. It demonstrates an
+  automated design flow. One can change a design parameter, then type
+  `make all` to recompile effected parts. In this design, parts are
+  engraved with a version and part identifier using a simple database
+  scheme available in [omdl].
 
 
 Contributing
