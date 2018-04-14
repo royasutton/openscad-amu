@@ -69,8 +69,8 @@ This example may be used as a *template* and is a good starting point
 for new designs using [openscad-amu].
 
 
-Installing for Design Development
----------------------------------
+Installing
+----------
 
 To setup and install the latest release of [openscad-amu] on a system
 for [OpenSCAD] design development, type:

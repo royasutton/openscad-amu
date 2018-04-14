@@ -92,7 +92,7 @@ See the GitHub source [repository] for setup instructions.
 Example
 -------
 
-* [A Portable solar panel tripod mount](https://royasutton.github.io/omdl/examples/solar_mount/index.html):
+* [A Portable solar panel tripod mount](http://www.thingiverse.com/thing:2051608):
 
   This design took approximately 48 hours from concept to assembly and
   documentation using [omdl] and [openscad-amu]. It demonstrates the
