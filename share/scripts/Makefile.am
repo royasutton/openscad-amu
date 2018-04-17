@@ -8,7 +8,7 @@ files = \
 	bootstrap.conf
 
 files_am = \
-	bootstrap.bash
+	bootstrap.bash \
 	doxygen_mainpage.bash \
 	segregate.bash
 
