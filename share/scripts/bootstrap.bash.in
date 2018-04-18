@@ -878,7 +878,7 @@ function parse_commands_branch() {
         print_h1 "Creating new project template in [${dir_name}]"
         create_template ${dir_name}
       ;;
-      --template-def)
+      -p|--template-def)
         print_h1 "Creating new project template with default name."
         create_template
       ;;
@@ -1042,7 +1042,7 @@ may also be used to start new design projects from a template.
  -m | --make <name>         : Run make with target 'name'.
 
  -t | --template <dir>      : Create project template in directory 'dir'.
-      --template-def        : Create project template in default directory.
+ -p | --template-def        : Create project template in default directory.
 
       --remove              : Remove source build directory.
 
