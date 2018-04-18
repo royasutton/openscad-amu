@@ -72,6 +72,10 @@ for new designs using [openscad-amu].
 Installing
 ----------
 
+To pull repository updates for an existing source tree, type:
+
+    $ ./bootstrap.bash --fetch
+
 To setup and install the latest release of [openscad-amu] on a system
 for [OpenSCAD] design development, type:
 
