@@ -209,6 +209,7 @@ function update_prerequisite_list() {
 
       packages_Linux="
         openscad
+        g++
         libboost-all-dev
         imagemagick
         texlive-latex-extra
@@ -256,6 +257,7 @@ function update_prerequisite_list() {
 
       packages_Linux="
         openscad
+        g++
         libboost-all-dev
         imagemagick
       "
