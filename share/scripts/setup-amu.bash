@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #/##############################################################################
 #
-#   \file   bootstrap.bash
+#   \file   setup-amu.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
 #   \date   2016-2018
@@ -1077,7 +1077,7 @@ cat << EOF
     create and populate a new project with a template. Finally build and
     install the (example) project.
 
-    $ ./bootstrap.bash --cache --install --template my_project
+    $ ./setup-amu.bash --cache --install --template my_project
     $ cd ./my_project
     $ make install
 
@@ -1096,19 +1096,19 @@ cat << EOF
 (2) Build and install the default source branch to the default system
     location (--fetch will update an existing source cache prior to building).
 
-    $ ./bootstrap.bash --fetch --build
-    $ sudo ./bootstrap.bash --install
+    $ ./setup-amu.bash --fetch --build
+    $ sudo ./setup-amu.bash --install
 
     To uninstall from the default system location and remove the local
     source cache.
 
-    $ sudo ./bootstrap.bash --uninstall
+    $ sudo ./setup-amu.bash --uninstall
     $ rm -rf cache
 
 (3) Build both the 'master' and 'develop' branch and install to the local
     cache, then create new project templates for each.
 
-    $ ./bootstrap.bash \\
+    $ ./setup-amu.bash \\
         --cache --branch master --install --template pt_master \\
         --reconfigure \\
         --cache --branch develop --install --template pt_develop
@@ -1119,46 +1119,46 @@ cat << EOF
 (4) Reconfigure an existing source tree for release 'v1.6' then build and
     install to the local cache.
 
-    $ ./bootstrap.bash --reconfigure --cache --branch v1.6 --install
+    $ ./setup-amu.bash --reconfigure --cache --branch v1.6 --install
 
 (5) Build release 'v1.6' and install to the default system location.
 
-    $ ./bootstrap.bash --branch v1.6 --build
-    $ sudo ./bootstrap.bash --branch v1.6 --install
+    $ ./setup-amu.bash --branch v1.6 --build
+    $ sudo ./setup-amu.bash --branch v1.6 --install
 
 (6) Create a new project using the most recently install version.
 
-    $ ./bootstrap.bash --template my_project
+    $ ./setup-amu.bash --template my_project
 
 (7) Fetch updates for and reconfigure an existing source cache for latest
     develop branch then rebuild and install with documentation to the local
     cache and create a project template.
 
-    $ ./bootstrap.bash \\
+    $ ./setup-amu.bash \\
         --fetch --reconfigure --cache --branch develop \\
         --install --installdocs --template my_project
 
 (8) Compile select tagged release versions, installing to local cache and
     creating project templates for each.
 
-    $ ./bootstrap.bash \\
+    $ ./setup-amu.bash \\
         --branch-list v1.5.1,v1.6,v1.7,v1.8.2 \\
         --reconfigure --cache --install --template-def
 
 (9) Build and install the last six tagged releases to the default system
     location.
 
-    $ ./bootstrap.bash --required
-    $ sudo ./bootstrap.bash \\
+    $ ./setup-amu.bash --required
+    $ sudo ./setup-amu.bash \\
         --branch-list tags6 --skip-check --reconfigure --install
 
     or in a single step:
 
-    $ sudo ./bootstrap.bash --branch-list tags6 --reconfigure --install
+    $ sudo ./setup-amu.bash --branch-list tags6 --reconfigure --install
 
     to remove everything installed in the previous step, use:
 
-    $ sudo ./bootstrap.bash --branch-list tags6 --reconfigure --uninstall
+    $ sudo ./setup-amu.bash --branch-list tags6 --reconfigure --uninstall
 
 EOF
 }

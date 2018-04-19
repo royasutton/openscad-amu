@@ -5,17 +5,17 @@
 ##############################################################################
 
 files_s = \
-	bootstrap.bash
+	setup-amu.bash
 
 files_d = \
-	bootstrap.conf
+	setup-amu.conf
 
 files_am = \
 	doxygen_mainpage.bash \
 	segregate.bash
 
 scripts_help = \
-	bootstrap.help \
+	setup-amu.help \
 	segregate.help
 
 EXTRA_DIST = \

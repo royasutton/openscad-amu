@@ -73,10 +73,10 @@
     If you are already familiar with [Doxygen], adding basic
     documentation to your [OpenSCAD] designs using [openscad-amu] is
     effortless. Simply markup each of your design files with the
-    [special commands], name each file in the [Project Makefile], and
+    [special commands], name each file in the project makefile, and
     type \c make to generate your documentation. You can start from a
-    ready-made template created by the [bootstrap], then customize
-    as needed.
+    ready-made template created by the \c setup-amu.bash script, then
+    customize as needed.
 
     \li \subpage source_annotate
     \li \subpage design_flow
@@ -94,8 +94,6 @@
   [openscad-amu]: https://royasutton.github.io/openscad-amu
   [repository]: https://github.com/royasutton/openscad-amu
   [issue]: https://github.com/royasutton/openscad-amu/issues
-  [bootstrap]: https://github.com/royasutton/openscad-amu#bootstrap
-  [Project Makefile]: https://github.com/royasutton/openscad-amu#project-makefile
 
   [OpenSCAD]: http://www.openscad.org/
 
