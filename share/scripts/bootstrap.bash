@@ -1,4 +1,3 @@
-#!@BASH_PATH@
 #!/usr/bin/env bash
 #/##############################################################################
 #
@@ -936,8 +935,8 @@ function parse_commands_repo() {
         print_examples
         exit 0
       ;;
-      --version)
-        print_version
+      --info)
+        print_info
         exit 0
       ;;
 
@@ -1000,7 +999,7 @@ function parse_commands_repo() {
 }
 
 #==============================================================================
-# help, examples, and version
+# help, examples, and info
 #==============================================================================
 
 #------------------------------------------------------------------------------
@@ -1058,7 +1057,7 @@ may also be used to start new design projects from a template.
 
  -h | --help                : Show this help message.
       --examples            : Show some examples uses.
-      --version             : Show version information.
+      --info                : Show script information.
 
  NOTES:
   * If used, --flow and --skip-* must be the precede all other options.
@@ -1165,16 +1164,15 @@ EOF
 }
 
 #------------------------------------------------------------------------------
-# version
+# info
 #------------------------------------------------------------------------------
-function print_version() {
-print_m -j "${base_name}: (Version)" -l
+function print_info() {
+print_m -j "${base_name}: (Info)" -l
 
 cat << EOF
-     package: @PACKAGE_NAME@
-     version: @PACKAGE_VERSION@
-  bug report: @PACKAGE_BUGREPORT@
-    site url: @PACKAGE_URL@
+     package: openscad-amu
+  bug report: royasutton@hotmail.com
+    site url: https://royasutton.github.io/openscad-amu
 
 EOF
 }

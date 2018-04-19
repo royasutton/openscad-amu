@@ -4,11 +4,13 @@
 #
 ##############################################################################
 
-files = \
+files_s = \
+	bootstrap.bash
+
+files_d = \
 	bootstrap.conf
 
 files_am = \
-	bootstrap.bash \
 	doxygen_mainpage.bash \
 	segregate.bash
 
@@ -17,7 +19,8 @@ scripts_help = \
 	segregate.help
 
 EXTRA_DIST = \
-	$(files)
+	$(files_s) \
+	$(files_d)
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
@@ -60,7 +63,12 @@ doxygen.stamp: Doxyfile Makefile $(files_am) $(scripts_help)
 '$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
 install-data-local: $(files_am) | '$(install_path)'
 	( cd ${srcdir} && \
-		for f in $(files); do \
+		for f in $(files_s); do \
+			$(INSTALL_SCRIPT) $$f '$(install_path)' \
+		; done \
+	) && \
+	( cd ${srcdir} && \
+		for f in $(files_d); do \
 			$(INSTALL_DATA) $$f '$(install_path)' \
 		; done \
 	) && \
@@ -85,7 +93,7 @@ install-man-local: man-local | '$(install_path_man)'
 	( cd doxygen && cp -av man/* '$(install_path_man)' )
 
 uninstall-local:
-	for f in $(files) $(files_am); do \
+	for f in $(files_s) $(files_d) $(files_am); do \
 		rm -fv "$(install_path)/$$f" \
 	; done
 	-test -d '$(install_path)' && rmdir -v '$(install_path)'
