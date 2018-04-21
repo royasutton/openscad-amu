@@ -155,7 +155,7 @@ you can contact the maintainer of the project or file an [issue].
 
 [GNU General Public License]: https://www.gnu.org/licenses/gpl.html
 
-[setup-amu.bash]: https://raw.githubusercontent.com/royasutton/openscad-amu/develop/share/scripts/setup-amu.bash
+[setup-amu.bash]: https://raw.githubusercontent.com/royasutton/openscad-amu/master/share/scripts/setup-amu.bash
 
 [openscad-amu]: https://royasutton.github.io/openscad-amu
 [repository]: https://github.com/royasutton/openscad-amu
