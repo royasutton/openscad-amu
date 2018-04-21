@@ -95,8 +95,7 @@ Manual Compilation
 The `setup-amu.bash` script is the easiest way to build and install the
 source. However, here are the steps to build it manually. Once all of
 the prerequisite packages exists (see: `setup-amu.bash --list` and
-`setup-amu.bash --required`), the development source can be compiled
-by:
+`setup-amu.bash --required`), the development source can be compiled:
 
     $ git clone https://github.com/royasutton/openscad-amu
     $ cd openscad-amu

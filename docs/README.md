@@ -93,8 +93,8 @@ section of the repository home page.
 
 ### Setup ###
 
-See the GitHub source [repository] for setup and [installing]
-instructions.
+See the GitHub source [repository] for instructions on
+[evaluating][evaluation] and [installing].
 
 
 Example

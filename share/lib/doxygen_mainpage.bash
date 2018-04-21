@@ -12,6 +12,11 @@
     }
    \enddot
 
+    A _framework_ and tools for automating the compilation of
+    [OpenSCAD] designs with a _pre-processor_ that allows
+    <i><b>*.scad</b></i> to be documented using [Doxygen].
+
+
   \section what_is_amu What is it?
 
     [openscad-amu] is being developed to support the construction of
