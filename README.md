@@ -22,13 +22,15 @@ install the prerequisites, fetch and compile the source, install
 project, type:
 
     $ mkdir tmp && cd tmp
-    $ wget https://raw.githubusercontent.com/royasutton/openscad-amu/develop/share/scripts/setup-amu.bash
+    $ wget https://git.io/setup-amu.bash
     $ chmod +x setup-amu.bash
 
     $ ./setup-amu.bash --cache --yes --install --template my_project
 
 The option `--yes` can be omitted if you prefer to confirm the
 installation of each required package (see: `setup-amu.bash --help`).
+If you don't like shortened URLs, here is the full URL to
+[setup-amu.bash].
 
 If all goes well, you will end up with two new directories: *cache* and
 *my_project*. The source will have been compiled and installed to
@@ -152,6 +154,8 @@ you can contact the maintainer of the project or file an [issue].
 
 
 [GNU General Public License]: https://www.gnu.org/licenses/gpl.html
+
+[setup-amu.bash]: https://raw.githubusercontent.com/royasutton/openscad-amu/develop/share/scripts/setup-amu.bash
 
 [openscad-amu]: https://royasutton.github.io/openscad-amu
 [repository]: https://github.com/royasutton/openscad-amu
