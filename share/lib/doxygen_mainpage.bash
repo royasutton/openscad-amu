@@ -14,33 +14,28 @@
 
   \section what_is_amu What is it?
 
-    It is a collection of \ref programs "programs", a \ref mslibrary
-    "scripting library", and support \ref scripts "scripts" in a
-    _framework_ for automating the compilation of [OpenSCAD] designs
-    with a _pre-processor_ that allows <i><b>*.scad</b></i> to be
-    documented using [Doxygen].
-
     [openscad-amu] is being developed to support the construction of
-    automated design flows and Doxygen-based documentation for
-    [OpenSCAD] language-based mechanical designs. It establishes a
-    framework that allows documentation and auxiliary build-scripts to
-    be embedded into the [OpenSCAD] design source.
-
-    The build scripts are automatically extracted at compile-time to
-    construct [Makefiles] that automate the design flow. It provides
-    source code input-filters that extend [Doxygen], providing
-    additional [special commands] with features useful in mechanical
-    design. The flow automates documentation generation for each
-    [OpenSCAD] design source with embedded [Doxygen] content.
+    automated design flows with Doxygen-based documentation for
+    OpenSCAD language-based mechanical design. It establishes a
+    framework that enables documentation and build-scripts to be
+    embedded into <i><b>*.scad</b></i> design source. It is a
+    collection of C++ \ref programs "programs", a makefile script \ref
+    mslibrary "library", and support \ref scripts "scripts" for
+    automating the compilation of [OpenSCAD] designs with a
+    _pre-processor_ that allows <i><b>*.scad</b></i> to be documented
+    using [Doxygen]. The embedded build scripts are extracted at
+    compile-time to construct [Makefiles] that manage design
+    compilation. It provides source code input-filters that extend
+    [Doxygen] and provide additional [special commands] with features
+    useful in mechanical design.
 
   \section an_example Example
 
-    To see what openscad-amu can do, see this trivial example \ref
-    vehicle.scad "source file" that represents an OpenSCAD design
-    library. It differs in that it includes: (1) comment-embedded
-    <em>special commands</em> that document the library and (2)
-    comment-embedded <em>auxiliary build scripts</em> that describe how
-    to automatically render any number of parameterized targets.
+    See this source \ref vehicle.scad "file" which represents a trivial
+    design library. It differs from a typical OpenSCAD design library
+    in that it includes documentation embedded in comments sections,
+    and <em>auxiliary build scripts</em> that describe how to render
+    numerous design targets.
 
     \dot
       digraph example {
@@ -55,28 +50,31 @@
       }
     \enddot
 
-    This simplified example produces the renditions that make up the
-    library documentation and generates 96 targets of interest
-    <tt>(*.png, *.stl, etc.)</tt>.  [openscad-amu] brings together
-    numerous widely-used tools to automate the production of [OpenSCAD]
-    design targets and the design source
-    <a href="../../../examples/build/html/index.html">documentation</a>
+    When compiled, this simplified example generates 96 targets
+    <tt>(*.png, *.stl, etc.)</tt> and assembles the library
+    documentation. [openscad-amu] brings together several widely-used
+    tools to automate the production of [OpenSCAD] design targets and
+    the design documentation in various output formats
+    <a href="../../../examples/build/html/index.html">(HTML)</a>
     <a href="../../../examples/build/latex/refman.pdf">(PDF)</a>.
+
+    \note The PDF version of this example documentation is not built by
+    default. To build it, go the the <tt>../build/latex directory</tt>
+    and type \c make.
 
   \section getting_started Getting Started
 
-    [openscad-amu] incorporated two distinct but complementary features
-    that may be used together or independantly: (1) design automation
-    and (2) design documentation. In either case, a design source file
-    is annotated with structued comments.
-
-    If you are already familiar with [Doxygen], adding basic
-    documentation to your [OpenSCAD] designs using [openscad-amu] is
-    effortless. Simply markup each of your design files with the
+    [openscad-amu] incorporated two complementary but distinct features
+    that may be used together or independantly: (1) design compilation
+    automation and (2) design documentation generation. In either case,
+    the design <i><b>*.scad</b></i> source files are augmented with
+    auxiliary comments. If you are familiar with [Doxygen], adding
+    basic documentation to your [OpenSCAD] designs using [openscad-amu]
+    is straight forward. Markup each of your design files with the
     [special commands], name each file in the project makefile, and
     type \c make to generate your documentation. You can start from a
-    ready-made template created by the \c setup-amu.bash script, then
-    customize as needed.
+    template created by the \c setup-amu.bash script, then customize as
+    needed.
 
     \li \subpage source_annotate
     \li \subpage design_flow

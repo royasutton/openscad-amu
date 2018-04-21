@@ -15,24 +15,23 @@ Introduction
 ------------
 
 [openscad-amu] is being developed to support the construction of
-automated design flows with Doxygen-based documentation for [OpenSCAD]
+automated design flows with Doxygen-based documentation for OpenSCAD
 language-based mechanical design. It establishes a framework that
-enables documentation and build-scripts to be embedded into the
-__\*.scad__ design source. It incorporates two distinct but
-complementary features that may be used together or independently:
+enables documentation and build-scripts to be embedded into __\*.scad__
+design source. It incorporates two complementary but distinct features
+that may be used together or independently:
 
     (1) Design Compilation Automation, and
     (2) Design Documentation Generation.
 
-In either case, design __\*.scad__ source files are augmented with
-structured auxiliary comments.
-
-Build scripts are automatically extracted at compile-time to construct
-[Makefiles] that manage the design compilation. [openscad-amu] provides
-source code filters that extend [Doxygen], and provides additional
-[special commands] with features useful in mechanical design. The
-design flow automates the documentation extraction and formatting for
-each __\*.scad__ source with embedded [Doxygen] content.
+In either case, the design __\*.scad__ source files are augmented with
+auxiliary structured comments. Build scripts are automatically
+extracted at compile-time to construct [Makefiles] that manage design
+compilation. [openscad-amu] provides source code filters that extend
+[Doxygen], and provides additional [special commands] with features
+useful in mechanical design. The design flow automates documentation
+extraction and formatting for each __\*.scad__ source with embedded
+[Doxygen] content.
 
 <p align="center">
 <img src="assets/flow_intro.svg" alt="" border="0" usemap="#adf.map"/>
@@ -48,28 +47,35 @@ each __\*.scad__ source with embedded [Doxygen] content.
       title="Automated Design Flow"
       coords="282,73,279,59,270,47,256,37,238,31,219,29,199,31,182,37,168,47,159,59,156,73,159,86,168,99,182,108,199,115,219,117,238,115,256,108,270,99,279,86"/>
 <area shape="rect" id="node3" alt=""
-      href="https://royasutton.github.io/omdl/examples/solar_mount/psptm_build_all.stl"
+      href="http://www.thingiverse.com/thing:2051608"
       title="Dependency-based Target Generation"
       coords="342,5,428,60"/>
 <area shape="rect" id="node4" alt=""
-      href="https://royasutton.github.io/omdl/examples/solar_mount/index.html"
+      href="http://www.thingiverse.com/thing:2051608"
       title="Design Documentation Set"
       coords="330,84,440,139"/>
 </map>
 
-Any design with multiple components will significantly benefit when
-using [openscad-amu]. The *targets* in the above diagram represent
-design component parts or part variations. Compiling design targets
-one-by-one is times consuming and error prone and discourages design
-optimization and/or exploration.
+Any design with multiple components will benefit when using
+[openscad-amu]. The benefits correlates directly with part count. The
+*targets* in the above diagram represent design components or part
+variations. Compiling design targets one-by-one is times consuming and
+error prone and discourages design optimization and/or exploration.
 
-For larger design projects, [openscad-amu] frees designers from mundane
-dependency and part coherency tracking. Moreover, it greatly reduces
-total project rendering time on multi-processor systems via parallel
-invocations of the single-threaded [OpenSCAD] compiler. Once
-compilation flows are described, using a simple scripting scheme, each
-design target is kept current from source as needed via invocations of
-`make`.
+> *For larger design projects, the increase in benefit is significant as
+> [openscad-amu] frees designers from mundane dependency and state
+> tracking and provides mechanisms for part compilation and coherent
+> design documentation.*
+
+Moreover, it can greatly reduce total project rendering time on
+multi-processor systems via parallel invocations of the single-threaded
+[OpenSCAD] compiler. Once compilation flows are described, using a
+simple scripting scheme, each design target is kept current from source
+as needed via invocations of `make`.
+
+> *For smaller projects, the ability to document a design or library using
+> [Doxygen] is a convenient way to both maintain and publish the design
+> interface or API.*
 
 
 Getting Started
@@ -87,7 +93,8 @@ section of the repository home page.
 
 ### Setup ###
 
-See the GitHub source [repository] for setup instructions.
+See the GitHub source [repository] for setup and [installing]
+instructions.
 
 
 Example
@@ -96,7 +103,7 @@ Example
 * [A Portable solar panel tripod mount](http://www.thingiverse.com/thing:2051608):
 
   This design took approximately 48 hours from concept to assembly and
-  documentation using [omdl] and [openscad-amu]. It demonstrates an
+  documentation using [omdl] and [openscad-amu]. It demonstrates the
   automated design flow. One can change a design parameter, then type
   `make all` to recompile effected parts. In this design, parts are
   engraved with a version and part identifier using a simple database
@@ -130,6 +137,7 @@ you can contact the maintainer of the project or file an [issue].
 [issue]: https://github.com/royasutton/openscad-amu/issues
 
 [evaluation]: https://github.com/royasutton/openscad-amu#evaluation
+[installing]: https://github.com/royasutton/openscad-amu#installing
 
 [omdl]: https://royasutton.github.io/omdl
 
