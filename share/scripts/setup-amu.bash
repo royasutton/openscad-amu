@@ -1,8 +1,7 @@
-#!@BASH_PATH@
 #!/usr/bin/env bash
 #/##############################################################################
 #
-#   \file   bootstrap.bash
+#   \file   setup-amu.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
 #   \date   2016-2018
@@ -44,114 +43,63 @@ if [[ $BASH_VERSINFO -lt 4 ]] ; then
 fi
 
 ###############################################################################
-# design flow: (1) prerequisite packages and (2) template files
+# global variables
 ###############################################################################
 
-function update_design_flow_variables() {
-  declare local packages_Common
-  declare local packages_Linux
-  declare local packages_CYGWIN_NT
+declare design_flow="df1"
 
-  case "${design_flow}" in
-    df1t)
-      packages_Common="
-        doxygen
-        texlive
-        graphviz
-        git
-        autoconf
-        automake
-        libtool
-        bash
-        make
-        flex
-        zip
-      "
+declare skip_check="no"
+declare skip_prep="no"
 
-      packages_Linux="
-        openscad
-        libboost-all-dev
-        imagemagick
-        texlive-latex-extra
-      "
+declare apt_cyg_path
+declare apt_get_opts="--verbose-versions"
+declare git_fetch_opts="--verbose"
 
-      packages_CYGWIN_NT="
-        gcc-g++
-        time
-        libboost-devel
-        ImageMagick
-        texlive-collection-basic
-        texlive-collection-bibtexextra
-        texlive-collection-binextra
-        texlive-collection-fontsrecommended
-        texlive-collection-fontutils
-        texlive-collection-latex
-        texlive-collection-latexextra
-        texlive-collection-latexrecommended
-        texlive-collection-mathextra
-        texlive-collection-pictures
-      "
+declare repo_url_apt_cyg="https://github.com/transcode-open/apt-cyg"
 
-      templates="
-        Project_Makefile
-        Doxyfile
-        design.scad
-        library.scad
-      "
-    ;;
-    df1)
-      packages_Common="
-        doxygen
-        graphviz
-        git
-        autoconf
-        automake
-        libtool
-        bash
-        make
-        flex
-        zip
-      "
+declare repo_url="https://github.com/royasutton/openscad-amu"
+declare repo_branch="master"
+declare repo_branch_list
 
-      packages_Linux="
-        openscad
-        libboost-all-dev
-        imagemagick
-      "
+declare cache_install="no"
+declare repo_cache_root="cache"
 
-      packages_CYGWIN_NT="
-        gcc-g++
-        time
-        libboost-devel
-        ImageMagick
-      "
+declare force_reconfigure="no"
+declare configure_opts_add
 
-      templates="
-        Project_Makefile
-        Doxyfile
-        design.scad
-        library.scad
-      "
-    ;;
-    *)
-      print_m "Design flow [$design_flow] not supported."
-      exit 1
-    ;;
-  esac
+declare conf_file_vars="
+  design_flow
+  skip_check
+  skip_prep
+  apt_cyg_path
+  apt_get_opts
+  git_fetch_opts
+  repo_url_apt_cyg
+  repo_url
+  repo_branch
+  repo_branch_list
+  cache_install
+  repo_cache_root
+  force_reconfigure
+  configure_opts_add
+  commands
+"
 
-  case "${sysname}" in
-    Linux)
-      packages="${packages_Common} ${packages_Linux}"
-    ;;
-    CYGWIN_NT)
-      packages="${packages_Common} ${packages_CYGWIN_NT}"
-    ;;
-    *)
-      print_m "Configuration for [$sysname] required."
-      exit 1
-    ;;
-  esac
-}
+# derived variables
+declare packages
+declare packages_installed
+declare packages_missing
+
+declare templates
+
+declare repo_cache_apt_cyg
+declare repo_cache
+
+declare build_dir
+
+declare cache_prefix
+declare cache_bindir
+declare configure_opts
 
 ###############################################################################
 # message printing
@@ -226,63 +174,220 @@ function print_h2 () {
 }
 
 ###############################################################################
-# variables
+# os dependent functions
 ###############################################################################
 
-declare design_flow="df1"
+#------------------------------------------------------------------------------
+# design flow configuration:
+#   (1) prerequisite package list and
+#   (2) template file list
+#------------------------------------------------------------------------------
+function update_prerequisite_list() {
+  print_m "${FUNCNAME} begin"
 
-declare skip_prep="no"
-declare skip_check="no"
-declare apt_get_opts="--verbose-versions"
+  declare local packages_Common
+  declare local packages_Linux
+  declare local packages_CYGWIN_NT
 
-declare git_fetch_opts="--verbose"
+  case "${design_flow}" in
+    # df1 with latex
+    df1t)
+      packages_Common="
+        doxygen
+        texlive
+        graphviz
+        git
+        autoconf
+        automake
+        libtool
+        bash
+        make
+        flex
+        zip
+      "
 
-declare repo_cache_root="cache"
+      packages_Linux="
+        openscad
+        g++
+        libboost-all-dev
+        imagemagick
+        texlive-latex-extra
+      "
 
-declare repo_url_apt_cyg="https://github.com/transcode-open/apt-cyg"
-declare repo_cache_apt_cyg
-declare apt_cyg_path
+      packages_CYGWIN_NT="
+        gcc-g++
+        time
+        libboost-devel
+        ImageMagick
+        texlive-collection-basic
+        texlive-collection-bibtexextra
+        texlive-collection-binextra
+        texlive-collection-fontsrecommended
+        texlive-collection-fontutils
+        texlive-collection-latex
+        texlive-collection-latexextra
+        texlive-collection-latexrecommended
+        texlive-collection-mathextra
+        texlive-collection-pictures
+      "
 
-declare repo_url="https://github.com/royasutton/openscad-amu"
-declare repo_cache
-declare repo_branch="master"
-declare repo_branch_list
+      templates="
+        Project_Makefile
+        Doxyfile
+        design.scad
+        library.scad
+      "
+    ;;
 
-declare templates
+    # df1 without latex
+    df1)
+      packages_Common="
+        doxygen
+        graphviz
+        git
+        autoconf
+        automake
+        libtool
+        bash
+        make
+        flex
+        zip
+      "
 
-declare packages
-declare packages_installed
-declare packages_missing
+      packages_Linux="
+        openscad
+        g++
+        libboost-all-dev
+        imagemagick
+      "
 
-declare openscad_amu_builddir
+      packages_CYGWIN_NT="
+        gcc-g++
+        time
+        libboost-devel
+        ImageMagick
+      "
 
-declare cache_install="no"
-declare cache_prefix
-declare cache_bindir
+      templates="
+        Project_Makefile
+        Doxyfile
+        design.scad
+        library.scad
+      "
+    ;;
 
-declare force_reconfigure="no"
-declare configure_opts
-declare configure_opts_add
+    *)
+      print_m "ERROR: Design flow [$design_flow] not supported."
+      exit 1
+    ;;
+  esac
 
-function update_build_variables() {
-  repo_cache_apt_cyg=${repo_cache_root}/apt_cyg
-  repo_cache=${repo_cache_root}/openscad-amu
+  case "${sysname}" in
+    Linux)
+      packages="${packages_Common} ${packages_Linux}"
+    ;;
+    CYGWIN_NT)
+      packages="${packages_Common} ${packages_CYGWIN_NT}"
+    ;;
+    *)
+      print_m "ERROR: Configuration for [$sysname] required."
+      exit 1
+    ;;
+  esac
 
-  openscad_amu_builddir="${repo_cache}/build/${repo_branch}/${sysname}"
+  print_m "${FUNCNAME} end"
+}
 
-  if [[ "${cache_install}" == "yes" ]] ; then
-    cache_prefix="${work_path}/${repo_cache_root}/local"
-    cache_bindir="${cache_prefix}/bin/${sysname}"
-    configure_opts="--prefix=${cache_prefix} --bindir=${cache_bindir}"
-  fi
+#==============================================================================
+# Linux
+#==============================================================================
 
-  if [[ -n "${configure_opts_add}" ]] ; then
-    [[ -n "${configure_opts}" ]] && configure_opts+=" ${configure_opts_add}"
-    [[ -z "${configure_opts}" ]] && configure_opts="${configure_opts_add}"
+function prerequisites_check.Linux() {
+  dpkg-query --show --showformat='${Status}\n' $1 2>/dev/null |
+    grep -q "install ok installed" &&
+      return 0
+
+  return 1
+}
+
+function prerequisites_status.Linux() {
+  dpkg-query --list $*
+}
+
+function prerequisites_install.Linux() {
+  print_m "apt-get install options: [${apt_get_opts}]"
+  if ! sudo apt-get install ${apt_get_opts} $* ; then
+    print_m "ERROR: install failed. aborting..."
+    exit 1
   fi
 }
 
-function parse_configuration() {
+#==============================================================================
+# Cygwin
+#==============================================================================
+
+function prerequisites_check.CYGWIN_NT() {
+  cygcheck --check-setup --dump-only $1 |
+    tail -1 |
+    grep -q $1 &&
+      return 0
+
+  return 1
+}
+
+function prerequisites_status.CYGWIN_NT() {
+  cygcheck --check-setup $*
+}
+
+function prerequisites_install.CYGWIN_NT() {
+  set_apt_cyg_path
+  if ! ${apt_cyg_path} install $* ; then
+    print_m "ERROR: install failed. aborting..."
+    exit 1
+  fi
+}
+
+function set_apt_cyg_path() {
+  declare local cmd_name="apt-cyg"
+  declare local cmd_cache=${repo_cache_apt_cyg}/${cmd_name}
+
+  if [[ -z "${apt_cyg_path}" ]] ; then
+    apt_cyg_path=$(which 2>/dev/null ${cmd_name} ${cmd_cache} | head -1)
+
+    if [[ -x "${apt_cyg_path}" ]] ; then
+      print_m "found: ${cmd_name}=${apt_cyg_path}"
+    else
+      print_m "fetching apt-cyg git repository to ${repo_cache_apt_cyg}"
+      repository_update "${repo_url_apt_cyg}" "${repo_cache_apt_cyg}"
+
+      if [[ -e "${cmd_cache}" ]] ; then
+        [[ ! -x "${cmd_cache}" ]] && chmod --verbose +x ${cmd_cache}
+        apt_cyg_path=$(which 2>/dev/null ${cmd_name} ${cmd_cache} | head -1)
+        print_m "using cached: ${cmd_name}=${apt_cyg_path}"
+        print_m "adding [${apt_cyg_path%/*}] to shell path"
+        PATH=${apt_cyg_path%/*}:${PATH}
+      else
+        print_m "ERROR: unable to locate or cache ${cmd_name}. aborting..."
+        exit 1
+      fi
+    fi
+  fi
+}
+
+###############################################################################
+# os independent functions
+###############################################################################
+
+#==============================================================================
+# general / core
+#==============================================================================
+
+#------------------------------------------------------------------------------
+# parse configuration file
+#------------------------------------------------------------------------------
+function parse_configuration_file() {
+  print_m "${FUNCNAME} begin"
+
   declare local file="$1"
   declare local varl="$2"
 
@@ -312,117 +417,86 @@ function parse_configuration() {
       print_m "setting $v=$t"
     fi
   done
+
+  print_m "${FUNCNAME} end"
 }
-
-###############################################################################
-# functions
-###############################################################################
-
-#==============================================================================
-# Linux
-#==============================================================================
-
-function check.Linux() {
-  dpkg-query --show --showformat='${Status}\n' $1 2>/dev/null |
-    grep -q "install ok installed" &&
-      return 0
-
-  return 1
-}
-
-function show.Linux() {
-  dpkg-query --list $*
-}
-
-function install.Linux() {
-  print_m "apt-get install options: [${apt_get_opts}]"
-  if ! sudo apt-get install ${apt_get_opts} $* ; then
-    print_m "install failed. aborting..."
-    exit 1
-  fi
-}
-
-#==============================================================================
-# Cygwin
-#==============================================================================
-
-function check.CYGWIN_NT() {
-  cygcheck --check-setup --dump-only $1 |
-    tail -1 |
-    grep -q $1 &&
-      return 0
-
-  return 1
-}
-
-function show.CYGWIN_NT() {
-  cygcheck --check-setup $*
-}
-
-function install.CYGWIN_NT() {
-  set_apt_cyg_path
-  if ! ${apt_cyg_path} install $* ; then
-    print_m "install failed. aborting..."
-    exit 1
-  fi
-}
-
-function set_apt_cyg_path() {
-  declare local cmd_name="apt-cyg"
-  declare local cmd_cache=${repo_cache_apt_cyg}/${cmd_name}
-
-  if [[ -z "${apt_cyg_path}" ]] ; then
-    apt_cyg_path=$(which 2>/dev/null ${cmd_name} ${cmd_cache} | head -1)
-
-    if [[ -x "${apt_cyg_path}" ]] ; then
-      print_m "found: ${cmd_name}=${apt_cyg_path}"
-    else
-      print_m "fetching apt-cyg git repository to ${repo_cache_apt_cyg}"
-      update_repo "${repo_url_apt_cyg}" "${repo_cache_apt_cyg}"
-
-      if [[ -e "${cmd_cache}" ]] ; then
-        [[ ! -x "${cmd_cache}" ]] && chmod --verbose +x ${cmd_cache}
-        apt_cyg_path=$(which 2>/dev/null ${cmd_name} ${cmd_cache} | head -1)
-        print_m "using cached: ${cmd_name}=${apt_cyg_path}"
-        print_m "adding [${apt_cyg_path%/*}] to shell path"
-        PATH=${apt_cyg_path%/*}:${PATH}
-      else
-        print_m "unable to locate or cache ${cmd_name}. aborting..."
-        exit 1
-      fi
-    fi
-  fi
-}
-
-#==============================================================================
-# System Independent
-#==============================================================================
 
 #------------------------------------------------------------------------------
-# update missing package list
+# update build variables
 #------------------------------------------------------------------------------
-function check_update() {
+function update_build_variables() {
+  print_m "${FUNCNAME} begin"
+
+  repo_cache_apt_cyg=${repo_cache_root}/apt-cyg
+  repo_cache=${repo_cache_root}/openscad-amu
+
+  build_dir="${repo_cache}/build/${repo_branch}/${sysname}"
+
+  if [[ "${cache_install}" == "yes" ]] ; then
+    cache_prefix="${work_path}/${repo_cache_root}/local"
+    cache_bindir="${cache_prefix}/bin/${sysname}"
+    configure_opts="--prefix=${cache_prefix} --bindir=${cache_bindir}"
+  fi
+
+  if [[ -n "${configure_opts_add}" ]] ; then
+    [[ -n "${configure_opts}" ]] && configure_opts+=" ${configure_opts_add}"
+    [[ -z "${configure_opts}" ]] && configure_opts="${configure_opts_add}"
+  fi
+
+  print_m "${FUNCNAME} end"
+}
+
+#------------------------------------------------------------------------------
+# list prerequisite packages
+#------------------------------------------------------------------------------
+function prerequisites_list() {
+  print_m "${FUNCNAME} begin"
+
+  print_h2 "[ ${design_flow} prerequisites ]"
+  for r in ${packages} ; do
+    print_m -j $r
+  done
+
+  print_h2 "[ ${design_flow} templates ]"
+  for t in ${templates} ; do
+    print_m -j $t
+  done
+  print_hb "="
+
+  print_m "${FUNCNAME} end"
+}
+
+#------------------------------------------------------------------------------
+# update prerequisite package status lists
+#------------------------------------------------------------------------------
+function prerequisites_check() {
+  print_m "${FUNCNAME} begin"
+
   packages_installed=""
   packages_missing=""
 
-  update_design_flow_variables
+  update_prerequisite_list
   for r in ${packages} ; do
-    if check.${sysname} $r
+    if prerequisites_check.${sysname} $r
     then
       packages_installed+=" $r"
     else
       packages_missing+=" $r"
     fi
   done
+
+  print_m "${FUNCNAME} end"
 }
 
 #------------------------------------------------------------------------------
-# show packages
+# show prerequisite package status
 #------------------------------------------------------------------------------
-function check_show_status() {
+function prerequisites_status() {
+  print_m "${FUNCNAME} begin"
+
   print_h2 "[ Installed ]"
   if [[ -n "${packages_installed}" ]] ; then
-    show.${sysname} $packages_installed
+    prerequisites_status.${sysname} $packages_installed
   else
     print_m -j "installed prerequisite list is empty."
   fi
@@ -436,35 +510,42 @@ function check_show_status() {
     print_m -j "missing prerequisite list is empty."
   fi
   print_hb "="
+
+  print_m "${FUNCNAME} end"
 }
 
 #------------------------------------------------------------------------------
-# install missing packages
+# install missing prerequisite packages
 #------------------------------------------------------------------------------
-function install_missing() {
+function prerequisites_install() {
+  print_m "${FUNCNAME} begin"
+
   if [[ -n "${packages_missing}" ]] ; then
     print_h2 "[ Missing ]"
     for r in ${packages_missing} ; do
       print_m -j $r
     done
 
-    update_build_variables
     print_h2 "[ Installing ]"
     for r in ${packages_missing} ; do
       print_h2 "installing: [ $r ]"
       print_m -j $r
-      install.${sysname} $r
+      prerequisites_install.${sysname} $r
     done
     print_hb "="
   else
     print_m -j "no missing prerequisites."
   fi
+
+  print_m "${FUNCNAME} end"
 }
 
 #------------------------------------------------------------------------------
 # clone or update a Git repository
 #------------------------------------------------------------------------------
-function update_repo() {
+function repository_update() {
+  print_m "${FUNCNAME} begin"
+
   declare local gitrepo="$1"
   declare local out_dir="$2"
 
@@ -473,7 +554,7 @@ function update_repo() {
 
   declare local git=$(which 2>/dev/null git)
   if [[ ! -x "${git}" ]] ; then
-    print_m "please install git:"
+    print_m "ERROR: please install git:"
 
     case "${sysname}" in
       Linux)        print_m "ex: sudo apt-get install git" ;;
@@ -489,7 +570,7 @@ function update_repo() {
       print_m "updating: Git repository cache"
       ( cd ${out_dir} && ${git} pull ${git_fetch_opts} )
     else
-      print_m "directory [${out_dir}] exists and is not a repository. aborting..."
+      print_m "ERROR: directory [${out_dir}] exists and is not a repository. aborting..."
       exit 1
     fi
   else
@@ -501,46 +582,56 @@ function update_repo() {
     print_m -n "repository description: "
     ( cd ${out_dir} && git describe --tags --long --dirty )
   else
-    print_m "repository update failed. aborting..."
+    print_m "ERROR: repository update failed. aborting..."
     exit 1
   fi
+
+  print_m "${FUNCNAME} end"
 }
 
 #------------------------------------------------------------------------------
-# remove source build directory
+# remove directory
 #------------------------------------------------------------------------------
-function remove_build_directory() {
-  declare local builddir="$1"
-
-  if [[ -x ${builddir} ]] ; then
-    print_m "removing source build directory [${builddir}]."
-    rm -rfv ${builddir}
-  else
-    print_m "source build directory [${builddir}] does not exists."
-  fi
-}
-
-#------------------------------------------------------------------------------
-# prepare source for compile
-#------------------------------------------------------------------------------
-function prep_openscad_amu() {
+function remove_directory() {
   print_m "${FUNCNAME} begin"
 
-  # check for source
+  declare local dir_path="$1"
+  declare local dir_desc="$2"
+
+  [[ -n ${dir_desc} ]] && dir_desc+=" "
+
+  if [[ -x ${dir_path} ]] ; then
+    print_m "removing ${dir_desc}directory [${dir_path}]."
+    rm -rfv ${dir_path}
+  else
+    print_m "${dir_desc}directory [${dir_path}] does not exists."
+  fi
+
+  print_m "${FUNCNAME} end"
+}
+
+#------------------------------------------------------------------------------
+# prepare source for compilation
+#------------------------------------------------------------------------------
+function source_prepare() {
+  print_m "${FUNCNAME} begin"
+
+  # check for existing source repository
   if ! ( cd ${repo_cache} 2>/dev/null && git rev-parse 2>/dev/null ) ; then
     print_m "fetching repository cache."
-    update_repo "${repo_url}" "${repo_cache}"
+    repository_update "${repo_url}" "${repo_cache}"
   fi
 
   # checkout branch
   if ! ( cd ${repo_cache} && git checkout ${repo_branch} ) ; then
-    print_m "failed to checkout branch [${repo_branch}]. aborting..."
+    print_m "ERROR: failed to checkout branch [${repo_branch}]. aborting..."
     exit 1
   else
     print_m -n "repository branch description: "
     ( cd ${repo_cache} && git describe --tags --long --dirty )
   fi
 
+  # generate autotools configure script
   [[ "${force_reconfigure}" == "yes" ]] && print_m "forcing configure."
   if [[ -x ${repo_cache}/configure && "${force_reconfigure}" == "no" ]] ; then
     print_m "configure script exists."
@@ -549,20 +640,25 @@ function prep_openscad_amu() {
     ( cd ${repo_cache} && ./autogen.sh )
   fi
 
-  if [[ -x ${openscad_amu_builddir} ]] ; then
+  # create build directory
+  if [[ -x ${build_dir} ]] ; then
     print_m "source build directory exists."
   else
     print_m "creating source build directory."
-    mkdir -pv ${openscad_amu_builddir}
+    mkdir -pv ${build_dir}
   fi
 
+  # generate autotools makefile
   [[ "${force_reconfigure}" == "yes" ]] && print_m "forcing configure."
-  if [[ -r ${openscad_amu_builddir}/Makefile && "${force_reconfigure}" == "no" ]] ; then
+  if [[ -r ${build_dir}/Makefile && "${force_reconfigure}" == "no" ]] ; then
     print_m "root Makefile exists."
   else
     print_m "generating Makefiles and configuring source."
     print_m configure_opts: [${configure_opts}]
-    ( cd ${openscad_amu_builddir} && ../../../configure ${configure_opts} )
+
+    # path to autotools configure script depends on structure of
+    # ${build_dir}  set in function update_build_variables()
+    ( cd ${build_dir} && ../../../configure ${configure_opts} )
   fi
 
   print_m "${FUNCNAME} end"
@@ -571,7 +667,7 @@ function prep_openscad_amu() {
 #------------------------------------------------------------------------------
 # run make with targets
 #------------------------------------------------------------------------------
-function make_openscad_amu() {
+function source_make() {
   print_m "${FUNCNAME} begin"
 
   update_build_variables
@@ -580,39 +676,46 @@ function make_openscad_amu() {
     print_m "skipping system prerequisite checks."
   else
     print_m "checking system for prerequisites."
-    check_update
-    install_missing
+    prerequisites_check
+    prerequisites_install
   fi
 
   if [[ "${skip_prep}" == "yes" ]] ; then
     print_m "skipping source preparation."
   else
     print_m "preparing source."
-    prep_openscad_amu
+    source_prepare
   fi
 
   print_m "building [$*]."
-  ( cd ${openscad_amu_builddir} && make $* )
+  ( cd ${build_dir} && make $* )
 
   print_m "${FUNCNAME} end"
 }
 
 #------------------------------------------------------------------------------
-# create project directory and copy template files
+# create project directory and copy design flow template files
 #------------------------------------------------------------------------------
 function create_template() {
   print_m "${FUNCNAME} begin"
 
-  update_design_flow_variables
+  update_prerequisite_list
   update_build_variables
 
   declare local dir_name="$1"
   declare local def_name_prefix="pm"
+
   declare local cmd_name="openscad-seam"
   declare local cmd_cache="${cache_bindir}/${cmd_name}"
+
   declare local cmd_path
 
+  # check for openscad-amu library path in:
+  #   (1) cache, and then
+  #   (2) system;
+  # use the first one located.
   cmd_path=$(which 2>/dev/null ${cmd_cache} ${cmd_name} | head -1)
+
   if [[ -x "${cmd_path}" ]] ; then
     declare local LIB_PATH=$(${cmd_path} --version --verbose  | grep "lib path" | awk '{print $4}')
     declare local LIB_VERSION=${LIB_PATH##*/}
@@ -647,16 +750,18 @@ function create_template() {
     fi
 
   else
-    print_m "unable to locate required command [${cmd_name}]. not creating..."
+    print_m "unable to locate openscad-amu library path. not creating..."
   fi
 
   print_m "${FUNCNAME} end"
 }
 
 #------------------------------------------------------------------------------
-# process commands
+# parse command line arguments (per-branch)
 #------------------------------------------------------------------------------
-function process_commands() {
+function parse_commands_branch() {
+  print_m "${FUNCNAME} begin"
+
   while [[ $# -gt 0 ]]; do
       case $1 in
       --flow)
@@ -669,13 +774,30 @@ function process_commands() {
         print_h2 "setting: design flow [${design_flow}]"
       ;;
 
+      --skip-check)
+        print_h2 "setting: skip prerequisite check"
+        skip_check="yes"
+      ;;
       --skip-prep)
         print_h2 "setting: skip source preparation"
         skip_prep="yes"
       ;;
-      --skip-check)
-        print_h2 "setting: skip prerequisite check"
-        skip_check="yes"
+
+      --list)
+        print_h1 "Listing prerequisites"
+        update_prerequisite_list
+        prerequisites_list
+      ;;
+      --check)
+        print_h1 "Checking for installed prerequisites"
+        prerequisites_check
+        prerequisites_status
+      ;;
+      --required)
+        print_h1 "Installing missing prerequisites"
+        update_build_variables
+        prerequisites_check
+        prerequisites_install
       ;;
       --yes)
         declare local opt="--assume-yes"
@@ -683,28 +805,26 @@ function process_commands() {
         [[ -n "${apt_get_opts}" ]] && apt_get_opts+=" ${opt}"
         [[ -z "${apt_get_opts}" ]] && apt_get_opts="${opt}"
       ;;
-      --check)
-        print_h1 "Checking for installed prerequisites"
-        check_update
-        check_show_status
+
+      -c|--cache)
+        print_h2 "setting: configure source to install to cache"
+        cache_install="yes"
       ;;
-      --required)
-        print_h1 "Installing missing prerequisites"
-        check_update
-        install_missing
-      ;;
-      --list)
-        print_h1 "Listing prerequisites"
-        update_design_flow_variables
-        for r in ${packages} ; do
-          print_m -j $r
-        done
+      --cache-root)
+        if [[ -z "$2" ]] ; then
+          print_m "syntax: ${base_name} $1 <path>"
+          print_m "missing cache root path. aborting..."
+          exit 1
+        fi
+        repo_cache_root="$2" ; shift 1
+        print_h2 "setting: cache root path [${repo_cache_root}]"
       ;;
 
       -r|--reconfigure)
         print_h2 "setting: force source reconfiguration"
         force_reconfigure="yes"
       ;;
+
       -v|--branch)
         if [[ -z "$2" ]] ; then
           print_m "syntax: ${base_name} $1 <name>"
@@ -714,30 +834,26 @@ function process_commands() {
         repo_branch="$2" ; shift 1
         print_h2 "setting: source branch [${repo_branch}]"
       ;;
-      -c|--cache)
-        print_h2 "setting: configure source to install to cache"
-        cache_install="yes"
-      ;;
 
       -b|--build)
         declare local targets="all"
         print_h1 "Building openscad-amu: make target=[${targets}]"
-        make_openscad_amu ${targets}
+        source_make ${targets}
       ;;
       -i|--install)
         declare local targets="install"
         print_h1 "Building openscad-amu: make target=[${targets}]"
-        make_openscad_amu ${targets}
+        source_make ${targets}
       ;;
       --installdocs)
         declare local targets="install-docs"
         print_h1 "Building openscad-amu: make target=[${targets}]"
-        make_openscad_amu ${targets}
+        source_make ${targets}
       ;;
       -u|--uninstall)
         declare local targets="uninstall"
         print_h1 "Building openscad-amu: make target=[${targets}]"
-        make_openscad_amu ${targets}
+        source_make ${targets}
       ;;
 
       -m|--make)
@@ -748,7 +864,7 @@ function process_commands() {
         fi
         declare local targets="$2" ; shift 1
         print_h1 "Building openscad-amu: make target=[${targets}]"
-        make_openscad_amu ${targets}
+        source_make ${targets}
       ;;
 
       -t|--template)
@@ -761,33 +877,15 @@ function process_commands() {
         print_h1 "Creating new project template in [${dir_name}]"
         create_template ${dir_name}
       ;;
-      --template-def)
+      -p|--template-def)
         print_h1 "Creating new project template with default name."
         create_template
       ;;
 
-      --fetch)
-        print_h1 "Updating openscad-amu source cache"
-        update_build_variables
-        update_repo "${repo_url}" "${repo_cache}"
-      ;;
       --remove)
         print_h1 "Remove source build directory"
         update_build_variables
-        remove_build_directory "${openscad_amu_builddir}"
-      ;;
-
-      -h|--help)
-        print_help
-        exit 0
-      ;;
-      --examples)
-        print_examples
-        exit 0
-      ;;
-      --version)
-        print_version
-        exit 0
+        remove_directory "${build_dir}" "source build"
       ;;
 
       *)
@@ -797,18 +895,26 @@ function process_commands() {
       esac
       shift 1
   done
+
+  print_m "${FUNCNAME} end"
 }
 
 #------------------------------------------------------------------------------
-# process commands: branch lists handler
+# parse command line arguments (per-repository)
 #------------------------------------------------------------------------------
-function process_commands_handler() {
+function parse_commands_repo() {
   print_m "${FUNCNAME} begin"
 
   declare local args
 
   while [[ $# -gt 0 ]]; do
       case $1 in
+      --fetch)
+        print_h1 "Updating openscad-amu source cache"
+        update_build_variables
+        repository_update "${repo_url}" "${repo_cache}"
+      ;;
+
       -l|--branch-list)
         if [[ -z "$2" ]] ; then
           print_m "syntax: ${base_name} $1 <list>"
@@ -821,6 +927,19 @@ function process_commands_handler() {
         print_h1 "setting: branch list [${repo_branch_list}]"
       ;;
 
+      -h|--help)
+        print_help
+        exit 0
+      ;;
+      --examples)
+        print_examples
+        exit 0
+      ;;
+      --info)
+        print_info
+        exit 0
+      ;;
+
       # add to command argument list
       *)
         [[ -n $args ]] && args+=" $1"
@@ -831,9 +950,9 @@ function process_commands_handler() {
   done
 
   if [[ -z ${repo_branch_list} ]] ; then
-    # empty list, single pass on command arguments
+    # empty list, single branch for command arguments
 
-    process_commands $args
+    parse_commands_branch $args
   else
     # list specified, process command arguments for each branch
 
@@ -847,7 +966,7 @@ function process_commands_handler() {
       # check for source
       if ! ( cd ${repo_cache} 2>/dev/null && git rev-parse 2>/dev/null ) ; then
         print_m "fetching repository cache."
-        update_repo "${repo_url}" "${repo_cache}"
+        repository_update "${repo_url}" "${repo_cache}"
       fi
 
       # check for 'tagsN', where 'N' indicates use last 'N' tags.
@@ -871,7 +990,7 @@ function process_commands_handler() {
       print_h2 "setting: source branch [${repo_branch}]"
 
       print_m $args
-      process_commands $args
+      parse_commands_branch $args
     done
     print_m "${FUNCNAME}.branch-list end"
   fi
@@ -880,62 +999,69 @@ function process_commands_handler() {
 }
 
 #==============================================================================
-# version, help and examples
+# help, examples, and info
 #==============================================================================
+
+#------------------------------------------------------------------------------
+# help
+#------------------------------------------------------------------------------
 function print_help() {
 print_m -j "${base_name}: (Help)" -l
 
 cat << EOF
-This script attempts to bootstrap the openscad-amu development environment.
-It downloads the latest source from the development repository, builds, and
-install the utilities (detected missing prerequisites are installed prior
-when possible). This script may also be used to start new design projects
-from a template.
+This script attempts to setup the openscad-amu development environment.
+It downloads the source, builds, and installs the utilities. Detected
+missing prerequisites are installed prior when possible. This script
+may also be used to start new design projects from a template.
 
-      --flow <name>         : Use design flow <name> default=(df1).
+ [ branch options ]
 
-      --skip-prep           : Skip source preparation (use with care).
+      --flow <name>         : Use design flow 'name' default=(df1).
+
       --skip-check          : Skip system prerequisites check.
+      --skip-prep           : Skip source preparation (use with care).
 
-      --yes                 : Automatic yes to apt-get install prompts.
-      --check               : Check for installed prerequisites.
-      --required            : Install missing prerequisites.
       --list                : List prerequisites.
+      --check               : Check system for prerequisites.
+      --required            : Install missing prerequisites.
+      --yes                 : Automatic 'yes' to install prompts.
 
- -r | --reconfigure         : Force source reconfiguration.
- -v | --branch <name>       : Use branch <name> default=(master).
- -l | --branch-list <list>  : Iterate over list of branch versions
-                              use: tags      for all tagged releases.
-                                   tagsN     for last 'N' tagged releases.
-                                   v1.6,v1.7 for releases v1.6 and v1.7, etc.
- -c | --cache               : Configure source for cache install.
+ -c | --cache               : Configure source to install to cache.
+      --cache-root          : Set the cache root directory.
+
+ -r | --reconfigure         : Force source autotools reconfiguration.
+
+ -v | --branch <name>       : Use branch 'name' default=(master).
 
  -b | --build               : Build programs.
  -i | --install             : Install programs.
       --installdocs         : Build and install documentation.
  -u | --uninstall           : Uninstall everything.
 
- -m | --make <name>         : Run make with target <name>.
+ -m | --make <name>         : Run make with target 'name'.
 
- -t | --template <dir>      : Create new project directory with templates.
-      --template-def        : Create new project/templates with default name.
+ -t | --template <dir>      : Create project template in directory 'dir'.
+ -p | --template-def        : Create project template in default directory.
 
-      --fetch               : Update source repository cache.
       --remove              : Remove source build directory.
+
+ [ repository options ]
+
+      --fetch               : Download/update source repository cache.
+
+ -l | --branch-list <list>  : Iterate over list of repository branches:
+                              use: tags      for ALL tagged releases.
+                                   tagsN     for last 'N' tagged releases.
+
+ [ other options ]
 
  -h | --help                : Show this help message.
       --examples            : Show some examples uses.
-      --version             : Show version information.
+      --info                : Show script information.
 
  NOTES:
-  * When using a flow or branch other than the default, the --flow
-    and/or --branch option must be used with each command invokation
-    or set in the configuration file.
   * If used, --flow and --skip-* must be the precede all other options.
-  * If used, {--reconfigure|--branch|--cache} must precede --build
-    (et al.), --install, --make, and --template.
-  * When changing {--branch|--cache}, force source reconfiguration
-    by prefixing --reconfigure.
+  * When changing branches, force source reconfiguration.
 
 EOF
 }
@@ -951,7 +1077,7 @@ cat << EOF
     create and populate a new project with a template. Finally build and
     install the (example) project.
 
-    $ ./bootstrap.bash --cache --install --template my_project
+    $ ./setup-amu.bash --cache --install --template my_project
     $ cd ./my_project
     $ make install
 
@@ -970,19 +1096,19 @@ cat << EOF
 (2) Build and install the default source branch to the default system
     location (--fetch will update an existing source cache prior to building).
 
-    $ ./bootstrap.bash --fetch --build
-    $ sudo ./bootstrap.bash --install
+    $ ./setup-amu.bash --fetch --build
+    $ sudo ./setup-amu.bash --install
 
     To uninstall from the default system location and remove the local
     source cache.
 
-    $ sudo ./bootstrap.bash --uninstall
+    $ sudo ./setup-amu.bash --uninstall
     $ rm -rf cache
 
 (3) Build both the 'master' and 'develop' branch and install to the local
     cache, then create new project templates for each.
 
-    $ ./bootstrap.bash \\
+    $ ./setup-amu.bash \\
         --cache --branch master --install --template pt_master \\
         --reconfigure \\
         --cache --branch develop --install --template pt_develop
@@ -993,61 +1119,60 @@ cat << EOF
 (4) Reconfigure an existing source tree for release 'v1.6' then build and
     install to the local cache.
 
-    $ ./bootstrap.bash --reconfigure --cache --branch v1.6 --install
+    $ ./setup-amu.bash --reconfigure --cache --branch v1.6 --install
 
 (5) Build release 'v1.6' and install to the default system location.
 
-    $ ./bootstrap.bash --branch v1.6 --build
-    $ ./bootstrap.bash --branch v1.6 --install
+    $ ./setup-amu.bash --branch v1.6 --build
+    $ sudo ./setup-amu.bash --branch v1.6 --install
 
 (6) Create a new project using the most recently install version.
 
-    $ ./bootstrap.bash --template my_project
+    $ ./setup-amu.bash --template my_project
 
 (7) Fetch updates for and reconfigure an existing source cache for latest
     develop branch then rebuild and install with documentation to the local
     cache and create a project template.
 
-    $ ./bootstrap.bash \\
+    $ ./setup-amu.bash \\
         --fetch --reconfigure --cache --branch develop \\
         --install --installdocs --template my_project
 
 (8) Compile select tagged release versions, installing to local cache and
     creating project templates for each.
 
-    $ ./bootstrap.bash \\
+    $ ./setup-amu.bash \\
         --branch-list v1.5.1,v1.6,v1.7,v1.8.2 \\
         --reconfigure --cache --install --template-def
 
 (9) Build and install the last six tagged releases to the default system
     location.
 
-    $ ./bootstrap.bash --required
-    $ sudo ./bootstrap.bash \\
+    $ ./setup-amu.bash --required
+    $ sudo ./setup-amu.bash \\
         --branch-list tags6 --skip-check --reconfigure --install
 
     or in a single step:
 
-    $ sudo ./bootstrap.bash --branch-list tags6 --reconfigure --install
+    $ sudo ./setup-amu.bash --branch-list tags6 --reconfigure --install
 
     to remove everything installed in the previous step, use:
 
-    $ sudo ./bootstrap.bash --branch-list tags6 --reconfigure --uninstall
+    $ sudo ./setup-amu.bash --branch-list tags6 --reconfigure --uninstall
 
 EOF
 }
 
 #------------------------------------------------------------------------------
-# version
+# info
 #------------------------------------------------------------------------------
-function print_version() {
-print_m -j "${base_name}: (Version)" -l
+function print_info() {
+print_m -j "${base_name}: (Info)" -l
 
 cat << EOF
-     package: @PACKAGE_NAME@
-     version: @PACKAGE_VERSION@
-  bug report: @PACKAGE_BUGREPORT@
-    site url: @PACKAGE_URL@
+     package: openscad-amu
+  bug report: royasutton@hotmail.com
+    site url: https://royasutton.github.io/openscad-amu
 
 EOF
 }
@@ -1063,35 +1188,19 @@ EOF
 # parse configuration file
 if [[ -e ${conf_file} ]] ; then
   print_m "reading configuration file: ${conf_file}"
-  parse_configuration "${conf_file}" "
-    design_flow
-    skip_prep
-    skip_check
-    apt_get_opts
-    repo_cache_root
-    repo_url
-    repo_branch
-    repo_branch_list
-    repo_url_apt_cyg
-    apt_cyg_path
-    configure_opts_add
-    force_reconfigure
-    cache_install
-    git_fetch_opts
-    commands
-  "
+  parse_configuration_file "${conf_file}" "${conf_file_vars}"
 fi
 
 # parse configuration file commands
 if [[ -n "${commands}" ]] ; then
   print_m "processing configuration file commands."
-  process_commands_handler ${commands}
+  parse_commands_repo ${commands}
 fi
 
 # parse command line arguments
 if [[ $# -ne 0 ]] ; then
   print_m "processing command line arguments."
-  process_commands_handler $*
+  parse_commands_repo $*
 fi
 
 # show help if no command line arguments or configuration file commands

@@ -14,14 +14,12 @@
 
   \section scripts Scripts
 
-  \subsection bootstrap_bash bootstrap.bash
-    \li \subpage bootstrap_bash_ht "Command line help"
+  \subsection setup-amu_bash setup-amu.bash
+    \li \subpage setup-amu_bash_ht "Command line help"
 
   \subsection segregate_bash segregate.bash
     \li \subpage segregate_bash_ht "Command line help"
 
-  \todo update bootstrap.bash to allow a template set to be specified when
-        populating new projects with template files.
 ###############################################################################/
 
 
@@ -29,8 +27,8 @@
   \page segregate_bash_ht Command line help: segregate.bash
   \include segregate.help
 
-  \page bootstrap_bash_ht Command line help: bootstrap.bash
-  \include bootstrap.help
+  \page setup-amu_bash_ht Command line help: setup-amu.bash
+  \include setup-amu.help
 ###############################################################################/
 
 
