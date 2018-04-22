@@ -67,23 +67,57 @@ declare repo_cache_root="cache"
 declare force_reconfigure="no"
 declare configure_opts_add
 
-declare conf_file_vars="
-  design_flow
-  skip_check
-  skip_prep
-  apt_cyg_path
-  apt_get_opts
-  git_fetch_opts
-  repo_url_apt_cyg
-  repo_url
-  repo_branch
-  repo_branch_list
-  cache_install
-  repo_cache_root
-  force_reconfigure
-  configure_opts_add
-  commands
-"
+declare commands
+
+# ( "variable-key" "description" "example-value" ... )
+declare -i conf_file_vw=3
+declare -a conf_file_va=(
+  "design_flow"
+      "use design flow"
+      "df1"
+  "skip_check"
+      "skip system prerequisites check"
+      "no"
+  "skip_prep"
+      "skip source preparation"
+      "no"
+  "apt_cyg_path"
+      "path to apt-cyg"
+      "/usr/local/bin/apt-cyg"
+  "apt_get_opts"
+      "apt get options"
+      "--verbose-versions --assume-yes"
+  "git_fetch_opts"
+      "git fetch options"
+      "--quiet"
+  "repo_url_apt_cyg"
+      "apt-get repo url"
+      "(can be local git repo cache)"
+  "repo_url"
+      "git repo url"
+      "(can be local git repo cache)"
+  "repo_branch"
+      "git repo branch or tag"
+      "develop"
+  "repo_branch_list"
+      "git repo branch or tag list"
+      "v1.7 v1.8.2 master develop"
+  "cache_install"
+      "install to cache"
+      "no"
+  "repo_cache_root"
+      "cache root directory name"
+      "cache"
+  "force_reconfigure"
+      "force source autotools reconfiguration"
+      "no"
+  "configure_opts_add"
+      "autotools reconfiguration options"
+      "--with-boost=DIR --silent --prefix=${HOME}/openscad-amu"
+  "commands"
+      "commands to run with invocation"
+      "--branch master --install --template my_project"
+)
 
 # derived variables
 declare packages
@@ -388,8 +422,12 @@ function set_apt_cyg_path() {
 function parse_configuration_file() {
   print_m "${FUNCNAME} begin"
 
-  declare local file="$1"
-  declare local varl="$2"
+  declare local file="$1"         ; shift 1
+  declare -i local cv_w="$1"      ; shift 1
+  declare -a local cv_a=( "$@" )
+
+  declare -i local cv_s=$(( ${#cv_a[@]} / ${cv_w} ))
+  declare -i local cv_r=0
 
   function read_key()
   {
@@ -408,15 +446,21 @@ function parse_configuration_file() {
     sed -e "s/${key}=//"
   }
 
-  for v in  ${varl} ; do
-    declare local t
+  print_m "checking for ${cv_s} configuration keys"
+  for ((i = 0; i < $cv_s; i++))
+  do
+    declare local key=${cv_a[$(( $i*$cv_w + 0 ))]}
+    declare local cfv
 
-    printf -v t '%s' "$(read_key ${file} $v)"
-    if [[ -n "$t" ]] ; then
-      printf -v $v '%s' "$t"
-      print_m "setting $v=$t"
+    printf -v cfv '%s' "$(read_key ${file} $key)"
+    if [[ -n "$cfv" ]] ; then
+      printf -v $key '%s' "$cfv"
+      print_m "setting $key=$cfv"
+
+      (( ++cv_r ))
     fi
   done
+  print_m "read ${cv_r} key values"
 
   print_m "${FUNCNAME} end"
 }
@@ -1188,7 +1232,9 @@ EOF
 # parse configuration file
 if [[ -e ${conf_file} ]] ; then
   print_m "reading configuration file: ${conf_file}"
-  parse_configuration_file "${conf_file}" "${conf_file_vars}"
+  parse_configuration_file "${conf_file}" "${conf_file_vw}" "${conf_file_va[@]}"
+else
+  print_m "configuration file ${conf_file} does not exists."
 fi
 
 # parse configuration file commands
