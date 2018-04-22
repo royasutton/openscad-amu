@@ -7,8 +7,7 @@
 files_s = \
 	setup-amu.bash
 
-files_d = \
-	setup-amu.conf
+files_d =
 
 files_am = \
 	doxygen_mainpage.bash \
