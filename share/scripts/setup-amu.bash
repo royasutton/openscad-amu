@@ -73,49 +73,49 @@ declare commands
 declare -i conf_file_vw=3
 declare -a conf_file_va=(
   "design_flow"
-      "use design flow"
-      "df1"
+      "design flow name"
+      "$design_flow"
   "skip_check"
       "skip system prerequisites check"
-      "no"
+      "$skip_check"
   "skip_prep"
       "skip source preparation"
-      "no"
+      "$skip_prep"
   "apt_cyg_path"
       "path to apt-cyg"
       "/usr/local/bin/apt-cyg"
   "apt_get_opts"
       "apt get options"
-      "--verbose-versions --assume-yes"
+      "$apt_get_opts"
   "git_fetch_opts"
       "git fetch options"
-      "--quiet"
+      "$git_fetch_opts"
   "repo_url_apt_cyg"
-      "apt-get repo url"
-      "(can be local git repo cache)"
+      "apt-cyg git repo url (can be local path)"
+      "$repo_url_apt_cyg"
   "repo_url"
-      "git repo url"
-      "(can be local git repo cache)"
+      "git repo url (can be local path)"
+      "$repo_url"
   "repo_branch"
       "git repo branch or tag"
-      "develop"
+      "$repo_branch"
   "repo_branch_list"
-      "git repo branch or tag list"
+      "git repo branch and/or tag list"
       "v1.7 v1.8.2 master develop"
   "cache_install"
       "install to cache"
-      "no"
+      "$cache_install"
   "repo_cache_root"
-      "cache root directory name"
-      "cache"
+      "cache root directory path"
+      "$repo_cache_root"
   "force_reconfigure"
       "force source autotools reconfiguration"
-      "no"
+      "$force_reconfigure"
   "configure_opts_add"
       "autotools reconfiguration options"
       "--with-boost=DIR --silent --prefix=${HOME}/openscad-amu"
   "commands"
-      "commands to run with invocation"
+      "commands to run with each invocation"
       "--branch master --install --template my_project"
 )
 
@@ -415,6 +415,65 @@ function set_apt_cyg_path() {
 #==============================================================================
 # general / core
 #==============================================================================
+
+#------------------------------------------------------------------------------
+# write configuration file
+#------------------------------------------------------------------------------
+function write_configuration_file() {
+  print_m "${FUNCNAME} begin"
+
+  declare local file="$1"         ; shift 1
+  declare -i local cv_w="$1"      ; shift 1
+  declare -a local cv_a=( "$@" )
+
+  declare -i local cv_s=$(( ${#cv_a[@]} / ${cv_w} ))
+
+  declare local cv_c="#"
+
+  if [[ -e ${file} ]]
+  then
+    print_m "configuration file ${file} exists... not writting."
+  else
+    print_m "writing ${cv_s} keys to ${file}"
+
+    print_m >  ${file} -j -r 80 ${cv_c} -l \
+                       -j "${cv_c} file: ${file}" -l \
+                       -j -r 80 ${cv_c}
+
+    cat >> ${file} << EOF
+# note:
+#  - Do not quote variable names or values.
+#  - Tokenize multi-value lists with ' ' (space-character).
+#  - 'commands' options are specified as they are on the commnad line,
+#    with multi-value lists Tokenized by ',' (comma-character).
+#  - Values can be split across lines using '\\':
+#      commands=\\
+#        --branch-list v1.5.1,master,develop --cache --reconfigure \\
+#        --install --template-def
+EOF
+
+    print_m >> ${file} -j -r 80 ${cv_c} -l -l \
+                       -j ${cv_c} -j -r 79 "=" -l \
+                       -j "${cv_c} Supported Variables" -l \
+                       -j ${cv_c} -j -r 79 "=" -l
+
+    for ((i = 0; i < $cv_s; i++))
+    do
+      declare local kv=${cv_a[$(( $i*$cv_w + 0 ))]}
+      declare local kd=${cv_a[$(( $i*$cv_w + 1 ))]}
+      declare local ke=${cv_a[$(( $i*$cv_w + 2 ))]}
+
+      print_m >> ${file} -j "${cv_c} [::: ${kd^} :::]" -l \
+                         -j "${cv_c} ${kv}=${ke}" -l
+    done
+
+    print_m >> ${file} -j -r 80 ${cv_c} -l \
+                       -j "${cv_c} eof" -l \
+                       -j -r 80 ${cv_c}
+  fi
+
+  print_m "${FUNCNAME} end"
+}
 
 #------------------------------------------------------------------------------
 # parse configuration file
@@ -983,6 +1042,10 @@ function parse_commands_repo() {
         print_info
         exit 0
       ;;
+      --write-conf)
+        write_configuration_file "${conf_file}" "${conf_file_vw}" "${conf_file_va[@]}"
+        exit 0
+      ;;
 
       # add to command argument list
       *)
@@ -1102,6 +1165,7 @@ may also be used to start new design projects from a template.
  -h | --help                : Show this help message.
       --examples            : Show some examples uses.
       --info                : Show script information.
+      --write-conf          : Write example configuration file.
 
  NOTES:
   * If used, --flow and --skip-* must be the precede all other options.
