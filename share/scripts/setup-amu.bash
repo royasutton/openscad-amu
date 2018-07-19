@@ -826,6 +826,7 @@ function source_make() {
   fi
 
   print_m "building [$*]."
+  print_m \( cd ${build_dir} \&\& make \-\-jobs=${make_job_slots} $* \)
   ( cd ${build_dir} && make --jobs=${make_job_slots} $* )
 
   print_m "${FUNCNAME} end"
@@ -996,11 +997,12 @@ function parse_commands_branch() {
 
       -m|--make)
         if [[ -z "$2" ]] ; then
-          print_m "syntax: ${base_name} $1 <name>"
-          print_m "missing make target name. aborting..."
+          print_m "syntax: ${base_name} $1 <name1,name2,...>"
+          print_m "missing make target list. aborting..."
           exit 1
         fi
-        local targets="$2" ; shift 1
+        # get list and tokenize with [,]
+        local targets="${2//,/ }" ; shift 1
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
@@ -1189,7 +1191,7 @@ may also be used to start new design projects from a template.
       --installdocs         : Build and install documentation.
  -u | --uninstall           : Uninstall everything.
 
- -m | --make <name>         : Run make with target 'name'.
+ -m | --make <list>         : Run make with target 'list'.
 
  -t | --template <dir>      : Create project template in directory 'dir'.
  -p | --template-def        : Create project template in default directory.
