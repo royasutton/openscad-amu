@@ -1020,7 +1020,7 @@ function parse_commands_repo() {
 
       -l|--branch-list)
         if [[ -z "$2" ]] ; then
-          print_m "syntax: ${base_name} $1 <list>"
+          print_m "syntax: ${base_name} $1 <name1,name2,...>"
           print_m "missing repository branch list. aborting..."
           exit 1
         fi
