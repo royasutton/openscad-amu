@@ -67,6 +67,8 @@ declare repo_cache_root="cache"
 declare force_reconfigure="no"
 declare configure_opts_add
 
+declare make_job_slots
+
 declare commands
 
 # ( "variable-key" "description" "example-value" ... )
@@ -114,6 +116,9 @@ declare -a conf_file_va=(
   "configure_opts_add"
       "autotools reconfiguration options"
       "--with-boost=DIR --silent --prefix=${HOME}/openscad-amu"
+  "make_job_slots"
+      "maximum simultaneous make jobs"
+      "4"
   "commands"
       "commands to run with each invocation"
       "--branch master --install --template my_project"
@@ -210,6 +215,35 @@ function print_h2 () {
 ###############################################################################
 # os dependent functions
 ###############################################################################
+
+#------------------------------------------------------------------------------
+# update make job slots count
+#------------------------------------------------------------------------------
+function update_make_job_slots() {
+  print_m "${FUNCNAME} begin"
+
+  # when not set, use system processor/thread count
+  if [[ -z "${make_job_slots}" ]] ; then
+    case "${sysname}" in
+      Linux)
+        make_job_slots=$(nproc)
+      ;;
+      CYGWIN_NT)
+        make_job_slots=$(nproc)
+      ;;
+      *)
+        print_m "ERROR: Configuration for [$sysname] required."
+        exit 1
+      ;;
+    esac
+  else
+    print_m "using preset limit."
+  fi
+
+  print_m "make job slots = ${make_job_slots}"
+
+  print_m "${FUNCNAME} end"
+}
 
 #------------------------------------------------------------------------------
 # design flow configuration:
@@ -774,6 +808,7 @@ function source_make() {
   print_m "${FUNCNAME} begin"
 
   update_build_variables
+  update_make_job_slots
 
   if [[ "${skip_check}" == "yes" ]] ; then
     print_m "skipping system prerequisite checks."
@@ -791,7 +826,7 @@ function source_make() {
   fi
 
   print_m "building [$*]."
-  ( cd ${build_dir} && make $* )
+  ( cd ${build_dir} && make --jobs=${make_job_slots} $* )
 
   print_m "${FUNCNAME} end"
 }
@@ -1042,6 +1077,15 @@ function parse_commands_repo() {
         print_info
         exit 0
       ;;
+      --jobs)
+        if [[ -z "$2" ]] ; then
+          print_m "syntax: ${base_name} $1 <int>"
+          print_m "missing job slots limit. aborting..."
+          exit 1
+        fi
+        make_job_slots="$2" ; shift 1
+        print_h2 "setting: make job slots [${make_job_slots}]"
+      ;;
       --write-conf)
         write_configuration_file "${conf_file}" "${conf_file_vw}" "${conf_file_va[@]}"
         exit 0
@@ -1165,6 +1209,7 @@ may also be used to start new design projects from a template.
  -h | --help                : Show this help message.
       --examples            : Show some examples uses.
       --info                : Show script information.
+      --jobs <int>          : Set make job slots.
       --write-conf          : Write example configuration file.
 
  NOTES:
