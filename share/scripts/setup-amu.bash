@@ -140,11 +140,11 @@ declare configure_opts
 ###############################################################################
 
 function print_m() {
-  declare    local nl
-  declare    local es
-  declare -i local rn=1
-  declare    local ws=' '
-  declare    local ns="${ws}"
+  local nl
+  local es
+  local -i rn=1
+  local ws=' '
+  local ns="${ws}"
 
   case $1 in
   -j)                                                     ;;
@@ -187,8 +187,8 @@ function print_m() {
 }
 
 function print_hb () {
-  declare local tput=$(which tput 2>/dev/null)
-  declare local cols=80
+  local tput=$(which tput 2>/dev/null)
+  local cols=80
 
   [[ -n "$tput" ]] && cols=$(${tput} cols)
 
@@ -219,9 +219,9 @@ function print_h2 () {
 function update_prerequisite_list() {
   print_m "${FUNCNAME} begin"
 
-  declare local packages_Common
-  declare local packages_Linux
-  declare local packages_CYGWIN_NT
+  local packages_Common
+  local packages_Linux
+  local packages_CYGWIN_NT
 
   case "${design_flow}" in
     # df1 with latex
@@ -382,8 +382,8 @@ function prerequisites_install.CYGWIN_NT() {
 }
 
 function set_apt_cyg_path() {
-  declare local cmd_name="apt-cyg"
-  declare local cmd_cache=${repo_cache_apt_cyg}/${cmd_name}
+  local cmd_name="apt-cyg"
+  local cmd_cache=${repo_cache_apt_cyg}/${cmd_name}
 
   if [[ -z "${apt_cyg_path}" ]] ; then
     apt_cyg_path=$(which 2>/dev/null ${cmd_name} ${cmd_cache} | head -1)
@@ -422,13 +422,13 @@ function set_apt_cyg_path() {
 function write_configuration_file() {
   print_m "${FUNCNAME} begin"
 
-  declare local file="$1"         ; shift 1
-  declare -i local cv_w="$1"      ; shift 1
-  declare -a local cv_a=( "$@" )
+  local file="$1"         ; shift 1
+  local -i cv_w="$1"      ; shift 1
+  local -a cv_a=( "$@" )
 
-  declare -i local cv_s=$(( ${#cv_a[@]} / ${cv_w} ))
+  local -i cv_s=$(( ${#cv_a[@]} / ${cv_w} ))
 
-  declare local cv_c="#"
+  local cv_c="#"
 
   if [[ -e ${file} ]]
   then
@@ -459,9 +459,9 @@ EOF
 
     for ((i = 0; i < $cv_s; i++))
     do
-      declare local kv=${cv_a[$(( $i*$cv_w + 0 ))]}
-      declare local kd=${cv_a[$(( $i*$cv_w + 1 ))]}
-      declare local ke=${cv_a[$(( $i*$cv_w + 2 ))]}
+      local kv=${cv_a[$(( $i*$cv_w + 0 ))]}
+      local kd=${cv_a[$(( $i*$cv_w + 1 ))]}
+      local ke=${cv_a[$(( $i*$cv_w + 2 ))]}
 
       print_m >> ${file} -j "${cv_c} [::: ${kd^} :::]" -l \
                          -j "${cv_c} ${kv}=${ke}" -l
@@ -481,17 +481,17 @@ EOF
 function parse_configuration_file() {
   print_m "${FUNCNAME} begin"
 
-  declare local file="$1"         ; shift 1
-  declare -i local cv_w="$1"      ; shift 1
-  declare -a local cv_a=( "$@" )
+  local file="$1"         ; shift 1
+  local -i cv_w="$1"      ; shift 1
+  local -a cv_a=( "$@" )
 
-  declare -i local cv_s=$(( ${#cv_a[@]} / ${cv_w} ))
-  declare -i local cv_r=0
+  local -i cv_s=$(( ${#cv_a[@]} / ${cv_w} ))
+  local -i cv_r=0
 
   function read_key()
   {
-    declare local file="$1"
-    declare local key="$2"
+    local file="$1"
+    local key="$2"
 
     # support line gobbling
     while IFS= read line || [[ -n "$line" ]]; do
@@ -508,8 +508,8 @@ function parse_configuration_file() {
   print_m "checking for ${cv_s} configuration keys"
   for ((i = 0; i < $cv_s; i++))
   do
-    declare local key=${cv_a[$(( $i*$cv_w + 0 ))]}
-    declare local cfv
+    local key=${cv_a[$(( $i*$cv_w + 0 ))]}
+    local cfv
 
     printf -v cfv '%s' "$(read_key ${file} $key)"
     if [[ -n "$cfv" ]] ; then
@@ -649,13 +649,13 @@ function prerequisites_install() {
 function repository_update() {
   print_m "${FUNCNAME} begin"
 
-  declare local gitrepo="$1"
-  declare local out_dir="$2"
+  local gitrepo="$1"
+  local out_dir="$2"
 
   print_m "source: [${gitrepo}]"
   print_m " cache: [${out_dir}]"
 
-  declare local git=$(which 2>/dev/null git)
+  local git=$(which 2>/dev/null git)
   if [[ ! -x "${git}" ]] ; then
     print_m "ERROR: please install git:"
 
@@ -698,8 +698,8 @@ function repository_update() {
 function remove_directory() {
   print_m "${FUNCNAME} begin"
 
-  declare local dir_path="$1"
-  declare local dir_desc="$2"
+  local dir_path="$1"
+  local dir_desc="$2"
 
   [[ -n ${dir_desc} ]] && dir_desc+=" "
 
@@ -805,13 +805,13 @@ function create_template() {
   update_prerequisite_list
   update_build_variables
 
-  declare local dir_name="$1"
-  declare local def_name_prefix="pm"
+  local dir_name="$1"
+  local def_name_prefix="pm"
 
-  declare local cmd_name="openscad-seam"
-  declare local cmd_cache="${cache_bindir}/${cmd_name}"
+  local cmd_name="openscad-seam"
+  local cmd_cache="${cache_bindir}/${cmd_name}"
 
-  declare local cmd_path
+  local cmd_path
 
   # check for openscad-amu library path in:
   #   (1) cache, and then
@@ -820,8 +820,8 @@ function create_template() {
   cmd_path=$(which 2>/dev/null ${cmd_cache} ${cmd_name} | head -1)
 
   if [[ -x "${cmd_path}" ]] ; then
-    declare local LIB_PATH=$(${cmd_path} --version --verbose  | grep "lib path" | awk '{print $4}')
-    declare local LIB_VERSION=${LIB_PATH##*/}
+    local LIB_PATH=$(${cmd_path} --version --verbose  | grep "lib path" | awk '{print $4}')
+    local LIB_VERSION=${LIB_PATH##*/}
 
     print_m using: LIB_PATH = ${LIB_PATH}
     print_m using: VERSION = ${LIB_VERSION}
@@ -839,7 +839,7 @@ function create_template() {
       print_m "copying template files to: [${dir_name}]."
       for f in ${templates}
       do
-        declare local file="${LIB_PATH}/templates/${design_flow}/$f"
+        local file="${LIB_PATH}/templates/${design_flow}/$f"
         if [[ -e ${file} ]] ; then
           cp -v ${file} ${dir_name}
         else
@@ -903,7 +903,7 @@ function parse_commands_branch() {
         prerequisites_install
       ;;
       --yes)
-        declare local opt="--assume-yes"
+        local opt="--assume-yes"
         print_h2 "adding: apt-get install option [${opt}]"
         [[ -n "${apt_get_opts}" ]] && apt_get_opts+=" ${opt}"
         [[ -z "${apt_get_opts}" ]] && apt_get_opts="${opt}"
@@ -939,22 +939,22 @@ function parse_commands_branch() {
       ;;
 
       -b|--build)
-        declare local targets="all"
+        local targets="all"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
       -i|--install)
-        declare local targets="install"
+        local targets="install"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
       --installdocs)
-        declare local targets="install-docs"
+        local targets="install-docs"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
       -u|--uninstall)
-        declare local targets="uninstall"
+        local targets="uninstall"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
@@ -965,7 +965,7 @@ function parse_commands_branch() {
           print_m "missing make target name. aborting..."
           exit 1
         fi
-        declare local targets="$2" ; shift 1
+        local targets="$2" ; shift 1
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
@@ -976,7 +976,7 @@ function parse_commands_branch() {
           print_m "missing project directory name. aborting..."
           exit 1
         fi
-        declare local dir_name="$2" ; shift 1
+        local dir_name="$2" ; shift 1
         print_h1 "Creating new project template in [${dir_name}]"
         create_template ${dir_name}
       ;;
@@ -1008,7 +1008,7 @@ function parse_commands_branch() {
 function parse_commands_repo() {
   print_m "${FUNCNAME} begin"
 
-  declare local args
+  local args
 
   while [[ $# -gt 0 ]]; do
       case $1 in
@@ -1077,7 +1077,7 @@ function parse_commands_repo() {
       fi
 
       # check for 'tagsN', where 'N' indicates use last 'N' tags.
-      declare local repo_branch_list_cnt=${repo_branch_list:4}
+      local repo_branch_list_cnt=${repo_branch_list:4}
 
       if [[ -z ${repo_branch_list_cnt} ]] ; then
         repo_branch_list=$( cd ${repo_cache} && git tag )
