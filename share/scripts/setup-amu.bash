@@ -1363,6 +1363,7 @@ fi
 # show help if no command line arguments or configuration file commands
 if [[ $# == 0 && -z "${commands}" ]] ; then
   print_help
+  exit 0
 fi
 
 print_m "done."
