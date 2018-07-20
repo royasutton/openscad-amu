@@ -38,7 +38,7 @@ declare sysname=${kernel%%-*}
 
 # verify minimum bash version
 if [[ $BASH_VERSINFO -lt 4 ]] ; then
-  echo "Bash version is $BASH_VERSION. Version 4 or greater required."
+  echo "Bash version is $BASH_VERSION. Version 4 or greater required. aborting..."
   exit 1
 fi
 
@@ -232,7 +232,7 @@ function update_make_job_slots() {
         make_job_slots=$(nproc)
       ;;
       *)
-        print_m "ERROR: Configuration for [$sysname] required."
+        print_m "ERROR: Configuration for [$sysname] required. aborting..."
         exit 1
       ;;
     esac
@@ -345,7 +345,7 @@ function update_prerequisite_list() {
     ;;
 
     *)
-      print_m "ERROR: Design flow [$design_flow] not supported."
+      print_m "ERROR: Design flow [$design_flow] not supported. aborting..."
       exit 1
     ;;
   esac
@@ -358,7 +358,7 @@ function update_prerequisite_list() {
       packages="${packages_Common} ${packages_CYGWIN_NT}"
     ;;
     *)
-      print_m "ERROR: Configuration for [$sysname] required."
+      print_m "ERROR: Configuration for [$sysname] required. aborting..."
       exit 1
     ;;
   esac
