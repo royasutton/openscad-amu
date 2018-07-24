@@ -38,7 +38,7 @@ declare sysname=${kernel%%-*}
 
 # verify minimum bash version
 if [[ $BASH_VERSINFO -lt 4 ]] ; then
-  echo "Bash version is $BASH_VERSION. Version 4 or greater required."
+  echo "Bash version is $BASH_VERSION. Version 4 or greater required. aborting..."
   exit 1
 fi
 
@@ -67,23 +67,62 @@ declare repo_cache_root="cache"
 declare force_reconfigure="no"
 declare configure_opts_add
 
-declare conf_file_vars="
-  design_flow
-  skip_check
-  skip_prep
-  apt_cyg_path
-  apt_get_opts
-  git_fetch_opts
-  repo_url_apt_cyg
-  repo_url
-  repo_branch
-  repo_branch_list
-  cache_install
-  repo_cache_root
-  force_reconfigure
-  configure_opts_add
-  commands
-"
+declare make_job_slots
+
+declare commands
+
+# ( "variable-key" "description" "example-value" ... )
+declare -i conf_file_vw=3
+declare -a conf_file_va=(
+  "design_flow"
+      "design flow name"
+      "$design_flow"
+  "skip_check"
+      "skip system prerequisites check"
+      "$skip_check"
+  "skip_prep"
+      "skip source preparation"
+      "$skip_prep"
+  "apt_cyg_path"
+      "path to apt-cyg"
+      "/usr/local/bin/apt-cyg"
+  "apt_get_opts"
+      "apt get options"
+      "$apt_get_opts"
+  "git_fetch_opts"
+      "git fetch options"
+      "$git_fetch_opts"
+  "repo_url_apt_cyg"
+      "apt-cyg git repo url (can be local path)"
+      "$repo_url_apt_cyg"
+  "repo_url"
+      "git repo url (can be local path)"
+      "$repo_url"
+  "repo_branch"
+      "git repo branch or tag"
+      "$repo_branch"
+  "repo_branch_list"
+      "git repo branch and/or tag list"
+      "v1.7 v1.8.2 master develop"
+  "cache_install"
+      "install to cache"
+      "$cache_install"
+  "repo_cache_root"
+      "cache root directory path"
+      "$repo_cache_root"
+  "force_reconfigure"
+      "force source autotools reconfiguration"
+      "$force_reconfigure"
+  "configure_opts_add"
+      "autotools reconfiguration options"
+      "--with-boost=DIR --silent --prefix=${HOME}/openscad-amu"
+  "make_job_slots"
+      "maximum simultaneous make jobs"
+      "4"
+  "commands"
+      "commands to run with each invocation"
+      "--branch master --install --template my_project"
+)
 
 # derived variables
 declare packages
@@ -106,11 +145,11 @@ declare configure_opts
 ###############################################################################
 
 function print_m() {
-  declare    local nl
-  declare    local es
-  declare -i local rn=1
-  declare    local ws=' '
-  declare    local ns="${ws}"
+  local nl
+  local es
+  local -i rn=1
+  local ws=' '
+  local ns="${ws}"
 
   case $1 in
   -j)                                                     ;;
@@ -153,8 +192,8 @@ function print_m() {
 }
 
 function print_hb () {
-  declare local tput=$(which tput 2>/dev/null)
-  declare local cols=80
+  local tput=$(which tput 2>/dev/null)
+  local cols=80
 
   [[ -n "$tput" ]] && cols=$(${tput} cols)
 
@@ -178,6 +217,35 @@ function print_h2 () {
 ###############################################################################
 
 #------------------------------------------------------------------------------
+# update make job slots count
+#------------------------------------------------------------------------------
+function update_make_job_slots() {
+  print_m "${FUNCNAME} begin"
+
+  # when not set, use system processor/thread count
+  if [[ -z "${make_job_slots}" ]] ; then
+    case "${sysname}" in
+      Linux)
+        make_job_slots=$(nproc)
+      ;;
+      CYGWIN_NT)
+        make_job_slots=$(nproc)
+      ;;
+      *)
+        print_m "ERROR: Configuration for [$sysname] required. aborting..."
+        exit 1
+      ;;
+    esac
+  else
+    print_m "using preset limit."
+  fi
+
+  print_m "make job slots = ${make_job_slots}"
+
+  print_m "${FUNCNAME} end"
+}
+
+#------------------------------------------------------------------------------
 # design flow configuration:
 #   (1) prerequisite package list and
 #   (2) template file list
@@ -185,9 +253,9 @@ function print_h2 () {
 function update_prerequisite_list() {
   print_m "${FUNCNAME} begin"
 
-  declare local packages_Common
-  declare local packages_Linux
-  declare local packages_CYGWIN_NT
+  local packages_Common
+  local packages_Linux
+  local packages_CYGWIN_NT
 
   case "${design_flow}" in
     # df1 with latex
@@ -277,7 +345,7 @@ function update_prerequisite_list() {
     ;;
 
     *)
-      print_m "ERROR: Design flow [$design_flow] not supported."
+      print_m "ERROR: Design flow [$design_flow] not supported. aborting..."
       exit 1
     ;;
   esac
@@ -290,7 +358,7 @@ function update_prerequisite_list() {
       packages="${packages_Common} ${packages_CYGWIN_NT}"
     ;;
     *)
-      print_m "ERROR: Configuration for [$sysname] required."
+      print_m "ERROR: Configuration for [$sysname] required. aborting..."
       exit 1
     ;;
   esac
@@ -348,8 +416,8 @@ function prerequisites_install.CYGWIN_NT() {
 }
 
 function set_apt_cyg_path() {
-  declare local cmd_name="apt-cyg"
-  declare local cmd_cache=${repo_cache_apt_cyg}/${cmd_name}
+  local cmd_name="apt-cyg"
+  local cmd_cache=${repo_cache_apt_cyg}/${cmd_name}
 
   if [[ -z "${apt_cyg_path}" ]] ; then
     apt_cyg_path=$(which 2>/dev/null ${cmd_name} ${cmd_cache} | head -1)
@@ -383,18 +451,81 @@ function set_apt_cyg_path() {
 #==============================================================================
 
 #------------------------------------------------------------------------------
+# write configuration file
+#------------------------------------------------------------------------------
+function write_configuration_file() {
+  print_m "${FUNCNAME} begin"
+
+  local file="$1"         ; shift 1
+  local -i cv_w="$1"      ; shift 1
+  local -a cv_a=( "$@" )
+
+  local -i cv_s=$(( ${#cv_a[@]} / ${cv_w} ))
+
+  local cv_c="#"
+
+  if [[ -e ${file} ]]
+  then
+    print_m "configuration file ${file} exists... not writting."
+  else
+    print_m "writing ${cv_s} keys to ${file}"
+
+    print_m >  ${file} -j -r 80 ${cv_c} -l \
+                       -j "${cv_c} file: ${file}" -l \
+                       -j -r 80 ${cv_c}
+
+    cat >> ${file} << EOF
+# note:
+#  - Do not quote variable names or values.
+#  - Tokenize multi-value lists with ' ' (space-character).
+#  - 'commands' options are specified as they are on the commnad line,
+#    with multi-value lists Tokenized by ',' (comma-character).
+#  - Values can be split across lines using '\\':
+#      commands=\\
+#        --branch-list v1.5.1,master,develop --cache --reconfigure \\
+#        --install --template-def
+EOF
+
+    print_m >> ${file} -j -r 80 ${cv_c} -l -l \
+                       -j ${cv_c} -j -r 79 "=" -l \
+                       -j "${cv_c} Supported Variables" -l \
+                       -j ${cv_c} -j -r 79 "=" -l
+
+    for ((i = 0; i < $cv_s; i++))
+    do
+      local kv=${cv_a[$(( $i*$cv_w + 0 ))]}
+      local kd=${cv_a[$(( $i*$cv_w + 1 ))]}
+      local ke=${cv_a[$(( $i*$cv_w + 2 ))]}
+
+      print_m >> ${file} -j "${cv_c} [::: ${kd^} :::]" -l \
+                         -j "${cv_c} ${kv}=${ke}" -l
+    done
+
+    print_m >> ${file} -j -r 80 ${cv_c} -l \
+                       -j "${cv_c} eof" -l \
+                       -j -r 80 ${cv_c}
+  fi
+
+  print_m "${FUNCNAME} end"
+}
+
+#------------------------------------------------------------------------------
 # parse configuration file
 #------------------------------------------------------------------------------
 function parse_configuration_file() {
   print_m "${FUNCNAME} begin"
 
-  declare local file="$1"
-  declare local varl="$2"
+  local file="$1"         ; shift 1
+  local -i cv_w="$1"      ; shift 1
+  local -a cv_a=( "$@" )
+
+  local -i cv_s=$(( ${#cv_a[@]} / ${cv_w} ))
+  local -i cv_r=0
 
   function read_key()
   {
-    declare local file="$1"
-    declare local key="$2"
+    local file="$1"
+    local key="$2"
 
     # support line gobbling
     while IFS= read line || [[ -n "$line" ]]; do
@@ -408,15 +539,21 @@ function parse_configuration_file() {
     sed -e "s/${key}=//"
   }
 
-  for v in  ${varl} ; do
-    declare local t
+  print_m "checking for ${cv_s} configuration keys"
+  for ((i = 0; i < $cv_s; i++))
+  do
+    local key=${cv_a[$(( $i*$cv_w + 0 ))]}
+    local cfv
 
-    printf -v t '%s' "$(read_key ${file} $v)"
-    if [[ -n "$t" ]] ; then
-      printf -v $v '%s' "$t"
-      print_m "setting $v=$t"
+    printf -v cfv '%s' "$(read_key ${file} $key)"
+    if [[ -n "$cfv" ]] ; then
+      printf -v $key '%s' "$cfv"
+      print_m "setting $key=$cfv"
+
+      (( ++cv_r ))
     fi
   done
+  print_m "read ${cv_r} key values"
 
   print_m "${FUNCNAME} end"
 }
@@ -546,19 +683,20 @@ function prerequisites_install() {
 function repository_update() {
   print_m "${FUNCNAME} begin"
 
-  declare local gitrepo="$1"
-  declare local out_dir="$2"
+  local gitrepo="$1"
+  local out_dir="$2"
 
   print_m "source: [${gitrepo}]"
   print_m " cache: [${out_dir}]"
 
-  declare local git=$(which 2>/dev/null git)
+  local git=$(which 2>/dev/null git)
   if [[ ! -x "${git}" ]] ; then
     print_m "ERROR: please install git:"
 
     case "${sysname}" in
       Linux)        print_m "ex: sudo apt-get install git" ;;
       CYGWIN_NT)    print_m "ex: run Cygwin setup and select Devel/git." ;;
+      *)            print_m "ERROR: Configuration for [$sysname] required." ;;
     esac
 
     print_m "aborting..."
@@ -595,8 +733,8 @@ function repository_update() {
 function remove_directory() {
   print_m "${FUNCNAME} begin"
 
-  declare local dir_path="$1"
-  declare local dir_desc="$2"
+  local dir_path="$1"
+  local dir_desc="$2"
 
   [[ -n ${dir_desc} ]] && dir_desc+=" "
 
@@ -671,6 +809,7 @@ function source_make() {
   print_m "${FUNCNAME} begin"
 
   update_build_variables
+  update_make_job_slots
 
   if [[ "${skip_check}" == "yes" ]] ; then
     print_m "skipping system prerequisite checks."
@@ -688,7 +827,8 @@ function source_make() {
   fi
 
   print_m "building [$*]."
-  ( cd ${build_dir} && make $* )
+  print_m \( cd ${build_dir} \&\& make \-\-jobs=${make_job_slots} $* \)
+  ( cd ${build_dir} && make --jobs=${make_job_slots} $* )
 
   print_m "${FUNCNAME} end"
 }
@@ -702,13 +842,13 @@ function create_template() {
   update_prerequisite_list
   update_build_variables
 
-  declare local dir_name="$1"
-  declare local def_name_prefix="pm"
+  local dir_name="$1"
+  local def_name_prefix="pm"
 
-  declare local cmd_name="openscad-seam"
-  declare local cmd_cache="${cache_bindir}/${cmd_name}"
+  local cmd_name="openscad-seam"
+  local cmd_cache="${cache_bindir}/${cmd_name}"
 
-  declare local cmd_path
+  local cmd_path
 
   # check for openscad-amu library path in:
   #   (1) cache, and then
@@ -717,8 +857,8 @@ function create_template() {
   cmd_path=$(which 2>/dev/null ${cmd_cache} ${cmd_name} | head -1)
 
   if [[ -x "${cmd_path}" ]] ; then
-    declare local LIB_PATH=$(${cmd_path} --version --verbose  | grep "lib path" | awk '{print $4}')
-    declare local LIB_VERSION=${LIB_PATH##*/}
+    local LIB_PATH=$(${cmd_path} --version --verbose  | grep "lib path" | awk '{print $4}')
+    local LIB_VERSION=${LIB_PATH##*/}
 
     print_m using: LIB_PATH = ${LIB_PATH}
     print_m using: VERSION = ${LIB_VERSION}
@@ -736,7 +876,7 @@ function create_template() {
       print_m "copying template files to: [${dir_name}]."
       for f in ${templates}
       do
-        declare local file="${LIB_PATH}/templates/${design_flow}/$f"
+        local file="${LIB_PATH}/templates/${design_flow}/$f"
         if [[ -e ${file} ]] ; then
           cp -v ${file} ${dir_name}
         else
@@ -800,7 +940,7 @@ function parse_commands_branch() {
         prerequisites_install
       ;;
       --yes)
-        declare local opt="--assume-yes"
+        local opt="--assume-yes"
         print_h2 "adding: apt-get install option [${opt}]"
         [[ -n "${apt_get_opts}" ]] && apt_get_opts+=" ${opt}"
         [[ -z "${apt_get_opts}" ]] && apt_get_opts="${opt}"
@@ -836,33 +976,34 @@ function parse_commands_branch() {
       ;;
 
       -b|--build)
-        declare local targets="all"
+        local targets="all"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
       -i|--install)
-        declare local targets="install"
+        local targets="install"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
       --installdocs)
-        declare local targets="install-docs"
+        local targets="install-docs"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
       -u|--uninstall)
-        declare local targets="uninstall"
+        local targets="uninstall"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
 
       -m|--make)
         if [[ -z "$2" ]] ; then
-          print_m "syntax: ${base_name} $1 <name>"
-          print_m "missing make target name. aborting..."
+          print_m "syntax: ${base_name} $1 <name1,name2,...>"
+          print_m "missing make target list. aborting..."
           exit 1
         fi
-        declare local targets="$2" ; shift 1
+        # get list and tokenize with [,]
+        local targets="${2//,/ }" ; shift 1
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
@@ -873,7 +1014,7 @@ function parse_commands_branch() {
           print_m "missing project directory name. aborting..."
           exit 1
         fi
-        declare local dir_name="$2" ; shift 1
+        local dir_name="$2" ; shift 1
         print_h1 "Creating new project template in [${dir_name}]"
         create_template ${dir_name}
       ;;
@@ -905,7 +1046,7 @@ function parse_commands_branch() {
 function parse_commands_repo() {
   print_m "${FUNCNAME} begin"
 
-  declare local args
+  local args
 
   while [[ $# -gt 0 ]]; do
       case $1 in
@@ -917,7 +1058,7 @@ function parse_commands_repo() {
 
       -l|--branch-list)
         if [[ -z "$2" ]] ; then
-          print_m "syntax: ${base_name} $1 <list>"
+          print_m "syntax: ${base_name} $1 <name1,name2,...>"
           print_m "missing repository branch list. aborting..."
           exit 1
         fi
@@ -937,6 +1078,19 @@ function parse_commands_repo() {
       ;;
       --info)
         print_info
+        exit 0
+      ;;
+      --jobs)
+        if [[ -z "$2" ]] ; then
+          print_m "syntax: ${base_name} $1 <int>"
+          print_m "missing job slots limit. aborting..."
+          exit 1
+        fi
+        make_job_slots="$2" ; shift 1
+        print_h2 "setting: make job slots [${make_job_slots}]"
+      ;;
+      --write-conf)
+        write_configuration_file "${conf_file}" "${conf_file_vw}" "${conf_file_va[@]}"
         exit 0
       ;;
 
@@ -970,7 +1124,7 @@ function parse_commands_repo() {
       fi
 
       # check for 'tagsN', where 'N' indicates use last 'N' tags.
-      declare local repo_branch_list_cnt=${repo_branch_list:4}
+      local repo_branch_list_cnt=${repo_branch_list:4}
 
       if [[ -z ${repo_branch_list_cnt} ]] ; then
         repo_branch_list=$( cd ${repo_cache} && git tag )
@@ -1038,7 +1192,7 @@ may also be used to start new design projects from a template.
       --installdocs         : Build and install documentation.
  -u | --uninstall           : Uninstall everything.
 
- -m | --make <name>         : Run make with target 'name'.
+ -m | --make <list>         : Run make with target 'list'.
 
  -t | --template <dir>      : Create project template in directory 'dir'.
  -p | --template-def        : Create project template in default directory.
@@ -1058,6 +1212,8 @@ may also be used to start new design projects from a template.
  -h | --help                : Show this help message.
       --examples            : Show some examples uses.
       --info                : Show script information.
+      --jobs <int>          : Set make job slots.
+      --write-conf          : Write example configuration file.
 
  NOTES:
   * If used, --flow and --skip-* must be the precede all other options.
@@ -1188,7 +1344,9 @@ EOF
 # parse configuration file
 if [[ -e ${conf_file} ]] ; then
   print_m "reading configuration file: ${conf_file}"
-  parse_configuration_file "${conf_file}" "${conf_file_vars}"
+  parse_configuration_file "${conf_file}" "${conf_file_vw}" "${conf_file_va[@]}"
+else
+  print_m "configuration file ${conf_file} does not exists."
 fi
 
 # parse configuration file commands
@@ -1206,7 +1364,11 @@ fi
 # show help if no command line arguments or configuration file commands
 if [[ $# == 0 && -z "${commands}" ]] ; then
   print_help
+  exit 0
 fi
+
+print_m "done."
+exit 0
 
 ###############################################################################
 # eof
