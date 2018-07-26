@@ -17,15 +17,15 @@ Evaluation
 ----------
 
 A script is available to bootstrap the development environment. To
-install the prerequisites, fetch and compile the source, install
-[openscad-amu] to a temporary cache directory, and create an example
-project, type:
+install the prerequisites, fetch and compile the source, install the
+latest tagged version of [openscad-amu] to a temporary cache directory,
+and create an example project, type:
 
     $ mkdir tmp && cd tmp
     $ wget https://git.io/setup-amu.bash
     $ chmod +x setup-amu.bash
 
-    $ ./setup-amu.bash --cache --yes --install --template my_project
+    $ ./setup-amu.bash --cache --branch-list tags1 --yes --install --template my_project
 
 The option `--yes` can be omitted if you prefer to confirm the
 installation of each required package (see: `setup-amu.bash --help`).
