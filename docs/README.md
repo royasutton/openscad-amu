@@ -1,6 +1,3 @@
-openscad-amu
-============
-
 > A design flow with compile automation and Doxygen doc generation for OpenSCAD...
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
