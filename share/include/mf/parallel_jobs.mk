@@ -34,7 +34,10 @@ endif
 #------------------------------------------------------------------------------#
 
 ifdef os_configured
-  $(warning $(cpu_cnt) CPU's detected, configuring parallel execution --jobs=$(cpu_cnt).)
+  ifdef verbose_make
+    $(warning $(cpu_cnt) CPU's detected, configuring parallel execution --jobs=$(cpu_cnt).)
+  endif
+
   MAKEFLAGS += --jobs=$(cpu_cnt)
   undefine os_configured
 else
