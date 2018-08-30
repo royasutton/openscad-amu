@@ -126,11 +126,15 @@ ODIF::ODIF_Scanner::bif_shell(void)
   {
   "stderr",   "s",
   "rmnl",     "r",
-  "eval",     "e",
+  "eval",     "e"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
-  size_t ap=6;
+  // declare and assign flag defaults
+  size_t ap=0;
+  bool flag_stde = false; ap+=2;
+  bool flag_rmnl = true;  ap+=2;
+  bool flag_eval = false; ap+=2;
 
   // generate options help string.
   string help = "flags: [";
@@ -139,11 +143,6 @@ ODIF::ODIF_Scanner::bif_shell(void)
     help.append( vana[it] + " (" + vana[it+1] + ")" );
   }
   help.append( "]" );
-
-  // declare and assign flag defaults
-  bool flag_stde = false;
-  bool flag_rmnl = true;
-  bool flag_eval = false;
 
   // assign local variable flags:
   vector<string> av = fx_argv.names_v(true, false);
@@ -228,7 +227,7 @@ ODIF::ODIF_Scanner::bif_combine(void)
   "suffix",     "s",
   "joiner",     "j",
   "separator",  "f",
-  "tokenizer",  "t",
+  "tokenizer",  "t"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
