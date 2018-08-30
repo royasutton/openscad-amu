@@ -1006,7 +1006,6 @@ ODIF::ODIF_Scanner::bif_viewer(void)
       extension     | e   |              | limit targets by extension
       target_prefix | tp  | echo_targets | make target prefix
 
-
     Command flags and result filtering.
 
      flags     | sc  | default | description
@@ -1203,7 +1202,10 @@ ODIF::ODIF_Scanner::bif_copy(void)
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
-  size_t ap=4;
+  // variables
+  size_t ap=0;
+  string files;  ap+=2;
+  string types;  ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -1212,10 +1214,6 @@ ODIF::ODIF_Scanner::bif_copy(void)
     help.append( vana[it] + " (" + vana[it+1] + ")" );
   }
   help.append( "]" );
-
-  // variables
-  string files;
-  string types;
 
   // iterate over the arguments, skipping function name (position zero)
   for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
