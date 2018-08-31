@@ -1295,11 +1295,11 @@ ODIF::ODIF_Scanner::bif_copy(void)
       string file( *fit );
       string path( *pit );
 
-      bool found=false;
+      bool found = false;
       string rl = file_rl( file, path, found );
 
       if ( found == false )
-        result.append(" " + rl);
+        result.append(rl + " ");
 
       filter_debug("copy " + file + " to " + path + " : " +
                    (found?string("ok"):string("not found")),
