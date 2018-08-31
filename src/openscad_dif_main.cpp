@@ -3,7 +3,7 @@
   \file   openscad_dif_main.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2017
+  \date   2016-2018
 
   \copyright
 
@@ -207,6 +207,9 @@ main(int argc, char** argv)
     string output_prefix;
     string make_path      = __MAKE_PATH__;
     string makefile_ext   = ".makefile";
+
+    // other
+    vector<string> scope_id_mf;
 
     po::options_description opts_cli("Options (visible)");
     opts_cli.add_options()
@@ -433,6 +436,8 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
     // include-path auto-configuration
     ////////////////////////////////////////////////////////////////////////////
+    scope_id_mf.clear();
+
     if ( search )
     {
       debug_m(debug_filter, "auto-search: configuring include paths.");
@@ -524,6 +529,9 @@ main(int argc, char** argv)
               debug_m(debug_filter, "does not exists.");
             }
           }
+
+          // save to list of scopes with makefile
+          scope_id_mf.push_back( scope_name );
         }
         else
         {
@@ -617,6 +625,9 @@ main(int argc, char** argv)
     scanner.set_output_prefix( output_prefix );
     scanner.set_make_path( make_path );
     scanner.set_makefile_ext( makefile_ext );
+
+    // other
+    scanner.set_scope_id_mf( scope_id_mf );
 
     while( scanner.scan() != 0 )
       ;

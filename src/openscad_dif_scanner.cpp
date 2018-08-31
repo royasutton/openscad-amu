@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2017
+  \date   2016-2018
 
   \copyright
 
@@ -226,6 +226,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
   {
     has_result=true;
     result=bif_find();
+  }
+  else if (fx_name.compare("scope")==0)
+  {
+    has_result=true;
+    result=bif_scope();
   }
   else
   {
