@@ -487,6 +487,10 @@ main(int argc, char** argv)
         {
           debug_m(debug_filter, "  makefile [" + makefile_path.string() + "] exists");
 
+          // save to list of scopes with makefile
+          debug_m(debug_filter, "  recording scope identifier [" + scope_name + "] in scope-id-mf");
+          scope_id_mf.push_back( scope_name );
+
           // run make to discover the target output directories
           string result;
           bool good=false;
@@ -529,9 +533,6 @@ main(int argc, char** argv)
               debug_m(debug_filter, "does not exists.");
             }
           }
-
-          // save to list of scopes with makefile
-          scope_id_mf.push_back( scope_name );
         }
         else
         {
