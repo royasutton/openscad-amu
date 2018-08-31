@@ -1319,6 +1319,156 @@ ODIF::ODIF_Scanner::bif_copy(void)
   }
 }
 
+/***************************************************************************//**
+  \details
+
+    Search for files in the include-path(s). If found, return the file
+    names with full path.
+
+    Prefix flags with \c ++ to enable and \c \-\- to disable. For
+    example <tt>++rmnl</tt> will set the flag value to true. The
+    options and flags (and their short codes) are summarized in the
+    following tables.
+
+     options    | sc  | default | description
+    :----------:|:---:|:-------:|:-----------------------------
+      files     | f   |         | list of files
+      nfl       | n   | 1       | file not-found limit (0 = unlimited)
+
+    Command flags.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      rmnl     | r   | true    | remove line-feeds / carriage returns
+      skip     | s   | false   | skip files that are not found
+
+    The tokenizer character that separates list members are summarized
+    in the following table.
+
+     type     | any of
+    :--------:|:------------:
+     files    | [,[:space:]]
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_find(void)
+{
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "files",    "f",
+  "nfl",      "n",
+  "rmnl",     "r",
+  "skip",     "s"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // variables
+  size_t ap=0;
+  string files;           ap+=2;
+  int nfl = 1;            ap+=2;
+
+  // flags
+  bool flag_rmnl = true;  ap+=2;
+  bool flag_skip = false; ap+=2;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if      (!(n.compare(vana[0])&&n.compare(vana[1])))
+      { // files
+        files = UTIL::unquote_trim( v );
+      }
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // abort
+        nfl = atoi( v.c_str() );
+      }
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])))
+      { // rmnl
+        flag_rmnl=( atoi( v.c_str() ) > 0 );
+      }
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])))
+      { // skip
+        flag_skip=( atoi( v.c_str() ) > 0 );
+      }
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  // remove line-feeds / carriage returns
+  if ( flag_rmnl )
+    files = UTIL::replace_chars(files, "\n\r", ' ');
+
+  typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+  boost::char_separator<char> fsep(", ");
+
+  tokenizer f_tok( files, fsep );
+
+  filter_debug(fx_name + " begin", true, false, true);
+
+  filter_debug("files=[" + files + "]", false, false, true);
+
+  string result;
+  int nfc = 0;
+
+  // iterate over each file
+  for ( tokenizer::iterator fit=f_tok.begin(); fit!=f_tok.end(); ++fit )
+  {
+    string file( *fit );
+
+    bool found = false;
+    string rl = file_rl( file, NO_FORMAT_OUTPUT, found );
+
+    if ( found == false )
+      nfc++;
+
+    // add unless both not found and flag_skip is true
+    if ( ! ((found == false) && (flag_skip == true)) )
+      result.append(rl + " ");
+
+    filter_debug("find " + file + " : " +
+                 (found?(string("found --> ") + rl):string("not found")),
+                 false, false, true);
+  }
+
+  filter_debug(fx_name + " end", false, true, true);
+
+  // skip test when nfl <= 0
+  if ( (nfc > nfl) && (nfl > 0) )
+    return
+    ( amu_error_msg
+      (
+        UTIL::to_string(nfc) + "(>" +
+        UTIL::to_string(nfl) + ") file(s) not found: " + result
+      )
+    );
+  else
+    return( result );
+}
+
 
 /*******************************************************************************
 // eof

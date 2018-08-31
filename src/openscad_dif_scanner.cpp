@@ -222,6 +222,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_copy();
   }
+  else if (fx_name.compare("find")==0)
+  {
+    has_result=true;
+    result=bif_find();
+  }
   else
   {
     /* check external function */

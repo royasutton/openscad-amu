@@ -299,6 +299,8 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string bif_make(void);
     //! copy files to documentation output directory.
     std::string bif_copy(void);
+    //! search for files in include path(s).
+    std::string bif_find(void);
 };
 
 } /* end namespace ODIF */
