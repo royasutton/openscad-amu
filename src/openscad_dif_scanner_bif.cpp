@@ -106,7 +106,7 @@ ODIF::ODIF_Scanner::bif_eval(void)
     captured to a string, striped of all return and linefeed characters
     and returned.
 
-    Prefix the flag with \c ++ to enable and \c \-- to disable. For example
+    Prefix the flag with \c ++ to enable and \c \-\- to disable. For example
     <tt>++eval</tt> will turn on variable expansion. The flags and their
     short codes are summarized in the following table.
 
