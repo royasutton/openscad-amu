@@ -1,20 +1,20 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  openscad-amu: Project Makefile (this file should be renamed to Makefile).
+#  openscad-amu: Project Makefile Template
 #
 ################################################################################
 
-# AMU_TOOL_VERSION and AMU_TOOL_PREFIX may be commented to use the default
+# AMU_TOOL_VERSION and AMU_TOOL_PREFIX may be commented out to use the default
 # version found in the shell search path.
 
 AMU_TOOL_VERSION    := @__PACKAGE_VERSION__@
 
-# Use library/tools from install path
+# install paths
 AMU_TOOL_PREFIX     := @bindir@/
 AMU_LIB_PATH        := @__LIB_PATH__@
 
-# Use library/tools from source and build path (uncomment both)
+# source paths
 #AMU_TOOL_PREFIX    := @abs_top_builddir@/src/
 #AMU_LIB_PATH       := @abs_top_srcdir@/share
 
@@ -22,6 +22,7 @@ AMU_PM_PREFIX       := $(AMU_LIB_PATH)/include/pmf/
 AMU_PM_INIT         := $(AMU_PM_PREFIX)amu_pm_init
 AMU_PM_RULES        := $(AMU_PM_PREFIX)amu_pm_rules
 
+# Uncomment for increased verbosity or debugging.
 #AMU_PM_VERBOSE     := defined
 #AMU_PM_DEBUG       := defined
 
@@ -76,7 +77,7 @@ release_archive_doxygen                 := $(true)
 #------------------------------------------------------------------------------#
 project_name        := template
 project_version     := 1.0
-project_brief       := openscad-amu Project Template (df1).
+project_brief       := Project Makefile Template (openscad-amu df1).
 
 docs_group_id       := none
 project_logo        := design_logo_top_200x50
