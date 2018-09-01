@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.hpp
 
   \author Roy Allen Sutton
-  \date   2016-2017
+  \date   2016-2018
 
   \copyright
 
@@ -100,6 +100,13 @@ class ODIF_Scanner : public yyFlexLexer{
 
     //! set the vector of scope identifiers.
     void set_scope_id(const std::vector<std::string>& v) { scope_id = v; }
+    //! get the vector of scope identifiers.
+    std::vector<std::string> get_scope_id(void) { return scope_id; }
+
+    //! set the vector of scope identifiers with makefiles.
+    void set_scope_id_mf(const std::vector<std::string>& v) { scope_id_mf = v; }
+    //! get the vector of scope identifiers with makefiles.
+    std::vector<std::string> get_scope_id_mf(void) { return scope_id_mf; }
 
     //! set the output prefix path.
     void set_output_prefix(const std::string& s) { output_prefix = s; }
@@ -165,6 +172,7 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string rootscope;                  //!< scanner root scope name.
     std::string scopejoiner;                //!< scanner scope hierarchy conjoiner string.
     std::vector<std::string> scope_id;      //!< vector of scope identifiers.
+    std::vector<std::string> scope_id_mf;   //!< vector of scope identifiers with makefile.
     std::string output_prefix;              //!< scanner output path prefix.
     bool prefix_scripts;                    //!< prefixing extracted scripts?
 
@@ -299,6 +307,10 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string bif_make(void);
     //! copy files to documentation output directory.
     std::string bif_copy(void);
+    //! search for files in include path(s).
+    std::string bif_find(void);
+    //! query scope data.
+    std::string bif_scope(void);
 };
 
 } /* end namespace ODIF */

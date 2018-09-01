@@ -21,11 +21,13 @@ install the prerequisites, fetch and compile the source, install the
 latest tagged version of [openscad-amu] to a temporary cache directory,
 and create an example project, type:
 
-    $ mkdir tmp && cd tmp
-    $ wget https://git.io/setup-amu.bash
-    $ chmod +x setup-amu.bash
+```bash
+mkdir tmp && cd tmp
+wget https://git.io/setup-amu.bash
+chmod +x setup-amu.bash
 
-    $ ./setup-amu.bash --cache --branch-list tags1 --yes --install --template my_project
+./setup-amu.bash --cache --branch-list tags1 --yes --install --template my_project
+```
 
 The option `--yes` can be omitted if you prefer to confirm the
 installation of each required package (see: `setup-amu.bash --help`).
@@ -44,12 +46,14 @@ The project *makefile* coordinates the design flow. All [openscad-amu]
 design flow configurations are set here. To see a menu of options,
 current configurations, and build and install this example:
 
-    $ cd my_project
+```bash
+cd my_project
 
-    $ make help
-    $ make info
-    $ make all
-    $ make install
+make help
+make info
+make all
+make install
+```
 
 The third `make` step will compile (via [OpenSCAD]) numerous targets
 guided by scripts embedded in source comments, process the embedded
@@ -60,12 +64,16 @@ design libraries.
 
 To see the system-dependent location of and view the index, type:
 
-    $ make print-install_prefix_html
-    $ firefox <install_prefix_html>/index.html
+```bash
+make print-install_prefix_html
+firefox <install_prefix_html>/index.html
+```
 
 To remove this example, type:
 
-    $ make uninstall
+```bash
+make uninstall
+```
 
 This example may be used as a *template* and is a good starting point
 for new designs using [openscad-amu].
@@ -78,8 +86,10 @@ To pull repository updates for an existing source tree and install the
 latest release of [openscad-amu] on a system for [OpenSCAD] design
 development, type:
 
-    $ ./setup-amu.bash --fetch
-    $ sudo ./setup-amu.bash --branch-list tags1 --reconfigure --install
+```bash
+./setup-amu.bash --fetch
+sudo ./setup-amu.bash --branch-list tags1 --reconfigure --install
+```
 
 In some cases you may wish to install several versions of the
 development tools concurrently. To install the last six release
@@ -99,29 +109,39 @@ source. However, here are the steps to build it manually. Once all of
 the prerequisite packages exists (see: `setup-amu.bash --list` and
 `setup-amu.bash --required`), the development source can be compiled:
 
-    $ git clone https://github.com/royasutton/openscad-amu
-    $ cd openscad-amu
-    $ git tag
-    $ git checkout <version>
-    $ ./autogen.sh
-    $ mkdir -p build && cd build
-    $ ../configure
-    $ make
+```bash
+git clone https://github.com/royasutton/openscad-amu
+cd openscad-amu
+git tag
+git checkout <version>
+
+./autogen.sh
+mkdir -p build && cd build
+../configure
+
+make
+```
 
 To run post-build sanity checks:
 
-    $ make check
+```bash
+make check
+```
 
 The openscad-amu html documentation is lean, but can be built and
 viewed by:
 
-    $ make html
-    $ firefox share/lib/doxygen/html/index.html
+```bash
+make html
+firefox share/lib/doxygen/html/index.html
+```
 
 To manually install or uninstall, issue:
 
-    $ sudo make install
-    $ sudo make uninstall
+```bash
+sudo make install
+sudo make uninstall
+```
 
 
 Release Convention

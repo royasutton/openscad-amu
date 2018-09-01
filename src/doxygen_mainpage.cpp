@@ -194,9 +194,9 @@
 
   <b>Additional Doxygen Commands:</b>
 
-  In addition to all of the normal Doxygen [special commands,]
-  (http://www.stack.nl/~dimitri/doxygen/manual/commands.html)
-  here is a list of additional filter-provided ones that can be used for
+  In addition to the normal Doxygen [special commands,]
+  (http://www.stack.nl/~dimitri/doxygen/manual/commands.html) here is a
+  list of additional filter-provided commands that can be used for
   document markup:
 
   | Internal Commands                                              | Description
@@ -210,8 +210,10 @@
   | \ref ODIF::ODIF_Scanner::bif_viewer() "\\amu_viewer"           | file viewer
   | \ref ODIF::ODIF_Scanner::bif_make() "\\amu_make"               | make script interface
   | \ref ODIF::ODIF_Scanner::bif_copy() "\\amu_copy"               | copy references
+  | \ref ODIF::ODIF_Scanner::bif_find() "\\amu_find"               | search for output files
+  | \ref ODIF::ODIF_Scanner::bif_scope() "\\amu_scope"             | query scope data
 
-  Eternal commands also exists and can be found in the directory:
+  External commands also exists and can be found in the directory:
   <tt><install-prefix>/functions/</tt>. For now, see the command itself for its
   documentation. Here is a list:
 

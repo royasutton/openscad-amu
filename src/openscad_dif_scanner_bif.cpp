@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner_bif.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2017
+  \date   2016-2018
 
   \copyright
 
@@ -106,7 +106,7 @@ ODIF::ODIF_Scanner::bif_eval(void)
     captured to a string, striped of all return and linefeed characters
     and returned.
 
-    Prefix the flag with \c ++ to enable and \c \-- to disable. For example
+    Prefix the flag with \c ++ to enable and \c \-\- to disable. For example
     <tt>++eval</tt> will turn on variable expansion. The flags and their
     short codes are summarized in the following table.
 
@@ -126,11 +126,15 @@ ODIF::ODIF_Scanner::bif_shell(void)
   {
   "stderr",   "s",
   "rmnl",     "r",
-  "eval",     "e",
+  "eval",     "e"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
-  size_t ap=6;
+  // declare and assign flag defaults
+  size_t ap=0;
+  bool flag_stde = false; ap+=2;
+  bool flag_rmnl = true;  ap+=2;
+  bool flag_eval = false; ap+=2;
 
   // generate options help string.
   string help = "flags: [";
@@ -139,11 +143,6 @@ ODIF::ODIF_Scanner::bif_shell(void)
     help.append( vana[it] + " (" + vana[it+1] + ")" );
   }
   help.append( "]" );
-
-  // declare and assign flag defaults
-  bool flag_stde = false;
-  bool flag_rmnl = true;
-  bool flag_eval = false;
 
   // assign local variable flags:
   vector<string> av = fx_argv.names_v(true, false);
@@ -228,7 +227,7 @@ ODIF::ODIF_Scanner::bif_combine(void)
   "suffix",     "s",
   "joiner",     "j",
   "separator",  "f",
-  "tokenizer",  "t",
+  "tokenizer",  "t"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
@@ -1007,7 +1006,6 @@ ODIF::ODIF_Scanner::bif_viewer(void)
       extension     | e   |              | limit targets by extension
       target_prefix | tp  | echo_targets | make target prefix
 
-
     Command flags and result filtering.
 
      flags     | sc  | default | description
@@ -1204,7 +1202,10 @@ ODIF::ODIF_Scanner::bif_copy(void)
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
-  size_t ap=4;
+  // variables
+  size_t ap=0;
+  string files;  ap+=2;
+  string types;  ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -1213,10 +1214,6 @@ ODIF::ODIF_Scanner::bif_copy(void)
     help.append( vana[it] + " (" + vana[it+1] + ")" );
   }
   help.append( "]" );
-
-  // variables
-  string files;
-  string types;
 
   // iterate over the arguments, skipping function name (position zero)
   for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
@@ -1298,11 +1295,11 @@ ODIF::ODIF_Scanner::bif_copy(void)
       string file( *fit );
       string path( *pit );
 
-      bool found=false;
+      bool found = false;
       string rl = file_rl( file, path, found );
 
       if ( found == false )
-        result.append(" " + rl);
+        result.append(rl + " ");
 
       filter_debug("copy " + file + " to " + path + " : " +
                    (found?string("ok"):string("not found")),
@@ -1320,6 +1317,349 @@ ODIF::ODIF_Scanner::bif_copy(void)
   {
     return( result );
   }
+}
+
+/***************************************************************************//**
+  \details
+
+    Search for files in the include-path(s). If found, return the file
+    names with full path.
+
+    Prefix flags with \c ++ to enable and \c \-\- to disable. For
+    example <tt>++rmnl</tt> will set the flag value to true. The
+    options and flags (and their short codes) are summarized in the
+    following tables.
+
+     options    | sc  | default | description
+    :----------:|:---:|:-------:|:-----------------------------
+      files     | f   |         | list of files
+      nfl       | n   | 1       | file not-found limit (0 = unlimited)
+
+    Command flags.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      rmnl     | r   | true    | remove line-feeds / carriage returns
+      skip     | s   | false   | skip files that are not found
+
+    The tokenizer character that separates list members are summarized
+    in the following table.
+
+     type     | any of
+    :--------:|:------------:
+     files    | [,[:space:]]
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_find(void)
+{
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "files",    "f",
+  "nfl",      "n",
+  "rmnl",     "r",
+  "skip",     "s"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // variables
+  size_t ap=0;
+  string files;           ap+=2;
+  int nfl = 1;            ap+=2;
+
+  // flags
+  bool flag_rmnl = true;  ap+=2;
+  bool flag_skip = false; ap+=2;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if      (!(n.compare(vana[0])&&n.compare(vana[1])))
+      { // files
+        files = UTIL::unquote_trim( v );
+      }
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // abort
+        nfl = atoi( v.c_str() );
+      }
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])))
+      { // rmnl
+        flag_rmnl=( atoi( v.c_str() ) > 0 );
+      }
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])))
+      { // skip
+        flag_skip=( atoi( v.c_str() ) > 0 );
+      }
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  // remove line-feeds / carriage returns
+  if ( flag_rmnl )
+    files = UTIL::replace_chars(files, "\n\r", ' ');
+
+  typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+  boost::char_separator<char> fsep(", ");
+
+  tokenizer f_tok( files, fsep );
+
+  filter_debug(fx_name + " begin", true, false, true);
+
+  filter_debug("files=[" + files + "]", false, false, true);
+
+  string result;
+  int nfc = 0;
+
+  // iterate over each file
+  for ( tokenizer::iterator fit=f_tok.begin(); fit!=f_tok.end(); ++fit )
+  {
+    string file( *fit );
+
+    bool found = false;
+    string rl = file_rl( file, NO_FORMAT_OUTPUT, found );
+
+    if ( found == false )
+      nfc++;
+
+    // add unless both not found and flag_skip is true
+    if ( ! ((found == false) && (flag_skip == true)) )
+      result.append(rl + " ");
+
+    filter_debug("find " + file + " : " +
+                 (found?(string("found --> ") + rl):string("not found")),
+                 false, false, true);
+  }
+
+  filter_debug(fx_name + " end", false, true, true);
+
+  // skip test when nfl <= 0
+  if ( (nfc > nfl) && (nfl > 0) )
+    return
+    ( amu_error_msg
+      (
+        UTIL::to_string(nfc) + "(>" +
+        UTIL::to_string(nfl) + ") file(s) not found: " + result
+      )
+    );
+  else
+    return( result );
+}
+
+/***************************************************************************//**
+  \details
+
+    Return information about embedded scopes.
+
+    Prefix flags with \c ++ to enable and \c \-\- to disable. For
+    example <tt>++rmnl</tt> will set the flag value to true. The
+    options and flags (and their short codes) are summarized in the
+    following tables.
+
+     options    | sc  | default | description
+    :----------:|:---:|:-------:|:-----------------------------
+      index     | i   |         | return scope at specified index
+
+    Command flags.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      count    | c   | false   | return scope count
+      list     | l   | false   | return scope list
+      join     | j   | false   | return scope joiner
+      root     | r   | false   | return root scope
+      make     | m   | false   | only consider scopes with makefiles
+      sort     | s   | false   | sort scope list
+      unique   | u   | false   | only consider unique scope names
+      verbose  | v   | false   | use verbose output
+
+    The \c make flag requires that the filter be run with the search
+    command line option.
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_scope(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "make",     "m",
+  "sort",     "s",
+  "unique",   "u",
+  "verbose",  "v",
+
+  "index",    "i",
+  "count",    "c",
+  "list",     "l",
+  "join",     "j",
+  "root",     "r"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  size_t ap=18;
+  bool make     = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[0],vana[1])).c_str() ) > 0 );
+  bool sort     = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[2],vana[3])).c_str() ) > 0 );
+  bool unique   = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[4],vana[5])).c_str() ) > 0 );
+  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[6],vana[7])).c_str() ) > 0 );
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  string result;
+  std::vector<std::string> sid_copy;
+
+  // make
+  if ( make )
+    sid_copy = get_scope_id_mf();
+  else
+    sid_copy = get_scope_id();
+
+  // sort
+  if ( sort )
+  {
+    std::sort(sid_copy.begin(), sid_copy.end());
+  }
+
+  // unique: limit scopes to those that are unique
+  if ( unique )
+  {
+    std::vector<std::string> sid_temp;
+
+    // add unique elements from copy in ordered
+    for ( vector<std::string>::iterator it=sid_copy.begin();
+                                        it!=sid_copy.end();
+                                        ++it )
+    {
+      // compare against unique list
+      bool found = false;
+      for ( vector<std::string>::iterator uit=sid_temp.begin();
+                                          uit!=sid_temp.end() && !found;
+                                          ++uit )
+      {
+        found = ( *it == *uit );
+      }
+
+      // add if not found
+      if ( !found )
+        sid_temp.push_back( *it );
+    }
+
+    sid_copy = sid_temp;
+  }
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+    bool flag = ( atoi( v.c_str() ) > 0 );   // assign flag value
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if      (
+                !(n.compare(vana[0])&&n.compare(vana[1])) ||  // make
+                !(n.compare(vana[2])&&n.compare(vana[3])) ||  // sort
+                !(n.compare(vana[4])&&n.compare(vana[5])) ||  // unique
+                !(n.compare(vana[6])&&n.compare(vana[7]))     // verbose
+              )
+      {
+        // do nothing
+      }
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      { // index
+        size_t index = atoi( v.c_str() );
+
+        if ( index < 1 )                index = 1;
+        if ( index > sid_copy.size() )  index = sid_copy.size();
+
+        if ( result.size() ) result.append( " " );
+        if ( verbose ) result.append( "index[" + to_string(index) + "] = " );
+
+        result.append( sid_copy[ index - 1 ] );
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      { // count
+        if ( result.size() ) result.append( " " );
+        if ( verbose ) result.append( "count = " );
+
+        result.append( to_string( sid_copy.size() ) );
+      }
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      { // list
+        if ( verbose )
+        {
+          if ( result.size() ) result.append( " " );
+          result.append( "list =" );
+        }
+
+        for ( vector<string>::iterator vit=sid_copy.begin();
+                                       vit!=sid_copy.end();
+                                       ++vit )
+        {
+          if ( result.size() ) result.append( " " );
+          result.append( *vit );
+        }
+      }
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      { // join
+        if ( result.size() ) result.append( " " );
+        if ( verbose ) result.append( "join = " );
+
+        result.append( get_scopejoiner() );
+      }
+      else if (!(n.compare(vana[16])&&n.compare(vana[17])) && flag)
+      { // root
+        if ( result.size() ) result.append( " " );
+        if ( verbose ) result.append( "root = " );
+
+        result.append( get_rootscope() );
+      }
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  return ( result );
 }
 
 
