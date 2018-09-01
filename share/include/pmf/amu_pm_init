@@ -152,13 +152,18 @@ $(this_guard) := $(notdir $(this_file))
 	#------------------------------------------------------------------------------#
 
 	amu_pm_bootstrap_variables := \
-		AMU_LIB_PATH \
-		AMU_TOOL_PREFIX \
 		AMU_TOOL_VERSION \
+		AMU_TOOL_PREFIX \
+		AMU_LIB_PATH \
 		AMU_PM_PREFIX \
+		\
+		AMU_PM_INIT \
+		AMU_PM_RULES \
+		\
 		AMU_PM_DESIGN_FLOW \
 		AMU_PM_COMPONENTS \
 		AMU_PM_COMPONENTS_ADD \
+		\
 		AMU_PM_VERBOSE \
 		AMU_PM_DEBUG
 
