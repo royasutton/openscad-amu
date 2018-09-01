@@ -5,23 +5,49 @@
 #
 ################################################################################
 
-# AMU_TOOL_PREFIX and AMU_TOOL_VERSION may be commented to use the default
+# AMU_TOOL_VERSION and AMU_TOOL_PREFIX may be commented to use the default
 # version found in the shell search path.
 
-# Use library/tools from install path
-AMU_LIB_PATH        := @__LIB_PATH__@
-AMU_TOOL_PREFIX     := @bindir@/
-
-# Use library/tools from source and build path (uncomment both)
-#AMU_LIB_PATH       := @abs_top_srcdir@/share
-#AMU_TOOL_PREFIX    := @abs_top_builddir@/src/
-
-AMU_PM_PREFIX       := $(AMU_LIB_PATH)/include/pmf/
-#AMU_PM_VERBOSE     := defined
-#AMU_PM_DEBUG       := defined
 AMU_TOOL_VERSION    := @__PACKAGE_VERSION__@
 
-include $(AMU_PM_PREFIX)amu_pm_init
+# Use library/tools from install path
+AMU_TOOL_PREFIX     := @bindir@/
+AMU_LIB_PATH        := @__LIB_PATH__@
+
+# Use library/tools from source and build path (uncomment both)
+#AMU_TOOL_PREFIX    := @abs_top_builddir@/src/
+#AMU_LIB_PATH       := @abs_top_srcdir@/share
+
+AMU_PM_PREFIX       := $(AMU_LIB_PATH)/include/pmf/
+AMU_PM_INIT         := $(AMU_PM_PREFIX)amu_pm_init
+AMU_PM_RULES        := $(AMU_PM_PREFIX)amu_pm_rules
+
+#AMU_PM_VERBOSE     := defined
+#AMU_PM_DEBUG       := defined
+
+#------------------------------------------------------------------------------#
+# Project Makefile Init (DO NO EDIT THIS SECTION)
+#------------------------------------------------------------------------------#
+define AMU_SETUP_ANNOUNCE
+
+ $1 not found...
+ Tried [$2].
+
+ Please update AMU_TOOL_PREFIX and AMU_LIB_PATH in $(lastword $(MAKEFILE_LIST))
+ as needed for your installation or setup openscad-amu ($(AMU_TOOL_VERSION))
+ using the following:
+
+ $$ wget http://git.io/setup-amu.bash && chmod +x setup-amu.bash
+ $$ sudo ./setup-amu.bash --branch $(AMU_TOOL_VERSION) --yes --install
+
+endef
+
+ifeq ($(wildcard $(AMU_PM_INIT)),)
+$(info $(call AMU_SETUP_ANNOUNCE,Init file,$(AMU_PM_INIT)))
+$(error unable to continue.)
+else
+include $(AMU_PM_INIT)
+endif
 
 #------------------------------------------------------------------------------#
 # Default Overrides
@@ -64,7 +90,15 @@ library             := library
 doxygen_config      := Doxyfile
 
 #------------------------------------------------------------------------------#
-include $(AMU_PM_PREFIX)amu_pm_rules
+# Project Makefile Rules (DO NO EDIT THIS SECTION)
+#------------------------------------------------------------------------------#
+ifeq ($(wildcard $(AMU_PM_RULES)),)
+$(info $(call AMU_SETUP_ANNOUNCE,Rules file,$(AMU_PM_RULES)))
+$(error unable to continue.)
+else
+include $(AMU_PM_RULES)
+endif
+
 ################################################################################
 # eof
 ################################################################################
