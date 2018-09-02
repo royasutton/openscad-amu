@@ -1349,6 +1349,9 @@ ODIF::ODIF_Scanner::bif_copy(void)
     :--------:|:------------:
      files    | [,[:space:]]
 
+  \note List of files should be enclosed in quotations (single or
+        double).
+
 *******************************************************************************/
 string
 ODIF::ODIF_Scanner::bif_find(void)
