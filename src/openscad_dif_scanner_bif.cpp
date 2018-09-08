@@ -899,10 +899,10 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       // assemble attributes
       string attr;
       if ( image_width.length() ) {
-        if ( attr.length() )         attr.append(",");
+        if ( attr.length() )       { attr.append(","); }
                                      attr.append("width=" + image_width); }
       if ( image_height.length() ) {
-        if ( attr.length() )         attr.append(",");
+        if ( attr.length() )       { attr.append(","); }
                                      attr.append("height=" + image_height); }
 
       if ( attr.length() )           result.append( "[" + attr + "]" );
