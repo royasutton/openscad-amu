@@ -42,9 +42,9 @@ doxygen_clean_files := \
   $(if $(generate_latex),$(latex_stamp))
 
 # path: autoconf_path, example_path
-# $(prefix_scopes_scripts) requires:[scopes]
-autoconf_path := $(if $(prefix_scopes_scripts),$(output_path),.)
-example_path  := $(if $(prefix_scopes_scripts),$(output_path)) $(example_path_add)
+# $(call scopes_target_path,<arg1>) requires:[scopes]
+autoconf_path := $(or $(call scopes_target_path,$(empty)),.)
+example_path  := $(call scopes_target_path,$(empty)) $(example_path_add)
 
 # path: image_path
 # $(scopes_targetsdir) requires:[scopes]

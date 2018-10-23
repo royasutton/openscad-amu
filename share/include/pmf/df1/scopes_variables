@@ -27,7 +27,7 @@
 ################################################################################
 
 # auxiliary script output path prefix
-scopes_prefix := $(if $(call bool_decode,$(prefix_scopes_scripts)),$(output_path))
+scopes_target_prefix := $(call scopes_target_path,<INPUT-SOURCE-PATH>/<TARGET>)
 
 # openscad_seam_opts1: for modes=(extract|list)
 openscad_seam_opts1 := \
@@ -42,8 +42,8 @@ openscad_seam_opts1 := \
 openscad_seam_opts2 := \
   $(strip \
     --prefix $(output_path) \
-    $(if $(call bool_decode,$(input_path_in_prefix)),$(empty),--prefix-ipp 0) \
-    --prefix-scripts $(if $(call bool_decode,$(prefix_scopes_scripts)),yes,no) \
+    $(if $(call bool_decode,$(prefix_scopes_scripts_input_path)),$(empty),--prefix-ipp 0) \
+    --prefix-scripts $(if $(call bool_decode,$(prefix_scopes_scripts_output_path)),yes,no) \
     $(if $(seam_defines),$(addprefix --define$(space),$(seam_defines))) \
     --comments yes \
     --show $(if $(call bool_decode,$(verbose_seam_show)),yes,no) \
@@ -71,8 +71,8 @@ scad_lib_path := $(call join_with,$(env_field_sep), \
 
 # scopes auxiliary scripts for all source files
 scopes_scripts_source := \
-  $(addprefix $(scopes_prefix), \
-    $(foreach s,$(src_files), \
+  $(foreach s,$(src_files), \
+    $(addprefix $(call scopes_target_path,$s), \
       $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
     ) \
   )
@@ -137,7 +137,7 @@ scopes_config_variables := \
   scad_lib_path_add
 
 scopes_config_derived += \
-  scopes_prefix \
+  scopes_target_prefix \
   \
   scopes_include_filter \
   scopes_exclude_filter \

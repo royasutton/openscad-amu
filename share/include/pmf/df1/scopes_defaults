@@ -31,8 +31,8 @@
 # AMU_TOOL_VERSION := v1.0
 
 # prefix output path to auxiliary scope scripts
-prefix_scopes_scripts                   := $(true)
-input_path_in_prefix                    := $(false)
+prefix_scopes_scripts_output_path       := $(true)
+prefix_scopes_scripts_input_path        := $(false)
 
 # add scope output to release directory/archive
 release_scopes                          := $(false)
@@ -68,8 +68,8 @@ scad_lib_path_add                       :=
 #------------------------------------------------------------------------------#
 
 scopes_control_variables := \
-  prefix_scopes_scripts \
-  input_path_in_prefix \
+  prefix_scopes_scripts_output_path \
+  prefix_scopes_scripts_input_path \
   \
   release_scopes \
   release_archive_scopes \
