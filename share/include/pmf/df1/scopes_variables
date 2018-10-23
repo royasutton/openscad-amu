@@ -42,7 +42,7 @@ openscad_seam_opts1 := \
 openscad_seam_opts2 := \
   $(strip \
     --prefix $(output_path) \
-    --prefix-ipp 0 \
+    $(if $(call bool_decode,$(input_path_in_prefix)),$(empty),--prefix-ipp 0) \
     --prefix-scripts $(if $(call bool_decode,$(prefix_scopes_scripts)),yes,no) \
     $(if $(seam_defines),$(addprefix --define$(space),$(seam_defines))) \
     --comments yes \

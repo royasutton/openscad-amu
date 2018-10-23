@@ -32,6 +32,7 @@
 
 # prefix output path to auxiliary scope scripts
 prefix_scopes_scripts                   := $(true)
+input_path_in_prefix                    := $(false)
 
 # add scope output to release directory/archive
 release_scopes                          := $(false)
@@ -68,6 +69,7 @@ scad_lib_path_add                       :=
 
 scopes_control_variables := \
   prefix_scopes_scripts \
+  input_path_in_prefix \
   \
   release_scopes \
   release_archive_scopes \
