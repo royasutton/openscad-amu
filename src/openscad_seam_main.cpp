@@ -326,8 +326,8 @@ main(int argc, char** argv)
           "append to the specified prefix.")
       ("prefix-scripts,x",
           po::value<bool>(&prefix_scripts)->default_value(prefix_scripts),
-          "Prepend output path prefix to extracted scripts. If false, "
-          "all extracted scripts will be written to current directory.\n")
+          "Prepend output path prefix to config, extracted scripts, and"
+          "targets. If false, output will be written to current directory.\n")
       ("define,D",
           po::value<vector<string> >(&define),
           "One or more environment variable definitions to declare in each "
