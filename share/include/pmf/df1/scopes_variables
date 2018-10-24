@@ -41,9 +41,19 @@ openscad_seam_opts1 := \
 # openscad_seam_opts1: for modes=(extract)
 openscad_seam_opts2 := \
   $(strip \
-    --prefix $(output_path) \
-    $(if $(call bool_decode,$(prefix_scopes_scripts_input_path)),$(empty),--prefix-ipp 0) \
-    --prefix-scripts $(if $(call bool_decode,$(prefix_scopes_scripts_output_path)),yes,no) \
+    $(if $(call scopes_target_path,$(empty)), \
+      --prefix $(call scopes_target_path,$(empty)) \
+      $(if $(call bool_decode,$(prefix_scopes_scripts_input_path)),$(empty), \
+        --prefix-ipp 0 \
+      ) \
+    ) \
+    --prefix-scripts \
+      $(if \
+        $(or \
+          $(call bool_decode,$(prefix_scopes_scripts_input_path)), \
+          $(call bool_decode,$(prefix_scopes_scripts_output_path)) \
+        ) \
+      ,yes,no) \
     $(if $(seam_defines),$(addprefix --define$(space),$(seam_defines))) \
     --comments yes \
     --show $(if $(call bool_decode,$(verbose_seam_show)),yes,no) \
