@@ -26,6 +26,10 @@
 # Defaults
 ################################################################################
 
+# prefix output paths to doxygen output root directory
+prefix_doxygen_output_path              := $(true)
+prefix_doxygen_output_prefix_path       := $(false)
+
 # doxygen targets depend on scope targets
 doxygen_depends_scopes                  := $(true)
 
@@ -42,6 +46,9 @@ release_latex_refman_only               := $(true)
 # debugging
 debug_dif_scanner                       := $(false)
 debug_dif_filter                        := $(false)
+
+# output prefix path
+doxygen_output_prefix                   := doxygen/
 
 # configuration input file
 doxygen_config                          := Doxyfile
@@ -86,6 +93,9 @@ doxygen_config_auto_name                 = $(doxygen_config).auto
 #------------------------------------------------------------------------------#
 
 doxygen_control_variables := \
+  prefix_doxygen_output_path \
+  prefix_doxygen_output_prefix_path \
+  \
   doxygen_depends_scopes \
   \
   generate_html \

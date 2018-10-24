@@ -36,7 +36,7 @@ all-doxygen: $(doxygen_stamp) $(if $(generate_latex),$(latex_stamp))
 
 # auto-configuration file
 # depends on $(scopes_mf) since image_path=$(call scopes_targetsdir)
-$(doxygen_config_auto): $(src_files) $(scopes_mf) | $(output_path)
+$(doxygen_config_auto): $(src_files) $(scopes_mf) | $(doxygen_output_path)
 	$(call target_begin)
 	$(file >$(doxygen_config_auto),$(doxygen_config_auto_text))
 
@@ -59,7 +59,7 @@ endif
 # latex
 $(latex_stamp): $(doxygen_stamp)
 	$(call target_begin)
-	( cd $(output_path)$(latex_output) && make ) \
+	( cd $(doxygen_output_path)$(latex_output) && make ) \
 	&& $(touch) $(latex_stamp)
 
 #------------------------------------------------------------------------------#
@@ -69,9 +69,9 @@ $(latex_stamp): $(doxygen_stamp)
 .PHONY: clean-doxygen
 clean-doxygen:
 	$(call target_begin)
-	-@$(test) -d $(output_path) && \
+	-@$(test) -d $(doxygen_output_path) && \
 	$(rm_f) $(doxygen_clean_files) && \
-	( cd $(output_path) && \
+	( cd $(doxygen_output_path) && \
 		$(rm_rf) \
 			$(if $(generate_html),$(html_output)) \
 			$(if $(generate_latex),$(latex_output)) \
@@ -106,7 +106,7 @@ install-doxygen-html: install-doxygen-html-files install-doxygen-update-html-ind
 install-doxygen-html-files: $(doxygen_stamp) | $(install_prefix_html) $(install_prefix_html)$(docs_install_id)
 	$(call target_begin)
 	( \
-		cd $(output_path) && \
+		cd $(doxygen_output_path) && \
 		$(cp_a) $(html_output) $(install_prefix_html)$(docs_install_id) \
 	)
 
@@ -153,7 +153,7 @@ install-doxygen-pdf: install-doxygen-pdf-files install-doxygen-update-pdf-index
 install-doxygen-pdf-files: $(latex_stamp) | $(install_prefix_pdf) $(install_prefix_pdf)$(docs_install_id)
 	$(call target_begin)
 	( \
-		cd $(output_path)$(latex_output) && \
+		cd $(doxygen_output_path)$(latex_output) && \
 		$(cp_a) \
 			refman.pdf \
 			$(install_prefix_pdf)$(docs_install_id)$(dir_level_sep)$(docs_install_id).pdf \
@@ -198,7 +198,7 @@ install-doxygen-man: $(doxygen_stamp) | $(install_prefix_man) $(install_prefix_m
 	$(call target_begin)
 	$(mkdir_p) $(install_prefix_man)$(man_subdir)
 	$(foreach f, \
-		$(wildcard $(output_path)$(man_output)$(dir_level_sep)$(man_subdir)$(dir_level_sep)*), \
+		$(wildcard $(doxygen_output_path)$(man_output)$(dir_level_sep)$(man_subdir)$(dir_level_sep)*), \
 		$(call execute_command, \
 			$(cp_a) \
 				$f \
@@ -211,7 +211,7 @@ $(install_prefix_man)$(man_subdir): ; $(mkdir_p) $@
 uninstall-doxygen-man: $(doxygen_stamp)
 	$(call target_begin)
 	$(foreach f, \
-		$(wildcard $(output_path)$(man_output)$(dir_level_sep)$(man_subdir)$(dir_level_sep)*), \
+		$(wildcard $(doxygen_output_path)$(man_output)$(dir_level_sep)$(man_subdir)$(dir_level_sep)*), \
 		$(call execute_command, \
 			$(rm_f) \
 				$(install_prefix_man)$(man_subdir)$(dir_level_sep)$(docs_install_id)-$(notdir $f) \

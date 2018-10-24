@@ -27,11 +27,11 @@
 ################################################################################
 
 # output file names in output directory
-latex_stamp         := $(addprefix $(output_path),$(latex_stamp_name))
-doxygen_stamp       := $(addprefix $(output_path),$(doxygen_stamp_name))
-doxygen_tag         := $(addprefix $(output_path),$(doxygen_tag_name))
-doxygen_warn        := $(addprefix $(output_path),$(doxygen_warn_name))
-doxygen_config_auto := $(addprefix $(output_path),$(notdir $(doxygen_config_auto_name)))
+latex_stamp         := $(addprefix $(doxygen_output_path),$(latex_stamp_name))
+doxygen_stamp       := $(addprefix $(doxygen_output_path),$(doxygen_stamp_name))
+doxygen_tag         := $(addprefix $(doxygen_output_path),$(doxygen_tag_name))
+doxygen_warn        := $(addprefix $(doxygen_output_path),$(doxygen_warn_name))
+doxygen_config_auto := $(addprefix $(doxygen_output_path),$(notdir $(doxygen_config_auto_name)))
 
 # clean Files
 doxygen_clean_files := \
@@ -47,7 +47,7 @@ autoconf_path := $(or $(call scopes_target_path,$(empty)),.)
 example_path  := $(call scopes_target_path,$(empty)) $(example_path_add)
 
 # path: image_path
-# $(scopes_targetsdir) requires:[scopes]
+# $(scopes_targetsdir) requires amu components:[scopes]
 # run-time evaluation required, use function rather than simple assignment.
 image_path = $(call scopes_targetsdir) $(image_path_add)
 
@@ -82,7 +82,7 @@ define doxygen_config_auto_text
     ENABLED_SECTIONS=$(enabled_sections)
     EXAMPLE_PATH=$(example_path)
     IMAGE_PATH=$(image_path)
-    OUTPUT_DIRECTORY=$(output_path)
+    OUTPUT_DIRECTORY=$(doxygen_output_path)
     GENERATE_HTML=$(if $(generate_html),YES,NO)
     HTML_OUTPUT=$(html_output)
     GENERATE_LATEX=$(if $(generate_latex),YES,NO)
@@ -125,7 +125,7 @@ ifdef project_logo
       ), \
         $(project_logo), \
         $(call join_with,$(dir_level_sep), \
-          $(output_path)$(strip $(subst .,$(empty), \
+          $(doxygen_output_path)$(strip $(subst .,$(empty), \
             $(if $(call strings_equal,.png,$(suffix $(project_logo))), \
               $(suffix $(project_logo)), \
               png2$(suffix $(project_logo)) \
@@ -163,9 +163,9 @@ endif
 # release generated files
 ifeq ($(release_doxygen),$(true))
   release_files += \
-    $(if $(generate_html),$(output_path)$(html_output)) \
-    $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
-    $(if $(generate_man),$(output_path)$(man_output))
+    $(if $(generate_html),$(doxygen_output_path)$(html_output)) \
+    $(if $(generate_latex),$(doxygen_output_path)$(latex_output)$(release_latex_path_filter)) \
+    $(if $(generate_man),$(doxygen_output_path)$(man_output))
 endif
 
 # archive project files
@@ -176,9 +176,9 @@ endif
 # archive generated files
 ifeq ($(release_archive_doxygen),$(true))
   release_archive_files += \
-    $(if $(generate_html),$(output_path)$(html_output)) \
-    $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
-    $(if $(generate_man),$(output_path)$(man_output))
+    $(if $(generate_html),$(doxygen_output_path)$(html_output)) \
+    $(if $(generate_latex),$(doxygen_output_path)$(latex_output)$(release_latex_path_filter)) \
+    $(if $(generate_man),$(doxygen_output_path)$(man_output))
 endif
 
 #------------------------------------------------------------------------------#
@@ -186,6 +186,8 @@ endif
 #------------------------------------------------------------------------------#
 
 doxygen_config_variables := \
+  doxygen_output_prefix \
+  \
   doxygen_config \
   \
   doxygen_html_header \
