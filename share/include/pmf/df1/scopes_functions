@@ -51,10 +51,6 @@ scopes_targetsdir = \
     ),$(true) \
   )
 
-#------------------------------------------------------------------------------#
-#  Scope Rules Generation
-#------------------------------------------------------------------------------#
-
 # scopes_target_path (arg1)
 # arg1: An auxiliary script output file.
 # returns output file path prefix using current design flow configuration.
@@ -64,6 +60,10 @@ $(amu_pm_d1)$(call join_with,$(empty),
   $(if $(call bool_decode,$(prefix_scopes_scripts_input_path)),$(dir $1))
 )
 endef
+
+#------------------------------------------------------------------------------#
+#  Scope Rules Generation
+#------------------------------------------------------------------------------#
 
 # scopes_targets (arg1,arg2)
 # arg1: An OpenSCAD design source file.
