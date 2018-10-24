@@ -59,9 +59,8 @@
     <tt>(*.png, *.stl, etc.)</tt> and assembles the library
     documentation. [openscad-amu] brings together several widely-used
     tools to automate the production of [OpenSCAD] design targets and
-    the design documentation in various output formats
-    <a href="../../../examples/build/html/index.html">(HTML)</a>
-    <a href="../../../examples/build/latex/refman.pdf">(PDF)</a>.
+    the design documentation in various output formats ([HTML][html-example])
+    (PDF).
 
     \note The PDF version of this example documentation is not built by
     default. To build it, go the the <tt>../build/latex directory</tt>
@@ -102,6 +101,9 @@
 
   [Doxygen]: http://www.stack.nl/~dimitri/doxygen/index.html
   [special commands]: http://www.stack.nl/~dimitri/doxygen/manual/commands.html
+
+  [html-example]: ../../../examples/build/html/index.html
+  [pdf-example]: ../../../examples/build/latex/refman.pdf
 ###############################################################################/
 
 
