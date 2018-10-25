@@ -212,8 +212,9 @@ write_options(
   ostream& sout,
   const po::variables_map& vm)
 {
-  sout << "#" << endl
-       << "# input: " << vm["input"].as<string>() << endl
+  sout << endl
+       << "#" << endl
+       << "# machine-readable: " << endl
        << "#" << endl
        << endl;
 
@@ -652,7 +653,7 @@ main(int argc, char** argv)
     ov.push_back((po_modes){1, "makefile-ext", "makefile ext", MODE_EXTRACT | MODE_COUNT});
     ov.push_back((po_modes){0, "mfscript-ext", "mfscript ext", MODE_EXTRACT | MODE_COUNT});
     ov.push_back((po_modes){0, "openscad-ext", "openscad ext", MODE_EXTRACT | MODE_COUNT});
-    ov.push_back((po_modes){1, "config", "config file", MODE_ALL});
+    ov.push_back((po_modes){1, "config", "read config file", MODE_ALL});
     ov.push_back((po_modes){0, "write-config", "write config file", MODE_EXTRACT});
     ov.push_back((po_modes){1, "debug-scanner", "debug scanner", MODE_ALL});
     ov.push_back((po_modes){0, "verbose", "verbose", MODE_ALL});
@@ -793,7 +794,7 @@ main(int argc, char** argv)
       std::ofstream config_file ( conf_path.c_str() );
 
       if ( config_file.good() ) {
-        format_options( config_file, "configuration:", "#", ov, run_mode, vm );
+        format_options( config_file, "configuration summary:", "#", ov, run_mode, vm );
         write_options( config_file, vm) ;
       } else {
         cerr << "ERROR: unable to open configuration file [" << conf_path.string()
