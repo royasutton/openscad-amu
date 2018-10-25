@@ -96,6 +96,19 @@
 
   \section views Views
 
+    \htmlonly
+      \amu_image_table
+      (
+        f=html c=2 iw=320
+        t="Generated GIF Animations"
+        cdl="animate_move.gif animate_rotate.gif"
+        ctl="Move^Rotate"
+        ccl="Move^Rotate"
+        chl="Column (1)^Column (2)"
+        cul="animate_move.gif animate_rotate.gif"
+      )
+    \endhtmlonly
+
     \amu_define  theadt ( View from all angles. )
     \amu_shell   ifurls ( "yes 'https://royasutton.github.io/openscad-amu^' | head -6" )
     \amu_shell   count6 ( "seq -f '(%g)' -s '^' 6" )

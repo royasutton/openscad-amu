@@ -61,8 +61,8 @@ examples.stamp: \
 		build/vehicle_document.stamp \
 		build/vehicle_test.stamp \
 		\
-		build/animate_move.makefile \
-		build/animate_rotate.makefile \
+		build/png/animate_move.gif \
+		build/png/animate_rotate.gif \
 		\
 		doxygen.stamp
 	touch $@
@@ -86,6 +86,19 @@ CLEANFILES += \
 
 # build directory
 build: ; mkdir -v build
+
+# animate_move.gif, animate_rotate.gif
+CLEANFILES += \
+	build/png/animate_move.gif \
+	build/png/animate_rotate.gif
+
+build/png/animate_move.gif: build/animate_move.stamp
+	convert -verbose -resize 320x240 -delay 2 -loop 0 \
+		build/png/animate_move_*.png $@
+
+build/png/animate_rotate.gif: build/animate_rotate.stamp
+	convert -verbose -resize 320x240 -delay 2 -loop 0 \
+		build/png/animate_rotate_*.png $@
 
 # *.makefile --> *.stamp
 CLEANFILES += \
