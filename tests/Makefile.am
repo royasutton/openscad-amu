@@ -18,41 +18,45 @@ EXTRA_DIST = \
 # targets
 ##############################################################################
 
-check-local:	test1.bash-dif \
+check-local:	test2.count \
+							test1.bash-dif \
 							test1.scad-dif \
-							test1_doc.makefile.timestamp \
-							test2.count
+							build/test1_doc.makefile.timestamp
 
+# test2.count
 test2.count: $(openscad_seam) $(srcdir)/test1.scad
 	$(openscad_seam) \
 		--input $(srcdir)/test2.scad \
 		--mode count \
 		--verbose > test2.count
 
+# test1.bash-dif
 test1.bash-dif: $(bash_dif) $(srcdir)/test1.bash
 	$(bash_dif) $(srcdir)/test1.bash > test1.bash-dif
 
+# test1.scad-dif
 test1.scad-dif: $(openscad_dif) $(srcdir)/test1.scad
 	$(openscad_dif) $(srcdir)/test1.scad > test1.scad-dif
 
-test1_doc.makefile.timestamp: test1_doc.makefile
-	OPENSCADPATH=${srcdir} \
-	make -f test1_doc.makefile all
-	touch test1_doc.makefile.timestamp
-
-test1_doc.makefile: test1_doc.bash
-	@echo "running makefile script"
-	./test1_doc.bash
-
+# build/test1_doc.makefile.timestamp
 build:
 	mkdir -v build
 
-test1_doc.bash: $(openscad_seam) $(srcdir)/test1.scad | build
+build/test1_doc.makefile.timestamp: build/test1_doc.makefile
+	OPENSCADPATH=${srcdir} \
+	make -f build/test1_doc.makefile all
+	touch build/test1_doc.makefile.timestamp
+
+build/test1_doc.makefile: build/test1_doc.bash
+	@echo "running makefile script"
+	./build/test1_doc.bash
+
+build/test1_doc.bash: $(openscad_seam) $(srcdir)/test1.scad | build
 	$(openscad_seam) \
 		--input $(srcdir)/test1.scad \
 		--prefix build \
 		--prefix-ipp 0 \
-		--prefix-scripts no \
+		--prefix-scripts yes \
 		--comments yes \
 		--show no \
 		--run no \
@@ -61,12 +65,13 @@ test1_doc.bash: $(openscad_seam) $(srcdir)/test1.scad | build
 		--define __TEST_INCLUDE_PATH__=\"$(top_srcdir)/share/include/mf\" \
 		--verbose
 
+# test3_doc.makefile (currently not built during checks)
 test3_doc.makefile: $(openscad_seam) $(srcdir)/test3.scad | build
 	$(openscad_seam) \
 		--input $(srcdir)/test3.scad \
 		--prefix build \
 		--prefix-ipp 0 \
-		--prefix-scripts no \
+		--prefix-scripts yes \
 		--run yes \
 		--make yes \
 		--lib-path $(top_srcdir)/share \
@@ -76,15 +81,15 @@ test3_doc.makefile: $(openscad_seam) $(srcdir)/test3.scad | build
 CLEANFILES = \
 	test1.bash-dif \
 	test1.scad-dif \
-	test1_doc.bash \
-	test1_doc.scad \
-	test1_doc.makefile.timestamp \
+	build/test1_doc.bash \
+	build/test1_doc.scad \
+	build/test1_doc.makefile.timestamp \
 	test2.count
 
 
 clean-local:
-	-make -f test1_doc.makefile clean
-	-rm -fv test1_doc.makefile
+	-make -f build/test1_doc.makefile clean
+	-rm -fv build/test1_doc.makefile
 	-rmdir build
 
 ##############################################################################
