@@ -47,6 +47,7 @@ pdf-local: examples.stamp doxygen.stamp build/latex/refman.pdf
 
 man-local: examples.stamp
 
+# examples.stamp
 CLEANFILES = \
 	examples.stamp
 
@@ -57,14 +58,16 @@ examples.stamp: \
 		hello_world.makefile \
 		log_segregate.makefile \
 		\
-		vehicle_document.stamp \
-		vehicle_test.stamp \
-		animate_move.makefile \
-		animate_rotate.makefile \
+		build/vehicle_document.stamp \
+		build/vehicle_test.stamp \
+		\
+		build/animate_move.makefile \
+		build/animate_rotate.makefile \
 		\
 		doxygen.stamp
 	touch $@
 
+# embedding_scheme.scripts
 CLEANFILES += \
 	embedding_scheme.scripts
 
@@ -72,6 +75,7 @@ embedding_scheme.scripts: $(srcdir)/embedding_scheme.scad $(openscad_seam)
 	$(openscad_seam) --mode count  --joiner=- --input $< --scope root --verbose \
 		> embedding_scheme.scripts
 
+# *.bash --> *.makefile
 CLEANFILES += \
 	convert.makefile \
 	hello_world.makefile \
@@ -80,53 +84,59 @@ CLEANFILES += \
 .bash.makefile:
 	$(BASH_PATH) --norc --noprofile $<
 
+# build directory
+build: ; mkdir -v build
+
+# *.makefile --> *.stamp
 CLEANFILES += \
-	vehicle_document.stamp \
-	vehicle_test.stamp \
-	animate_move.stamp \
-	animate_rotate.stamp
+	build/vehicle_document.stamp \
+	build/vehicle_test.stamp \
+	\
+	build/animate_move.stamp \
+	build/animate_rotate.stamp
 
 .makefile.stamp:
 	OPENSCADPATH=${srcdir} \
 	make -f $< all
 	touch $@
 
-build: ; mkdir -v build
-
+# vehicle_document.{scad,bash}, vehicle_test.{scad,bash}
 CLEANFILES += \
-	vehicle_document.scad \
-	vehicle_document.bash \
-	vehicle_test.scad \
-	vehicle_test.bash \
-	vehicle.conf
+	build/vehicle_document.scad \
+	build/vehicle_document.bash \
+	build/vehicle_test.scad \
+	build/vehicle_test.bash \
+	build/vehicle.conf
 
-vehicle_document.makefile \
-vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
+build/vehicle_document.makefile \
+build/vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
 	$(openscad_seam) \
 		--input $< \
-		--prefix build --prefix-ipp 0 --prefix-scripts no \
+		--prefix build --prefix-ipp 0 --prefix-scripts yes \
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
 		--write-config yes \
 		--verbose
 
+# animate_move.{scad,bash}, animate_rotate.{scad,bash}
 CLEANFILES += \
-	animate_move.scad \
-	animate_move.bash \
-	animate_rotate.scad \
-	animate_rotate.bash \
-	animate.conf
+	build/animate_move.scad \
+	build/animate_move.bash \
+	build/animate_rotate.scad \
+	build/animate_rotate.bash \
+	build/animate.conf
 
-animate_move.makefile \
-animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
+build/animate_move.makefile \
+build/animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
 	$(openscad_seam) \
 		--input $< \
-		--prefix build --prefix-ipp 0 --prefix-scripts no \
+		--prefix build --prefix-ipp 0 --prefix-scripts yes \
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
 		--write-config yes \
 		--verbose
 
+# doxygen.stamp
 CLEANFILES += \
 	doxygen.stamp \
 	doxygen.tagfile \
@@ -174,14 +184,15 @@ uninstall-local:
 	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
 
 clean-local:
-	-make -f vehicle_document.makefile clean
-	-rm -fv vehicle_document.makefile
-	-make -f vehicle_test.makefile clean
-	-rm -fv vehicle_test.makefile
-	-make -f animate_move.makefile clean
-	-rm -fv animate_move.makefile
-	-make -f animate_rotate.makefile clean
-	-rm -fv animate_rotate.makefile
+	-for f in \
+		vehicle_document.makefile \
+		vehicle_test.makefile \
+		animate_move.makefile \
+		animate_rotate.makefile ; \
+	do \
+		make -f build/$$f clean ; \
+		rm -fv build/$$f ; \
+	done
 	-rm -rfv build/html build/latex build/man
 	-test -d build && rmdir -v build
 
