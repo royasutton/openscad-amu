@@ -300,60 +300,52 @@ main(int argc, char** argv)
     opts.add_options()
       ("mode,m",
           po::value<string>(&mode)->default_value(mode),
-          "Mode: one of (count | extract | list | return | scopes). "
-          "Count outputs the number of scripts found in the input. List "
-          "enumerates the script names found. Return sets the command "
-          "exit value to the script count. Scopes enumerate the scope "
-          "names found. Extract write the scripts to separate files.\n")
+          "(count|extract|list|return|scopes); "
+          "count=output number of scripts; list=enumerate script; "
+          "return=set command exit value to script count; scopes="
+          "enumerate scopes; extract=write scripts to output files.\n")
       ("input,i",
           po::value<string>(&input)->required(),
-          "Input file containing annotated script(s) embedded within "
-          "comments.\n")
+          "Input source file name.\n")
       ("scope,s",
           po::value<string>(&scope),
-          "Scope root name. When not specified, the input file stem "
-          "name is used.")
+          "Scope root name.")
       ("joiner,j",
           po::value<string>(&joiner)->default_value(joiner),
-          "Scope joiner. String used to conjoin scope hierarchies.")
+          "Scope hierarchy joiner string.")
       ("prefix,p",
           po::value<string>(&prefix),
-          "Output prefix for derived files. This path is prepended to "
-          "the input file path to set the output path prefix.")
+          "Output file(s) prefix.")
       ("prefix-ipp,a",
           po::value<int>(&prefix_ipp),
-          "Number of parent directory levels of the input file path to "
-          "append to the specified prefix.")
+          "Input file parent directory count to append to the prefix.")
       ("prefix-scripts,x",
           po::value<bool>(&prefix_scripts)->default_value(prefix_scripts),
-          "Prepend output path prefix to config, extracted scripts, and"
-          "targets. If false, output will be written to current directory.\n")
+          "Use prefix for config, scripts, and targets.\n")
       ("define,D",
           po::value<vector<string> >(&define),
-          "One or more environment variable definitions to declare in each "
-          "extracted makefile script: (NAME=VALUE).\n")
+          "Define  environment variable(s) in extracted script; (NAME=VALUE).\n")
       ("comments",
           po::value<bool>(&comments)->default_value(comments),
-          "Copy comment lines to output: (0|1, yes|no, true|false).")
+          "Copy comments; (0|1, yes|no, true|false).")
       ("show",
           po::value<bool>(&show)->default_value(show),
-          "Show extracted script(s).")
+          "Show extracted makefile scripts.")
       ("run",
           po::value<bool>(&run)->default_value(run),
-          "Run extracted makefile script(s).")
+          "Run extracted makefile scripts.")
       ("make",
           po::value<bool>(&make)->default_value(make),
-          "Run make on each generated makefile.\n")
+          "Run make on generated makefiles.\n")
       ("target",
           po::value<string>(&target)->default_value(target),
-          "Makefile target name to use when running make.\n")
+          "Target when running make.\n")
       ("lib-path",
           po::value<string>(&lib_path)->default_value(lib_path),
           "Makefile script library path.")
       ("openscad-path",
           po::value<string>(&openscad_path),
-          "OpenSCAD executable path. When specified, "
-          "this overrides that defined in the Makefile script library.")
+          "OpenSCAD executable path; overrides script library definition.")
       ("bash-path",
           po::value<string>(&bash_path)->default_value(bash_path),
           "Bash executable path.")
@@ -362,19 +354,19 @@ main(int argc, char** argv)
           "GNU Make executable path.\n")
       ("makefile-ext",
           po::value<string>(&makefile_ext)->default_value(makefile_ext),
-          "Makefile file extension.")
+          "Makefile extension.")
       ("mfscript-ext",
           po::value<string>(&mfscript_ext)->default_value(mfscript_ext),
-          "Makefile scripts file extension.")
+          "Makefile script extension.")
       ("openscad-ext",
           po::value<string>(&openscad_ext)->default_value(openscad_ext),
-          "OpenSCAD scripts file extension.\n")
+          "OpenSCAD script extension.\n")
       ("config,c",
           po::value<string>(&config),
-          "Configuration file with one or more option value pairs.\n")
+          "Read configuration file.\n")
       ("write-config,w",
           po::value<bool>(&write_config)->default_value(write_config),
-          "Write configuration file with program options.\n")
+          "Write configuration file.\n")
       ("debug-scanner",
           "Run scanner in debug mode.\n")
       ("verbose,V",
@@ -405,13 +397,11 @@ main(int argc, char** argv)
         cout << command_name << " " << PACKAGE_VERSION << endl
              << endl
              <<
-  "OpenSCAD Script Extractor and Auto-Make (SEAM) tool. Extracts OpenSCAD\n"
-  "and/or Makefile scripts annotated within comment block sections of the\n"
-  "specified input file. The extracted Makefile scripts may be run to generate\n"
-  "makefiles. Subsequently, make can be run on each generated makefile with a\n"
-  "named target to invoke OpenSCAD on the input source and/or extracted source\n"
-  "files.\n"
-
+  "OpenSCAD script extractor and auto-make tool (seam).\n\n"
+  "Extract makefile-generation- and OpenSCAD-build-scripts, embedded\n"
+  "into comment blocks, of an OpenSCAD input file. These scripts may\n"
+  "be used to generate makefiles that automate the compilation of\n"
+  "OpenSCAD design targets.\n"
              << endl
              << "Examples:" << endl
              << "  " << command_name << " <input>" << endl
