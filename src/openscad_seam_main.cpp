@@ -375,7 +375,7 @@ main(int argc, char** argv)
       ("version,v",
           "Report tool version.")
       ("help,h",
-          "Print this help messages.")
+          "Print this help message.")
     ;
 
     po::positional_options_description opts_pos;

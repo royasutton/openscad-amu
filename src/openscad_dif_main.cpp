@@ -215,60 +215,44 @@ main(int argc, char** argv)
     opts_cli.add_options()
       ("input,i",
           po::value<string>(&input)->required(),
-          "Input file containing annotated script(s) embedded within "
-          "comments.\n")
+          "Input source file name.\n")
       ("search,s",
           po::value<bool>(&search)->default_value(search),
-          "Search makefile target output directories for files referenced "
-          "by the filter functions.")
+          "Search make targets for references.")
       ("include-path,I",
           po::value<vector<string> >(&include_path),
-          "One or more directories to search for files references.\n")
+          "Explicit search paths for references.\n")
       ("html-output",
           po::value<string>(&html_output)->default_value(html_output),
-          string(
-            "Directory where filter will copy HTML documents "
-            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
-          ).c_str())
+          "HTML output path.")
       ("latex-output",
           po::value<string>(&latex_output)->default_value(latex_output),
-          string(
-            "Directory where filter will copy Latex documents "
-            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
-          ).c_str())
+          "Latex output path.")
       ("docbook-output",
           po::value<string>(&docbook_output)->default_value(docbook_output),
-          string(
-            "Directory where filter will copy Docbook documents "
-            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
-          ).c_str())
+          "Docbook output path.")
       ("rtf-output",
           po::value<string>(&rtf_output)->default_value(rtf_output),
-          string(
-            "Directory where filter will copy RTF documents "
-            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
-          ).c_str())
+          "RTF output path.")
       ("lib-path",
           po::value<string>(&lib_path)->default_value(lib_path),
           "Makefile script library path.\n")
       ("auto-config,a",
           po::value<string>(&auto_config),
-          "Auto configuration path. When specified, this path is checked "
-          "for a configuration file for the specified input file and read "
-          "if it exists.")
+          "Filter Auto configuration path.")
       ("config,c",
           po::value<string>(&config),
-          "Configuration file with one or more option value pairs.\n")
+          "Read configuration file.\n")
       ("debug-scanner",
           "Run scanner in debug mode.")
       ("debug-filter",
           "Turn on filter debugging output.\n")
       ("verbose,V",
-          "Provide verbose help or version output.")
+          "Run in version mode.")
       ("version,v",
           "Report tool version.")
       ("help,h",
-          "Print this help messages.")
+          "Print this help message.")
     ;
 
     po::options_description opts_conf("Options (hidden)");
@@ -322,9 +306,9 @@ main(int argc, char** argv)
         cout << command_name << " " << PACKAGE_VERSION << endl
              << endl
              <<
-  "Doxygen input filter for OpenSCAD source files. Can be used in conjunction\n"
-  "with Doxygen tags INPUT_FILTER and FILTER_*.\n"
-
+  "OpenSCAD source script Doxygen input filter (dif).\n\n"
+  "An OpenSCAD design scripts preprocesspr input filter for the Doxygen\n"
+  "documentation generaton tool.\n"
              << endl
              << "Examples:" << endl
              << "  INPUT_FILTER = <prefix>/bin/" << command_name << endl
