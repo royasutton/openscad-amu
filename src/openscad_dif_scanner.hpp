@@ -291,7 +291,8 @@ class ODIF_Scanner : public yyFlexLexer{
                          const bool& copy=true, const bool& rid=false);
 
 
-    // built-in amu functions
+    // built-in amu functions (bif)
+    // see: openscad_dif_scanner_bif.cpp
     //! evaluate and output the function arguments.
     std::string bif_eval(void);
     //! execute a shell command and output its results.
