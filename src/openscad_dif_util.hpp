@@ -33,6 +33,8 @@
 #ifndef __ODIF_UTIL_HPP__
 #define __ODIF_UTIL_HPP__ 1
 
+#include <boost/filesystem.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -303,6 +305,10 @@ namespace UTIL{
 
   //! test if a string only contains digits.
   bool is_number(const std::string &s);
+
+  //! return a directory path relative to another.
+  boost::filesystem::path get_relative_path(const boost::filesystem::path &to_path,
+                                            const boost::filesystem::path &from_path);
 
 } /* end namespace UTIL */
 

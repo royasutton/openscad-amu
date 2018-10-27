@@ -608,6 +608,40 @@ UTIL::is_number(const std::string& s)
   return ( !s.empty() && it == s.end() );
 }
 
+boost::filesystem::path
+UTIL::get_relative_path(
+    const boost::filesystem::path &to_path,
+    const boost::filesystem::path &from_path)
+{
+   boost::filesystem::path::const_iterator tit = to_path.begin();
+   boost::filesystem::path::const_iterator fit = from_path.begin();
+
+   // loop while they are the same to find common parrent path
+   while (tit != to_path.end() && fit != from_path.end() && (*fit) == (*tit))
+   {
+      ++fit;
+      ++tit;
+   }
+
+   boost::filesystem::path relative_path;
+
+   // append ".." for each remaining level of from_path
+   while (fit != from_path.end())
+   {
+      relative_path /= "..";
+      ++fit;
+   }
+
+   // append remainder of to_path
+   while (tit != to_path.end())
+   {
+      relative_path /= *tit;
+      ++tit;
+   }
+
+   return relative_path;
+}
+
 
 /*******************************************************************************
 // eof
