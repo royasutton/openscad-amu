@@ -531,26 +531,6 @@ main(int argc, char** argv)
       debug_m(debug_filter, "auto-search: configuring include paths.");
 
       //
-      // add initial include paths
-      //
-      if ( auto_config.length() )
-      {
-        debug_m(debug_filter, "auto-configured, adding include path [" + auto_config + "].");
-        include_path.push_back( auto_config );
-      }
-      else
-      {
-        debug_m(debug_filter, "manually configured, adding include path [.].");
-        include_path.push_back( "." );
-      }
-
-      if ( prefix_scripts )
-      {
-        debug_m(debug_filter, "scripts prefixed, adding include path [" + output_prefix + "].");
-        include_path.push_back( output_prefix );
-      }
-
-      //
       // add target directories for for each scope
       //
       debug_m(debug_filter, "checking each scope for generated makefile:");
@@ -647,12 +627,30 @@ main(int argc, char** argv)
         }
       }
 
-      // add directories in map to include path
+      // add unique directories in map to include path
       debug_m(debug_filter, "adding unique directories to include-path:");
       for( map<string,string>::iterator mit=path_map.begin(); mit != path_map.end(); ++mit)
       {
-        include_path.push_back( mit->second );
         debug_m(debug_filter, "adding [" + mit->second + "]");
+        include_path.push_back( mit->second );
+      }
+
+      // add default include paths
+      if ( prefix_scripts )
+      {
+        debug_m(debug_filter, "adding [" + output_prefix + "] (prefix default)");
+        include_path.push_back( output_prefix );
+      }
+
+      if ( auto_config.length() )
+      {
+        debug_m(debug_filter, "adding [" + auto_config + "] (auto-config default)");
+        include_path.push_back( auto_config );
+      }
+      else
+      {
+        debug_m(debug_filter, "adding [.] (manual-config default)");
+        include_path.push_back( "." );
       }
 
       // insert discovered paths into a new program option identifier.
