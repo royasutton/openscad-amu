@@ -308,7 +308,8 @@ namespace UTIL{
 
   //! return a directory path relative to another.
   boost::filesystem::path get_relative_path(const boost::filesystem::path &to_path,
-                                            const boost::filesystem::path &from_path);
+                                            const boost::filesystem::path &from_path,
+                                            const bool parent=false);
 
 } /* end namespace UTIL */
 
