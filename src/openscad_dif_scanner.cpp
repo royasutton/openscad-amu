@@ -541,7 +541,7 @@ ODIF::ODIF_Scanner::file_rl(
     p  = *it;
     p /= f.filename();
 
-    filter_debug( "  checking: " + p.string(), false, false, false);
+    filter_debug( "  checking-file: " + p.string(), false, false, false);
     if ( exists(p) && is_regular_file(p) ) {
       found = true;
       found_file = p;
@@ -549,16 +549,18 @@ ODIF::ODIF_Scanner::file_rl(
       break;
     }
 
-    // check with existing prefixed path.
+    // check with existing prefixed path iff present.
     p  = *it;
     p /= f;
 
-    filter_debug( "  checking: " + p.string(), false, false, false);
-    if ( exists(p) && is_regular_file(p) ) {
-      found = true;
-      found_file = p;
+    if ( f.has_parent_path() ) {
+      filter_debug( "  checking-path: " + p.string(), false, false, false);
+      if ( exists(p) && is_regular_file(p) ) {
+        found = true;
+        found_file = p;
 
-      break;
+        break;
+      }
     }
   }
 
