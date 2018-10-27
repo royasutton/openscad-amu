@@ -247,6 +247,8 @@ find_config(
   try_paths.push_back( input_path_abs );
   try_paths.push_back( "." );
 
+  debug_m(debug_filter, "searching for configuration file.");
+
   bool found = false;
 
   for(
@@ -257,7 +259,7 @@ find_config(
   {
       path try_file ( *it / config_name );
 
-      debug_m(debug_filter, "        trying file: [" + try_file.string() + "]");
+      debug_m(debug_filter, "  trying: [" + try_file.string() + "]");
 
       if ( exists(try_file) && is_regular_file(try_file) )
       {
@@ -520,11 +522,20 @@ main(int argc, char** argv)
       string first_include_path;
 
       if ( prefix_scripts )
+      {
+        debug_m(debug_filter, "scripts prefixed, using configuration prefix path.");
         first_include_path = output_prefix;
+      }
       else if ( auto_config.length() )
+      {
+        debug_m(debug_filter, "scripts not prefixed, using auto-config path.");
         first_include_path = auto_config;
+      }
       else
+      {
+        debug_m(debug_filter, "defaulted, using current directory.");
         first_include_path = ".";
+      }
 
       debug_m(debug_filter, "inserting [" + first_include_path + "] as first include path.");
       include_path.push_back( first_include_path );
