@@ -287,6 +287,7 @@ main(int argc, char** argv)
     string input;
     bool search           = true;
     vector<string> include_path;
+    string doxygen_output;
     string html_output    = ODIF::NO_FORMAT_OUTPUT;
     string latex_output   = ODIF::NO_FORMAT_OUTPUT;
     string docbook_output = ODIF::NO_FORMAT_OUTPUT;
@@ -320,6 +321,9 @@ main(int argc, char** argv)
       ("include-path,I",
           po::value<vector<string> >(&include_path),
           "Explicit search paths for references.\n")
+      ("doxygen-output",
+          po::value<string>(&doxygen_output),
+          "Doxygen output rootpath.")
       ("html-output",
           po::value<string>(&html_output)->default_value(html_output),
           "HTML output path.")
@@ -505,6 +509,16 @@ main(int argc, char** argv)
     // validate arguments
     ////////////////////////////////////////////////////////////////////////////
      option_depend( vm, "verbose", "version");
+
+    // set doxygen-output when not specified for backwards compatibility
+    if ( !vm.count("doxygen-output") )
+    {
+      debug_m(debug_filter, "doxygen-output not specified, setting to"
+                            " output-prefix=[" + output_prefix + "]");
+
+      doxygen_output = output_prefix;
+      vm.insert( make_pair("doxygen-output", po::variable_value(doxygen_output, true)) );
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -706,6 +720,7 @@ main(int argc, char** argv)
 
     // command line
     scanner.set_include_path( include_path );
+    scanner.set_doxygen_output( doxygen_output );
     scanner.set_html_output( html_output );
     scanner.set_latex_output( latex_output );
     scanner.set_docbook_output( docbook_output );

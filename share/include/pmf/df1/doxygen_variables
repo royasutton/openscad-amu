@@ -54,6 +54,7 @@ image_path = $(call scopes_targetsdir) $(image_path_add)
 # filter configuration
 openscad_dif_opts := \
   $(strip \
+    --doxygen-output $(if $(doxygen_output_path),$(doxygen_output_path),./) \
     $(if $(call bool_decode,$(generate_html)),--html-output $(html_output)) \
     $(if $(call bool_decode,$(generate_latex)),--latex-output $(latex_output)) \
     $(if $(AMU_LIB_PATH),--lib-path $(AMU_LIB_PATH)) \
