@@ -531,28 +531,24 @@ main(int argc, char** argv)
       debug_m(debug_filter, "auto-search: configuring include paths.");
 
       //
-      // add first include paths
+      // add initial include paths
       //
-      string first_include_path;
-
-      if ( prefix_scripts )
+      if ( auto_config.length() )
       {
-        debug_m(debug_filter, "scripts prefixed, using configuration prefix path.");
-        first_include_path = output_prefix;
-      }
-      else if ( auto_config.length() )
-      {
-        debug_m(debug_filter, "scripts not prefixed, using auto-config path.");
-        first_include_path = auto_config;
+        debug_m(debug_filter, "auto-configured, adding include path [" + auto_config + "].");
+        include_path.push_back( auto_config );
       }
       else
       {
-        debug_m(debug_filter, "defaulted, using current directory.");
-        first_include_path = ".";
+        debug_m(debug_filter, "manually configured, adding include path [.].");
+        include_path.push_back( "." );
       }
 
-      debug_m(debug_filter, "inserting [" + first_include_path + "] as first include path.");
-      include_path.push_back( first_include_path );
+      if ( prefix_scripts )
+      {
+        debug_m(debug_filter, "scripts prefixed, adding include path [" + output_prefix + "].");
+        include_path.push_back( output_prefix );
+      }
 
       //
       // add target directories for for each scope
