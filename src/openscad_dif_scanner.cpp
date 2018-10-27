@@ -511,6 +511,9 @@ ODIF::ODIF_Scanner::filter_debug(
     When \p outdir == \p ODIF::NO_FORMAT_OUTPUT, a copy will not be
     performed for any located file regarded of the parameter \p copy.
 
+  \todo Only search for local files. Files that match the pattern of a
+        remote URL should be returned immediately.
+
 *******************************************************************************/
 string
 ODIF::ODIF_Scanner::file_rl(
@@ -586,16 +589,10 @@ ODIF::ODIF_Scanner::file_rl(
         target = found_file.filename();
       }
 
-      // handle configuration prefix if not current directory (or empty)
+      // set output directory path
       bfs::path out_path;
-      if ( get_config_prefix().compare(".") && get_config_prefix().length() )
-        out_path /= get_config_prefix();
 
-      // were scripts and configuration already prefixed by seam?
-      // if not, add the output prefix to the output path.
-      if ( get_prefix_scripts() == false )
-        out_path /= get_output_prefix();
-
+      out_path  = get_doxygen_output();
       out_path /= outdir;
 
       bfs::path target_path ( out_path / target );
