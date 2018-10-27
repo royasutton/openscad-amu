@@ -35,8 +35,6 @@
         HTML_EXTRA_FILES.
   \todo add option to create a histogram/map of amu command that exists
         in the input file.
-  \todo support --auto-config='auto-config'. When specified as such, the
-         auto configuration path is set to the path of the input file.
 
   \ingroup openscad_dif_src
 *******************************************************************************/
@@ -171,6 +169,104 @@ debug_m(const bool& output, const string& message, const bool& newline=true)
     if ( newline )
       cerr << endl;
   }
+}
+
+
+//! make a directory path relative to another.
+path
+get_relative_path(
+  const path to_path,
+  const path from_path)
+{
+   path::const_iterator tit = to_path.begin();
+   path::const_iterator fit = from_path.begin();
+
+   // loop while they are the same to find common parrent path
+   while (tit != to_path.end() && fit != from_path.end() && (*fit) == (*tit))
+   {
+      ++fit;
+      ++tit;
+   }
+
+   path relative_path;
+
+   // append ".." for each remaining level of from_path
+   while (fit != from_path.end())
+   {
+      relative_path /= "..";
+      ++fit;
+   }
+
+   // append remainder of to_path
+   while (tit != to_path.end())
+   {
+      relative_path /= *tit;
+      ++tit;
+   }
+
+   return relative_path;
+}
+
+//! search for configuration file for given input file.
+bool
+find_config(
+  const string input,
+  const string auto_config,
+  string& config,
+  const bool debug_filter)
+{
+  path input_path ( input );
+  path input_path_abs ( input_path.parent_path() );
+  path input_path_rel;
+  path config_name ( input_path.stem() );
+
+  input_path_rel = get_relative_path(input_path_abs, current_path());
+  config_name += ".conf";
+
+  debug_m(debug_filter, "         input file: [" + input + "]");
+  debug_m(debug_filter, "   auto config path: [" + auto_config + "]");
+  debug_m(debug_filter, " target config name: [" + config_name.string() + "]");
+  debug_m(debug_filter, "       current path: [" + current_path().string() + "]");
+  debug_m(debug_filter, "absolute input path: [" + input_path_abs.string() + "]");
+  debug_m(debug_filter, "relative input path: [" + input_path_rel.string() + "]");
+
+  vector<path> try_paths;
+
+  // search order:
+  // (1) <auto-config-path>
+  // (2) <auto-config-path>/<relative-input-path>
+  // (3) <auto-config-path>/<absolute-input-path>
+  // (4) <relative-input-path>
+  // (5) <absolute-input-path>
+  // (6) <./>
+
+  try_paths.push_back( path(auto_config) );
+  try_paths.push_back( path(auto_config) / input_path_rel );
+  try_paths.push_back( path(auto_config) / input_path_abs.relative_path() );
+  try_paths.push_back( input_path_rel );
+  try_paths.push_back( input_path_abs );
+  try_paths.push_back( "." );
+
+  bool found = false;
+
+  for(
+    vector<path>::iterator it = try_paths.begin();
+    (found == false) && (it != try_paths.end());
+    ++it
+  )
+  {
+      path try_file ( *it / config_name );
+
+      debug_m(debug_filter, "        trying file: [" + try_file.string() + "]");
+
+      if ( exists(try_file) && is_regular_file(try_file) )
+      {
+        config = try_file.string();
+        found = true;
+      }
+  }
+
+  return found;
 }
 
 
@@ -353,23 +449,15 @@ main(int argc, char** argv)
         input = vm["input"].as<string>();
         auto_config = vm["auto-config"].as<string>();
 
-        debug_m( debug_filter, "attempting auto-configuration with path: ["
-                                + auto_config + "]");
-
-        path input_path ( input );
-        path conf_path ( auto_config );
-
-        conf_path /= input_path.stem();
-        conf_path += ".conf";
-
-        if ( exists(conf_path) && is_regular_file(conf_path) )
+        debug_m(debug_filter, "attempting auto-configuration");
+        if ( find_config(input, auto_config, config, debug_filter) )
         {
-          debug_m( debug_filter, "configuration found: [" + conf_path.string() + "]");
+          debug_m(debug_filter, "configuration found.");
 
           // insert configuration file name into variable map to be parsed later.
-          vm.insert( make_pair("config", po::variable_value(conf_path.string(), true)) );
+          vm.insert( make_pair("config", po::variable_value(config, true)) );
         } else {
-          debug_m( debug_filter, "configuration file not found." );
+          debug_m(debug_filter, "configuration not found.");
         }
       }
 
@@ -380,7 +468,7 @@ main(int argc, char** argv)
         // get values from variable map directly.
         config = vm["config"].as<string>();
 
-        debug_m( debug_filter, "reading configuration file: [" + config + "]");
+        debug_m(debug_filter, "reading configuration file: [" + config + "]");
 
         std::ifstream config_file ( config.c_str() );
 
@@ -426,15 +514,24 @@ main(int argc, char** argv)
     {
       debug_m(debug_filter, "auto-search: configuring include paths.");
 
+      //
+      // add first include paths
+      //
       string first_include_path;
-      if ( auto_config.compare(".") && auto_config.length() )
+
+      if ( prefix_scripts )
+        first_include_path = output_prefix;
+      else if ( auto_config.length() )
         first_include_path = auto_config;
       else
         first_include_path = ".";
 
       debug_m(debug_filter, "inserting [" + first_include_path + "] as first include path.");
-      include_path.insert(include_path.begin(), first_include_path);
+      include_path.push_back( first_include_path );
 
+      //
+      // add target directories for for each scope
+      //
       debug_m(debug_filter, "checking each scope for generated makefile:");
 
       map<string,string> path_map;
@@ -451,8 +548,13 @@ main(int argc, char** argv)
 
         path makefile_path;
 
-        // handle configuration prefix if not current directory (or empty)
-        if ( auto_config.compare(".") && auto_config.length() )
+        // identify path prefix to makefile
+        if ( prefix_scripts )
+        {
+          makefile_path /= output_prefix;
+          opts += " --directory=" + output_prefix;
+        }
+        else if ( auto_config.length() )
         {
           makefile_path /= auto_config;
           opts += " --directory=" + auto_config;
@@ -466,7 +568,7 @@ main(int argc, char** argv)
 
         debug_m(debug_filter, "scope: " + scope_name);
 
-        // does makefile exists?
+        // when makefile exists
         if ( exists(makefile_path) && is_regular_file(makefile_path) )
         {
           debug_m(debug_filter, "  makefile [" + makefile_path.string() + "] exists");
@@ -484,7 +586,7 @@ main(int argc, char** argv)
 
           if ( good )
           {
-            debug_m(debug_filter, "   result: " + result, false );
+            debug_m(debug_filter, "   result: " + result, true );
           }
           else
           {
