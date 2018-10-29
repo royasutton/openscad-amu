@@ -474,7 +474,7 @@ void
 UTIL::sys_command(
   const string& command,
         string& result,
-        bool& good,
+        bool& success,
   const bool& standard_error,
   const bool& replace_newlines)
 {
@@ -493,7 +493,7 @@ UTIL::sys_command(
   {
     result = "popen() failed for " + cmd_str;
 
-    good=false;
+    success=false;
   }
   else
   {
@@ -505,12 +505,12 @@ UTIL::sys_command(
 
     pclose(pipe);
 
-    good=true;
+    success=true;
   }
 #else /* HAVE_POPEN */
   result = "popen() not available, unable to execute " + cmd_str;
 
-  good=false;
+  success=false;
 #endif /* HAVE_POPEN */
 
   if ( replace_newlines )

@@ -282,7 +282,7 @@ namespace UTIL{
 
   //! run a system command and capture return result.
   void sys_command( const std::string& command, std::string& result,
-                    bool& good, const bool& standard_error=false,
+                    bool& success, const bool& standard_error=false,
                     const bool& replace_newlines=false);
 
   //! return word number n from string w.
