@@ -136,6 +136,8 @@ endif
 #------------------------------------------------------------------------------#
 
 scopes_config_variables := \
+  scopes_scripts_output_prefix \
+  \
   scopes_joiner \
   \
   scopes_include \
