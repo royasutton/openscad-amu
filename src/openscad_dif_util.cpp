@@ -647,6 +647,86 @@ UTIL::get_relative_path(
   return relative_path;
 }
 
+bool
+UTIL::make_dir(const std::string &d,
+                     std::string &m,
+               const bool &p,
+               const std::string &a)
+{
+  boost::filesystem::path f ( d );      // new directory path
+  boost::filesystem::path b ( a );      // existing ancestors base path
+  boost::filesystem::path n ( b / f );  // new complete target path
+
+  bool created = false;
+
+  m = "makedir";
+
+  if ( n.empty() )
+  { // target empty, do nothing.
+    m += " [<pathname empty>]";
+  }
+  else if ( boost::filesystem::exists( n ) && boost::filesystem::is_directory( n ) )
+  { // target exists, do nothing.
+    m += " [" + n.string() + "] exists";
+  }
+  else if ( !p )
+  { // assume ancestors exists, and make target path.
+    created = boost::filesystem::create_directory( n );
+    m += "[" + n.string() + "] 1 created";
+  }
+  else
+  { // otherwise assume ancestors exists, and make missing parents of target path.
+
+    m += " [";
+
+    boost::filesystem::path::const_iterator nit = n.begin();;
+    boost::filesystem::path t;
+
+    // ancestors: assume exists
+    if ( !b.empty() )
+    {
+      boost::filesystem::path::const_iterator bit = b.begin();;
+
+      while (bit != b.end() && nit != n.end())
+      {
+        ++bit;
+        ++nit;
+      }
+
+      // mark end
+      m += b.string() + "+";
+      t  = b;
+    }
+
+    // make missing parents of target directory path
+    uint count = 0;
+    bool success = true;
+
+    while (nit != n.end() && success)
+    {
+      t /= *nit;
+
+      if ( boost::filesystem::exists( t ) && boost::filesystem::is_directory( t ) )
+      {
+        m += "/" + nit->string();
+      }
+      else
+      {
+        success = boost::filesystem::create_directory( t );
+        m += "/<" + nit->string() + ">";
+        count++;
+      }
+
+      ++nit;
+    }
+    created = success;
+
+    m += "] " + to_string( count ) + " created";
+  }
+
+  return created;
+}
+
 
 /*******************************************************************************
 // eof
