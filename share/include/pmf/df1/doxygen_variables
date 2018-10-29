@@ -112,27 +112,25 @@ else
 endif
 
 # project logo
+# $(call scopes_target_path,<arg1>) requires:[scopes]
 ifdef project_logo
-  # add default extension when not specified with file name
+  # add default .png extension when not specified with file name
   project_logo := $(if $(suffix $(project_logo)),$(project_logo),$(project_logo).png)
 
-  # add default path when not specified with file name
-  # follow mfscript target naming convention for original and converted images
-  # png, png2eps, png2tiff, etc.
+  # add default path when not specified with file name:
+  # $(scopes_target_path)/<ext>/<logo-name>.<ext>
   project_logo := \
     $(strip \
       $(if $(call bool_decode, \
         $(call sstrings_not_equal,$(notdir $(project_logo)),$(project_logo)) \
       ), \
         $(project_logo), \
-        $(call join_with,$(dir_level_sep), \
-          $(doxygen_output_path)$(strip $(subst .,$(empty), \
-            $(if $(call strings_equal,.png,$(suffix $(project_logo))), \
-              $(suffix $(project_logo)), \
-              png2$(suffix $(project_logo)) \
-            ) \
-          )) \
-          $(project_logo) \
+        $(call join_with,$(empty), \
+          $(call scopes_target_path,$(project_logo_prefix)) \
+          $(call join_with,$(dir_level_sep), \
+            $(subst .,$(empty),$(suffix $(project_logo))) \
+            $(project_logo) \
+          ) \
         ) \
       ) \
     )
@@ -212,6 +210,7 @@ doxygen_config_variables := \
 doxygen_config_derived += \
   docs_install_id \
   \
+  project_logo_prefix \
   project_logo \
   \
   latex_stamp \
