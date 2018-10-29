@@ -285,8 +285,8 @@ class ODIF_Scanner : public yyFlexLexer{
     void filter_debug( const std::string& m, const bool& h=true,
                        const bool& f=true, const bool& s=true);
 
-    //! try to locate a file and copy it to an output directory.
-    std::string file_rl( const std::string& file, const std::string& outdir,
+    //! try to locate a file and copy it to an output subdirectory.
+    std::string file_rl( const std::string& file, const std::string& subdir,
                          bool& found, const bool& extension=true,
                          const bool& copy=true, const bool& rid=false);
 

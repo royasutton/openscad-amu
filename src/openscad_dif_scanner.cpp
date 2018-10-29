@@ -483,10 +483,10 @@ ODIF::ODIF_Scanner::filter_debug(
 /***************************************************************************//**
 
   \param file       file to locate.
-  \param outdir     destination directory for file copy.
+  \param subdir     destination subdirectory for file copy.
   \param found      status of if the file was located.
   \param extension  return file name with file extension.
-  \param copy       copy the found file to the specified outdir.
+  \param copy       copy the found file to the specified subdir.
   \param rid        rename the copied file with an random identifier.
 
   \returns  a string with (a) \p file when not located, (b) path to the
@@ -500,7 +500,7 @@ ODIF::ODIF_Scanner::filter_debug(
     path successively. If the file is not located then \p found = \p false and
     the original \p file string is returned.
 
-    When located, \p found = \p true, the file is copied to the \p outdir
+    When located, \p found = \p true, the file is copied to the \p subdir
     (if \p copy == \p true), and the path to the target file is returned.
     If \p rid == \p true, then the target file name is assigned a random
     target file name. When \p copy == \p false, the located source file
@@ -508,7 +508,7 @@ ODIF::ODIF_Scanner::filter_debug(
     with or without a file name extension as indicated by the \p extension
     parameter.
 
-    When \p outdir == \p ODIF::NO_FORMAT_OUTPUT, a copy will not be
+    When \p subdir == \p ODIF::NO_FORMAT_OUTPUT, a copy will not be
     performed for any located file regarded of the parameter \p copy.
 
   \todo Only search for local files. Files that match the pattern of a
@@ -518,17 +518,19 @@ ODIF::ODIF_Scanner::filter_debug(
 string
 ODIF::ODIF_Scanner::file_rl(
   const string& file,
-  const string& outdir,
+  const string& subdir,
         bool& found,
   const bool& extension,
   const bool& copy,
   const bool& rid
 )
 {
-  filter_debug( "locate file: [" + file + "]", true, false, false);
+  filter_debug("locate "
+               + string( bfs::path(file).has_parent_path()?"path":"file" )
+               + " [" + file + "]", true, false, false);
 
   // check each include path for file.
-  bfs::path found_file;
+  bfs::path location;
   found = false;
   for( vector<string>::iterator it = include_path.begin();
                                 it != include_path.end() && !found;
@@ -541,10 +543,10 @@ ODIF::ODIF_Scanner::file_rl(
     p  = *it;
     p /= f.filename();
 
-    filter_debug( "  checking-file: " + p.string(), false, false, false);
+    filter_debug(" checking-file: " + p.string(), false, false, false);
     if ( exists(p) && is_regular_file(p) ) {
       found = true;
-      found_file = p;
+      location = p;
 
       break;
     }
@@ -554,90 +556,110 @@ ODIF::ODIF_Scanner::file_rl(
     p /= f;
 
     if ( f.has_parent_path() ) {
-      filter_debug( "  checking-path: " + p.string(), false, false, false);
+      filter_debug(" checking-path: " + p.string(), false, false, false);
       if ( exists(p) && is_regular_file(p) ) {
         found = true;
-        found_file = p;
+        location = p;
 
         break;
       }
     }
   }
 
-  string return_file;
+  string reference;
   if ( found )
   {
-    filter_debug( " found.", false, false, false);
+    filter_debug(" found.", false, false, false);
 
-    // target is found file where located.
-    bfs::path target( found_file );
+    bfs::path target;
+    bfs::path rootoutpath;
 
-    if ( outdir.compare(NO_FORMAT_OUTPUT) == 0 )
-      filter_debug( " format output disabled.", false, false, false);
-
-    // copy iff: (copy == true) and (outdir != NO_FORMAT_OUTPUT)
-    if ( copy && (outdir.compare(NO_FORMAT_OUTPUT) != 0) )
+    if ( subdir.compare(NO_FORMAT_OUTPUT) == 0 )
     {
-      // source file
-      bfs::path source( found_file );
+      filter_debug(" format output disabled.", false, false, false);
+      target = location;
+    }
+    else if ( copy )
+    {
+      bfs::path source  = location;
+      bfs::path outpath = get_doxygen_output();
+      bfs::path prefix  = UTIL::get_relative_path(source.parent_path(), outpath, true);
 
-      // target file
-      if ( rid == true ) {
-        // generate rid for target file keeping extension.
-        target = bfs::unique_path( bfs::path("%%%%-%%%%-%%%%-%%%%-%%%%-%%%%") );
-        target += found_file.extension();
-      } else {
-        // found file without a prefixed path.
-        target = found_file.filename();
+      outpath /= subdir;
+      rootoutpath = outpath;
+
+      // set output filename
+      bfs::path outname;
+      if ( rid )
+      { // random output filename.
+        outname  = bfs::unique_path( bfs::path("%%%%-%%%%-%%%%-%%%%-%%%%-%%%%") );
+        outname += source.extension();
+      }
+      else
+      {
+        outname = location.filename();
       }
 
-      // set output directory path
-      bfs::path out_path;
-
-      out_path  = get_doxygen_output();
-      out_path /= outdir;
-
-      bfs::path target_path ( out_path / target );
-      bool copy_target = true;
-
-      filter_debug( " copying to [" + out_path.string() + "]", false, false, false);
-
-      // do not copy if the file exists and has same size.
-      if ( exists(target_path) && is_regular_file(target_path) )
+      // prefix output file with input file prefix
+      if ( get_prefix_scripts() )
       {
-        if ( bfs::file_size( source ) == bfs::file_size( target_path ) )
-        {
-          filter_debug( "  same sized file exists.", false, false, false);
+        filter_debug(" relative prefix [" + prefix.string() + "]", false, false, false);
 
-          copy_target = false;
+        std::string m;
+        if ( UTIL::make_dir(prefix.string(), m, true, outpath.string()) )
+          filter_debug(" " + m, false, false, false);
+
+        outpath /= prefix;
+      }
+
+      // set target path and filename
+      target = outpath / outname.filename();
+
+      filter_debug(" copying to [" + target.string() + "]", false, false, false);
+
+      // skip copy when file of same size exists.
+      bool copy_needed = true;
+      if ( exists(target) && is_regular_file(target) )
+      {
+        if ( bfs::file_size( source ) == bfs::file_size( target ) )
+        {
+          filter_debug("  same sized file exists.", false, false, false);
+
+          copy_needed = false;
         }
         else
         {
-          bfs::remove( target_path );
+          bfs::remove( target );
         }
       }
 
-      if ( copy_target )
+      if ( copy_needed )
       {
-        bfs::copy_file( source, target_path, bfs::copy_option::overwrite_if_exists );
-        filter_debug( " done.", false, false, false);
+        // copy source to target
+        bfs::copy_file( source, target, bfs::copy_option::overwrite_if_exists );
+        filter_debug(" done.", false, false, false);
       }
     }
 
-    // return file name with file extension?
+    // remake target path relative to rootoutpath
+    target = UTIL::get_relative_path(target, rootoutpath, true);
+
+    // return with or without extension
     if ( extension == true )
-      return_file = target.string();
+      reference = target.string();
     else
-      return_file = target.stem().string();
+      reference = target.stem().string();
   }
   else
-  { // file not located, return original reference string.
-    return_file = file;
+  { // file not found.
+    filter_debug(" not found.", false, false, false);
+
+    reference = file;
   }
 
-  filter_debug( " reference [" + return_file + "]", false, true, false);
+  filter_debug(" --> reference [" + reference + "]", false, true, false);
 
-  return( return_file );
+  return( reference );
 }
 
 
