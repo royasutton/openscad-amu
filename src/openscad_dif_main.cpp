@@ -288,7 +288,7 @@ main(int argc, char** argv)
           "Explicit search paths for references.\n")
       ("doxygen-output",
           po::value<string>(&doxygen_output),
-          "Doxygen output rootpath.")
+          "Doxygen output rootpath.\n")
       ("html-output",
           po::value<string>(&html_output)->default_value(html_output),
           "HTML output path.")
@@ -300,7 +300,7 @@ main(int argc, char** argv)
           "Docbook output path.")
       ("rtf-output",
           po::value<string>(&rtf_output)->default_value(rtf_output),
-          "RTF output path.")
+          "RTF output path.\n")
       ("lib-path",
           po::value<string>(&lib_path)->default_value(lib_path),
           "Makefile script library path.\n")
