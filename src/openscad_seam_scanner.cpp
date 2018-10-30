@@ -3,7 +3,7 @@
   \file   openscad_seam_scanner.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2017
+  \date   2016-2018
 
   \copyright
 

@@ -4,7 +4,7 @@
 #   \file   openscad_opts.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2017
+#   \date   2016-2018
 #
 #   \copyright
 #     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
