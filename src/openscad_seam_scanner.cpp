@@ -328,6 +328,12 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
     return;
   }
 
+  // default prefix is empty string (or current directory)
+  string target_prefix;
+
+  if ( prefix_scripts )
+    target_prefix = output_prefix;
+
   string scope_makefile = get_filename( makefile_ext );
   string scope_openscad = get_filename( openscad_ext );
   string mfscript_init = "lib/bootloader.bash";
@@ -349,7 +355,7 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
   output_file << "__LIB_PATH__=\"" << lib_path << "\""
               << " && source \"${__LIB_PATH__}/" << mfscript_init << "\""
               << " || exit 1" << endl
-              << "__PREFIX__=\"" << output_prefix << "\"" << endl
+              << "__PREFIX__=\"" << target_prefix << "\"" << endl
               << "__SOURCE_FILE__=\"" << input_name << "\"" << endl
               << "__SCOPE_FILE__=\"" << scope_openscad << "\"" << endl
               << "__MAKE_FILE__=\"" << scope_makefile << "\"" << endl

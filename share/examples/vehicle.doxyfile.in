@@ -8,15 +8,15 @@ OPTIMIZE_OUTPUT_FOR_C  = YES
 EXTENSION_MAPPING      = scad=C
 WARN_LOGFILE           = doxygen.warn
 INPUT                  = @srcdir@/vehicle.scad
-EXAMPLE_PATH           = "@builddir@"
+EXAMPLE_PATH           = "@builddir@/build"
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = "@builddir@/build/png" \
                          "@builddir@/build/png2eps"
-INPUT_FILTER          = "@top_builddir@/src/openscad-dif \
-                                   --auto-config @builddir@ \
-                                   --html-output html \
-                                   --latex-output latex"
-#                                   --debug-filter \
+INPUT_FILTER           = "@top_builddir@/src/openscad-dif \
+                           --auto-config @builddir@/build \
+                           --html-output html \
+                           --latex-output latex"
+#                           --debug-filter"
 #ENABLED_SECTIONS       = __INCLUDE_FILTER_DEBUG__
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html

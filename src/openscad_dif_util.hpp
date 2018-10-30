@@ -33,6 +33,8 @@
 #ifndef __ODIF_UTIL_HPP__
 #define __ODIF_UTIL_HPP__ 1
 
+#include <boost/filesystem.hpp>
+
 #include <iostream>
 #include <sstream>
 #include <map>
@@ -280,7 +282,7 @@ namespace UTIL{
 
   //! run a system command and capture return result.
   void sys_command( const std::string& command, std::string& result,
-                    bool& good, const bool& standard_error=false,
+                    bool& success, const bool& standard_error=false,
                     const bool& replace_newlines=false);
 
   //! return word number n from string w.
@@ -303,6 +305,17 @@ namespace UTIL{
 
   //! test if a string only contains digits.
   bool is_number(const std::string &s);
+
+  //! return a directory path relative to another.
+  boost::filesystem::path get_relative_path(const boost::filesystem::path &to_path,
+                                            const boost::filesystem::path &from_path,
+                                            const bool parent=false);
+
+  //!make a directory path including all missing parents.
+  bool make_dir(const std::string &d,
+                      std::string &m,
+                const bool &p=false,
+                const std::string &a="");
 
 } /* end namespace UTIL */
 

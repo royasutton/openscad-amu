@@ -123,6 +123,11 @@ class ODIF_Scanner : public yyFlexLexer{
     //! get the vector of include paths.
     std::vector<std::string> get_include_path(void) { return include_path; }
 
+    //! set the doxygen output path.
+    void set_doxygen_output(const std::string& s) { doxygen_output = s; }
+    //! get the doxygen output path.
+    std::string get_doxygen_output(void) { return doxygen_output; }
+
     //! set the html output path.
     void set_html_output(const std::string& s) { html_output = s; }
     //! get the html output path.
@@ -178,6 +183,7 @@ class ODIF_Scanner : public yyFlexLexer{
 
     std::vector<std::string> include_path;  //!< vector of include paths.
 
+    std::string doxygen_output;             //!< doxygen output rootpath.
     std::string html_output;                //!< html output path.
     std::string latex_output;               //!< latex output path.
     std::string docbook_output;             //!< docbook output path.
@@ -279,13 +285,14 @@ class ODIF_Scanner : public yyFlexLexer{
     void filter_debug( const std::string& m, const bool& h=true,
                        const bool& f=true, const bool& s=true);
 
-    //! try to locate a file and copy it to an output directory.
-    std::string file_rl( const std::string& file, const std::string& outdir,
+    //! try to locate a file and copy it to an output subdirectory.
+    std::string file_rl( const std::string& file, const std::string& subdir,
                          bool& found, const bool& extension=true,
                          const bool& copy=true, const bool& rid=false);
 
 
-    // built-in amu functions
+    // built-in amu functions (bif)
+    // see: openscad_dif_scanner_bif.cpp
     //! evaluate and output the function arguments.
     std::string bif_eval(void);
     //! execute a shell command and output its results.

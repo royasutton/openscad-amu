@@ -46,7 +46,7 @@
   \section overview Overview
 
     The primary purpose of this example is to demonstrate how these
-    utilities ([openscad-amu] (https://github.com/royasutton/openscad-amu))
+    utilities ([openscad-amu] (https://royasutton.github.io/openscad-amu))
     may be used to script target generation, such as configured
     implementations, rendered examples, or test cases, and
     extract documentation from commented OpenSCAD designs. The file
@@ -96,8 +96,21 @@
 
   \section views Views
 
+    \htmlonly
+      \amu_image_table
+      (
+        f=html c=2 iw=320
+        t="Generated GIF Animations"
+        cdl="animate_move.gif animate_rotate.gif"
+        ctl="Move^Rotate"
+        ccl="Move^Rotate"
+        chl="Column (1)^Column (2)"
+        cul="animate_move.gif animate_rotate.gif"
+      )
+    \endhtmlonly
+
     \amu_define  theadt ( View from all angles. )
-    \amu_shell   ifurls ( "yes 'https://github.com/royasutton/openscad-amu^' | head -6" )
+    \amu_shell   ifurls ( "yes 'https://royasutton.github.io/openscad-amu^' | head -6" )
     \amu_shell   count6 ( "seq -f '(%g)' -s '^' 6" )
     \amu_combine ititle ( j=" " f="^" t=";" p="Viewed from the" "front.;right side.;left side.;top.;bottom.;back." )
     \amu_combine hfiles ( p="vehicle_test" suffix=".png" "car" "12" "green" "left front back top bottom right" "320x240" )
@@ -213,8 +226,8 @@
     for mechanical designs. Running \c make on the designs' makefile, updates all
     scripted tests and documentation.
 
-  \note There are also UNIX man page documentation that has been generated
-        via Doxygen. It can be found at: <tt>\@builddir\@/share/examples/build/man</tt>.
+  \note UNIX man page documentation has been generated and can be found at:
+        <tt><source-build-dir>/share/examples/build/man</tt>.
 
   \todo Improve the vehicle window detail.
   \todo Fix all the typos and spelling mistakes.
@@ -231,11 +244,11 @@
 //! Parameterized wheel model.
 /***************************************************************************//**
 
-  \param diameter   <integer> wheel rim diameter size in inches.
-  \param width      <integer> wheel width in inches.
-  \param wallheight <integer> wheel size tire wall height.
-  \param tirecolor  <string> wire color.
-  \param rimcolor   <string> rim color.
+  \param diameter   \<integer> wheel rim diameter size in inches.
+  \param width      \<integer> wheel width in inches.
+  \param wallheight \<integer> wheel size tire wall height.
+  \param tirecolor  \<string> wire color.
+  \param rimcolor   \<string> rim color.
 
   \details
 
@@ -278,8 +291,8 @@ module wheel( diameter=15, width=7, wallheight=6, tirecolor="black", rimcolor="w
 //! Parameterized vehicle cabin design module.
 /***************************************************************************//**
 
-  \param size       <integer[x, y, z]> Overall size of cabin
-  \param cabcolor   <string>  Color for vehicle cabin.
+  \param size       \<integer[x, y, z]> Overall size of cabin
+  \param cabcolor   \<string>  Color for vehicle cabin.
 
   \details
     For a complete list of color names see the World Wide Web consortium's
@@ -297,13 +310,13 @@ module cabin( size, cabcolor ) {
 //! Parameterized vehicle design module.
 /***************************************************************************//**
 
-  \param type       <string>  Type of vehicle desired. One of {car, truck, van}.
-  \param bodycolor  <string>  Color for body of vehicle.
-  \param cabcolor   <string>  Color for vehicle cabin.
-  \param width      <integer> Overall width of vehicle in inches.
-  \param height     <integer> Overall height of vehicle in inches.
-  \param length     <integer> Overall length of vehicle in inches.
-  \param wheels     <integer> Vehicle rim diameter in inches.
+  \param type       \<string>  Type of vehicle desired. One of {car, truck, van}.
+  \param bodycolor  \<string>  Color for body of vehicle.
+  \param cabcolor   \<string>  Color for vehicle cabin.
+  \param width      \<integer> Overall width of vehicle in inches.
+  \param height     \<integer> Overall height of vehicle in inches.
+  \param length     \<integer> Overall length of vehicle in inches.
+  \param wheels     \<integer> Vehicle rim diameter in inches.
 
   \details
     For a complete list of color names see the World Wide Web consortium's
@@ -438,7 +451,6 @@ Begin_Scope document;
 
     variables
       set_Makefile "${__MAKE_FILE__}"  add_Depend "${__MAKE_FILE__}"
-      add_Depend "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
       set_Source "${__SCOPE_FILE__}"   set_Prefix "${__PREFIX__}"
 
       set_Ext "png"
@@ -448,7 +460,7 @@ Begin_Scope document;
 
     script
       Begin_Makefile
-        Include "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
+        Include_Copy "${__AMU_INCLUDE_PATH__}/parallel_jobs.mk"
         Summary  Tables  Targets  Menu
       End_Makefile;
 

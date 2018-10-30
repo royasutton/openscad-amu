@@ -47,6 +47,7 @@ pdf-local: examples.stamp doxygen.stamp build/latex/refman.pdf
 
 man-local: examples.stamp
 
+# examples.stamp
 CLEANFILES = \
 	examples.stamp
 
@@ -57,14 +58,16 @@ examples.stamp: \
 		hello_world.makefile \
 		log_segregate.makefile \
 		\
-		vehicle_document.stamp \
-		vehicle_test.stamp \
-		animate_move.makefile \
-		animate_rotate.makefile \
+		build/vehicle_document.stamp \
+		build/vehicle_test.stamp \
+		\
+		build/png/animate_move.gif \
+		build/png/animate_rotate.gif \
 		\
 		doxygen.stamp
 	touch $@
 
+# embedding_scheme.scripts
 CLEANFILES += \
 	embedding_scheme.scripts
 
@@ -72,6 +75,7 @@ embedding_scheme.scripts: $(srcdir)/embedding_scheme.scad $(openscad_seam)
 	$(openscad_seam) --mode count  --joiner=- --input $< --scope root --verbose \
 		> embedding_scheme.scripts
 
+# *.bash --> *.makefile
 CLEANFILES += \
 	convert.makefile \
 	hello_world.makefile \
@@ -80,53 +84,72 @@ CLEANFILES += \
 .bash.makefile:
 	$(BASH_PATH) --norc --noprofile $<
 
+# build directory
+build: ; mkdir -v build
+
+# animate_move.gif, animate_rotate.gif
 CLEANFILES += \
-	vehicle_document.stamp \
-	vehicle_test.stamp \
-	animate_move.stamp \
-	animate_rotate.stamp
+	build/png/animate_move.gif \
+	build/png/animate_rotate.gif
+
+build/png/animate_move.gif: build/animate_move.stamp
+	convert -verbose -resize 320x240 -delay 2 -loop 0 \
+		build/png/animate_move_*.png $@
+
+build/png/animate_rotate.gif: build/animate_rotate.stamp
+	convert -verbose -resize 320x240 -delay 2 -loop 0 \
+		build/png/animate_rotate_*.png $@
+
+# *.makefile --> *.stamp
+CLEANFILES += \
+	build/vehicle_document.stamp \
+	build/vehicle_test.stamp \
+	\
+	build/animate_move.stamp \
+	build/animate_rotate.stamp
 
 .makefile.stamp:
 	OPENSCADPATH=${srcdir} \
 	make -f $< all
 	touch $@
 
-build: ; mkdir -v build
-
+# vehicle_document.{scad,bash}, vehicle_test.{scad,bash}
 CLEANFILES += \
-	vehicle_document.scad \
-	vehicle_document.bash \
-	vehicle_test.scad \
-	vehicle_test.bash \
-	vehicle.conf
+	build/vehicle_document.scad \
+	build/vehicle_document.bash \
+	build/vehicle_test.scad \
+	build/vehicle_test.bash \
+	build/vehicle.conf
 
-vehicle_document.makefile \
-vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
+build/vehicle_document.makefile \
+build/vehicle_test.makefile: $(srcdir)/vehicle.scad $(openscad_seam) | build
 	$(openscad_seam) \
 		--input $< \
-		--prefix build --prefix-ipp 0 --prefix-scripts no \
+		--prefix build --prefix-ipp 0 --prefix-scripts yes \
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
 		--write-config yes \
 		--verbose
 
+# animate_move.{scad,bash}, animate_rotate.{scad,bash}
 CLEANFILES += \
-	animate_move.scad \
-	animate_move.bash \
-	animate_rotate.scad \
-	animate_rotate.bash \
-	animate.conf
+	build/animate_move.scad \
+	build/animate_move.bash \
+	build/animate_rotate.scad \
+	build/animate_rotate.bash \
+	build/animate.conf
 
-animate_move.makefile \
-animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
+build/animate_move.makefile \
+build/animate_rotate.makefile: $(srcdir)/animate.scad $(openscad_seam) | build
 	$(openscad_seam) \
 		--input $< \
-		--prefix build --prefix-ipp 0 --prefix-scripts no \
+		--prefix build --prefix-ipp 0 --prefix-scripts yes \
 		--comments yes --show no --run yes --make no \
 		--lib-path $(top_srcdir)/share \
 		--write-config yes \
 		--verbose
 
+# doxygen.stamp
 CLEANFILES += \
 	doxygen.stamp \
 	doxygen.tagfile \
@@ -142,14 +165,16 @@ doxygen.stamp: vehicle.doxyfile Makefile $(srcdir)/vehicle.scad
 '$(install_path)': ; $(MKDIR_P) -v '$(install_path)'
 install-data-local: $(files_am) | '$(install_path)'
 	( cd ${srcdir} && \
-		for f in $(files); do \
-			$(INSTALL_DATA) $$f '$(install_path)' \
-		; done \
+		for f in $(files); \
+		do \
+			$(INSTALL_DATA) $$f '$(install_path)' ; \
+		done \
 	) && \
 	( cd ${builddir} && \
-		for f in $(files_am); do \
-			$(INSTALL_SCRIPT) $$f '$(install_path)' \
-		; done \
+		for f in $(files_am); \
+		do \
+			$(INSTALL_SCRIPT) $$f '$(install_path)' ; \
+		done \
 	)
 
 install-docs-local: install-html-local
@@ -167,21 +192,23 @@ install-man-local: man-local | '$(install_path_man)'
 	( cd build && cp -av man/* '$(install_path_man)' )
 
 uninstall-local:
-	for f in $(files) $(files_am); do \
-		rm -fv "$(install_path)/$$f" \
-	; done
+	for f in $(files) $(files_am); \
+	do \
+		rm -fv "$(install_path)/$$f" ; \
+	done
 	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
 
 clean-local:
-	-make -f vehicle_document.makefile clean
-	-rm -fv vehicle_document.makefile
-	-make -f vehicle_test.makefile clean
-	-rm -fv vehicle_test.makefile
-	-make -f animate_move.makefile clean
-	-rm -fv animate_move.makefile
-	-make -f animate_rotate.makefile clean
-	-rm -fv animate_rotate.makefile
+	-for f in \
+		vehicle_document.makefile \
+		vehicle_test.makefile \
+		animate_move.makefile \
+		animate_rotate.makefile ; \
+	do \
+		make -f build/$$f clean ; \
+		rm -fv build/$$f ; \
+	done
 	-rm -rfv build/html build/latex build/man
 	-test -d build && rmdir -v build
 

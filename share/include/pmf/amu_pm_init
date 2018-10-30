@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2017 Roy Allen Sutton
+#  Copyright (C) 2016-2018 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -137,6 +137,7 @@ $(this_guard) := $(notdir $(this_file))
 
   $(call amu_pm_m,include [$($(this_guard))])
 
+	# components
 	amu_pm_init_components := \
 		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX),$(AMU_PM_DESIGN_FLOW), \
 			base $(AMU_PM_COMPONENTS), \
@@ -145,6 +146,17 @@ $(this_guard) := $(notdir $(this_file))
   $(foreach x, $(amu_pm_init_components), \
       $(call amu_pm_m,include [$x]) \
       $(eval include $(AMU_PM_PREFIX)$x) \
+  )
+
+	# local components
+	amu_pm_init_components_local := \
+		$(strip $(call AMU_PM_GET_COMPONENTS,,$(AMU_PM_COMPONENTS_LOCAL_PATH)/, \
+			$(AMU_PM_COMPONENTS_LOCAL), \
+			constants functions system defaults))
+
+  $(foreach x, $(amu_pm_init_components_local), \
+      $(call amu_pm_m,include [$x]) \
+      $(eval include $x) \
   )
 
 	#------------------------------------------------------------------------------#
@@ -163,6 +175,9 @@ $(this_guard) := $(notdir $(this_file))
 		AMU_PM_DESIGN_FLOW \
 		AMU_PM_COMPONENTS \
 		AMU_PM_COMPONENTS_ADD \
+		\
+		AMU_PM_COMPONENTS_LOCAL \
+		AMU_PM_COMPONENTS_LOCAL_PATH \
 		\
 		AMU_PM_VERBOSE \
 		AMU_PM_DEBUG

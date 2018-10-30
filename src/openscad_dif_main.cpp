@@ -35,8 +35,6 @@
         HTML_EXTRA_FILES.
   \todo add option to create a histogram/map of amu command that exists
         in the input file.
-  \todo support --auto-config='auto-config'. When specified as such, the
-         auto configuration path is set to the path of the input file.
 
   \ingroup openscad_dif_src
 *******************************************************************************/
@@ -174,6 +172,71 @@ debug_m(const bool& output, const string& message, const bool& newline=true)
 }
 
 
+//! search for configuration file for given input file.
+bool
+find_config(
+  const string input,
+  const string auto_config,
+  string& config,
+  const bool debug_filter)
+{
+  path input_path ( input );
+  path input_path_abs ( input_path.parent_path() );
+  path input_path_rel;
+  path config_name ( input_path.stem() );
+
+  input_path_rel = UTIL::get_relative_path(input_path_abs, current_path());
+  config_name += ".conf";
+
+  debug_m(debug_filter, "         input file: [" + input + "]");
+  debug_m(debug_filter, "   auto config path: [" + auto_config + "]");
+  debug_m(debug_filter, " target config name: [" + config_name.string() + "]");
+  debug_m(debug_filter, "       current path: [" + current_path().string() + "]");
+  debug_m(debug_filter, "absolute input path: [" + input_path_abs.string() + "]");
+  debug_m(debug_filter, "relative input path: [" + input_path_rel.string() + "]");
+
+  vector<path> try_paths;
+
+  // search order:
+  // (1) <auto-config-path>
+  // (2) <auto-config-path>/<relative-input-path>
+  // (3) <auto-config-path>/<absolute-input-path>
+  // (4) <relative-input-path>
+  // (5) <absolute-input-path>
+  // (6) <./>
+
+  try_paths.push_back( path(auto_config) );
+  try_paths.push_back( path(auto_config) / input_path_rel );
+  try_paths.push_back( path(auto_config) / input_path_abs.relative_path() );
+  try_paths.push_back( input_path_rel );
+  try_paths.push_back( input_path_abs );
+  try_paths.push_back( "." );
+
+  debug_m(debug_filter, "searching for configuration file.");
+
+  bool found = false;
+
+  for(
+    vector<path>::iterator it = try_paths.begin();
+    (found == false) && (it != try_paths.end());
+    ++it
+  )
+  {
+      path try_file ( *it / config_name );
+
+      debug_m(debug_filter, "  trying: [" + try_file.string() + "]");
+
+      if ( exists(try_file) && is_regular_file(try_file) )
+      {
+        config = try_file.string();
+        found = true;
+      }
+  }
+
+  return found;
+}
+
+
 //! program main.
 int
 main(int argc, char** argv)
@@ -189,6 +252,7 @@ main(int argc, char** argv)
     string input;
     bool search           = true;
     vector<string> include_path;
+    string doxygen_output;
     string html_output    = ODIF::NO_FORMAT_OUTPUT;
     string latex_output   = ODIF::NO_FORMAT_OUTPUT;
     string docbook_output = ODIF::NO_FORMAT_OUTPUT;
@@ -215,60 +279,47 @@ main(int argc, char** argv)
     opts_cli.add_options()
       ("input,i",
           po::value<string>(&input)->required(),
-          "Input file containing annotated script(s) embedded within "
-          "comments.\n")
+          "Input source file name.\n")
       ("search,s",
           po::value<bool>(&search)->default_value(search),
-          "Search makefile target output directories for files referenced "
-          "by the filter functions.")
+          "Search make targets for references.")
       ("include-path,I",
           po::value<vector<string> >(&include_path),
-          "One or more directories to search for files references.\n")
+          "Explicit search paths for references.\n")
+      ("doxygen-output",
+          po::value<string>(&doxygen_output),
+          "Doxygen output rootpath.")
       ("html-output",
           po::value<string>(&html_output)->default_value(html_output),
-          string(
-            "Directory where filter will copy HTML documents "
-            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
-          ).c_str())
+          "HTML output path.")
       ("latex-output",
           po::value<string>(&latex_output)->default_value(latex_output),
-          string(
-            "Directory where filter will copy Latex documents "
-            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
-          ).c_str())
+          "Latex output path.")
       ("docbook-output",
           po::value<string>(&docbook_output)->default_value(docbook_output),
-          string(
-            "Directory where filter will copy Docbook documents "
-            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
-          ).c_str())
+          "Docbook output path.")
       ("rtf-output",
           po::value<string>(&rtf_output)->default_value(rtf_output),
-          string(
-            "Directory where filter will copy RTF documents "
-            "(" + ODIF::NO_FORMAT_OUTPUT + " disables output)."
-          ).c_str())
+          "RTF output path.")
       ("lib-path",
           po::value<string>(&lib_path)->default_value(lib_path),
           "Makefile script library path.\n")
       ("auto-config,a",
           po::value<string>(&auto_config),
-          "Auto configuration path. When specified, this path is checked "
-          "for a configuration file for the specified input file and read "
-          "if it exists.")
+          "Filter Auto configuration path.")
       ("config,c",
           po::value<string>(&config),
-          "Configuration file with one or more option value pairs.\n")
+          "Read configuration file.\n")
       ("debug-scanner",
           "Run scanner in debug mode.")
       ("debug-filter",
           "Turn on filter debugging output.\n")
       ("verbose,V",
-          "Provide verbose help or version output.")
+          "Run in version mode.")
       ("version,v",
           "Report tool version.")
       ("help,h",
-          "Print this help messages.")
+          "Print this help message.")
     ;
 
     po::options_description opts_conf("Options (hidden)");
@@ -322,9 +373,9 @@ main(int argc, char** argv)
         cout << command_name << " " << PACKAGE_VERSION << endl
              << endl
              <<
-  "Doxygen input filter for OpenSCAD source files. Can be used in conjunction\n"
-  "with Doxygen tags INPUT_FILTER and FILTER_*.\n"
-
+  "OpenSCAD source script Doxygen input filter (dif).\n\n"
+  "An OpenSCAD design scripts preprocesspr input filter for the Doxygen\n"
+  "documentation generaton tool.\n"
              << endl
              << "Examples:" << endl
              << "  INPUT_FILTER = <prefix>/bin/" << command_name << endl
@@ -369,23 +420,15 @@ main(int argc, char** argv)
         input = vm["input"].as<string>();
         auto_config = vm["auto-config"].as<string>();
 
-        debug_m( debug_filter, "attempting auto-configuration with path: ["
-                                + auto_config + "]");
-
-        path input_path ( input );
-        path conf_path ( auto_config );
-
-        conf_path /= input_path.stem();
-        conf_path += ".conf";
-
-        if ( exists(conf_path) && is_regular_file(conf_path) )
+        debug_m(debug_filter, "attempting auto-configuration");
+        if ( find_config(input, auto_config, config, debug_filter) )
         {
-          debug_m( debug_filter, "configuration found: [" + conf_path.string() + "]");
+          debug_m(debug_filter, "configuration found.");
 
           // insert configuration file name into variable map to be parsed later.
-          vm.insert( make_pair("config", po::variable_value(conf_path.string(), true)) );
+          vm.insert( make_pair("config", po::variable_value(config, true)) );
         } else {
-          debug_m( debug_filter, "configuration file not found." );
+          debug_m(debug_filter, "configuration not found.");
         }
       }
 
@@ -396,7 +439,7 @@ main(int argc, char** argv)
         // get values from variable map directly.
         config = vm["config"].as<string>();
 
-        debug_m( debug_filter, "reading configuration file: [" + config + "]");
+        debug_m(debug_filter, "reading configuration file: [" + config + "]");
 
         std::ifstream config_file ( config.c_str() );
 
@@ -432,6 +475,16 @@ main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
      option_depend( vm, "verbose", "version");
 
+    // set doxygen-output when not specified for backwards compatibility
+    if ( !vm.count("doxygen-output") )
+    {
+      debug_m(debug_filter, "doxygen-output not specified, setting to"
+                            " output-prefix=[" + output_prefix + "]");
+
+      doxygen_output = output_prefix;
+      vm.insert( make_pair("doxygen-output", po::variable_value(doxygen_output, true)) );
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////
     // include-path auto-configuration
@@ -442,15 +495,9 @@ main(int argc, char** argv)
     {
       debug_m(debug_filter, "auto-search: configuring include paths.");
 
-      string first_include_path;
-      if ( auto_config.compare(".") && auto_config.length() )
-        first_include_path = auto_config;
-      else
-        first_include_path = ".";
-
-      debug_m(debug_filter, "inserting [" + first_include_path + "] as first include path.");
-      include_path.insert(include_path.begin(), first_include_path);
-
+      //
+      // add target directories for for each scope
+      //
       debug_m(debug_filter, "checking each scope for generated makefile:");
 
       map<string,string> path_map;
@@ -467,8 +514,13 @@ main(int argc, char** argv)
 
         path makefile_path;
 
-        // handle configuration prefix if not current directory (or empty)
-        if ( auto_config.compare(".") && auto_config.length() )
+        // identify path prefix to makefile
+        if ( prefix_scripts )
+        {
+          makefile_path /= output_prefix;
+          opts += " --directory=" + output_prefix;
+        }
+        else if ( auto_config.length() )
         {
           makefile_path /= auto_config;
           opts += " --directory=" + auto_config;
@@ -482,7 +534,7 @@ main(int argc, char** argv)
 
         debug_m(debug_filter, "scope: " + scope_name);
 
-        // does makefile exists?
+        // when makefile exists
         if ( exists(makefile_path) && is_regular_file(makefile_path) )
         {
           debug_m(debug_filter, "  makefile [" + makefile_path.string() + "] exists");
@@ -500,7 +552,7 @@ main(int argc, char** argv)
 
           if ( good )
           {
-            debug_m(debug_filter, "   result: " + result, false );
+            debug_m(debug_filter, "   result: " + result, true );
           }
           else
           {
@@ -540,12 +592,30 @@ main(int argc, char** argv)
         }
       }
 
-      // add directories in map to include path
+      // add unique directories in map to include path
       debug_m(debug_filter, "adding unique directories to include-path:");
       for( map<string,string>::iterator mit=path_map.begin(); mit != path_map.end(); ++mit)
       {
-        include_path.push_back( mit->second );
         debug_m(debug_filter, "adding [" + mit->second + "]");
+        include_path.push_back( mit->second );
+      }
+
+      // add default include paths
+      if ( prefix_scripts )
+      {
+        debug_m(debug_filter, "adding [" + output_prefix + "] (prefix default)");
+        include_path.push_back( output_prefix );
+      }
+
+      if ( auto_config.length() )
+      {
+        debug_m(debug_filter, "adding [" + auto_config + "] (auto-config default)");
+        include_path.push_back( auto_config );
+      }
+      else
+      {
+        debug_m(debug_filter, "adding [.] (manual-config default)");
+        include_path.push_back( "." );
       }
 
       // insert discovered paths into a new program option identifier.
@@ -609,6 +679,7 @@ main(int argc, char** argv)
 
     // command line
     scanner.set_include_path( include_path );
+    scanner.set_doxygen_output( doxygen_output );
     scanner.set_html_output( html_output );
     scanner.set_latex_output( latex_output );
     scanner.set_docbook_output( docbook_output );

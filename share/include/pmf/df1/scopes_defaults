@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2017 Roy Allen Sutton
+#  Copyright (C) 2016-2018 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -31,7 +31,9 @@
 # AMU_TOOL_VERSION := v1.0
 
 # prefix output path to auxiliary scope scripts
-prefix_scopes_scripts                   := $(true)
+prefix_scopes_output_path               := $(true)
+prefix_scopes_output_prefix             := $(true)
+prefix_scopes_input_prefix              := $(false)
 
 # add scope output to release directory/archive
 release_scopes                          := $(false)
@@ -43,6 +45,9 @@ verbose_seam_show                       := $(false)
 
 # debugging
 debug_seam_scanner                      := $(false)
+
+# output prefix
+scopes_output_prefix                    := scopes/
 
 # scope joiner
 scopes_joiner                           := _
@@ -67,7 +72,9 @@ scad_lib_path_add                       :=
 #------------------------------------------------------------------------------#
 
 scopes_control_variables := \
-  prefix_scopes_scripts \
+  prefix_scopes_output_path \
+  prefix_scopes_output_prefix \
+  prefix_scopes_input_prefix \
   \
   release_scopes \
   release_archive_scopes \

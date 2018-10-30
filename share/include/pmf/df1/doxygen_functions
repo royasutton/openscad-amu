@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2017 Roy Allen Sutton
+#  Copyright (C) 2016-2018 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -25,6 +25,19 @@
 ################################################################################
 # Functions
 ################################################################################
+
+#------------------------------------------------------------------------------#
+#  General
+#------------------------------------------------------------------------------#
+
+# doxygen_output_path (empty)
+# returns output directory for current configuration.
+define doxygen_output_path
+$(amu_pm_d0)$(call join_with,$(empty),
+  $(if $(call bool_decode,$(prefix_doxygen_output_path)),$(output_path))
+  $(if $(call bool_decode,$(prefix_doxygen_output_prefix)),$(doxygen_output_prefix))
+)
+endef
 
 #------------------------------------------------------------------------------#
 # Documentation Index: HTML

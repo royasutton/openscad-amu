@@ -13,7 +13,7 @@
    \enddot
 
     A _framework_ and tools for automating the compilation of
-    [OpenSCAD] designs with a _pre-processor_ that allows
+    [OpenSCAD] designs with a _preprocessor_ that allows
     <i><b>*.scad</b></i> to be documented using [Doxygen].
 
 
@@ -27,7 +27,7 @@
     collection of C++ \ref programs "programs", a makefile script \ref
     mslibrary "library", and support \ref scripts "scripts" for
     automating the compilation of [OpenSCAD] designs with a
-    _pre-processor_ that allows <i><b>*.scad</b></i> to be documented
+    _preprocessor_ that allows <i><b>*.scad</b></i> to be documented
     using [Doxygen]. The embedded build scripts are extracted at
     compile-time to construct [Makefiles] that manage design
     compilation. It provides source code input-filters that extend
@@ -59,9 +59,8 @@
     <tt>(*.png, *.stl, etc.)</tt> and assembles the library
     documentation. [openscad-amu] brings together several widely-used
     tools to automate the production of [OpenSCAD] design targets and
-    the design documentation in various output formats
-    <a href="../../../examples/build/html/index.html">(HTML)</a>
-    <a href="../../../examples/build/latex/refman.pdf">(PDF)</a>.
+    the design documentation in various output formats ([HTML][html-example])
+    (PDF).
 
     \note The PDF version of this example documentation is not built by
     default. To build it, go the the <tt>../build/latex directory</tt>
@@ -102,6 +101,9 @@
 
   [Doxygen]: http://www.stack.nl/~dimitri/doxygen/index.html
   [special commands]: http://www.stack.nl/~dimitri/doxygen/manual/commands.html
+
+  [html-example]: ../../../examples/build/html/index.html
+  [pdf-example]: ../../../examples/build/latex/refman.pdf
 ###############################################################################/
 
 
