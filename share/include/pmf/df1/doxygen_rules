@@ -82,6 +82,7 @@ clean-doxygen:
 			$(if $(generate_man),$(man_output)) \
 	))
 	-$(if $(doxygen_output_path),$(rmdir_p) $(doxygen_output_path))
+	$(call target_end)
 
 #------------------------------------------------------------------------------#
 # Install / Uninstall Targets

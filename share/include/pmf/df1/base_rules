@@ -79,6 +79,7 @@ install-library: | $(install_prefix_scad) $(install_prefix_scad)$(library_instal
 		) \
 		)$(newline)\
 	)
+	$(call target_end)
 
 .PHONY: uninstall-library
 uninstall-library:
@@ -98,6 +99,7 @@ uninstall-library:
 		) \
 	)
 	-(cd $(install_prefix_scad) && $(rmdir_p) $(library_install_subdir))
+	$(call target_end)
 
 # create install directories
 $(install_prefix_scad): ; $(mkdir_p) $@
@@ -208,6 +210,7 @@ release: all $(release_stamp)
 	$(if $(call bool_decode,$(write_release_stamp)), \
 		$(call execute_command, $(ls_l) $(release_stamp) $(release_path)) \
 	)
+	$(call target_end)
 
 # copy files and create stamp
 $(release_stamp): $(release_files) \
@@ -275,7 +278,7 @@ help: | silent
 		$(info [ $x ]) $(info $(empty)) \
 		$(info $(help_text_$x)) $(info $(empty)) \
 	)
-	$(call horizontal_bar)
+	$(call target_end)
 
 ################################################################################
 # eof
