@@ -56,9 +56,9 @@ scopes_targetsdir = \
 # returns output file path prefix using current design flow configuration.
 define scopes_target_path
 $(amu_pm_d1)$(call join_with,$(empty),
-  $(if $(call bool_decode,$(prefix_scopes_scripts_output_path)),$(output_path))
-  $(if $(call bool_decode,$(prefix_scopes_scripts_output_prefix)),$(scopes_scripts_output_prefix))
-  $(if $(call bool_decode,$(prefix_scopes_scripts_input_path)),$(dir $1))
+  $(if $(call bool_decode,$(prefix_scopes_output_path)),$(output_path))
+  $(if $(call bool_decode,$(prefix_scopes_output_prefix)),$(scopes_output_prefix))
+  $(if $(call bool_decode,$(prefix_scopes_input_prefix)),$(dir $1))
 )
 endef
 

@@ -35,7 +35,7 @@
 define doxygen_output_path
 $(amu_pm_d0)$(call join_with,$(empty),
   $(if $(call bool_decode,$(prefix_doxygen_output_path)),$(output_path))
-  $(if $(call bool_decode,$(prefix_doxygen_output_prefix_path)),$(doxygen_output_prefix))
+  $(if $(call bool_decode,$(prefix_doxygen_output_prefix)),$(doxygen_output_prefix))
 )
 endef
 

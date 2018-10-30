@@ -43,16 +43,16 @@ openscad_seam_opts2 := \
   $(strip \
     $(if $(call scopes_target_path,$(empty)), \
       --prefix $(call scopes_target_path,$(empty)) \
-      $(if $(call bool_decode,$(prefix_scopes_scripts_input_path)),$(empty), \
+      $(if $(call bool_decode,$(prefix_scopes_input_prefix)),$(empty), \
         --prefix-ipp 0 \
       ) \
     ) \
     --prefix-scripts \
       $(if \
         $(or \
-          $(call bool_decode,$(prefix_scopes_scripts_input_path)), \
-          $(call bool_decode,$(prefix_scopes_scripts_output_prefix)), \
-          $(call bool_decode,$(prefix_scopes_scripts_output_path)) \
+          $(call bool_decode,$(prefix_scopes_input_prefix)), \
+          $(call bool_decode,$(prefix_scopes_output_prefix)), \
+          $(call bool_decode,$(prefix_scopes_output_path)) \
         ) \
       ,yes,no) \
     $(if $(seam_defines),$(addprefix --define$(space),$(seam_defines))) \
@@ -141,7 +141,7 @@ endif
 #------------------------------------------------------------------------------#
 
 scopes_config_variables := \
-  scopes_scripts_output_prefix \
+  scopes_output_prefix \
   \
   scopes_joiner \
   \
