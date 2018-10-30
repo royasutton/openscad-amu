@@ -55,6 +55,11 @@ $(foreach s,\
 all-scopes:	$(scopes_stamp)
 	$(call target_end)
 
+# create target directories (iff not empty)
+ifneq ($(scopes_output_directories),$(empty))
+$(scopes_output_directories): ; $(mkdir_p) $@
+endif
+
 #------------------------------------------------------------------------------#
 # Clean Targets
 #------------------------------------------------------------------------------#
@@ -64,6 +69,7 @@ clean-scopes: $(scopes_mf)
 	$(call target_begin)
 	-list='$^'; for i in $$list ; do $(path_gnumake) -f $$i clean ; done
 	-$(rm_f) $(scopes_clean_files)
+	-$(if $(scopes_output_directories),$(rmdir_p) $(scopes_output_directories))
 
 #------------------------------------------------------------------------------#
 # Install / Uninstall Targets
@@ -94,6 +100,7 @@ info-scopes: | silent
 		scopes_mfs \
 		scopes_mf \
 		scopes_stamp \
+		scopes_output_directories \
 	,$(call enumerate_variable,$x,$(false),$(false)))
 
 ################################################################################

@@ -62,6 +62,11 @@ $(latex_stamp): $(doxygen_stamp)
 	( cd $(doxygen_output_path)$(latex_output) && make ) \
 	&& $(touch) $(latex_stamp)
 
+# create target directories (iff not empty)
+ifneq ($(doxygen_output_path),$(empty))
+$(doxygen_output_path): ; $(mkdir_p) $@
+endif
+
 #------------------------------------------------------------------------------#
 # Clean Targets
 #------------------------------------------------------------------------------#
@@ -69,14 +74,14 @@ $(latex_stamp): $(doxygen_stamp)
 .PHONY: clean-doxygen
 clean-doxygen:
 	$(call target_begin)
-	-@$(test) -d $(doxygen_output_path) && \
-	$(rm_f) $(doxygen_clean_files) && \
-	( cd $(doxygen_output_path) && \
+	-$(rm_f) $(doxygen_clean_files)
+	-($(strip $(if $(doxygen_output_path),cd $(doxygen_output_path) &&) \
 		$(rm_rf) \
 			$(if $(generate_html),$(html_output)) \
 			$(if $(generate_latex),$(latex_output)) \
 			$(if $(generate_man),$(man_output)) \
-	)
+	))
+	-$(if $(doxygen_output_path),$(rmdir_p) $(doxygen_output_path))
 
 #------------------------------------------------------------------------------#
 # Install / Uninstall Targets
@@ -116,7 +121,8 @@ install-doxygen-update-html-index: | $(install_prefix_html)$(docs_install_id)
 	$(call doxygen_index_write_info,$(install_prefix_html),$(docs_install_id))
 	$(call doxygen_index_html_update,$(install_prefix_html))
 
-# create install directory
+# create install directories
+$(install_prefix_html): ; $(mkdir_p) $@
 $(install_prefix_html)$(docs_install_id): ; $(mkdir_p) $@
 
 # uninstall ordering
@@ -165,7 +171,8 @@ install-doxygen-update-pdf-index: | $(install_prefix_pdf)$(docs_install_id)
 	$(call doxygen_index_write_info,$(install_prefix_pdf),$(docs_install_id))
 	$(call doxygen_index_pdf_update,$(install_prefix_pdf))
 
-# create install directory
+# create install directories
+$(install_prefix_pdf): ; $(mkdir_p) $@
 $(install_prefix_pdf)$(docs_install_id): ; $(mkdir_p) $@
 
 # uninstall ordering
@@ -196,7 +203,6 @@ uninstall-doxygen: uninstall-doxygen-man
 
 install-doxygen-man: $(doxygen_stamp) | $(install_prefix_man) $(install_prefix_man)$(man_subdir)
 	$(call target_begin)
-	$(mkdir_p) $(install_prefix_man)$(man_subdir)
 	$(foreach f, \
 		$(wildcard $(doxygen_output_path)$(man_output)$(dir_level_sep)$(man_subdir)$(dir_level_sep)*), \
 		$(call execute_command, \
@@ -206,6 +212,8 @@ install-doxygen-man: $(doxygen_stamp) | $(install_prefix_man) $(install_prefix_m
 		) \
 	)
 
+# create install directories
+$(install_prefix_man): ; $(mkdir_p) $@
 $(install_prefix_man)$(man_subdir): ; $(mkdir_p) $@
 
 uninstall-doxygen-man: $(doxygen_stamp)

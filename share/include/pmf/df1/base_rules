@@ -34,22 +34,13 @@
 all: $(addprefix all-,$(AMU_PM_COMPONENTS))
 	$(call target_end)
 
-# output directory path
-$(output_path): ; $(mkdir_p) $@
-
 #------------------------------------------------------------------------------#
 # Clean Targets
 #------------------------------------------------------------------------------#
 
 .PHONY: clean
-clean: $(addprefix clean-,$(AMU_PM_COMPONENTS) base)
+clean: $(addprefix clean-,$(AMU_PM_COMPONENTS))
 	$(call target_end)
-
-.PHONY: clean-base
-clean-base:
-	$(call target_begin)
-	-@$(test) -d $(output_path) && \
-	$(rmdir) $(output_path)
 
 #------------------------------------------------------------------------------#
 # Install / Uninstall Targets
@@ -64,9 +55,8 @@ uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS) $(if $(strip $(library_fi
 	$(call target_end)
 
 .PHONY: install-library
-install-library: | $(install_prefix_scad)
+install-library: | $(install_prefix_scad) $(install_prefix_scad)$(library_install_subdir)
 	$(call target_begin)
-	$(mkdir_p) $(install_prefix_scad)$(library_install_subdir)
 	$(foreach l,$(library_files), \
 		$(strip \
 		$(if \
@@ -103,11 +93,9 @@ uninstall-library:
 	)
 	-(cd $(install_prefix_scad) && $(rmdir_p) $(library_install_subdir))
 
-# install directories
+# create install directories
 $(install_prefix_scad): ; $(mkdir_p) $@
-$(install_prefix_html): ; $(mkdir_p) $@
-$(install_prefix_pdf):  ; $(mkdir_p) $@
-$(install_prefix_man):  ; $(mkdir_p) $@
+$(install_prefix_scad)$(library_install_subdir): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Information Targets
@@ -196,7 +184,7 @@ $(backup_file).zip: $(backup_files) | $(backup_root)
 	$(call target_begin)
 	$(zip_c) $@ $(backup_files)
 
-# backup directory
+# create backup directory
 $(backup_root): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
@@ -261,7 +249,7 @@ $(release_archive_file).zip: $(release_archive_files) | $(release_path)
 	$(call target_begin)
 	$(zip_c) $@ $(release_archive_files)
 
-# release directory
+# create release directory
 $(release_path): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#

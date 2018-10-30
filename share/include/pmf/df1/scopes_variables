@@ -119,6 +119,10 @@ scopes_scripts_selected := \
     $(scopes_scripts_source) \
   ))
 
+# scopes output directories
+scopes_output_directories := \
+  $(call unique,$(foreach s,$(src_files),$(call scopes_target_path,$s)))
+
 # assign all source auxiliary scripts to clean-files
 scopes_clean_files := $(scopes_scripts_source)
 
