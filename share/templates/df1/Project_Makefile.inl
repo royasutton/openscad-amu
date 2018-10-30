@@ -62,6 +62,7 @@ endif
 
 # targets_depends_project               := $(false)
 version_checks                          := $(true)
+# version_checks_skip_warnings          := $(true)
 generate_latex                          := $(false)
 
 # prefix_scopes_input_prefix            := $(true)

@@ -37,6 +37,7 @@ parallel_jobs                           := $(false)
 
 # perform tool version checks
 version_checks                          := $(true)
+version_checks_skip_warnings            := $(false)
 
 #------------------------------------------------------------------------------#
 # System Control Variable List
@@ -44,7 +45,8 @@ version_checks                          := $(true)
 
 system_control_variables := \
   parallel_jobs \
-  version_checks
+  version_checks \
+  version_checks_skip_warnings
 
 #------------------------------------------------------------------------------#
 # Project
