@@ -51,6 +51,7 @@ openscad_seam_opts2 := \
       $(if \
         $(or \
           $(call bool_decode,$(prefix_scopes_scripts_input_path)), \
+          $(call bool_decode,$(prefix_scopes_scripts_output_prefix)), \
           $(call bool_decode,$(prefix_scopes_scripts_output_path)) \
         ) \
       ,yes,no) \
