@@ -31,6 +31,7 @@
 #------------------------------------------------------------------------------#
 
 .PHONY:	all
+all: $(addprefix all-,$(AMU_PM_COMPONENTS_LOCAL))
 all: $(addprefix all-,$(AMU_PM_COMPONENTS))
 	$(call target_end)
 
@@ -39,6 +40,7 @@ all: $(addprefix all-,$(AMU_PM_COMPONENTS))
 #------------------------------------------------------------------------------#
 
 .PHONY: clean
+clean: $(addprefix clean-,$(AMU_PM_COMPONENTS_LOCAL))
 clean: $(addprefix clean-,$(AMU_PM_COMPONENTS))
 	$(call target_end)
 
@@ -47,11 +49,15 @@ clean: $(addprefix clean-,$(AMU_PM_COMPONENTS))
 #------------------------------------------------------------------------------#
 
 .PHONY: install
-install: $(addprefix install-,$(AMU_PM_COMPONENTS) $(if $(strip $(library_files)),library))
+install: $(addprefix install-,$(AMU_PM_COMPONENTS))
+install: $(addprefix install-,$(AMU_PM_COMPONENTS_LOCAL))
+install: $(addprefix install-,$(if $(strip $(library_files)),library))
 	$(call target_end)
 
 .PHONY: uninstall
-uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS) $(if $(strip $(library_files)),library))
+uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS))
+uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS_LOCAL))
+uninstall: $(addprefix uninstall-,$(if $(strip $(library_files)),library))
 	$(call target_end)
 
 .PHONY: install-library
@@ -128,7 +134,10 @@ info-%: | silent
 	$(info $(space) value: $(value $*))
 
 .PHONY: info
-info: info-makefile info-system info-project $(addprefix info-,$(AMU_PM_COMPONENTS))
+info: $(addprefix info-,$(AMU_PM_COMPONENTS))
+info: $(addprefix info-,$(AMU_PM_COMPONENTS_LOCAL))
+info: $(addprefix info-,makefile system project paths)
+	$(call target_end)
 
 .PHONY: info-makefile
 info-makefile: | silent
@@ -136,6 +145,8 @@ info-makefile: | silent
 	$(call list_variables,$(amu_pm_bootstrap_variables),$(false), bootstrap)
 	$(call enumerate_variable,amu_pm_init_components,$(false),$(false))
 	$(call enumerate_variable,amu_pm_rules_components,$(false),$(false))
+	$(call enumerate_variable,amu_pm_init_components_local,$(false),$(false))
+	$(call enumerate_variable,amu_pm_rules_components_local,$(false),$(false))
 
 .PHONY: info-system
 info-system: | silent
@@ -259,7 +270,7 @@ $(release_path): ; $(mkdir_p) $@
 .PHONY: help
 help: | silent
 	$(call heading1, Help: Project Makefile (openscad-amu))
-	$(foreach x,$(AMU_PM_COMPONENTS) base,\
+	$(foreach x,base $(AMU_PM_COMPONENTS) $(AMU_PM_COMPONENTS_LOCAL), \
 		$(call horizontal_bar,-) \
 		$(info [ $x ]) $(info $(empty)) \
 		$(info $(help_text_$x)) $(info $(empty)) \

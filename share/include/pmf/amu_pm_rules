@@ -39,6 +39,7 @@ $(this_guard) := $(notdir $(this_file))
 
   $(call amu_pm_m,include [$($(this_guard))])
 
+	# components
 	amu_pm_rules_components := \
 		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX),$(AMU_PM_DESIGN_FLOW), \
 			base $(AMU_PM_COMPONENTS), \
@@ -47,6 +48,17 @@ $(this_guard) := $(notdir $(this_file))
   $(foreach x, $(amu_pm_rules_components), \
 			$(call amu_pm_m,include [$x]) \
 			$(eval include $(AMU_PM_PREFIX)$x) \
+	)
+
+	# local components
+	amu_pm_rules_components_local := \
+		$(strip $(call AMU_PM_GET_COMPONENTS,,$(AMU_PM_COMPONENTS_LOCAL_PATH)/, \
+			base $(AMU_PM_COMPONENTS_LOCAL), \
+			variables rules))
+
+  $(foreach x, $(amu_pm_rules_components_local), \
+			$(call amu_pm_m,include [$x]) \
+			$(eval include $x) \
 	)
 
 else
