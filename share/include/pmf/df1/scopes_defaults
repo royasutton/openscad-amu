@@ -32,7 +32,7 @@
 
 # prefix output path to auxiliary scope scripts
 prefix_scopes_scripts_output_path       := $(true)
-prefix_scopes_scripts_output_prefix     := $(false)
+prefix_scopes_scripts_output_prefix     := $(true)
 prefix_scopes_scripts_input_path        := $(false)
 
 # add scope output to release directory/archive

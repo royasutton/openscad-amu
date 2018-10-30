@@ -28,7 +28,7 @@
 
 # prefix output paths to doxygen output root directory
 prefix_doxygen_output_path              := $(true)
-prefix_doxygen_output_prefix_path       := $(false)
+prefix_doxygen_output_prefix_path       := $(true)
 
 # doxygen targets depend on scope targets
 doxygen_depends_scopes                  := $(true)
