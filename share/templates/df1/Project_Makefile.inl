@@ -27,7 +27,7 @@ AMU_PM_RULES        := $(AMU_PM_PREFIX)amu_pm_rules
 #AMU_PM_DEBUG       := defined
 
 #------------------------------------------------------------------------------#
-# Project Makefile Init (DO NO EDIT THIS SECTION)
+# Project Announcements
 #------------------------------------------------------------------------------#
 define AMU_SETUP_ANNOUNCE
 
@@ -43,6 +43,9 @@ define AMU_SETUP_ANNOUNCE
 
 endef
 
+#------------------------------------------------------------------------------#
+# Design Flow Init (DO NO EDIT THIS SECTION)
+#------------------------------------------------------------------------------#
 ifeq ($(wildcard $(AMU_PM_INIT)),)
 $(info $(call AMU_SETUP_ANNOUNCE,Init file,$(AMU_PM_INIT)))
 $(error unable to continue.)
@@ -51,19 +54,25 @@ include $(AMU_PM_INIT)
 endif
 
 #------------------------------------------------------------------------------#
-# Default Overrides
+# Overrides to Design Flow Configuration Defaults
 #------------------------------------------------------------------------------#
-#parallel_jobs                          := $(true)
-#version_checks                         := $(false)
-#target_headings                        := $(false)
-#verbose_seam                           := $(false)
+# target_headings                       := $(false)
+# verbose_seam                          := $(false)
+# debug_dif_filter                      := $(true)
+
+# targets_depends_project               := $(false)
+version_checks                          := $(true)
 generate_latex                          := $(false)
-#debug_dif_filter                       := $(true)
+
+# prefix_scopes_input_prefix            := $(true)
+
+release_project                         := $(true)
+release_library                         := $(true)
 release_archive_doxygen                 := $(true)
-#release_archive_scopes                 := $(true)
+release_archive_scopes                  := $(false)
 
 #------------------------------------------------------------------------------#
-# Version Checks
+# Design Flow Tools Assertions (examples)
 #------------------------------------------------------------------------------#
 #ifeq ($(version_checks),$(true))
 #$(call check_version,doxygen,ge,1.8.12,$(false),designed for v1.8.12.)
@@ -76,10 +85,11 @@ release_archive_doxygen                 := $(true)
 # Project
 #------------------------------------------------------------------------------#
 project_name        := template
-project_version     := 1.0
+project_version     := v1.1
 project_brief       := Project Makefile Template (openscad-amu df1).
 
 docs_group_id       := none
+#project_logo_prefix:= ./
 project_logo        := design_logo_top_200x50
 
 #design_prefix      := ./
@@ -91,7 +101,7 @@ library             := library
 doxygen_config      := Doxyfile
 
 #------------------------------------------------------------------------------#
-# Project Makefile Rules (DO NO EDIT THIS SECTION)
+# Design Flow Rules (DO NO EDIT THIS SECTION)
 #------------------------------------------------------------------------------#
 ifeq ($(wildcard $(AMU_PM_RULES)),)
 $(info $(call AMU_SETUP_ANNOUNCE,Rules file,$(AMU_PM_RULES)))
