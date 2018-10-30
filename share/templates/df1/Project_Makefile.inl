@@ -60,12 +60,12 @@ endif
 # verbose_seam                          := $(false)
 # debug_dif_filter                      := $(true)
 
-# targets_depends_project               := $(false)
+targets_depends_project                 := $(true)
 version_checks                          := $(true)
-# version_checks_skip_warnings          := $(true)
+version_checks_skip_warnings            := $(false)
 generate_latex                          := $(false)
 
-# prefix_scopes_input_prefix            := $(true)
+prefix_scopes_input_prefix              := $(false)
 
 release_project                         := $(true)
 release_library                         := $(true)
