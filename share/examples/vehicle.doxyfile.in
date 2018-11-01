@@ -3,15 +3,15 @@ PROJECT_NAME           = "VehicleLibrary"
 PROJECT_NUMBER         = "1.0"
 PROJECT_BRIEF          = "OpenSCAD Example Design Library Documentation."
 OUTPUT_DIRECTORY       = build
-STRIP_FROM_PATH        = "@top_srcdir@"
+STRIP_FROM_PATH        = @top_srcdir@
 OPTIMIZE_OUTPUT_FOR_C  = YES
 EXTENSION_MAPPING      = scad=C
 WARN_LOGFILE           = doxygen.warn
 INPUT                  = @srcdir@/vehicle.scad
-EXAMPLE_PATH           = "@builddir@/build"
+EXAMPLE_PATH           = @builddir@/build
 EXAMPLE_RECURSIVE      = NO
-IMAGE_PATH             = "@builddir@/build/png" \
-                         "@builddir@/build/png2eps"
+IMAGE_PATH             = @builddir@/build/png \
+                         @builddir@/build/png2eps
 INPUT_FILTER           = "@top_builddir@/src/openscad-dif \
                            --auto-config @builddir@/build \
                            --html-output html \
