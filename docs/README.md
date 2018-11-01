@@ -1,4 +1,4 @@
-> A design flow with compile automation and Doxygen doc generation for OpenSCAD...
+> Compile-Scripting and Documentation-Generatation for OpenSCAD Designs...
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
@@ -12,26 +12,27 @@ Introduction
 ------------
 
 [openscad-amu] is being developed to support the construction of
-automated design flows with Doxygen-based documentation for OpenSCAD
-language-based mechanical design. It establishes a framework that
-enables documentation and build-scripts to be embedded into __\*.scad__
-design source. It incorporates two complementary but distinct features
-that may be used together or independently:
+automated design flows with Doxygen generated documentation for
+OpenSCAD language-based mechanical design. It provides a framework that
+allows documentation and build-scripts to be embedded into __\*.scad__
+source and incorporates two complementary but distinct features that
+may be used together or independently:
 
-    (1) Design Compilation Automation, and
+    (1) Scripted Design Compilation, and
     (2) Design Documentation Generation.
 
-In either case, the design __\*.scad__ source files are augmented with
-auxiliary structured comments. Build scripts are automatically
-extracted at compile-time to construct [Makefiles] that manage design
-compilation. [openscad-amu] provides source code filters that extend
-[Doxygen], and provides additional [special commands] with features
-useful in mechanical design. The design flow automates documentation
-extraction and formatting for each __\*.scad__ source with embedded
-[Doxygen] content.
+Both the scripting and documentation is done in the design __\*.scad__
+source files using auxiliary structured comments. Subsequently, the
+build-scripts are extracted at compile-time to construct [Makefiles]
+that manage design compilation. As for documentation, [openscad-amu]
+provides source code prefilters that both extend [Doxygen] and provide
+additional [special commands] with features useful in mechanical
+design. The design flow automates documentation extraction and
+formatting for each __\*.scad__ source with embedded [Doxygen] content.
 
 <p align="center">
-<img src="assets/flow_intro.svg" alt="" border="0" usemap="#adf.map"/>
+<img src="assets/flow_intro.svg" alt="" title="<active image map>"
+     border="0" usemap="#adf.map"/>
 </p>
 
 <map name="adf.map" id="dot_inline_dotgraph_4.map">
@@ -53,22 +54,22 @@ extraction and formatting for each __\*.scad__ source with embedded
       coords="330,84,440,139"/>
 </map>
 
-Any design with multiple components will benefit when using
-[openscad-amu]. The benefits correlates directly with part count. The
-*targets* in the above diagram represent design components or part
-variations. Compiling design targets one-by-one is times consuming and
-error prone and discourages design optimization and/or exploration.
+As the design part count increases, so does the benefit of using
+[openscad-amu]. The *targets* in the above diagram represent design
+components or part variations. Compiling design targets one-by-one is
+times consuming and error prone and discourages design optimization
+and/or exploration.
 
 > *For larger design projects, the increase in benefit is significant as
 > [openscad-amu] frees designers from mundane dependency and state
 > tracking and provides mechanisms for part compilation and coherent
 > design documentation.*
 
-Moreover, it can greatly reduce total project rendering time on
-multi-processor systems via parallel invocations of the single-threaded
-[OpenSCAD] compiler. Once compilation flows are described, using a
-simple scripting scheme, each design target is kept current from source
-as needed via invocations of `make`.
+A significant side effect is greatly reduce total project compile time
+on multi-processor systems via parallel invocations of the
+single-threaded [OpenSCAD] compiler. Once compilation flows are
+described, using the simple scripting scheme, each design target is
+kept current from source as needed via invocations of `make`.
 
 > *For smaller projects, the ability to document a design or library using
 > [Doxygen] is a convenient way to both maintain and publish the design

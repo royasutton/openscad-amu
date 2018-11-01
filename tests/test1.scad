@@ -329,7 +329,8 @@ Begin_Scope doc;
     #---------------------------------------------------------------------------
     # Options
     #---------------------------------------------------------------------------
-    views   Name "view" Translate "0,0,12" Distance "200" Views "all";
+    views   Name "view" Translate "0,0,12" Distance "200"
+            Views "all c_id_a_b_c_0=4.5,5.000,6.999 cust_id_a_b_c_1=.99,.009,90.999";
 
     images  Name "size"
             Types "pdf html"

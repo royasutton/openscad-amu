@@ -4,7 +4,7 @@
 #   \file   openscad_opts.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2017
+#   \date   2016-2018
 #
 #   \copyright
 #     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
@@ -85,6 +85,19 @@
 #   \dontinclude vehicle_document.bash
 #   \skipline views
 #
+#   Arbitrary viewport rotation can be defined using the following syntax:
+#   \p cust_id=x,y,z (no spaces within the definition), where \p id sets
+#   the arbitrary name and \p x,y,z sets the arbitrary viewport rotation.
+#
+#    Custom         | Alias      | Viewport Rotation
+#   :--------------:|:----------:|:-----------------:
+#    cust_id=x,y,z  | c_id=x,y,z | x,y,z
+#
+#   Example:
+#   \code{.sh}
+#     views name "views" distance "200" views "all cust_best=10,20,31 c_good=22.99,1.31,0.99"
+#   \endcode
+#
 ###############################################################################/
 function views()
 {
@@ -142,6 +155,14 @@ function views()
             table_set "$name" '_front'   "--camera=${translate},${cv_front},${distance}"
             table_set "$name" '_back'    "--camera=${translate},${cv_back},${distance}"
             table_set "$name" '_diag'    "--camera=${translate},${cv_diag},${distance}"
+          ;;
+          cust_*|c_*)
+            # example: cust_name_a_b_c_0=4.5,5.000,6.999
+            declare local cv_cust="${v#*_}"         # --> name_a_b_c_0=4.5,5.000,6.999
+            declare local cv_cust_id=${cv_cust%%=*} # --> name_a_b_c_0
+            declare local cv_cust_vr=${cv_cust#*=}  # --> 4.5,5.000,6.999
+
+            table_set "$name" "_${cv_cust_id}" "--camera=${translate},${cv_cust_vr},${distance}"
           ;;
           *) abort_invalid_arg $v for $1 ;;
           esac

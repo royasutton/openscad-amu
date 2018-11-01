@@ -899,10 +899,10 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       // assemble attributes
       string attr;
       if ( image_width.length() ) {
-        if ( attr.length() )         attr.append(",");
+        if ( attr.length() )       { attr.append(","); }
                                      attr.append("width=" + image_width); }
       if ( image_height.length() ) {
-        if ( attr.length() )         attr.append(",");
+        if ( attr.length() )       { attr.append(","); }
                                      attr.append("height=" + image_height); }
 
       if ( attr.length() )           result.append( "[" + attr + "]" );
@@ -1145,12 +1145,14 @@ ODIF::ODIF_Scanner::bif_make(void)
   string scmd;
   string opts = " --no-print-directory";
 
-  // handle configuration prefix if not current directory (or empty)
-  if ( get_config_prefix().compare(".") && get_config_prefix().length() )
+  // identify path prefix to makefile
+  if ( get_prefix_scripts() )
+    opts += " --directory=" + get_output_prefix();
+  else if ( get_config_prefix().compare(".") && get_config_prefix().length() )
     opts += " --directory=" + get_config_prefix();
 
   scmd = get_make_path() + opts
-       + " -f " + makefile_stem + get_makefile_ext()
+       + " --makefile=" + makefile_stem + get_makefile_ext()
        + " " + target_prefix + mf_scopejoiner + make_target;
 
   // issue system command
@@ -1348,6 +1350,9 @@ ODIF::ODIF_Scanner::bif_copy(void)
      type     | any of
     :--------:|:------------:
      files    | [,[:space:]]
+
+  \note List of files should be enclosed in quotations (single or
+        double).
 
 *******************************************************************************/
 string

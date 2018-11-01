@@ -3,7 +3,7 @@
   \file   openscad_dif_util.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2017
+  \date   2016-2018
 
   \copyright
 
@@ -474,7 +474,7 @@ void
 UTIL::sys_command(
   const string& command,
         string& result,
-        bool& good,
+        bool& success,
   const bool& standard_error,
   const bool& replace_newlines)
 {
@@ -493,7 +493,7 @@ UTIL::sys_command(
   {
     result = "popen() failed for " + cmd_str;
 
-    good=false;
+    success=false;
   }
   else
   {
@@ -505,12 +505,12 @@ UTIL::sys_command(
 
     pclose(pipe);
 
-    good=true;
+    success=true;
   }
 #else /* HAVE_POPEN */
   result = "popen() not available, unable to execute " + cmd_str;
 
-  good=false;
+  success=false;
 #endif /* HAVE_POPEN */
 
   if ( replace_newlines )
@@ -606,6 +606,125 @@ UTIL::is_number(const std::string& s)
     ++it;
 
   return ( !s.empty() && it == s.end() );
+}
+
+boost::filesystem::path
+UTIL::get_relative_path(
+    const boost::filesystem::path &to_path,
+    const boost::filesystem::path &from_path,
+    const bool parent)
+{
+  boost::filesystem::path::const_iterator tit = to_path.begin();
+  boost::filesystem::path::const_iterator fit = from_path.begin();
+
+  // loop while they are the same to find common parent path
+  while (tit != to_path.end() && fit != from_path.end() && (*fit) == (*tit))
+  {
+    ++fit;
+    ++tit;
+  }
+
+  boost::filesystem::path relative_path;
+
+  if ( !parent )
+  {
+    // append ".." for each remaining level of from_path
+    // in order to return to the common parent path
+    while (fit != from_path.end())
+    {
+      relative_path /= "..";
+      ++fit;
+    }
+  }
+
+  // append remainder of to_path
+  while (tit != to_path.end())
+  {
+    relative_path /= *tit;
+    ++tit;
+  }
+
+  return relative_path;
+}
+
+bool
+UTIL::make_dir(const std::string &d,
+                     std::string &m,
+               const bool &p,
+               const std::string &a)
+{
+  boost::filesystem::path f ( d );      // new directory path
+  boost::filesystem::path b ( a );      // existing ancestors base path
+  boost::filesystem::path n ( b / f );  // new complete target path
+
+  bool created = false;
+
+  m = "makedir";
+
+  if ( n.empty() )
+  { // target empty, do nothing.
+    m += " [<pathname empty>]";
+  }
+  else if ( boost::filesystem::exists( n ) && boost::filesystem::is_directory( n ) )
+  { // target exists, do nothing.
+    m += " [" + n.string() + "] exists";
+  }
+  else if ( !p )
+  { // assume ancestors exists, and make target path.
+    created = boost::filesystem::create_directory( n );
+    m += "[" + n.string() + "] 1 created";
+  }
+  else
+  { // otherwise assume ancestors exists, and make missing parents of target path.
+
+    m += " [";
+
+    boost::filesystem::path::const_iterator nit = n.begin();;
+    boost::filesystem::path t;
+
+    // ancestors: assume exists
+    if ( !b.empty() )
+    {
+      boost::filesystem::path::const_iterator bit = b.begin();;
+
+      while (bit != b.end() && nit != n.end())
+      {
+        ++bit;
+        ++nit;
+      }
+
+      // mark end
+      m += b.string() + "+";
+      t  = b;
+    }
+
+    // make missing parents of target directory path
+    uint count = 0;
+    bool success = true;
+
+    while (nit != n.end() && success)
+    {
+      t /= *nit;
+
+      if ( boost::filesystem::exists( t ) && boost::filesystem::is_directory( t ) )
+      {
+        m += "/" + nit->string();
+      }
+      else
+      {
+        success = boost::filesystem::create_directory( t );
+        m += "/<" + nit->string() + ">";
+        count++;
+      }
+
+      ++nit;
+    }
+    created = success;
+
+    m += "] " + to_string( count ) + " created";
+  }
+
+  return created;
 }
 
 

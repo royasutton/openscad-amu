@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2017 Roy Allen Sutton
+#  Copyright (C) 2016-2018 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -450,17 +450,24 @@ check_version_compare = $(amu_pm_d3)$(strip \
 # arg3: A version string requirement (of the form 'n.n.n.n').
 # arg4: An encoded boolean; version check condition pass required.
 # arg5: A fail message.
-# returns .
+# returns version check result. when arg4 is $(true), a failed test aborts
+# the makefile with error, otherwise a failure warning is issued. warning
+# checks are skipped when version_checks_skip_warnings := $(true).
 define check_version
   $(amu_pm_d5) \
-  $(call amu_pm_m,$1 version check $$($(1)vn)=[$($(1)vn)] $2 [$3] \
-    $(if $(call bool_decode,$4),(required),(recommended)).) \
-  $(if $(call check_version_compare,$($(1)vn),$2,$3), \
-    $(call amu_pm_m,$1 version check passed.), \
-    $(warning $1 version check [$($(1)vn)] $2 [$3] failed \
-              ($(if $(call bool_decode,$4),,non-)critical).) \
-    $(warning $5) \
-    $(if $(call bool_decode,$4),$(error $0: aborting)) \
+  $(call amu_pm_m,$1 assert version $$($(1)vn)=[$($(1)vn)] $2 [$3] \
+    else $(if $(call bool_decode,$4),error,warning).) \
+  $(if $(or \
+         $(call bool_decode,$4), \
+         $(call bool_decode,$(call not,$(version_checks_skip_warnings))) \
+       ), \
+    $(if $(call check_version_compare,$($(1)vn),$2,$3), \
+      $(call amu_pm_m,$1 version check passed.), \
+      $(warning $1 version check [$($(1)vn)] $2 [$3] \
+        else $(if $(call bool_decode,$4),error,warning).) \
+      $(warning $5) \
+      $(if $(call bool_decode,$4),$(error $0: aborting..)) \
+    ) \
   )
 endef
 

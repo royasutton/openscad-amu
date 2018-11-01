@@ -138,10 +138,11 @@ install-exec-hook:
 	  list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo soft linking [$$list] version=[$(PACKAGE_VERSION)] extension=[$(EXEEXT)]; \
 	( cd '$(DESTDIR)$(bindir)' && \
-		for p in $$list; do \
+		for p in $$list; \
+		do \
 			$(am__mv) $$p$(EXEEXT) $$p-$(PACKAGE_VERSION)$(EXEEXT) && \
-			$(LN_S) -vf $$p-$(PACKAGE_VERSION)$(EXEEXT) $$p$(EXEEXT) \
-		; done \
+			$(LN_S) -vf $$p-$(PACKAGE_VERSION)$(EXEEXT) $$p$(EXEEXT) ; \
+		done \
 	)
 
 install-docs-local: install-html-local
@@ -163,9 +164,10 @@ uninstall-local:
 	  list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo unlinking [$$list] version=[$(PACKAGE_VERSION)] extension=[$(EXEEXT)]; \
 	( cd '$(DESTDIR)$(bindir)' && \
-		for p in $$list; do \
-			rm -fv $$p-$(PACKAGE_VERSION)$(EXEEXT) \
-		; done \
+		for p in $$list; \
+		do \
+			rm -fv $$p-$(PACKAGE_VERSION)$(EXEEXT) ; \
+		done \
 	)
 	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
 

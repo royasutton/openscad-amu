@@ -1,7 +1,7 @@
 /***************************************************************************//**
   \mainpage C++ Programs
 
-  \dot
+  \dot "Compile-Scripting and Documentation-Generatation for OpenSCAD Designs."
     digraph example {
       node [shape=Mrecord, fontname=Helvetica, fontsize=10];
       a [label="openscad-amu" URL="../../../share/lib/doxygen/html/index.html"];

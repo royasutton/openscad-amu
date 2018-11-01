@@ -1,7 +1,7 @@
 openscad-amu
 ============
 
-> A design flow with compile automation and Doxygen doc generation for OpenSCAD...
+> Compile-Scripting and Documentation-Generatation for OpenSCAD Designs...
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
@@ -16,10 +16,10 @@ View live docs on [GitHib Pages](https://royasutton.github.io/openscad-amu).
 Evaluation
 ----------
 
-A script is available to bootstrap the development environment. To
-install the prerequisites, fetch and compile the source, install the
-latest tagged version of [openscad-amu] to a temporary cache directory,
-and create an example project, type:
+A script is available to bootstrap the development environment and its
+dependencies. To install the prerequisites, fetch and compile the
+source, install the latest tagged version of [openscad-amu] to a
+temporary cache directory, and create an example project, type:
 
 ```bash
 mkdir tmp && cd tmp
@@ -58,15 +58,13 @@ make install
 The third `make` step will compile (via [OpenSCAD]) numerous targets
 guided by scripts embedded in source comments, process the embedded
 documentation (via [Doxygen]), and the last will install the library
-files to the system-dependent [OpenSCAD] user library path. In
-addition, the documentation will be added to an index of installed
-design libraries.
+files to the system-dependent [OpenSCAD] user library path.
 
-To see the system-dependent location of and view the index, type:
+
+To see the table of contents of installed libraries, type:
 
 ```bash
-make print-install_prefix_html
-firefox <install_prefix_html>/index.html
+firefox `make echo-install_prefix_html`/index.html
 ```
 
 To remove this example, type:
@@ -95,10 +93,10 @@ In some cases you may wish to install several versions of the
 development tools concurrently. To install the last six release
 versions, replace `tags1` with `tags6` in the prior command.
 
-To uninstall everything that was installed by the prior step, rerun
-the step replacing `--install` with `--uninstall`. More help and
-examples are available (see: `setup-amu.bash --help` and
-`setup-amu.bash --examples`).
+To uninstall everything that was installed by these step, rerun the
+step replacing `--install` with `--uninstall`. More help and examples
+are available (see: `setup-amu.bash --help` and `setup-amu.bash
+--examples`).
 
 
 Manual Compilation
@@ -122,7 +120,7 @@ mkdir -p build && cd build
 make
 ```
 
-To run post-build sanity checks:
+To run post-build basic sanity checks:
 
 ```bash
 make check
@@ -142,16 +140,6 @@ To manually install or uninstall, issue:
 sudo make install
 sudo make uninstall
 ```
-
-
-Release Convention
-------------------
-
-The *master* branch of the repository will be tagged with the most
-recent *release version* of the source and the *develop* branch is
-where new development changes take place. When the development branch
-reaches a stable point and is ready for release it is merged back into
-the master branch and tagged with a new version.
 
 
 Contributing

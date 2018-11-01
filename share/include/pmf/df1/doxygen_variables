@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2017 Roy Allen Sutton
+#  Copyright (C) 2016-2018 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -27,11 +27,11 @@
 ################################################################################
 
 # output file names in output directory
-latex_stamp         := $(addprefix $(output_path),$(latex_stamp_name))
-doxygen_stamp       := $(addprefix $(output_path),$(doxygen_stamp_name))
-doxygen_tag         := $(addprefix $(output_path),$(doxygen_tag_name))
-doxygen_warn        := $(addprefix $(output_path),$(doxygen_warn_name))
-doxygen_config_auto := $(addprefix $(output_path),$(notdir $(doxygen_config_auto_name)))
+latex_stamp         := $(addprefix $(doxygen_output_path),$(latex_stamp_name))
+doxygen_stamp       := $(addprefix $(doxygen_output_path),$(doxygen_stamp_name))
+doxygen_tag         := $(addprefix $(doxygen_output_path),$(doxygen_tag_name))
+doxygen_warn        := $(addprefix $(doxygen_output_path),$(doxygen_warn_name))
+doxygen_config_auto := $(addprefix $(doxygen_output_path),$(notdir $(doxygen_config_auto_name)))
 
 # clean Files
 doxygen_clean_files := \
@@ -42,18 +42,19 @@ doxygen_clean_files := \
   $(if $(generate_latex),$(latex_stamp))
 
 # path: autoconf_path, example_path
-# $(prefix_scopes_scripts) requires:[scopes]
-autoconf_path := $(if $(prefix_scopes_scripts),$(output_path),.)
-example_path  := $(if $(prefix_scopes_scripts),$(output_path)) $(example_path_add)
+# $(call scopes_target_path,<arg1>) requires:[scopes]
+autoconf_path := $(or $(call scopes_target_path,$(empty)),.)
+example_path  := $(call scopes_target_path,$(empty)) $(example_path_add)
 
 # path: image_path
-# $(scopes_targetsdir) requires:[scopes]
+# $(scopes_targetsdir) requires amu components:[scopes]
 # run-time evaluation required, use function rather than simple assignment.
 image_path = $(call scopes_targetsdir) $(image_path_add)
 
 # filter configuration
 openscad_dif_opts := \
   $(strip \
+    --doxygen-output $(if $(doxygen_output_path),$(doxygen_output_path),./) \
     $(if $(call bool_decode,$(generate_html)),--html-output $(html_output)) \
     $(if $(call bool_decode,$(generate_latex)),--latex-output $(latex_output)) \
     $(if $(AMU_LIB_PATH),--lib-path $(AMU_LIB_PATH)) \
@@ -82,7 +83,7 @@ define doxygen_config_auto_text
     ENABLED_SECTIONS=$(enabled_sections)
     EXAMPLE_PATH=$(example_path)
     IMAGE_PATH=$(image_path)
-    OUTPUT_DIRECTORY=$(output_path)
+    OUTPUT_DIRECTORY=$(doxygen_output_path)
     GENERATE_HTML=$(if $(generate_html),YES,NO)
     HTML_OUTPUT=$(html_output)
     GENERATE_LATEX=$(if $(generate_latex),YES,NO)
@@ -111,27 +112,25 @@ else
 endif
 
 # project logo
+# $(call scopes_target_path,<arg1>) requires:[scopes]
 ifdef project_logo
-  # add default extension when not specified with file name
+  # add default .png extension when not specified with file name
   project_logo := $(if $(suffix $(project_logo)),$(project_logo),$(project_logo).png)
 
-  # add default path when not specified with file name
-  # follow mfscript target naming convention for original and converted images
-  # png, png2eps, png2tiff, etc.
+  # add default path when not specified with file name:
+  # $(scopes_target_path)/<ext>/<logo-name>.<ext>
   project_logo := \
     $(strip \
       $(if $(call bool_decode, \
         $(call sstrings_not_equal,$(notdir $(project_logo)),$(project_logo)) \
       ), \
         $(project_logo), \
-        $(call join_with,$(dir_level_sep), \
-          $(output_path)$(strip $(subst .,$(empty), \
-            $(if $(call strings_equal,.png,$(suffix $(project_logo))), \
-              $(suffix $(project_logo)), \
-              png2$(suffix $(project_logo)) \
-            ) \
-          )) \
-          $(project_logo) \
+        $(call join_with,$(empty), \
+          $(call scopes_target_path,$(project_logo_prefix)) \
+          $(call join_with,$(dir_level_sep), \
+            $(subst .,$(empty),$(suffix $(project_logo))) \
+            $(project_logo) \
+          ) \
         ) \
       ) \
     )
@@ -163,9 +162,9 @@ endif
 # release generated files
 ifeq ($(release_doxygen),$(true))
   release_files += \
-    $(if $(generate_html),$(output_path)$(html_output)) \
-    $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
-    $(if $(generate_man),$(output_path)$(man_output))
+    $(if $(generate_html),$(doxygen_output_path)$(html_output)) \
+    $(if $(generate_latex),$(doxygen_output_path)$(latex_output)$(release_latex_path_filter)) \
+    $(if $(generate_man),$(doxygen_output_path)$(man_output))
 endif
 
 # archive project files
@@ -176,9 +175,9 @@ endif
 # archive generated files
 ifeq ($(release_archive_doxygen),$(true))
   release_archive_files += \
-    $(if $(generate_html),$(output_path)$(html_output)) \
-    $(if $(generate_latex),$(output_path)$(latex_output)$(release_latex_path_filter)) \
-    $(if $(generate_man),$(output_path)$(man_output))
+    $(if $(generate_html),$(doxygen_output_path)$(html_output)) \
+    $(if $(generate_latex),$(doxygen_output_path)$(latex_output)$(release_latex_path_filter)) \
+    $(if $(generate_man),$(doxygen_output_path)$(man_output))
 endif
 
 #------------------------------------------------------------------------------#
@@ -186,6 +185,8 @@ endif
 #------------------------------------------------------------------------------#
 
 doxygen_config_variables := \
+  doxygen_output_prefix \
+  \
   doxygen_config \
   \
   doxygen_html_header \
@@ -209,6 +210,7 @@ doxygen_config_variables := \
 doxygen_config_derived += \
   docs_install_id \
   \
+  project_logo_prefix \
   project_logo \
   \
   latex_stamp \

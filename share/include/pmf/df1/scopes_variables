@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2017 Roy Allen Sutton
+#  Copyright (C) 2016-2018 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -27,7 +27,7 @@
 ################################################################################
 
 # auxiliary script output path prefix
-scopes_prefix := $(if $(call bool_decode,$(prefix_scopes_scripts)),$(output_path))
+scopes_target_prefix := $(call scopes_target_path,<INPUT-SOURCE-PATH>/<TARGET>)
 
 # openscad_seam_opts1: for modes=(extract|list)
 openscad_seam_opts1 := \
@@ -41,9 +41,20 @@ openscad_seam_opts1 := \
 # openscad_seam_opts1: for modes=(extract)
 openscad_seam_opts2 := \
   $(strip \
-    --prefix $(output_path) \
-    --prefix-ipp 0 \
-    --prefix-scripts $(if $(call bool_decode,$(prefix_scopes_scripts)),yes,no) \
+    $(if $(call scopes_target_path,$(empty)), \
+      --prefix $(call scopes_target_path,$(empty)) \
+      $(if $(call bool_decode,$(prefix_scopes_input_prefix)),$(empty), \
+        --prefix-ipp 0 \
+      ) \
+    ) \
+    --prefix-scripts \
+      $(if \
+        $(or \
+          $(call bool_decode,$(prefix_scopes_input_prefix)), \
+          $(call bool_decode,$(prefix_scopes_output_prefix)), \
+          $(call bool_decode,$(prefix_scopes_output_path)) \
+        ) \
+      ,yes,no) \
     $(if $(seam_defines),$(addprefix --define$(space),$(seam_defines))) \
     --comments yes \
     --show $(if $(call bool_decode,$(verbose_seam_show)),yes,no) \
@@ -71,8 +82,8 @@ scad_lib_path := $(call join_with,$(env_field_sep), \
 
 # scopes auxiliary scripts for all source files
 scopes_scripts_source := \
-  $(addprefix $(scopes_prefix), \
-    $(foreach s,$(src_files), \
+  $(foreach s,$(src_files), \
+    $(addprefix $(call scopes_target_path,$s), \
       $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
     ) \
   )
@@ -108,6 +119,10 @@ scopes_scripts_selected := \
     $(scopes_scripts_source) \
   ))
 
+# scopes output directories
+scopes_output_directories := \
+  $(call unique,$(foreach s,$(src_files),$(call scopes_target_path,$s)))
+
 # assign all source auxiliary scripts to clean-files
 scopes_clean_files := $(scopes_scripts_source)
 
@@ -126,6 +141,8 @@ endif
 #------------------------------------------------------------------------------#
 
 scopes_config_variables := \
+  scopes_output_prefix \
+  \
   scopes_joiner \
   \
   scopes_include \
@@ -137,7 +154,7 @@ scopes_config_variables := \
   scad_lib_path_add
 
 scopes_config_derived += \
-  scopes_prefix \
+  scopes_target_prefix \
   \
   scopes_include_filter \
   scopes_exclude_filter \

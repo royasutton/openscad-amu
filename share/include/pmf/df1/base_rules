@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2017 Roy Allen Sutton
+#  Copyright (C) 2016-2018 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -31,42 +31,38 @@
 #------------------------------------------------------------------------------#
 
 .PHONY:	all
+all: $(addprefix all-,$(AMU_PM_COMPONENTS_LOCAL))
 all: $(addprefix all-,$(AMU_PM_COMPONENTS))
 	$(call target_end)
-
-# output directory path
-$(output_path): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Clean Targets
 #------------------------------------------------------------------------------#
 
 .PHONY: clean
-clean: $(addprefix clean-,$(AMU_PM_COMPONENTS) base)
+clean: $(addprefix clean-,$(AMU_PM_COMPONENTS_LOCAL))
+clean: $(addprefix clean-,$(AMU_PM_COMPONENTS))
 	$(call target_end)
-
-.PHONY: clean-base
-clean-base:
-	$(call target_begin)
-	-@$(test) -d $(output_path) && \
-	$(rmdir) $(output_path)
 
 #------------------------------------------------------------------------------#
 # Install / Uninstall Targets
 #------------------------------------------------------------------------------#
 
 .PHONY: install
-install: $(addprefix install-,$(AMU_PM_COMPONENTS) $(if $(strip $(library_files)),library))
+install: $(addprefix install-,$(AMU_PM_COMPONENTS))
+install: $(addprefix install-,$(AMU_PM_COMPONENTS_LOCAL))
+install: $(addprefix install-,$(if $(strip $(library_files)),library))
 	$(call target_end)
 
 .PHONY: uninstall
-uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS) $(if $(strip $(library_files)),library))
+uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS))
+uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS_LOCAL))
+uninstall: $(addprefix uninstall-,$(if $(strip $(library_files)),library))
 	$(call target_end)
 
 .PHONY: install-library
-install-library: | $(install_prefix_scad)
+install-library: | $(install_prefix_scad) $(install_prefix_scad)$(library_install_subdir)
 	$(call target_begin)
-	$(mkdir_p) $(install_prefix_scad)$(library_install_subdir)
 	$(foreach l,$(library_files), \
 		$(strip \
 		$(if \
@@ -83,6 +79,7 @@ install-library: | $(install_prefix_scad)
 		) \
 		)$(newline)\
 	)
+	$(call target_end)
 
 .PHONY: uninstall-library
 uninstall-library:
@@ -102,12 +99,11 @@ uninstall-library:
 		) \
 	)
 	-(cd $(install_prefix_scad) && $(rmdir_p) $(library_install_subdir))
+	$(call target_end)
 
-# install directories
+# create install directories
 $(install_prefix_scad): ; $(mkdir_p) $@
-$(install_prefix_html): ; $(mkdir_p) $@
-$(install_prefix_pdf):  ; $(mkdir_p) $@
-$(install_prefix_man):  ; $(mkdir_p) $@
+$(install_prefix_scad)$(library_install_subdir): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
 # Information Targets
@@ -140,7 +136,10 @@ info-%: | silent
 	$(info $(space) value: $(value $*))
 
 .PHONY: info
-info: info-makefile info-system info-project $(addprefix info-,$(AMU_PM_COMPONENTS))
+info: $(addprefix info-,$(AMU_PM_COMPONENTS))
+info: $(addprefix info-,$(AMU_PM_COMPONENTS_LOCAL))
+info: $(addprefix info-,makefile system project paths)
+	$(call target_end)
 
 .PHONY: info-makefile
 info-makefile: | silent
@@ -148,6 +147,8 @@ info-makefile: | silent
 	$(call list_variables,$(amu_pm_bootstrap_variables),$(false), bootstrap)
 	$(call enumerate_variable,amu_pm_init_components,$(false),$(false))
 	$(call enumerate_variable,amu_pm_rules_components,$(false),$(false))
+	$(call enumerate_variable,amu_pm_init_components_local,$(false),$(false))
+	$(call enumerate_variable,amu_pm_rules_components_local,$(false),$(false))
 
 .PHONY: info-system
 info-system: | silent
@@ -196,7 +197,7 @@ $(backup_file).zip: $(backup_files) | $(backup_root)
 	$(call target_begin)
 	$(zip_c) $@ $(backup_files)
 
-# backup directory
+# create backup directory
 $(backup_root): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
@@ -209,6 +210,7 @@ release: all $(release_stamp)
 	$(if $(call bool_decode,$(write_release_stamp)), \
 		$(call execute_command, $(ls_l) $(release_stamp) $(release_path)) \
 	)
+	$(call target_end)
 
 # copy files and create stamp
 $(release_stamp): $(release_files) \
@@ -261,7 +263,7 @@ $(release_archive_file).zip: $(release_archive_files) | $(release_path)
 	$(call target_begin)
 	$(zip_c) $@ $(release_archive_files)
 
-# release directory
+# create release directory
 $(release_path): ; $(mkdir_p) $@
 
 #------------------------------------------------------------------------------#
@@ -271,12 +273,12 @@ $(release_path): ; $(mkdir_p) $@
 .PHONY: help
 help: | silent
 	$(call heading1, Help: Project Makefile (openscad-amu))
-	$(foreach x,$(AMU_PM_COMPONENTS) base,\
+	$(foreach x,base $(AMU_PM_COMPONENTS) $(AMU_PM_COMPONENTS_LOCAL), \
 		$(call horizontal_bar,-) \
 		$(info [ $x ]) $(info $(empty)) \
 		$(info $(help_text_$x)) $(info $(empty)) \
 	)
-	$(call horizontal_bar)
+	$(call target_end)
 
 ################################################################################
 # eof
