@@ -97,7 +97,7 @@ ifndef scopes_include_filter
     scopes_include_filter := %
   endif
 else
-  $(call amu_pm_m,using pre-defined value for $$(scopes_include_filter))
+  $(call amu_pm_m,using predefined value for $$(scopes_include_filter))
 endif
 
 # scopes exclude filter
@@ -109,7 +109,7 @@ ifndef scopes_exclude_filter
     scopes_exclude_filter := $(empty)
   endif
 else
-  $(call amu_pm_m,using pre-defined value for $$(scopes_exclude_filter))
+  $(call amu_pm_m,using predefined value for $$(scopes_exclude_filter))
 endif
 
 # apply include and exclude filter
