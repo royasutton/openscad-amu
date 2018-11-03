@@ -81,9 +81,10 @@ scad_lib_path := $(call join_with,$(env_field_sep), \
   ,$(true))
 
 # scopes auxiliary scripts for all source files
+# use $(empty) string when path is the current directory './'
 scopes_scripts_source := \
   $(foreach s,$(src_files), \
-    $(addprefix $(call scopes_target_path,$s), \
+    $(addprefix $(call scopes_target_path,$(subst ./,$(empty),$(dir $s))), \
       $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
     ) \
   )
