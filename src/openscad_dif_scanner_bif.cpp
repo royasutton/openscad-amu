@@ -1484,11 +1484,13 @@ ODIF::ODIF_Scanner::bif_find(void)
     options and flags (and their short codes) are summarized in the
     following tables.
 
-     options    | sc  | default | description
-    :----------:|:---:|:-------:|:-----------------------------
-      index     | i   |         | return scope at specified index
+    Options that require arguments.
 
-    Command flags.
+     options   | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------
+      index    | i   |         | return scope at specified index
+
+    Flags that produce output.
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -1496,6 +1498,11 @@ ODIF::ODIF_Scanner::bif_find(void)
       list     | l   | false   | return scope list
       join     | j   | false   | return scope joiner
       root     | r   | false   | return root scope
+
+    Flags that control the produced output.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
       make     | m   | false   | only consider scopes with makefiles
       sort     | s   | false   | sort scope list
       unique   | u   | false   | only consider unique scope names
