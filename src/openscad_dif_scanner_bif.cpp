@@ -32,6 +32,7 @@
 
 #include "openscad_dif_scanner.hpp"
 
+#include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -42,6 +43,7 @@
 #endif
 
 using namespace std;
+namespace bfs = boost::filesystem;
 
 
 /***************************************************************************//**
@@ -1494,6 +1496,8 @@ ODIF::ODIF_Scanner::bif_find(void)
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
+      file     | f   | false   | return scope source file
+      path     | p   | false   | return scope source path
       count    | c   | false   | return scope count
       list     | l   | false   | return scope list
       join     | j   | false   | return scope joiner
@@ -1506,6 +1510,7 @@ ODIF::ODIF_Scanner::bif_find(void)
       make     | m   | false   | only consider scopes with makefiles
       sort     | s   | false   | sort scope list
       unique   | u   | false   | only consider unique scope names
+      absolute | a   | false   | return absolute path for file or path
       verbose  | v   | false   | use verbose output
 
     The \c make flag requires that the filter be run with the search
@@ -1524,9 +1529,12 @@ ODIF::ODIF_Scanner::bif_scope(void)
   "make",     "m",
   "sort",     "s",
   "unique",   "u",
+  "absolute", "a",
   "verbose",  "v",
 
   "index",    "i",
+  "file",     "f",
+  "path",     "p",
   "count",    "c",
   "list",     "l",
   "join",     "j",
@@ -1535,11 +1543,12 @@ ODIF::ODIF_Scanner::bif_scope(void)
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
   // assign local variable values: positions must match declaration above.
-  size_t ap=18;
+  size_t ap=24;
   bool make     = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[0],vana[1])).c_str() ) > 0 );
   bool sort     = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[2],vana[3])).c_str() ) > 0 );
   bool unique   = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[4],vana[5])).c_str() ) > 0 );
-  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[6],vana[7])).c_str() ) > 0 );
+  bool absolute = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[6],vana[7])).c_str() ) > 0 );
+  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[8],vana[9])).c_str() ) > 0 );
 
   // generate options help string.
   string help = "options: [";
@@ -1552,19 +1561,19 @@ ODIF::ODIF_Scanner::bif_scope(void)
   string result;
   std::vector<std::string> sid_copy;
 
-  // make
+  // make: assign copy of scope identifiers
   if ( make )
     sid_copy = get_scope_id_mf();
   else
     sid_copy = get_scope_id();
 
-  // sort
+  // sort scope identifiers
   if ( sort )
   {
     std::sort(sid_copy.begin(), sid_copy.end());
   }
 
-  // unique: limit scopes to those that are unique
+  // unique: limit scope identifiers to those that are unique
   if ( unique )
   {
     std::vector<std::string> sid_temp;
@@ -1610,12 +1619,13 @@ ODIF::ODIF_Scanner::bif_scope(void)
                 !(n.compare(vana[0])&&n.compare(vana[1])) ||  // make
                 !(n.compare(vana[2])&&n.compare(vana[3])) ||  // sort
                 !(n.compare(vana[4])&&n.compare(vana[5])) ||  // unique
-                !(n.compare(vana[6])&&n.compare(vana[7]))     // verbose
+                !(n.compare(vana[6])&&n.compare(vana[7])) ||  // absolute
+                !(n.compare(vana[8])&&n.compare(vana[9]))     // verbose
               )
       {
-        // do nothing
+        // do nothing, control flags values set above.
       }
-      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
       { // index
         size_t index = atoi( v.c_str() );
 
@@ -1627,14 +1637,53 @@ ODIF::ODIF_Scanner::bif_scope(void)
 
         result.append( sid_copy[ index - 1 ] );
       }
-      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      { // file
+        bfs::path p = input_name;
+
+        if ( result.size() ) result.append( " " );
+        if ( absolute )
+        {
+          if ( verbose ) result.append( "absolute" );
+        }
+        else
+        {
+          if ( verbose ) result.append( "relative" );
+          p = UTIL::get_relative_path(p, bfs::current_path());
+        }
+
+        if ( verbose ) result.append( " file = " );
+
+        result.append( p.string() );
+      }
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      { // path
+        bfs::path p = input_name;
+        p = p.parent_path();
+
+        if ( result.size() ) result.append( " " );
+        if ( absolute )
+        {
+          if ( verbose ) result.append( "absolute" );
+        }
+        else
+        {
+          if ( verbose ) result.append( "relative" );
+          p = UTIL::get_relative_path(p, bfs::current_path());
+        }
+
+        if ( verbose ) result.append( " file = " );
+
+        result.append( p.string() );
+      }
+      else if (!(n.compare(vana[16])&&n.compare(vana[17])) && flag)
       { // count
         if ( result.size() ) result.append( " " );
         if ( verbose ) result.append( "count = " );
 
         result.append( to_string( sid_copy.size() ) );
       }
-      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      else if (!(n.compare(vana[18])&&n.compare(vana[19])) && flag)
       { // list
         if ( verbose )
         {
@@ -1650,14 +1699,14 @@ ODIF::ODIF_Scanner::bif_scope(void)
           result.append( *vit );
         }
       }
-      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      else if (!(n.compare(vana[20])&&n.compare(vana[21])) && flag)
       { // join
         if ( result.size() ) result.append( " " );
         if ( verbose ) result.append( "join = " );
 
         result.append( get_scopejoiner() );
       }
-      else if (!(n.compare(vana[16])&&n.compare(vana[17])) && flag)
+      else if (!(n.compare(vana[22])&&n.compare(vana[23])) && flag)
       { // root
         if ( result.size() ) result.append( " " );
         if ( verbose ) result.append( "root = " );
