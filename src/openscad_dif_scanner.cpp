@@ -525,39 +525,49 @@ ODIF::ODIF_Scanner::file_rl(
   const bool& rid
 )
 {
-  filter_debug("locate "
-               + string( bfs::path(file).has_parent_path()?"path":"file" )
-               + " [" + file + "]", true, false, false);
-
-  // check each include path for file.
+  bfs::path file_path ( file );
   bfs::path location;
+
   found = false;
-  for( vector<string>::iterator it = include_path.begin();
-                                it != include_path.end() && !found;
-                              ++it )
+
+  //
+  // test if file has a parent path
+  //
+  if ( file_path.has_parent_path() )
   {
-    bfs::path f( file );
-    bfs::path p;
+    // has parent path, check each include path in reverse order.
+    filter_debug("locate path [" + file + "]", true, false, false);
 
-    // check with just the filename.
-    p  = *it;
-    p /= f.filename();
+    for( vector<string>::reverse_iterator it = include_path.rbegin();
+                                          it != include_path.rend() && !found;
+                                        ++it )
+    {
+      bfs::path p = *it / file_path;              // full filepath
 
-    filter_debug(" checking-file: " + p.string(), false, false, false);
-    if ( exists(p) && is_regular_file(p) ) {
-      found = true;
-      location = p;
-
-      break;
-    }
-
-    // check with existing prefixed path iff present.
-    p  = *it;
-    p /= f;
-
-    if ( f.has_parent_path() ) {
       filter_debug(" checking-path: " + p.string(), false, false, false);
-      if ( exists(p) && is_regular_file(p) ) {
+      if ( exists(p) && is_regular_file(p) )
+      {
+        found = true;
+        location = p;
+
+        break;
+      }
+    }
+  }
+  else
+  {
+    // has no parent path, check each include path in order.
+    filter_debug("locate file [" + file + "]", true, false, false);
+
+    for( vector<string>::iterator it = include_path.begin();
+                                  it != include_path.end() && !found;
+                                ++it )
+    {
+      bfs::path p = *it / file_path.filename();   // filename only
+
+      filter_debug(" checking-file: " + p.string(), false, false, false);
+      if ( exists(p) && is_regular_file(p) )
+      {
         found = true;
         location = p;
 
