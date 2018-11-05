@@ -1507,9 +1507,9 @@ ODIF::ODIF_Scanner::bif_find(void)
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
-      make     | m   | false   | only consider scopes with makefiles
+      make     | m   | true    | only consider scopes with makefiles
       sort     | s   | false   | sort scope list
-      unique   | u   | false   | only consider unique scope names
+      unique   | u   | true    | only consider unique scope names
       verbose  | v   | false   | use verbose output
 
     The \c make flag requires that the filter be run with the search
@@ -1540,10 +1540,10 @@ ODIF::ODIF_Scanner::bif_scope(void)
 
   // assign local variable values: positions must match declaration above.
   size_t ap=18;
-  bool make     = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[0],vana[1])).c_str() ) > 0 );
-  bool sort     = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[2],vana[3])).c_str() ) > 0 );
-  bool unique   = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[4],vana[5])).c_str() ) > 0 );
-  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[6],vana[7])).c_str() ) > 0 );
+  bool make     = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[0],vana[1])).c_str() ) > 0 );
+  bool sort     = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[2],vana[3])).c_str() ) > 0 );
+  bool unique   = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[4],vana[5])).c_str() ) > 0 );
+  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[6],vana[7])).c_str() ) > 0 );
 
   // generate options help string.
   string help = "options: [";
@@ -1728,8 +1728,8 @@ ODIF::ODIF_Scanner::bif_source(void)
 
   // assign local variable values: positions must match declaration above.
   size_t ap=14;
-  bool absolute = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[0],vana[1])).c_str() ) > 0 );
-  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[2],vana[3])).c_str() ) > 0 );
+  bool absolute = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[0],vana[1])).c_str() ) > 0 );
+  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[2],vana[3])).c_str() ) > 0 );
 
   // generate options help string.
   string help = "options: [";
