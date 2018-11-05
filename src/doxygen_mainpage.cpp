@@ -212,6 +212,7 @@
   | \ref ODIF::ODIF_Scanner::bif_copy() "\\amu_copy"               | copy references
   | \ref ODIF::ODIF_Scanner::bif_find() "\\amu_find"               | search for output files
   | \ref ODIF::ODIF_Scanner::bif_scope() "\\amu_scope"             | query scope data
+  | \ref ODIF::ODIF_Scanner::bif_source() "\\amu_source"           | query source filename
 
   External commands also exists and can be found in the directory:
   <tt><install-prefix>/functions/</tt>. For now, see the command itself for its

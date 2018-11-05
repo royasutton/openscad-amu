@@ -232,6 +232,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_scope();
   }
+  else if (fx_name.compare("source")==0)
+  {
+    has_result=true;
+    result=bif_source();
+  }
   else
   {
     /* check external function */

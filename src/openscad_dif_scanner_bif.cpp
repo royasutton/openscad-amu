@@ -1482,7 +1482,7 @@ ODIF::ODIF_Scanner::bif_find(void)
     Return information about embedded scopes.
 
     Prefix flags with \c ++ to enable and \c \-\- to disable. For
-    example <tt>++rmnl</tt> will set the flag value to true. The
+    example <tt>++verbose</tt> will set the flag value to true. The
     options and flags (and their short codes) are summarized in the
     following tables.
 
@@ -1496,8 +1496,6 @@ ODIF::ODIF_Scanner::bif_find(void)
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
-      file     | f   | false   | return scope source file
-      path     | p   | false   | return scope source path
       count    | c   | false   | return scope count
       list     | l   | false   | return scope list
       join     | j   | false   | return scope joiner
@@ -1510,7 +1508,6 @@ ODIF::ODIF_Scanner::bif_find(void)
       make     | m   | false   | only consider scopes with makefiles
       sort     | s   | false   | sort scope list
       unique   | u   | false   | only consider unique scope names
-      absolute | a   | false   | return absolute path for file or path
       verbose  | v   | false   | use verbose output
 
     The \c make flag requires that the filter be run with the search
@@ -1529,12 +1526,9 @@ ODIF::ODIF_Scanner::bif_scope(void)
   "make",     "m",
   "sort",     "s",
   "unique",   "u",
-  "absolute", "a",
   "verbose",  "v",
 
   "index",    "i",
-  "file",     "f",
-  "path",     "p",
   "count",    "c",
   "list",     "l",
   "join",     "j",
@@ -1543,12 +1537,11 @@ ODIF::ODIF_Scanner::bif_scope(void)
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
   // assign local variable values: positions must match declaration above.
-  size_t ap=24;
+  size_t ap=18;
   bool make     = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[0],vana[1])).c_str() ) > 0 );
   bool sort     = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[2],vana[3])).c_str() ) > 0 );
   bool unique   = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[4],vana[5])).c_str() ) > 0 );
-  bool absolute = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[6],vana[7])).c_str() ) > 0 );
-  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[8],vana[9])).c_str() ) > 0 );
+  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[6],vana[7])).c_str() ) > 0 );
 
   // generate options help string.
   string help = "options: [";
@@ -1619,13 +1612,12 @@ ODIF::ODIF_Scanner::bif_scope(void)
                 !(n.compare(vana[0])&&n.compare(vana[1])) ||  // make
                 !(n.compare(vana[2])&&n.compare(vana[3])) ||  // sort
                 !(n.compare(vana[4])&&n.compare(vana[5])) ||  // unique
-                !(n.compare(vana[6])&&n.compare(vana[7])) ||  // absolute
-                !(n.compare(vana[8])&&n.compare(vana[9]))     // verbose
+                !(n.compare(vana[6])&&n.compare(vana[7]))     // verbose
               )
       {
         // do nothing, control flags values set above.
       }
-      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
       { // index
         size_t index = atoi( v.c_str() );
 
@@ -1637,53 +1629,14 @@ ODIF::ODIF_Scanner::bif_scope(void)
 
         result.append( sid_copy[ index - 1 ] );
       }
-      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
-      { // file
-        bfs::path p = input_name;
-
-        if ( result.size() ) result.append( " " );
-        if ( absolute )
-        {
-          if ( verbose ) result.append( "absolute" );
-        }
-        else
-        {
-          if ( verbose ) result.append( "relative" );
-          p = UTIL::get_relative_path(p, bfs::current_path());
-        }
-
-        if ( verbose ) result.append( " file = " );
-
-        result.append( p.string() );
-      }
-      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
-      { // path
-        bfs::path p = input_name;
-        p = p.parent_path();
-
-        if ( result.size() ) result.append( " " );
-        if ( absolute )
-        {
-          if ( verbose ) result.append( "absolute" );
-        }
-        else
-        {
-          if ( verbose ) result.append( "relative" );
-          p = UTIL::get_relative_path(p, bfs::current_path());
-        }
-
-        if ( verbose ) result.append( " file = " );
-
-        result.append( p.string() );
-      }
-      else if (!(n.compare(vana[16])&&n.compare(vana[17])) && flag)
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
       { // count
         if ( result.size() ) result.append( " " );
         if ( verbose ) result.append( "count = " );
 
         result.append( to_string( sid_copy.size() ) );
       }
-      else if (!(n.compare(vana[18])&&n.compare(vana[19])) && flag)
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
       { // list
         if ( verbose )
         {
@@ -1699,19 +1652,166 @@ ODIF::ODIF_Scanner::bif_scope(void)
           result.append( *vit );
         }
       }
-      else if (!(n.compare(vana[20])&&n.compare(vana[21])) && flag)
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
       { // join
         if ( result.size() ) result.append( " " );
         if ( verbose ) result.append( "join = " );
 
         result.append( get_scopejoiner() );
       }
-      else if (!(n.compare(vana[22])&&n.compare(vana[23])) && flag)
+      else if (!(n.compare(vana[16])&&n.compare(vana[17])) && flag)
       { // root
         if ( result.size() ) result.append( " " );
         if ( verbose ) result.append( "root = " );
 
         result.append( get_rootscope() );
+      }
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  return ( result );
+}
+
+/***************************************************************************//**
+  \details
+
+    Return information about source input file.
+
+    Prefix flags with \c ++ to enable and \c \-\- to disable. For
+    example <tt>++verbose</tt> will set the flag value to true. The
+    options and flags (and their short codes) are summarized in the
+    following tables.
+
+    Flags that produce output.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      file     | f   | false   | return source filename
+      path     | p   | false   | return source pathname
+      base     | b   | false   | return source basename
+      stem     | s   | false   | return source stemname
+      ext      | e   | false   | return source file extension
+
+    Flags that control the produced output.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      absolute | a   | false   | return absolute path
+      verbose  | v   | false   | use verbose output
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_source(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "absolute", "a",
+  "verbose",  "v",
+
+  "file",     "f",
+  "path",     "p",
+  "base",     "b",
+  "stem",     "s",
+  "ext",      "e"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  size_t ap=14;
+  bool absolute = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[0],vana[1])).c_str() ) > 0 );
+  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[2],vana[3])).c_str() ) > 0 );
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  string result;
+
+  bfs::path input_path;
+  string path_type;
+
+  if ( absolute )
+  { // get absolute path
+    path_type = "absolute";
+
+    input_path = input_name;
+  }
+  else
+  { // get relative path
+    path_type = "relative";
+
+    input_path = input_name;
+    input_path = UTIL::get_relative_path(input_path, bfs::current_path());
+  }
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+    bool flag = ( atoi( v.c_str() ) > 0 );   // assign flag value
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if      (
+                !(n.compare(vana[0])&&n.compare(vana[1])) ||  // absolute
+                !(n.compare(vana[2])&&n.compare(vana[3]))     // verbose
+              )
+      {
+        // do nothing, control flags values set above.
+      }
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])) && flag)
+      { // file
+        if ( result.size() ) result.append( " " );
+        if ( verbose ) result.append( path_type + " filename = " );
+
+        result.append( input_path.string() );
+      }
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])) && flag)
+      { // path
+        if ( result.size() ) result.append( " " );
+        if ( verbose ) result.append( path_type + " pathname = " );
+
+        result.append( input_path.parent_path().string() );
+      }
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      { // base
+        if ( result.size() ) result.append( " " );
+        if ( verbose ) result.append( "basename = " );
+
+        result.append( input_path.filename().string() );
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      { // stem
+        if ( result.size() ) result.append( " " );
+        if ( verbose ) result.append( "stemname = " );
+
+        result.append( input_path.stem().string() );
+      }
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      { // ext
+        if ( result.size() ) result.append( " " );
+        if ( verbose ) result.append( "extension = " );
+
+        result.append( input_path.extension().string() );
       }
       else
       { // invalid
