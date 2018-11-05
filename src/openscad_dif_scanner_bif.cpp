@@ -238,11 +238,11 @@ ODIF::ODIF_Scanner::bif_combine(void)
   // assign local variable values: positions must match declaration above.
   // do not trim to allow combining of natural language.
   size_t ap=0;
-  string prefix     = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string suffix     = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string joiner     = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string separator  = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string tokenizer  = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string prefix     = unquote(fx_argv.arg_firstof(   "",vana[ap],vana[ap+1])); ap+=2;
+  string suffix     = unquote(fx_argv.arg_firstof(   "",vana[ap],vana[ap+1])); ap+=2;
+  string joiner     = unquote(fx_argv.arg_firstof(  "_",vana[ap],vana[ap+1])); ap+=2;
+  string separator  = unquote(fx_argv.arg_firstof(  ",",vana[ap],vana[ap+1])); ap+=2;
+  string tokenizer  = unquote(fx_argv.arg_firstof("|, ",vana[ap],vana[ap+1])); ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -261,18 +261,6 @@ ODIF::ODIF_Scanner::bif_combine(void)
   //
   // general argument validation:
   //
-
-  // assign default joiner when not specified.
-  if ( ! fx_argv.exists( vana[4] ) && ! fx_argv.exists( vana[5] ) )
-    joiner = "_";
-
-  // assign default separator when not specified.
-  if ( ! fx_argv.exists( vana[6] ) && ! fx_argv.exists( vana[7] ) )
-    separator = ",";
-
-  // assign default tokenizer when not specified.
-  if ( ! fx_argv.exists( vana[8] ) && ! fx_argv.exists( vana[9] ) )
-    tokenizer = "|, ";
 
   // get the positional arguments as vector (except arg0).
   vector<string> pa = fx_argv.values_v(false, true);
