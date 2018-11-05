@@ -317,34 +317,47 @@ ODIF::func_args::arg(const size_t n)
 }
 
 string
-ODIF::func_args::arg(const string& n)
+ODIF::func_args::arg(const string& n, bool& found)
 {
-  bool found = false;
   string rs;
+
+  found = false;
 
   for ( vector<arg_term>::iterator  it=argv.begin();
                                     it!=argv.end() && !found;
                                   ++it )
   {
     if ( it->name.compare( n )==0 )
+    {
       rs = it->value;
+      found = true;
+    }
   }
 
   return ( rs );
 }
 
 string
-ODIF::func_args::arg_firstof(const string& n1, const string& n2, const string& n3,
-                             const string& n4, const string& n5, const string& n6)
-{
-  string rs = arg( n1 );
+ODIF::func_args::arg_firstof(const string& dv,
+                             const string& n1, const string& n2,
+                             const string& n3, const string& n4,
+                             const string& n5, const string& n6)
 
-  if ( (rs.length() == 0) && (n2.length() != 0) ) { rs = arg( n2 );
-  if ( (rs.length() == 0) && (n3.length() != 0) ) { rs = arg( n3 );
-  if ( (rs.length() == 0) && (n4.length() != 0) ) { rs = arg( n4 );
-  if ( (rs.length() == 0) && (n5.length() != 0) ) { rs = arg( n5 );
-  if ( (rs.length() == 0) && (n6.length() != 0) ) { rs = arg( n6 );
+{
+  string rs;
+
+  bool found;
+                                 rs = arg( n1, found );
+  if ( !found && !n2.empty() ) { rs = arg( n2, found );
+  if ( !found && !n3.empty() ) { rs = arg( n3, found );
+  if ( !found && !n4.empty() ) { rs = arg( n4, found );
+  if ( !found && !n5.empty() ) { rs = arg( n5, found );
+  if ( !found && !n6.empty() ) { rs = arg( n6, found );
   }}}}}
+
+  // default
+  if ( !found )
+    rs = dv;
 
   return( rs );
 }

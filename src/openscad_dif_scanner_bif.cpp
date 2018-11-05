@@ -150,12 +150,14 @@ ODIF::ODIF_Scanner::bif_shell(void)
   vector<string> av = fx_argv.names_v(true, false);
   for ( vector<string>::iterator it=av.begin(); it!=av.end(); ++it )
   {
+    bool found;
+
     if      (!(it->compare(vana[0])&&it->compare(vana[1])))
-      flag_stde=( atoi(fx_argv.arg(*it).c_str()) > 0 );
+      flag_stde=( atoi(fx_argv.arg(*it, found).c_str()) > 0 );
     else if (!(it->compare(vana[2])&&it->compare(vana[3])))
-      flag_rmnl=( atoi(fx_argv.arg(*it).c_str()) > 0 );
+      flag_rmnl=( atoi(fx_argv.arg(*it, found).c_str()) > 0 );
     else if (!(it->compare(vana[4])&&it->compare(vana[5])))
-      flag_eval=( atoi(fx_argv.arg(*it).c_str()) > 0 );
+      flag_eval=( atoi(fx_argv.arg(*it, found).c_str()) > 0 );
     else
       return( amu_error_msg(*it + " invalid flag. " + help) );
   }
@@ -236,11 +238,11 @@ ODIF::ODIF_Scanner::bif_combine(void)
   // assign local variable values: positions must match declaration above.
   // do not trim to allow combining of natural language.
   size_t ap=0;
-  string prefix     = unquote(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string suffix     = unquote(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string joiner     = unquote(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string separator  = unquote(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string tokenizer  = unquote(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string prefix     = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string suffix     = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string joiner     = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string separator  = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string tokenizer  = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -372,14 +374,14 @@ ODIF::ODIF_Scanner::bif_table(void)
 
   // assign local variable values: positions must match declaration above.
   size_t ap=0;
-  string id               = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string table_caption    = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string columns          = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string table_class      = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string column_headings  = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string cell_texts       = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string cell_captions    = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string cell_urls        = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string id               = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string table_caption    = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string columns          = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string table_class      = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string column_headings  = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string cell_texts       = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string cell_captions    = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string cell_urls        = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -608,18 +610,18 @@ ODIF::ODIF_Scanner::bif_image_table(void)
 
   // assign local variable values: positions must match declaration above.
   size_t ap=0;
-  string type             = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string id               = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string table_caption    = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string columns          = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string table_class      = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string image_width      = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string image_height     = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string column_headings  = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string cell_files       = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string cell_titles      = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string cell_captions    = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
-  string cell_urls        = unquote_trim(fx_argv.arg_firstof(vana[ap],vana[ap+1])); ap+=2;
+  string type             = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string id               = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string table_caption    = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string columns          = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string table_class      = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string image_width      = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string image_height     = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string column_headings  = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string cell_files       = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string cell_titles      = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string cell_captions    = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string cell_urls        = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -1538,10 +1540,10 @@ ODIF::ODIF_Scanner::bif_scope(void)
 
   // assign local variable values: positions must match declaration above.
   size_t ap=18;
-  bool make     = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[0],vana[1])).c_str() ) > 0 );
-  bool sort     = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[2],vana[3])).c_str() ) > 0 );
-  bool unique   = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[4],vana[5])).c_str() ) > 0 );
-  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[6],vana[7])).c_str() ) > 0 );
+  bool make     = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[0],vana[1])).c_str() ) > 0 );
+  bool sort     = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[2],vana[3])).c_str() ) > 0 );
+  bool unique   = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[4],vana[5])).c_str() ) > 0 );
+  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[6],vana[7])).c_str() ) > 0 );
 
   // generate options help string.
   string help = "options: [";
@@ -1726,8 +1728,8 @@ ODIF::ODIF_Scanner::bif_source(void)
 
   // assign local variable values: positions must match declaration above.
   size_t ap=14;
-  bool absolute = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[0],vana[1])).c_str() ) > 0 );
-  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof(vana[2],vana[3])).c_str() ) > 0 );
+  bool absolute = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[0],vana[1])).c_str() ) > 0 );
+  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof("",vana[2],vana[3])).c_str() ) > 0 );
 
   // generate options help string.
   string help = "options: [";
