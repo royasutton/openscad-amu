@@ -1813,6 +1813,180 @@ ODIF::ODIF_Scanner::bif_source(void)
   return ( result );
 }
 
+/***************************************************************************//**
+  \details
+
+    Return information about source path.
+
+    Prefix flags with \c ++ to enable. For example <tt>++full</tt> will
+    return the full path name of the input formatted as a path
+    identifier.
+
+    Options that require arguments.
+
+     options   | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      head     | h   |         | return path name from head at location
+      tail     | t   |         | return path name from tail at location
+
+    Flags that produce output.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      full     | f   | false   | return full path name to input
+      root     | r   | false   | return root path name
+      stem     | s   | false   | return input stem name
+      dir      | d   | false   | return input directory name
+      parent   | p   | false   | return input parent directory name
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_pathid(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "head",     "h",
+  "tail",     "t",
+
+  "full",     "f",
+  "root",     "r",
+  "stem",     "s",
+  "dir",      "d",
+  "parent",   "p"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  size_t ap=14;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  string result;
+
+  bfs::path input_path = input_name;
+  bfs::path parent_path;
+
+  string path_joiner = "_";
+
+  // get relative parent path.
+  input_path = UTIL::get_relative_path(input_path, bfs::current_path());
+  parent_path = input_path.parent_path();
+
+  //
+  // create vector of parent path levels
+  //
+  vector<string> input_path_vec;
+
+  // start with 'root'
+  input_path_vec.push_back("root");
+
+  // add each directory of parent_path from left to right
+  for (bfs::path::const_iterator pi=parent_path.begin();
+                                 pi!=parent_path.end();
+                                 ++pi)
+  {
+    input_path_vec.push_back( pi->string() );
+  }
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+
+    bool flag = ( atoi( v.c_str() ) > 0 );    // assign flag value
+    bool limited = false;
+    size_t index = atoi( v.c_str() );         // assign value as integer
+
+    // limit index
+    if ( index > (input_path_vec.size()-1) )
+    {
+      index = input_path_vec.size()-1;
+      limited = true;
+    }
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      //
+      // [ option with integer argument ]
+      //
+
+      if      (!(n.compare(vana[0])&&n.compare(vana[1])))
+      { // head
+        if ( result.size() ) result.append( path_joiner );
+        if ( limited ) result.append( "limited" + path_joiner );
+        result.append( input_path_vec[ index ] );
+      }
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // tail
+        if ( result.size() ) result.append( path_joiner );
+        result.append( input_path_vec[ input_path_vec.size() - 1 - index ] );
+        if ( limited ) result.append( path_joiner + "limited" );
+      }
+
+      //
+      // [ flags ]
+      //
+
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])) && flag)
+      { // full
+        for( vector<string>::iterator vit=input_path_vec.begin();
+                                      vit!=input_path_vec.end();
+                                      ++vit)
+        {
+          if ( result.size() ) result.append( path_joiner );
+          result.append( *vit );
+        }
+      }
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])) && flag)
+      { // root
+        if ( result.size() ) result.append( path_joiner );
+        result.append( input_path_vec[ 0 ] );
+      }
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      { // stem
+        if ( result.size() ) result.append( path_joiner );
+        result.append( input_path.stem().string() );
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      { // dir
+        if ( result.size() ) result.append( path_joiner );
+        result.append( input_path_vec[ input_path_vec.size() - 1 ] );
+      }
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      { // parent or 'none'
+        if ( result.size() ) result.append( path_joiner );
+        if ( input_path_vec.size() > 1 )
+          result.append( input_path_vec[ input_path_vec.size() - 2 ] );
+        else
+          result.append( "none" );
+      }
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  return ( result );
+}
+
 
 /*******************************************************************************
 // eof
