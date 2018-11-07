@@ -1833,7 +1833,8 @@ ODIF::ODIF_Scanner::bif_source(void)
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
-      full     | f   | false   | return full path name to input
+      full     | f   | false   | return full path name to input from root
+      path     | a   | false   | return full path name to input after root
       root     | r   | false   | return root path name
       stem     | s   | false   | return input stem name
       dir      | d   | false   | return input directory name
@@ -1853,6 +1854,7 @@ ODIF::ODIF_Scanner::bif_pathid(void)
   "tail",     "t",
 
   "full",     "f",
+  "path",     "a",
   "root",     "r",
   "stem",     "s",
   "dir",      "d",
@@ -1861,7 +1863,7 @@ ODIF::ODIF_Scanner::bif_pathid(void)
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
   // assign local variable values: positions must match declaration above.
-  size_t ap=14;
+  size_t ap=16;
 
   // generate options help string.
   string help = "options: [";
@@ -1955,21 +1957,31 @@ ODIF::ODIF_Scanner::bif_pathid(void)
         }
       }
       else if (!(n.compare(vana[6])&&n.compare(vana[7])) && flag)
+      { // path
+        for( vector<string>::iterator vit=input_path_vec.begin()+1;
+                                      vit!=input_path_vec.end();
+                                      ++vit)
+        {
+          if ( result.size() ) result.append( path_joiner );
+          result.append( *vit );
+        }
+      }
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
       { // root
         if ( result.size() ) result.append( path_joiner );
         result.append( input_path_vec[ 0 ] );
       }
-      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
       { // stem
         if ( result.size() ) result.append( path_joiner );
         result.append( input_path.stem().string() );
       }
-      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
       { // dir
         if ( result.size() ) result.append( path_joiner );
         result.append( input_path_vec[ input_path_vec.size() - 1 ] );
       }
-      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
       { // parent or 'none'
         if ( result.size() ) result.append( path_joiner );
         if ( input_path_vec.size() > 1 )
