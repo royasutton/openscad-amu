@@ -1824,21 +1824,28 @@ ODIF::ODIF_Scanner::bif_source(void)
 
     Options that require arguments.
 
-     options   | sc  | default | description
-    :---------:|:---:|:-------:|:-----------------------------------------
-      head     | h   |         | return path name from head at location
-      tail     | t   |         | return path name from tail at location
+     options      | sc  | default | description
+    :------------:|:---:|:-------:|:-----------------------------------------
+      head        | h   |         | path name from head at location
+      tail        | t   |         | path name from tail at location
 
     Flags that produce output.
 
-     flags     | sc  | default | description
-    :---------:|:---:|:-------:|:-----------------------------------------
-      full     | f   | false   | return full path name to input from root
-      path     | a   | false   | return full path name to input after root
-      root     | r   | false   | return root path name
-      stem     | s   | false   | return input stem name
-      dir      | d   | false   | return input directory name
-      parent   | p   | false   | return input parent directory name
+     flags        | sc  | default | description
+    :------------:|:---:|:-------:|:-----------------------------------------
+      full        | f   | false   | full path name to input from root
+      path        | a   | false   | full path name to input after root
+      full_parent | fp  | false   | full parent path name to input from root
+      path_parent | ap  | false   | full parent path name to input after root
+
+    Flags that produce output.
+
+     flags        | sc  | default | description
+    :------------:|:---:|:-------:|:-----------------------------------------
+      root        | r   | false   | root path name
+      stem        | s   | false   | input stem name
+      dir         | d   | false   | input directory name
+      parent      | p   | false   | input parent directory name
 
 *******************************************************************************/
 string
@@ -1850,20 +1857,23 @@ ODIF::ODIF_Scanner::bif_pathid(void)
   // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
   string vana[] =
   {
-  "head",     "h",
-  "tail",     "t",
+  "head",         "h",
+  "tail",         "t",
 
-  "full",     "f",
-  "path",     "a",
-  "root",     "r",
-  "stem",     "s",
-  "dir",      "d",
-  "parent",   "p"
+  "full",         "f",
+  "path",         "a",
+  "full_parent",  "fp",
+  "path_parent",  "ap",
+
+  "root",         "r",
+  "stem",         "s",
+  "dir",          "d",
+  "parent",       "p"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
   // assign local variable values: positions must match declaration above.
-  size_t ap=16;
+  size_t ap=20;
 
   // generate options help string.
   string help = "options: [";
@@ -1958,30 +1968,68 @@ ODIF::ODIF_Scanner::bif_pathid(void)
       }
       else if (!(n.compare(vana[6])&&n.compare(vana[7])) && flag)
       { // path
-        for( vector<string>::iterator vit=input_path_vec.begin()+1;
-                                      vit!=input_path_vec.end();
-                                      ++vit)
+        if ( input_path_vec.size() > 1 )
         {
-          if ( result.size() ) result.append( path_joiner );
-          result.append( *vit );
+          for( vector<string>::iterator vit=input_path_vec.begin()+1;
+                                        vit!=input_path_vec.end();
+                                        ++vit)
+          {
+            if ( result.size() ) result.append( path_joiner );
+            result.append( *vit );
+          }
         }
       }
       else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      { // full_parent
+        if ( input_path_vec.size() > 1 )
+        {
+          for( vector<string>::iterator vit=input_path_vec.begin();
+                                        vit!=input_path_vec.end()-1;
+                                        ++vit)
+          {
+            if ( result.size() ) result.append( path_joiner );
+            result.append( *vit );
+          }
+        }
+        else
+        {
+          result.append( "none" );
+        }
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      { // path_parent
+        if ( input_path_vec.size() > 2 )
+        {
+          for( vector<string>::iterator vit=input_path_vec.begin()+1;
+                                        vit!=input_path_vec.end()-1;
+                                        ++vit)
+          {
+            if ( result.size() ) result.append( path_joiner );
+            result.append( *vit );
+          }
+        }
+      }
+
+      //
+      // [ flags ]
+      //
+
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
       { // root
         if ( result.size() ) result.append( path_joiner );
         result.append( input_path_vec[ 0 ] );
       }
-      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
       { // stem
         if ( result.size() ) result.append( path_joiner );
         result.append( input_path.stem().string() );
       }
-      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      else if (!(n.compare(vana[16])&&n.compare(vana[17])) && flag)
       { // dir
         if ( result.size() ) result.append( path_joiner );
         result.append( input_path_vec[ input_path_vec.size() - 1 ] );
       }
-      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      else if (!(n.compare(vana[18])&&n.compare(vana[19])) && flag)
       { // parent or 'none'
         if ( result.size() ) result.append( path_joiner );
         if ( input_path_vec.size() > 1 )
