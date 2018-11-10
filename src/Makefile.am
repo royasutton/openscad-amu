@@ -65,13 +65,15 @@ openscad_seam_SOURCES = \
 	openscad_seam_main.cpp
 
 EXTRA_DIST = \
-	doxygen_mainpage.cpp \
+	mainpage.dox \
+	\
 	bash_dif_lexer.ll \
 	openscad_dif_lexer.ll \
 	openscad_seam_lexer.ll
 
 doxygen_stamp_other_dependacies = \
-	doxygen_mainpage.cpp \
+	mainpage.dox \
+	\
 	$(bash_dif_SOURCES) \
 	$(openscad_dif_SOURCES) \
 	$(openscad_seam_SOURCES) \

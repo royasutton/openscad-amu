@@ -19,7 +19,7 @@ GENERATE_BUGLIST       = YES
 GENERATE_DEPRECATEDLIST= YES
 WARN_LOGFILE           = doxygen.warn
 INPUT                  =
-FILE_PATTERNS          = *.ll *.cpp *.hpp
+FILE_PATTERNS          = *.ll *.cpp *.hpp *.dox
 RECURSIVE              = NO
 EXAMPLE_PATH           = "@top_builddir@/share/examples" \
                          "@top_srcdir@/share/examples" \

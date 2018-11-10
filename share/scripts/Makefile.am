@@ -10,7 +10,8 @@ files_s = \
 files_d =
 
 files_am = \
-	doxygen_mainpage.bash \
+	mainpage.bash \
+	\
 	segregate.bash
 
 scripts_help = \
