@@ -399,7 +399,7 @@ main(int argc, char** argv)
              << endl
              <<
   "OpenSCAD script extractor and auto-make tool (seam).\n\n"
-  "Extract makefile-generation- and OpenSCAD-build-scripts, embedded\n"
+  "Extract makefile-generation- and OpenSCAD-build-scripts embedded\n"
   "into comment blocks, of an OpenSCAD input file. These scripts may\n"
   "be used to generate makefiles that automate the compilation of\n"
   "OpenSCAD design targets.\n"

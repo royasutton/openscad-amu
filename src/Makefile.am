@@ -64,19 +64,29 @@ openscad_seam_SOURCES = \
 	openscad_seam_scanner.cpp \
 	openscad_seam_main.cpp
 
-EXTRA_DIST = \
+# doxygen documentation
+DOXYGEN_DOXFILES = \
 	mainpage.dox \
+	bash_dif.dox \
+	openscad_dif.dox \
+	openscad_seam.dox
+
+EXTRA_DIST = \
+	$(DOXYGEN_DOXFILES) \
 	\
 	bash_dif_lexer.ll \
 	openscad_dif_lexer.ll \
 	openscad_seam_lexer.ll
 
-doxygen_stamp_other_dependacies = \
-	mainpage.dox \
+doxygen_stamp_dependacies = \
+	Makefile \
+	Doxyfile \
+	$(DOXYGEN_DOXFILES) \
 	\
 	$(bash_dif_SOURCES) \
 	$(openscad_dif_SOURCES) \
 	$(openscad_seam_SOURCES) \
+	\
 	$(programs_help)
 
 root_path = $(DESTDIR)$(pkgdatadir)
@@ -105,7 +115,7 @@ man-local: doxygen.stamp
 doxygen/latex/refman.pdf:
 	( cd doxygen/latex && make refman.pdf )
 
-doxygen.stamp: Doxyfile Makefile $(doxygen_stamp_other_dependacies)
+doxygen.stamp: $(doxygen_stamp_dependacies)
 	( cat Doxyfile ; \
 		echo "INPUT=$(srcdir)" ; \
 		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: C++ Programs\"" ; \

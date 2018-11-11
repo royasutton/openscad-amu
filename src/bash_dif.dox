@@ -1,0 +1,85 @@
+/***************************************************************************//**
+  \page bash_dif_ht Command Line Help (bash-dif)
+  \include bash-dif.help
+*******************************************************************************/
+
+/***************************************************************************//**
+  \defgroup bash_dif_src Source Code (bash-dif)
+  \brief
+    The Doxygen input filter for \em Bash scripts.
+*******************************************************************************/
+
+/***************************************************************************//**
+  \page bash_dif_doc Program Usage (bash-dif)
+
+
+  \section bash_dif_sm Documenting Bash script
+
+  This filter may be used to markup bash scripts for use with Doygen.
+  See [Documenting the code][docblocks] in the Doxygen manual for
+  information.
+
+  [docblocks]: http://www.stack.nl/~dimitri/doxygen/manual/docblocks.html
+
+
+  \subsection bash_dif_sm_cs Comment Sections
+
+  Comment patters are identified according to the rules in the
+  following table. See the flex documentation on [patterns]
+  (http://flex.sourceforge.net/manual/Patterns.html)
+  for more information.
+
+   patterns   | behavior
+  :----------:|:-----------------------------------------
+   "#"        | comment. ignored by filter.
+   "##"[#]*   | documentation pass to Doxygen.
+   "#/"[#!/]+ | open a comment block.
+   "#"+"/"    | close comment block.
+   "#"[#]*    | comment line while in open comment block.
+
+
+  \subsection bash_dif_sm_adc Additional Doxygen Commands
+
+  In addition to all of the normal Doxygen [special commands,]
+  (http://www.stack.nl/~dimitri/doxygen/manual/commands.html)
+  here is a list of additional filter-provided ones that can be used for
+  document markup:
+
+  | Additional Commands             | Description
+  |:--------------------------------|:--------------------------
+  | \\afn id                        | function name
+  | \\aparam	<type> [direction] id | function parameter
+  | \\aparami <type> id             | function parameter input
+  | \\aparamo <type> id             | function parameter output
+
+
+  \subsection bash_dif_sm_me Example Markup
+
+  \verbatim
+  # This comment will not be passed to Doxygen.
+  ## \ingroup the_group_name
+  ## @{
+
+  ## Create a camera view option set table from predefined names.
+  #/##################################################################
+  # \afn function
+  #
+  # \aparam  [in] <optional integer>      width      Set table width.
+  # \aparami      <required named string> name       Set table name.
+  # \aparamo      <named string>          translate  String of integers.
+  #
+  # \returns void
+  #
+  # \details
+  #   This function provides an abstracted way to create option
+  #    set tables for predefined views.
+  ###################################################################/
+
+  ## @}
+  \endverbatim
+
+*******************************************************************************/
+
+//
+// eof
+//
