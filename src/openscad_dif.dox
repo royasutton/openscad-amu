@@ -52,31 +52,45 @@
 
   \subsection openscad_dif_sm_v Variabes
 
-  The result of the function will be inserted into the output of the
-  input file being filtered unless an optional results variable name
-  follows the function name. When a variable name is provided, the
-  command function's result is written to the specified variable and
-  is not to copied the filters output.
+  The result of a function will be copied to the output of the filter
+  operation unless a results variable name follows the function name.
+  When a variable name is provided, the command result is stored in the
+  specified variable and is not to copied to output.
 
   These variables can be referenced in the context of other function
-  \em arguments of the filtered input file. A variable is referenced
-  using the form: <tt>${VAR}</tt>. Variable expansions are recursive and
-  expansion can be postponed using expansion escaping of the form:
-  <tt>\\${VAR}</tt>.
+  \em arguments. A variable is referenced using the form:
+  <tt>${VAR}</tt>. Variable expansions are recursive and expansion can
+  be postponed using expansion escaping of the form: <tt>\\${VAR}</tt>.
+
+  The following table list the predefined variables.
+
+  Name                | Description
+  :-------------------|:------------------------------
+  EFS                 | amu_eval feild separator
+  ABS_FILE_NAME       | absolute input file file name
+  ABS_PATH_NAME       | absolute input file path name
+  FILE_NAME           | input file file name
+  PATH_NAME           | input file path name
+  BASE_NAME           | input file base name
+  STEM_NAME           | input file stem name
+  EXTN_AME            | input file extension name
 
 
   \subsection openscad_dif_sm_a Arguments
 
   Arguments are function dependent, however, there are four categories
-  that may be used by any particular function. These are summarized
-  in the following table:
+  that are used. These are summarized in the following table:
 
-  Type        | Example
-  :-----------|:---------------:
-  positional  | value
-  named       | name=value
-  flag        | ++flag /--flag
-  incr/decr   | var++ / var--
+  Type        | Example         | Scope
+  :-----------|:---------------:|:------:
+  positional  | value           | local
+  named       | name=value      | local
+  flag        | ++flag /--flag  | local
+  incr/decr   | var++ / var--   | global
+
+  Except where noted otherwise, \em positional, \em named, and \em flag
+  assigned values are local to the function where they are used. The
+  \em incr/decr argument values are global across all function.
 
 
   \subsection openscad_dif_sm_adc Additional Doxygen Commands
