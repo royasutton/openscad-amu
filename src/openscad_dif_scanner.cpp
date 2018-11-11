@@ -98,6 +98,18 @@ ODIF::ODIF_Scanner::init(void)
   varm.set_report( true );
   varm.set_report_message("<tt><UNDEFINED></tt>");
 
+  bfs::path ifap ( input_name );
+  bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
+  // setup predefined environment variables
+  varm.store( "EFS", " " );
+  varm.store( "ABS_FILENAME", ifap.string() );
+  varm.store( "ABS_PATHNAME", ifap.parent_path().string() );
+  varm.store( "FILENAME", ifrp.string() );
+  varm.store( "PATHNAME", ifrp.parent_path().string() );
+  varm.store( "BASENAME", ifrp.filename().string() );
+  varm.store( "STEMNAME", ifrp.stem().string() );
+  varm.store( "EXTNAME", ifrp.extension().string() );
+
   // initialize function argument positional prefix
   fx_argv.clear();
   fx_argv.set_prefix("arg");
