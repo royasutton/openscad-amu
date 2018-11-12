@@ -114,6 +114,7 @@
   | \ref ODIF::ODIF_Scanner::bif_scope()        "\\amu_scope"         | query scope data
   | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_source"        | query source filename
   | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_pathid"        | generate source path identifier
+  | \ref ODIF::ODIF_Scanner::bif_filenames()    "\\amu_filenames"     | operations for lists of filenames
 
   External commands also exists and can be found in the directory:
   <tt><install-prefix>/functions/</tt>. Here is a list:

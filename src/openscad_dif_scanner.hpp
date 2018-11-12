@@ -322,6 +322,8 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string bif_source(void);
     //! generate source path identifier.
     std::string bif_pathid(void);
+    //! perform operations on lists of filenames.
+    std::string bif_filenames(void);
 };
 
 } /* end namespace ODIF */

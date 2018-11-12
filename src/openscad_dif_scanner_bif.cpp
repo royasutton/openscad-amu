@@ -2079,6 +2079,165 @@ ODIF::ODIF_Scanner::bif_pathid(void)
   return ( result );
 }
 
+/***************************************************************************//**
+  \details
+
+    Perform filename operations on a list of files.
+
+    Prefix flags with \c ++ to enable. For example <tt>++path</tt> will
+    return the path name of each file in the file list.
+
+    Options that require arguments.
+
+     options      | sc  | default       | description
+    :------------:|:---:|:-------------:|:-----------------------------------------
+      files       | f   |               | list of files
+      tokenizer   | t   | [,[:space:]]  | tokenizer to separate files in list
+      separator   | r   | [[:space:]]   | file separator for resulting list
+
+    Flags that produce output.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      file     | n   | false   | return filename for each file
+      path     | p   | false   | return pathname for each file
+      base     | b   | false   | return basename for each file
+      stem     | s   | false   | return stemname for each file
+      ext      | e   | false   | return extension for each file
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_filenames(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "files",      "f",
+
+  "tokenizer",  "t",
+  "separator",  "r",
+
+  "file",       "n",
+  "path",       "p",
+  "base",       "b",
+  "stem",       "s",
+  "ext",        "e"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // generate options help string.
+  size_t ap=16;
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  //
+  // assemble result
+  //
+  string result;
+
+  string tokl = ", ";   // assign default token list
+  string fsep = " ";    // assign default output file separator
+
+  vector<string> fl_v;
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+    bool flag = ( atoi( v.c_str() ) > 0 );   // assign flag value
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if (!(n.compare(vana[0])&&n.compare(vana[1])))
+      { // file list
+        string fl_s = unquote( v );
+
+        typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+        boost::char_separator<char> fsep( tokl.c_str() );
+        tokenizer fl_tok( fl_s, fsep );
+
+        fl_v.clear();
+        for ( tokenizer::iterator fit=fl_tok.begin(); fit!=fl_tok.end(); ++fit )
+          fl_v.push_back( boost::trim_copy( *fit ) );
+      }
+
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // tokenizer
+        tokl = unquote( v );
+      }
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])))
+      { // separator
+        fsep = unquote( v );
+      }
+
+      //
+      // flags
+      //
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])) && flag)
+      { // file
+        for ( vector<string>::const_iterator fit=fl_v.begin(); fit!=fl_v.end(); ++fit )
+        {
+          if ( result.size() ) result.append( fsep );
+            result.append( bfs::path( *fit ).string() );
+        }
+      }
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      { // path
+        for ( vector<string>::const_iterator fit=fl_v.begin(); fit!=fl_v.end(); ++fit )
+        {
+          if ( result.size() ) result.append( fsep );
+            result.append( bfs::path( *fit ).parent_path().string() );
+        }
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      { // base
+        for ( vector<string>::const_iterator fit=fl_v.begin(); fit!=fl_v.end(); ++fit )
+        {
+          if ( result.size() ) result.append( fsep );
+          result.append( bfs::path( *fit ).filename().string() );
+        }
+      }
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      { // stem
+        for ( vector<string>::const_iterator fit=fl_v.begin(); fit!=fl_v.end(); ++fit )
+        {
+          if ( result.size() ) result.append( fsep );
+          result.append( bfs::path( *fit ).stem().string() );
+        }
+      }
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      { // ext
+        for ( vector<string>::const_iterator fit=fl_v.begin(); fit!=fl_v.end(); ++fit )
+        {
+          if ( result.size() ) result.append( fsep );
+          result.append( bfs::path( *fit ).extension().string() );
+        }
+      }
+
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  return ( result );
+}
+
 
 /*******************************************************************************
 // eof
