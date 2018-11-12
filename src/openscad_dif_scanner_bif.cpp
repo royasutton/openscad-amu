@@ -613,6 +613,22 @@ ODIF::ODIF_Scanner::bif_table(void)
      titles | [~^]
      urls   | [^\|#[:space:]]
 
+    When using \p cell_urls, the function may need to be enclosed by \p
+    \\htmlonly and \p \\endhtmlonly to prevent Doxygen from rewriting
+    the assigned urls as show below.
+
+    \verbatim
+      // image table with cell urls
+
+      \htmlonly
+        \amu_image_table (
+            type=html table_caption="Downloadable"
+            cell_files="${png_files}" cell_captions="${titles}"
+            cell_urls="${stl_files}"
+        )
+      \endhtmlonly
+    \endverbatim
+
     For more information on how to specify and use function arguments
     see \ref openscad_dif_sm_a.
 
