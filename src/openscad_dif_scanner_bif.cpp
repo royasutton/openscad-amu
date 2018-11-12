@@ -35,6 +35,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
+#include <boost/xpressive/xpressive.hpp>
 
 #include <set>
 
@@ -2261,6 +2263,108 @@ ODIF::ODIF_Scanner::bif_filenames(void)
       }
     }
   }
+
+  return ( result );
+}
+
+/***************************************************************************//**
+  \details
+
+    Perform search and replace on text. Regular expression support is
+    provided by the [boost] regex_replace() library function.
+
+    The options and flags (and their short codes) are summarized in the
+    following tables.
+
+    Options that require arguments.
+
+     options    | sc  | default | description
+    :----------:|:---:|:-------:|:--------------------------
+      text      | t   |         | text string to seach
+      search    | s   | []      | search regular expression
+      replace   | r   | []      | replacement format string
+
+    Flags.
+
+     flags      | sc  | default | description
+    :----------:|:---:|:-------:|:--------------------------------
+      global    | g   | true    | replace all occurances
+      literal   | l   | false   | treat format string as literal
+      perl      | p   | false   | recognize perl format sequences
+      sed       | e   | false   | recognize sed format sequences
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+
+    [boost]: https://www.boost.org
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_replace(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "text",     "t",
+  "search",   "s",
+  "replace",  "r",
+
+  "global",   "g",
+  "literal",  "l",
+  "perl",     "p",
+  "sed",      "e"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  size_t ap=0;
+  string text     = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string search   = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string replace  = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+
+  bool global     = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool literal    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool perl       = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool sed        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  // validate named arguments: (must be one of the declared options).
+  vector<string> av = fx_argv.names_v(true, false);
+  for ( vector<string>::iterator it=av.begin(); it!=av.end(); ++it )
+    if ( vans.find( *it ) == vans.end() )
+      return( amu_error_msg(*it + " invalid option. " + help) );
+
+  //
+  // general argument validation:
+  //
+
+  // enforce zero positional arguments (except arg0).
+  if ( fx_argv.size(false, true) != 1 )
+    return(amu_error_msg("requires zero positional argument. " + help));
+
+  string result;
+
+  using namespace boost::xpressive;
+  sregex sre = sregex::compile( search );
+  regex_constants::match_flag_type flags;
+
+  flags = regex_constants::format_default;
+
+  if ( !global )  flags = flags | regex_constants::format_first_only;
+  if ( literal )  flags = flags | regex_constants::format_literal;
+  if ( perl )     flags = flags | regex_constants::format_perl;
+  if ( sed )      flags = flags | regex_constants::format_sed;
+
+  result = regex_replace( text, sre, replace, flags );
 
   return ( result );
 }

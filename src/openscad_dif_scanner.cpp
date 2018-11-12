@@ -259,6 +259,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_filenames();
   }
+  else if (fx_name.compare("replace")==0)
+  {
+    has_result=true;
+    result=bif_replace();
+  }
   else
   {
     /* check external function */
