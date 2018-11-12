@@ -78,8 +78,8 @@
 
   \subsection openscad_dif_sm_a Arguments
 
-  Arguments are function dependent, however, there are four categories
-  that are used. These are summarized in the following table:
+  There are four categories that are used  by functions as summarized
+  in the following table:
 
   Type        | Example         | Scope
   :-----------|:---------------:|:------:
@@ -88,9 +88,18 @@
   flag        | ++flag /--flag  | local
   incr/decr   | var++ / var--   | global
 
-  Except where noted otherwise, \em positional, \em named, and \em flag
-  assigned values are local to the function where they are used. The
-  \em incr/decr argument values are global across all function.
+  Except where noted otherwise, \p positional, \p named, and \p flag
+  assignments have a local scope to the function where they are used.
+  The \p incr/decr argument values are global across all function for
+  an input file. A named argument takes the form of <tt>name=value</tt>
+  where \p name is a variable identifier and \p value is the content to
+  be assigend to the specified variable. A value, for positional or
+  named arguments, should be quoted with single or double quotes when
+  it contains spaces. Prefix a flag with \c ++ to enable it and \c \-\-
+  to disable it. For example \p ++name enables the argument \p name and
+  \p --name disables it. \p incr/decr will always operate on and update
+  the global variable scope (ex: \p i++ or \p i-- will always increment
+  or decrement the global variable \p i).
 
 
   \subsection openscad_dif_sm_adc Additional Doxygen Commands
