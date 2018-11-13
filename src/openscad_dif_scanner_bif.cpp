@@ -2187,7 +2187,7 @@ ODIF::ODIF_Scanner::bif_pathid(void)
 
 *******************************************************************************/
 string
-ODIF::ODIF_Scanner::bif_filenames(void)
+ODIF::ODIF_Scanner::bif_filename(void)
 {
   using namespace UTIL;
 

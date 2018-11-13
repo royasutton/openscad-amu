@@ -254,10 +254,10 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_pathid();
   }
-  else if (fx_name.compare("filenames")==0)
+  else if (fx_name.compare("filename")==0)
   {
     has_result=true;
-    result=bif_filenames();
+    result=bif_filename();
   }
   else if (fx_name.compare("replace")==0)
   {
