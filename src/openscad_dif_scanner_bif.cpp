@@ -2371,9 +2371,9 @@ ODIF::ODIF_Scanner::bif_replace(void)
 
   // assign local variable values: positions must match declaration above.
   size_t ap=0;
-  string text     = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string search   = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string replace  = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string text     = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string search   = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string replace  = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
   bool global     = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool literal    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
