@@ -107,6 +107,8 @@ ODIF::ODIF_Scanner::bif_eval(void)
         result.append( UTIL::unquote( vm.expand(efs) ) );
 
       // expand and append positional argument text
+      // do not unquote value, quotations in positional
+      // arguments assumed to have significance.
       result.append( vm.expand_text( it->value ) );
     }
     // argument is named or flag
@@ -119,12 +121,14 @@ ODIF::ODIF_Scanner::bif_eval(void)
         update_local = ( atoi( it->value.c_str() ) > 0 );
       else
       // add name=value pair to variable map
+      // unquote value before storing. no need to expand
+      // text as this is done recursively by class 'env_var'.
       {
         // local
-        if ( update_local ) vm.store( it->name, it->value );
+        if ( update_local ) vm.store( it->name, UTIL::unquote( it->value ) );
 
         // global
-        if ( update_global ) varm.store( it->name, it->value );
+        if ( update_global ) varm.store( it->name, UTIL::unquote( it->value ) );
       }
     }
   }
