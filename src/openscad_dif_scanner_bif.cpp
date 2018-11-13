@@ -599,6 +599,8 @@ ODIF::ODIF_Scanner::bif_table(void)
       image_width       | iw  |          |           |  width for each image
       image_height      | ih  |          |           |  height for each image
       column_headings   | chl |          |  titles   |  column headings list
+      cell_begin        | cdb |          |  titles   |  initial text for each cell
+      cell_end          | cde |          |  titles   |  final text for each cell
       cell_files        | cdl |          |  files    |  cell image list
       cell_titles       | ctl |          |  titles   |  cell title list
       cell_captions     | ccl |          |  titles   |  cell caption list
@@ -650,6 +652,8 @@ ODIF::ODIF_Scanner::bif_image_table(void)
   "image_width",      "iw",
   "image_height",     "ih",
   "column_headings",  "chl",
+  "cell_begin",       "cdb",
+  "cell_end",         "cde",
   "cell_files",       "cdl",
   "cell_titles",      "ctl",
   "cell_captions",    "ccl",
@@ -667,6 +671,8 @@ ODIF::ODIF_Scanner::bif_image_table(void)
   string image_width      = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
   string image_height     = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
   string column_headings  = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string cell_begin       = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string cell_end         = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
   string cell_files       = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
   string cell_titles      = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
   string cell_captions    = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
@@ -727,6 +733,18 @@ ODIF::ODIF_Scanner::bif_image_table(void)
   for ( tokenizer::iterator it=chl_tok.begin(); it!=chl_tok.end(); ++it )
     chl_v.push_back( boost::trim_copy( *it ) );
 
+  // cell_begin
+  tokenizer cdb_tok( cell_begin, tsep );
+  vector<string> cdb_v;
+  for ( tokenizer::iterator it=cdb_tok.begin(); it!=cdb_tok.end(); ++it )
+    cdb_v.push_back( boost::trim_copy( *it ) );
+
+  // cell_end
+  tokenizer cde_tok( cell_end, tsep );
+  vector<string> cde_v;
+  for ( tokenizer::iterator it=cde_tok.begin(); it!=cde_tok.end(); ++it )
+    cde_v.push_back( boost::trim_copy( *it ) );
+
   // cell_files
   tokenizer cdl_tok( cell_files, fsep );
   vector<string> cdl_v;
@@ -756,19 +774,29 @@ ODIF::ODIF_Scanner::bif_image_table(void)
     return( amu_error_msg("mismatched " + vana[14] + ": " + to_string(chl_v.size()) +
                           " headings for " + to_string(columns_cnt) + " columns.") );
 
+  // must be a begin for every cell (vana[ cell_begin ])
+  if ( (cdb_v.size() >0) && (cdb_v.size() != cdl_v.size()) )
+    return( amu_error_msg("mismatched " + vana[16] + ": " + to_string(cdb_v.size()) +
+                          " begins for " + to_string(cdl_v.size()) + " cells.") );
+
+  // must be an end for every cell (vana[ cell_end ])
+  if ( (cde_v.size() >0) && (cde_v.size() != cdl_v.size()) )
+    return( amu_error_msg("mismatched " + vana[18] + ": " + to_string(cde_v.size()) +
+                          " ends for " + to_string(cdl_v.size()) + " cells.") );
+
   // must be a title for every cell (vana[ cell_titles ])
   if ( (ctl_v.size() >0) && (ctl_v.size() != cdl_v.size()) )
-    return( amu_error_msg("mismatched " + vana[18] + ": " + to_string(ctl_v.size()) +
+    return( amu_error_msg("mismatched " + vana[22] + ": " + to_string(ctl_v.size()) +
                           " titles for " + to_string(cdl_v.size()) + " cells.") );
 
   // must be a caption for every cell (vana[ cell_captions ])
   if ( (ccl_v.size() >0) && (ccl_v.size() != cdl_v.size()) )
-    return( amu_error_msg("mismatched " + vana[20] + ": " + to_string(ccl_v.size()) +
+    return( amu_error_msg("mismatched " + vana[24] + ": " + to_string(ccl_v.size()) +
                           " captions for " + to_string(cdl_v.size()) + " cells.") );
 
   // must be a url for every cell (vana[ cell_urls ])
   if ( (cul_v.size() >0) && (cul_v.size() != cdl_v.size()) )
-    return( amu_error_msg("mismatched " + vana[22] + ": " + to_string(cul_v.size()) +
+    return( amu_error_msg("mismatched " + vana[26] + ": " + to_string(cul_v.size()) +
                           " URLs for " + to_string(cdl_v.size()) + " cells.") );
 
 
@@ -833,6 +861,9 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       // begin cell
       result.append("<td>");
 
+      // first text for each cell
+      if ( cell_begin.length() ) result.append( cdb_v[cdl_num] );
+
       // begin cell image
       bool found = false;
       if ( cell_urls.length() ) result.append( "<a href=\""
@@ -852,6 +883,9 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       // end cell image
       result.append(">");
       if ( cell_urls.length() ) result.append("</a>");
+
+      // last text for each cell
+      if ( cell_end.length() ) result.append( cde_v[cdl_num] );
 
       // end cell
       result.append("</td>");
@@ -965,6 +999,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
       if ( cell_urls.length() ) result.append( "}");
 
       // end cell image
+
       // end cell
 
       // check end row
