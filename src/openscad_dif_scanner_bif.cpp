@@ -2337,16 +2337,18 @@ ODIF::ODIF_Scanner::bif_filename(void)
     :----------:|:---:|:-------:|:--------------------------
       text      | t   |         | text string to seach
       search    | s   | []      | search regular expression
-      replace   | r   | []      | replacement format string
+      replace   | r   | []      | format string for matched text
 
     Flags.
 
      flags      | sc  | default | description
-    :----------:|:---:|:-------:|:--------------------------------
+    :----------:|:---:|:-------:|:------------------------------------
       global    | g   | true    | replace all occurances
+      no_copy   | n   | false   | do not copy text that do not match
       literal   | l   | false   | treat format string as literal
       perl      | p   | false   | recognize perl format sequences
       sed       | e   | false   | recognize sed format sequences
+      all       | a   | false   | recognize all format sequences
 
     For more information on how to specify and use function arguments
     see \ref openscad_dif_sm_a.
@@ -2367,9 +2369,11 @@ ODIF::ODIF_Scanner::bif_replace(void)
   "replace",  "r",
 
   "global",   "g",
+  "no_copy",  "n",
   "literal",  "l",
   "perl",     "p",
-  "sed",      "e"
+  "sed",      "e",
+  "all",      "a"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
@@ -2380,9 +2384,11 @@ ODIF::ODIF_Scanner::bif_replace(void)
   string replace  = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
   bool global     = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool no_copy    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool literal    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool perl       = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool sed        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool all        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -2415,9 +2421,12 @@ ODIF::ODIF_Scanner::bif_replace(void)
   flags = regex_constants::format_default;
 
   if ( !global )  flags = flags | regex_constants::format_first_only;
+  if ( no_copy )  flags = flags | regex_constants::format_no_copy;
+
   if ( literal )  flags = flags | regex_constants::format_literal;
   if ( perl )     flags = flags | regex_constants::format_perl;
   if ( sed )      flags = flags | regex_constants::format_sed;
+  if ( all )      flags = flags | regex_constants::format_all;
 
   result = regex_replace( text, sre, replace, flags );
 
