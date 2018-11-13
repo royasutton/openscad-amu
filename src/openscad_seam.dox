@@ -1,0 +1,26 @@
+/***************************************************************************//**
+  \page openscad_seam_ht Command Line Help (openscad-seam)
+  \include openscad-seam.help
+*******************************************************************************/
+
+/***************************************************************************//**
+  \defgroup openscad_seam_src Source Code (openscad-seam)
+  \brief
+    The auxiliary script extractor for \em OpenSCAD scripts.
+*******************************************************************************/
+
+/***************************************************************************//**
+  \page openscad_seam_doc Program Usage (openscad-seam)
+
+  OpenSCAD script extractor and auto-make tool (seam).
+
+  Extract makefile-generation- and OpenSCAD-build-scripts embedded into
+  comment blocks, of an OpenSCAD input file. These scripts may be used
+  to generate makefiles that automate the compilation of OpenSCAD
+  design targets.
+
+*******************************************************************************/
+
+//
+// eof
+//

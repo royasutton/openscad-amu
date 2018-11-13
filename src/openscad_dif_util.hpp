@@ -221,15 +221,13 @@ class func_args {
     //! return the named or positional argument value at location n.
     std::string arg(const size_t n);
     //! return the value for the argument named n.
-    std::string arg(const std::string& n);
+    std::string arg(const std::string& n, bool& found);
 
-    //! return the value of the first argument that exists of n1, n2, ..., n6.
-    std::string arg_firstof(const std::string& n1,
-                            const std::string& n2="",
-                            const std::string& n3="",
-                            const std::string& n4="",
-                            const std::string& n5="",
-                            const std::string& n6="");
+    //! return the first argument that exists of n1, ..., n6, else default dv.
+    std::string arg_firstof(const std::string& dv,
+                            const std::string& n1,    const std::string& n2="",
+                            const std::string& n3="", const std::string& n4="",
+                            const std::string& n5="", const std::string& n6="");
 
     //! \brief return the vector of the values for all arguments.
     //! \param n  include named arguments.

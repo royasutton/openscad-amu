@@ -592,31 +592,47 @@ main(int argc, char** argv)
         }
       }
 
-      // add unique directories in map to include path
-      debug_m(debug_filter, "adding unique directories to include-path:");
+      //
+      // add search results to include path
+      //
+
+      // add unique target directories in map
+      debug_m(debug_filter, "adding unique target directories to include-path:");
       for( map<string,string>::iterator mit=path_map.begin(); mit != path_map.end(); ++mit)
       {
-        debug_m(debug_filter, "adding [" + mit->second + "]");
+        debug_m(debug_filter, " added [" + mit->second + "]");
         include_path.push_back( mit->second );
       }
 
-      // add default include paths
+      // add prefixed output directory
       if ( prefix_scripts )
       {
-        debug_m(debug_filter, "adding [" + output_prefix + "] (prefix default)");
+        debug_m(debug_filter, " added [" + output_prefix + "] (prefix)");
         include_path.push_back( output_prefix );
       }
 
+      // add auto-config output root directory
       if ( auto_config.length() )
       {
-        debug_m(debug_filter, "adding [" + auto_config + "] (auto-config default)");
+        debug_m(debug_filter, " added [" + auto_config + "] (auto-config)");
         include_path.push_back( auto_config );
       }
-      else
+
+      debug_m(debug_filter, "adding source input directories to include-path:");
+
+      path input_path ( input );
+      path input_path_rel = UTIL::get_relative_path(input_path.parent_path(), current_path());
+
+      // add source relative input path if exists
+      if ( !input_path_rel.empty() )
       {
-        debug_m(debug_filter, "adding [.] (manual-config default)");
-        include_path.push_back( "." );
+        debug_m(debug_filter, " added [" + input_path_rel.string() + "] (prefix)");
+        include_path.push_back( input_path_rel.string() );
       }
+
+      // add source root directory
+      debug_m(debug_filter, " added [.] (root)");
+      include_path.push_back( "." );
 
       // insert discovered paths into a new program option identifier.
       // this is for informational purposes only for use with debugging.

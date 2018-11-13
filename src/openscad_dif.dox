@@ -1,0 +1,213 @@
+/***************************************************************************//**
+  \page openscad_dif_ht Command Line Help (openscad-dif)
+  \include openscad-dif.help
+*******************************************************************************/
+
+/***************************************************************************//**
+  \defgroup openscad_dif_src Source Code (openscad-dif)
+  \brief
+    The Doxygen input filter for \em OpenSCAD scripts.
+*******************************************************************************/
+
+/***************************************************************************//**
+  \page openscad_dif_doc Program Usage (openscad-dif)
+
+
+  \section openscad_dif_sm Documenting OpenSCAD scripts
+
+  This filter may be used to markup OpenSCAD scripts for use with
+  Doygen. See [Documenting the code][docblocks] in the Doxygen manual
+  for information.
+
+  [docblocks]: http://www.stack.nl/~dimitri/doxygen/manual/docblocks.html
+
+
+  \subsection openscad_dif_sm_cs Comment Sections
+
+  Comment patters are identified according to the rules in the
+  following table. See the flex documentation on [patterns] for more
+  information.
+
+   patterns   | behavior
+  :----------:|:--------------------------------
+   "//"       | comment. ignored by filter.
+   "//"[/!]?  | documentation pass to Doxygen.
+   "/*"[*!]?  | open a comment block.
+   "*"+"/"    | close comment block.
+
+  The filter provides additional command functions that take the form:
+
+  \code{.C}
+  \amu_<function> <variable> ( <arguments> )
+  \endcode
+
+  The \em variable must be the first word that follows the function name,
+  but does not have to be on the same line if present. The \em arguments,
+  including the opening and closing parenthesis can also be split across
+  any number of lines. The \em arguments may be blank, however, the
+  parenthesis are required.
+
+  [patterns]: http://flex.sourceforge.net/manual/Patterns.html
+
+
+  \subsection openscad_dif_sm_v Variabes
+
+  The result of a function will be copied to the output of the filter
+  operation unless a results variable name follows the function name.
+  When a variable name is provided, the command result is stored in the
+  specified variable and is not to copied to output.
+
+  These variables can be referenced in the context of other function
+  \em arguments. A variable is referenced using the form:
+  <tt>${VAR}</tt>. Variable expansions are recursive and expansion can
+  be postponed using expansion escaping of the form: <tt>\\${VAR}</tt>.
+
+  The following table list the predefined variables.
+
+  Name                | Description
+  :-------------------|:------------------------------
+  EFS                 | amu_eval feild separator
+  ABS_FILE_NAME       | absolute input file file name
+  ABS_PATH_NAME       | absolute input file path name
+  FILE_NAME           | input file file name
+  PATH_NAME           | input file path name
+  BASE_NAME           | input file base name
+  STEM_NAME           | input file stem name
+  EXTN_AME            | input file extension name
+
+
+  \subsection openscad_dif_sm_a Arguments
+
+  There are four categories that are used  by functions as summarized
+  in the following table:
+
+  Type        | Example         | Scope
+  :-----------|:---------------:|:------:
+  positional  | value           | local
+  named       | name=value      | local
+  flag        | ++flag /--flag  | local
+  incr/decr   | var++ / var--   | global
+
+  Except where noted otherwise, \p positional, \p named, and \p flag
+  assignments have a local scope to the function where they are used.
+  The \p incr/decr argument values are global across all function for
+  an input file. A named argument takes the form of <tt>name=value</tt>
+  where \p name is a variable identifier and \p value is the content to
+  be assigend to the specified variable. A value, for positional or
+  named arguments, should be quoted with single or double quotes when
+  it contains spaces. Prefix a flag with \c ++ to enable it and \c \-\-
+  to disable it. For example \p ++name enables the argument \p name and
+  \p --name disables it. \p incr/decr will always operate on and update
+  the global variable scope (ex: \p i++ or \p i-- will always increment
+  or decrement the global variable \p i).
+
+
+  \subsection openscad_dif_sm_adc Additional Doxygen Commands
+
+  In addition to the normal Doxygen [special commands], here is a list
+  of additional filter-provided commands that can be used for document
+  markup:
+
+  | Internal Commands                                                 | Description
+  |:------------------------------------------------------------------|:---------------------------------
+  | \ref ODIF::ODIF_Scanner::def_init()         "\\amu_define"        | define text macro
+  | \ref ODIF::ODIF_Scanner::bif_eval()         "\\amu_eval"          | evaluate arguments
+  | \ref ODIF::ODIF_Scanner::bif_shell()        "\\amu_shell"         | execute shell command
+  | \ref ODIF::ODIF_Scanner::bif_combine()      "\\amu_combine"       | combine words
+  | \ref ODIF::ODIF_Scanner::bif_table()        "\\amu_table"         | generate a text table
+  | \ref ODIF::ODIF_Scanner::bif_image_table()  "\\amu_image_table"   | generate an image table
+  | \ref ODIF::ODIF_Scanner::bif_viewer()       "\\amu_viewer"        | file viewer
+  | \ref ODIF::ODIF_Scanner::bif_make()         "\\amu_make"          | make script interface
+  | \ref ODIF::ODIF_Scanner::bif_copy()         "\\amu_copy"          | copy references
+  | \ref ODIF::ODIF_Scanner::bif_find()         "\\amu_find"          | search for output files
+  | \ref ODIF::ODIF_Scanner::bif_scope()        "\\amu_scope"         | query scope data
+  | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_source"        | query source filename
+  | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_pathid"        | generate source path identifier
+  | \ref ODIF::ODIF_Scanner::bif_filename()     "\\amu_filename"      | operations for filename lists
+  | \ref ODIF::ODIF_Scanner::bif_replace()      "\\amu_replace"       | text search and replace operation
+
+  External commands also exists and can be found in the directory:
+  <tt><install-prefix>/functions/</tt>.
+
+  Here is a list:
+
+  | External Commands                 | Description
+  |:----------------------------------|:--------------------------------
+  | \\amu_date                        | current date and/or time
+  | \\amu_list                        | format arguments into a list
+
+  [special commands]: http://www.stack.nl/~dimitri/doxygen/manual/commands.html
+
+
+  \subsection openscad_dif_sm_me Example Markup
+
+  \verbatim
+  //
+  // This comment will not be passed to Doxygen.
+  //
+
+  //! \ingroup the_group_name
+  //! @{
+
+  //! Parameterized vehicle design module.
+  /***************************************************************//**
+   * \param <string> name       Table name.
+   * \param <string> translate  String of integers.
+   *
+   * \details
+   *   For a complete list of color names see the World Wide Web
+   *   consortium's
+   ******************************************************************/
+   module example() { }
+
+  /***************************************************************//**
+   * \page imt Image Table
+   *
+   * \amu_define  var1  ( table_of_all )
+   * \amu_shell   var2  ( "seq -f 'Col (%g)' -s '^' 10" )
+   * \amu_define  var3  ( Table of all Generated Images. )
+   * \amu_shell   var4  ( "seq -f 'h%g' -s '^' 84" )
+   * \amu_combine var5  ( joiner=" " separator="^" tokenizer=" " prefix="a"
+   *                      "car truck van"
+   *                      "with" "12 17" "wheels" "thats"
+   *                      "blue, green," "viewed" "from"
+   *                      "right. bottom. diagonal. left. front. back. top." )
+   * \amu_make    var6  ( append=test extension=png )
+   *
+   * \htmlonly
+   *   \amu_image_table ( type=html
+   *                      id="${var1}" table_caption="${var3}"
+   *                      columns="10" column_headings="${var2}"
+   *                      cell_captions="${var4}"
+   *                      cell_files="${var6}" image_width="92"
+   *                      cell_titles="${var5}" )
+   * \endhtmlonly
+  ******************************************************************/
+
+  //! @}
+  \endverbatim
+
+
+  \subsection openscad_dif_sm_afc Adding Filter Commands
+
+  Additional internal commands can be added to the filter by coding the
+  function in C++ and incorporating it into the source. External
+  functions can also be incorporated using any language that can operate
+  on standard input and write to the standard output.
+
+  External functions can be found at:
+
+  \code{.C}
+  <install-prefix>/functions/amu_<function>
+  \endcode
+
+  When the filter encounters a command of the form
+  <tt>amu_<function></tt> that it does not recognize, it checks this
+  location and if it finds a match this external command is called to
+  handle the command. See examples there as a starting point.
+
+*******************************************************************************/
+
+//
+// eof
+//

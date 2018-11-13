@@ -1,0 +1,47 @@
+/***************************************************************************//**
+  \mainpage C++ Programs
+
+  \dot "Compile-Scripting and Documentation-Generatation for OpenSCAD Designs."
+    digraph example {
+      node [shape=Mrecord, fontname=Helvetica, fontsize=10];
+      a [label="openscad-amu" URL="../../../share/lib/doxygen/html/index.html"];
+      b [label="C++ Programs" URL="index.html" style="filled"];
+      c [label="Makefile Script Library" URL="../../../share/lib/doxygen/html/mslibrary.html"];
+      d [label="Support Scripts" URL="../../../share/scripts/doxygen/html/index.html"];
+      a->b; a->c; a->d;
+    }
+  \enddot
+
+
+  \section programs Programs
+
+
+  \subsection bash_dif bash-dif
+
+    \li \subpage bash_dif_ht "Command help"
+    \li \subpage bash_dif_doc "Program usage"
+    \li \ref bash_dif_src "Source code"
+
+
+  \subsection openscad_dif openscad-dif
+
+    \li \subpage openscad_dif_ht "Command help"
+    \li \subpage openscad_dif_doc "Program usage"
+    \li \ref openscad_dif_src "Source code"
+
+
+  \subsection openscad_seam openscad-seam
+
+    \li \subpage openscad_seam_ht "Command help"
+    \li \subpage openscad_seam_doc "Program usage"
+    \li \ref openscad_seam_src "Source code"
+
+
+  \todo create a test suite that compares output from each program to
+        known good results.
+
+*******************************************************************************/
+
+//
+// eof
+//

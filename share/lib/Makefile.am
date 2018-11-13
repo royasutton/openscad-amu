@@ -5,7 +5,8 @@
 ##############################################################################
 
 files = \
-	doxygen_mainpage.bash \
+	mainpage.bash \
+	\
 	bootloader.bash \
 	exception.bash \
 	make_makefile.bash \

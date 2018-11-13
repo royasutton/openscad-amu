@@ -98,6 +98,18 @@ ODIF::ODIF_Scanner::init(void)
   varm.set_report( true );
   varm.set_report_message("<tt><UNDEFINED></tt>");
 
+  bfs::path ifap ( input_name );
+  bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
+  // setup predefined environment variables
+  varm.store( "EFS", " " );
+  varm.store( "ABS_FILE_NAME", ifap.string() );
+  varm.store( "ABS_PATH_NAME", ifap.parent_path().string() );
+  varm.store( "FILE_NAME", ifrp.string() );
+  varm.store( "PATH_NAME", ifrp.parent_path().string() );
+  varm.store( "BASE_NAME", ifrp.filename().string() );
+  varm.store( "STEM_NAME", ifrp.stem().string() );
+  varm.store( "EXT_NAME", ifrp.extension().string() );
+
   // initialize function argument positional prefix
   fx_argv.clear();
   fx_argv.set_prefix("arg");
@@ -231,6 +243,26 @@ ODIF::ODIF_Scanner::fx_pend(void)
   {
     has_result=true;
     result=bif_scope();
+  }
+  else if (fx_name.compare("source")==0)
+  {
+    has_result=true;
+    result=bif_source();
+  }
+  else if (fx_name.compare("pathid")==0)
+  {
+    has_result=true;
+    result=bif_pathid();
+  }
+  else if (fx_name.compare("filename")==0)
+  {
+    has_result=true;
+    result=bif_filename();
+  }
+  else if (fx_name.compare("replace")==0)
+  {
+    has_result=true;
+    result=bif_replace();
   }
   else
   {
@@ -525,39 +557,49 @@ ODIF::ODIF_Scanner::file_rl(
   const bool& rid
 )
 {
-  filter_debug("locate "
-               + string( bfs::path(file).has_parent_path()?"path":"file" )
-               + " [" + file + "]", true, false, false);
-
-  // check each include path for file.
+  bfs::path file_path ( file );
   bfs::path location;
+
   found = false;
-  for( vector<string>::iterator it = include_path.begin();
-                                it != include_path.end() && !found;
-                              ++it )
+
+  //
+  // test if file has a parent path
+  //
+  if ( file_path.has_parent_path() )
   {
-    bfs::path f( file );
-    bfs::path p;
+    // has parent path, check each include path in reverse order.
+    filter_debug("locate path [" + file + "]", true, false, false);
 
-    // check with just the filename.
-    p  = *it;
-    p /= f.filename();
+    for( vector<string>::reverse_iterator it = include_path.rbegin();
+                                          it != include_path.rend() && !found;
+                                        ++it )
+    {
+      bfs::path p = *it / file_path;              // full filepath
 
-    filter_debug(" checking-file: " + p.string(), false, false, false);
-    if ( exists(p) && is_regular_file(p) ) {
-      found = true;
-      location = p;
-
-      break;
-    }
-
-    // check with existing prefixed path iff present.
-    p  = *it;
-    p /= f;
-
-    if ( f.has_parent_path() ) {
       filter_debug(" checking-path: " + p.string(), false, false, false);
-      if ( exists(p) && is_regular_file(p) ) {
+      if ( exists(p) && is_regular_file(p) )
+      {
+        found = true;
+        location = p;
+
+        break;
+      }
+    }
+  }
+  else
+  {
+    // has no parent path, check each include path in order.
+    filter_debug("locate file [" + file + "]", true, false, false);
+
+    for( vector<string>::iterator it = include_path.begin();
+                                  it != include_path.end() && !found;
+                                ++it )
+    {
+      bfs::path p = *it / file_path.filename();   // filename only
+
+      filter_debug(" checking-file: " + p.string(), false, false, false);
+      if ( exists(p) && is_regular_file(p) )
+      {
         found = true;
         location = p;
 

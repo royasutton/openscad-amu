@@ -65,7 +65,7 @@ ifndef output_path
       $(strip $(foreach x,$(output_path_spec), \
         $(if $(call bool_decode,$(output_path_add_$x)),$($x)))))$(dir_level_sep)
 else
-  $(call amu_pm_m,using pre-defined value for $$(output_path))
+  $(call amu_pm_m,using predefined value for $$(output_path))
 endif
 
 # backup file basename
@@ -76,7 +76,7 @@ ifndef backup_file
       $(strip $(foreach x,$(backup_file_spec), \
         $(if $(call bool_decode,$(backup_file_add_$x)),$($x))))))
 else
-  $(call amu_pm_m,using pre-defined value for $$(backup_file))
+  $(call amu_pm_m,using predefined value for $$(backup_file))
 endif
 
 # release directory path
@@ -87,7 +87,7 @@ ifndef release_path
       $(strip $(foreach x,$(release_path_spec), \
         $(if $(call bool_decode,$(release_path_add_$x)),$($x))))))$(dir_level_sep)
 else
-  $(call amu_pm_m,using pre-defined value for $$(release_path))
+  $(call amu_pm_m,using predefined value for $$(release_path))
 endif
 
 # release archive file basename
@@ -98,14 +98,14 @@ ifndef release_archive_file
       $(strip $(foreach x,$(release_archive_file_spec), \
         $(if $(call bool_decode,$(release_archive_file_add_$x)),$($x))))))
 else
-  $(call amu_pm_m,using pre-defined value for $$(release_archive_file))
+  $(call amu_pm_m,using predefined value for $$(release_archive_file))
 endif
 
 # library install sub-directory
 ifndef library_install_subdir
   library_install_subdir := $(project_name)-$(project_version)$(dir_level_sep)
 else
-  $(call amu_pm_m,using pre-defined value for $$(library_install_subdir))
+  $(call amu_pm_m,using predefined value for $$(library_install_subdir))
 endif
 
 # backup files

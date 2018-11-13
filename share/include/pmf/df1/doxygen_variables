@@ -108,7 +108,7 @@ ifndef docs_install_id
 else
   # replace spaces with '-'
   docs_install_id := $(subst $(space),-,$(docs_install_id))
-  $(call amu_pm_m,using pre-defined value for $$(docs_install_id))
+  $(call amu_pm_m,using predefined value for $$(docs_install_id))
 endif
 
 # project logo
