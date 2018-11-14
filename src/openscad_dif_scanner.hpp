@@ -326,6 +326,8 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string bif_filename(void);
     //! perform search and replace on text.
     std::string bif_replace(void);
+    //! Count or select words from a list.
+    std::string bif_word(void);
 };
 
 } /* end namespace ODIF */

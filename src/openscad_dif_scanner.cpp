@@ -264,6 +264,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_replace();
   }
+  else if (fx_name.compare("word")==0)
+  {
+    has_result=true;
+    result=bif_word();
+  }
   else
   {
     /* check external function */

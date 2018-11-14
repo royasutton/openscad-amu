@@ -2433,6 +2433,168 @@ ODIF::ODIF_Scanner::bif_replace(void)
   return ( result );
 }
 
+/***************************************************************************//**
+  \details
+
+    Count or select a word from a list of words.
+
+    The options and flags (and their short codes) are summarized in the
+    following tables.
+
+    Options that require arguments.
+
+     options      | sc  | default         | description
+    :------------:|:---:|:---------------:|:-------------------------------------
+      words       | w   |                 | list of words
+      index       | i   |                 | return word \p i in list
+      tokenizer   | t   | [~^,[:space:]]  | tokenizer to separate words in list
+      separator   | r   | [^]             | separator for resulting list
+
+    Flags that produce output.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      count    | c   | false   | return number of words in list
+      first    | f   | false   | return first word in list
+      last     | l   | false   | return last word in list
+      list     | s   | false   | return word list
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_word(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "words",      "w",
+  "index",      "i",
+
+  "tokenizer",  "t",
+  "separator",  "r",
+
+  "count",      "c",
+  "first",      "f",
+  "last",       "l",
+  "list",       "s"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // generate options help string.
+  size_t ap=16;
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  //
+  // assemble result
+  //
+  string result;
+
+  string tokl = "~^, "; // assign default token list
+  string wsep = "^";    // assign default output file separator
+
+  vector<string> wl_v;
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+    bool flag = ( atoi( v.c_str() ) > 0 );   // assign flag value
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if (!(n.compare(vana[0])&&n.compare(vana[1])))
+      { // word list
+        string wl_s = unquote( v );
+
+        typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+        boost::char_separator<char> wsep( tokl.c_str() );
+        tokenizer wl_tok( wl_s, wsep );
+
+        wl_v.clear();
+         for ( tokenizer::iterator wit=wl_tok.begin(); wit!=wl_tok.end(); ++wit )
+          wl_v.push_back( boost::trim_copy( *wit ) );
+      }
+
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // index
+        size_t i = atoi( v.c_str() );
+
+        if ( (i>0) && (i<wl_v.size()) )
+        {
+          if ( result.size() ) result.append( wsep );
+            result.append( wl_v[ i - 1 ] );
+        }
+      }
+
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])))
+      { // tokenizer
+        tokl = unquote( v );
+      }
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])))
+      { // separator
+        wsep = unquote( v );
+      }
+
+      //
+      // flags
+      //
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      { // count
+        if ( result.size() ) result.append( wsep );
+          result.append( UTIL::to_string(wl_v.size()) );
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      { // first
+        if ( ! wl_v.empty() )
+        {
+          if ( result.size() ) result.append( wsep );
+            result.append( wl_v[ 0 ] );
+        }
+      }
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      { // last
+        if ( ! wl_v.empty() )
+        {
+          if ( result.size() ) result.append( wsep );
+            result.append( wl_v[ wl_v.size() -1 ] );
+        }
+      }
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      { // list
+        for ( vector<string>::const_iterator wit=wl_v.begin(); wit!=wl_v.end(); ++wit )
+        {
+          if ( result.size() ) result.append( wsep );
+          result.append( *wit );
+        }
+      }
+
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  return ( result );
+}
+
 
 /*******************************************************************************
 // eof
