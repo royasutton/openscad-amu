@@ -269,6 +269,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_word();
   }
+  else if (fx_name.compare("seq")==0)
+  {
+    has_result=true;
+    result=bif_seq();
+  }
   else
   {
     /* check external function */

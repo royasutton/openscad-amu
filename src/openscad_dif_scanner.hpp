@@ -328,6 +328,8 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string bif_replace(void);
     //! Count or select words from a list.
     std::string bif_word(void);
+    //! Generate a sequence of numbers.
+    std::string bif_seq(void);
 };
 
 } /* end namespace ODIF */

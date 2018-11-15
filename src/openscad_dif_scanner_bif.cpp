@@ -2595,6 +2595,199 @@ ODIF::ODIF_Scanner::bif_word(void)
   return ( result );
 }
 
+/***************************************************************************//**
+  \details
+
+    Generate a sequence of numbers.
+
+    The options and flags (and their short codes) are summarized in the
+    following tables.
+
+    Options that require arguments.
+
+     options      | sc  | default | description
+    :------------:|:---:|:-------:|:------------------------------
+      first       | f   | 1       | start of sequence
+      incr        | i   | 1       | sequence increment
+      last        | l   |         | end of sequence
+      prefix      | p   | []      | element prefix text
+      suffix      | s   | []      | element suffix text
+      separator   | r   | [^]     | separator for resulting list
+      format      | o   | []      | format using [printf] function
+
+    Flags that produce output.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      number   | n   | false   | generate numerical sequence
+      roman    | m   | false   | generate roman numeral sequence
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+
+    [printf]: https://en.wikipedia.org/wiki/Printf_format_string
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_seq(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "first",      "f",
+  "incr",       "i",
+  "last",       "l",
+  "prefix",     "p",
+  "suffix",     "s",
+  "separator",  "r",
+  "format",     "o",
+
+  "number",     "n",
+  "roman",      "m"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // generate options help string.
+  size_t ap=18;
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  //
+  // assemble result
+  //
+  string result;
+
+  int first = 1;
+  int incr  = 1;
+  int last  = 0;
+
+  string prefix;
+  string suffix;
+
+  string wsep = "^";
+
+  string format;
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+    bool flag = ( atoi( v.c_str() ) > 0 );   // assign flag value
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if (!(n.compare(vana[0])&&n.compare(vana[1])))
+      { // first
+        first = atoi( unquote( v ).c_str() );
+      }
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // incr
+        incr = atoi( unquote( v ).c_str() );
+      }
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])))
+      { // last
+        last = atoi( unquote( v ).c_str() );
+      }
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])))
+      { // prefix
+        prefix = unquote( v );
+      }
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])))
+      { // suffix
+        suffix = unquote( v );
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])))
+      { // separator
+        wsep = unquote( v );
+      }
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])))
+      { // format
+        format = unquote( v );
+      }
+
+      //
+      // flags
+      //
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      { // number
+        for (int seq = first; seq <= last; seq += incr)
+        {
+          if ( result.size() ) result.append( wsep );
+          if ( prefix.size() ) result.append( prefix );
+
+          if ( format.size() )
+          {
+            // determine buffer requirement
+            size_t bsize = snprintf(NULL, 0, format.c_str(), seq);
+
+            if ( bsize > 0 )
+            {
+              char buffer[bsize+1];
+              snprintf(buffer, bsize+1, format.c_str(), seq);
+              result.append( buffer );
+            }
+          }
+          else
+          {
+            result.append(UTIL::to_string( seq ));
+          }
+
+          if ( suffix.size() ) result.append( suffix );
+        }
+      }
+      else if (!(n.compare(vana[16])&&n.compare(vana[17])) && flag)
+      { // roman
+        for (int seq = first; seq <= last; seq += incr)
+        {
+          if ( result.size() ) result.append( wsep );
+          if ( prefix.size() ) result.append( prefix );
+
+          if ( format.size() )
+          {
+            // determine buffer requirement
+            size_t bsize = snprintf(NULL, 0, format.c_str(),
+                                    UTIL::to_roman_numeral( seq ).c_str());;
+
+            if ( bsize > 0 )
+            {
+              char buffer[bsize+1];
+              snprintf(buffer, bsize+1, format.c_str(),
+                       UTIL::to_roman_numeral( seq ).c_str());
+              result.append( buffer );
+            }
+          }
+          else
+          {
+            result.append(UTIL::to_roman_numeral( seq ));
+          }
+
+          if ( suffix.size() ) result.append( suffix );
+        }
+      }
+
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  return ( result );
+}
+
 
 /*******************************************************************************
 // eof
