@@ -740,6 +740,25 @@ UTIL::make_dir(const std::string &d,
   return created;
 }
 
+string
+UTIL::to_roman_numeral(const int &n)
+{
+  int   decimal[] = {1000,900,500,400,100,90,50,40,10,9,5,4,1};
+  string symbol[] = {"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
+
+  string rn;
+  int dn = n;
+
+  for (int i = 0; i < 13; i++)
+    while (dn >= decimal[i])
+    {
+      dn -= decimal[i];
+      rn.append( symbol[i] );
+    }
+
+  return ( rn );
+}
+
 
 /*******************************************************************************
 // eof
