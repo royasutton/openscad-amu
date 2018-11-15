@@ -5,7 +5,7 @@
 /***************************************************************************//**
   \file   design.scad
   \author Designers' Name
-  \date   2016-2017
+  \date   2016-2018
 
   \copyright
     Copyright notice.
@@ -17,8 +17,8 @@
     Long design description.
 
     \amu_make png_files ( append=scope1 extension=png ++pstarget )
-    \amu_shell file_cnt ( "echo ${png_files} | wc -w" )
-    \amu_shell   labels ( "seq -f '(%g)' -s '^' ${file_cnt}" )
+    \amu_word  file_cnt ( words="${png_files}" ++count )
+    \amu_seq     labels ( last=${file_cnt} ++roman )
 
     \htmlonly
       \amu_image_table
@@ -94,7 +94,7 @@
 
     \ref library.scad "Library Documentation."
 
-    \amu_shell        seq4 ( "seq -f '(%g)' -s '^' 4" )
+    \amu_seq          seq4 ( prefix="(" suffix=")" last=4 ++number )
     \amu_combine    titles ( prefix="Example" "A B C D" suffix="." joiner=" " separator="^" )
     \amu_make    stl_files ( set="library" append=scope1 extension=stl )
 
