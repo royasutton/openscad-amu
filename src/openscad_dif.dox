@@ -127,6 +127,7 @@
   | \ref ODIF::ODIF_Scanner::bif_replace()      "\\amu_replace"       | text search and replace operation
   | \ref ODIF::ODIF_Scanner::bif_word()         "\\amu_word"          | Count or select words from a list
   | \ref ODIF::ODIF_Scanner::bif_seq()          "\\amu_seq"           | Generate a sequence of numbers
+  | \ref ODIF::ODIF_Scanner::bif_file()         "\\amu_file"          | Perform operations on text files
 
   External commands also exists and can be found in the directory:
   <tt><install-prefix>/functions/</tt>.

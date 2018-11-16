@@ -2788,6 +2788,229 @@ ODIF::ODIF_Scanner::bif_seq(void)
   return ( result );
 }
 
+/***************************************************************************//**
+  \details
+
+    Perform operations on text files.
+
+    The options and flags (and their short codes) are summarized in the
+    following tables.
+
+    Options that require arguments.
+
+     options      | sc  | default | description
+    :------------:|:---:|:-------:|:------------------------------
+      file        | f   |         | name of file
+      first       | i   | 1       | start line of file
+      last        | t   | 0       | end line of file, 0=<eof>
+      separator   | s   | []      | separator for joining results
+
+    Flags that modify the output
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      rmecho   | o   | false   | remove OpenSCAD quoted [ECHO: "..."]
+      rmnl     | r   | false   | remove line-feeds / carriage returns
+      eval     | e   | false   | expand variables in text
+
+    Flags that produce output
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      read     | rd  | false   | return processed \p file contents
+      lines    | lc  | false   | return processed line count
+      chars    | cc  | false   | return processed character count
+      max      | xl  | false   | return processed max line size
+      min      | nl  | false   | return processed min line size
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+
+    [printf]: https://en.wikipedia.org/wiki/Printf_format_string
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_file(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "file",       "f",
+
+  "first",      "i",
+  "last",       "t",
+
+  "separator",  "s",
+
+  "rmecho",     "o",
+  "rmnl",       "r",
+  "eval",       "e",
+
+  "read",       "rd",
+  "lines",      "lc",
+  "chars",      "cc",
+  "max",        "xl",
+  "min",        "nl"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  size_t ap=0;
+  string file = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+
+  uint first  = atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ); ap+=2;
+  uint last   = atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ); ap+=2;
+
+  string wsep = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+
+  bool rmecho = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool rmnl   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool eval   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+
+  bool read   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool lines  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool chars  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool maxln  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool minln  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  // validate named arguments: (must be one of the declared options).
+  vector<string> av = fx_argv.names_v(true, false);
+  for ( vector<string>::iterator it=av.begin(); it!=av.end(); ++it )
+    if ( vans.find( *it ) == vans.end() )
+      return( amu_error_msg(*it + " invalid option. " + help) );
+
+  //
+  // general argument validation:
+  //
+
+  // enforce zero positional arguments (except arg0).
+  if ( fx_argv.size(false, true) != 1 )
+    return(amu_error_msg("requires zero positional argument. " + help));
+
+  string result;
+
+  bool found = false;
+  string rl = file_rl( file, NO_FORMAT_OUTPUT, found );
+
+  if ( found  )
+  {
+    uint file_line  = 0;          // current line of input file
+
+    uint text_line  = 0;          // current stats of processed file
+    uint char_count = 0;
+    uint line_max   = 0;
+    uint line_min   = UINT_MAX;
+
+    string line;
+    string text;
+
+    ifstream ifs ( rl.c_str() );
+
+    if ( ifs.is_open() )
+    {
+      while ( !ifs.eof() )
+      {
+        getline(ifs, line);
+        file_line++;
+
+        if ( (file_line >= first) && ( (last == 0) || (file_line<=last) ) )
+        {
+          text_line++;
+
+          // remove OpenSCAD echo
+          if ( rmecho )
+          { // format [ECHO: " ... content ... "\n]
+            // remove leading 'ECHO: "' iff at pos==0
+            if ( line.find( "ECHO: \"" ) == 0 )
+            {
+              line.erase( 0, 7 );
+
+              // remove '"' at end of line
+              if ( line.at( line.length() -1) == '\"' )
+                line.erase( line.length() -1, 1 );
+              else
+                line.append( "< " + amu_error_msg("end of line quotation missing") );
+            }
+          }
+
+          // eval variables
+          if ( eval )
+            line = varm.expand_text(line);
+
+          if (line.size() > line_max)
+            line_max = line.size();
+
+          if ( line.size() && (line.size() < line_min) )
+            line_min = line.size();
+
+          // handle end of line
+          if ( rmnl )
+            line += wsep;
+          else
+            line += "\n";
+
+          char_count += line.size();
+
+          text.append( line );
+        }
+      }
+
+      ifs.close();
+    }
+
+    //
+    // produce output
+    //
+
+    if ( read )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( text );
+    }
+
+    if ( lines )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( UTIL::to_string( text_line ) );
+    }
+
+    if ( chars )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( UTIL::to_string( char_count ) );
+    }
+
+    if ( maxln )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( UTIL::to_string( line_max ) );
+    }
+
+    if ( minln )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( UTIL::to_string( line_min ) );
+    }
+  }
+  else
+  {
+    if ( result.size() ) result.append( " " );
+    result.append( amu_error_msg("file not found: " + file) );
+  }
+
+  return ( result );
+}
+
 
 /*******************************************************************************
 // eof
