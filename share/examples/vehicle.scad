@@ -110,12 +110,12 @@
     \endhtmlonly
 
     \amu_define  theadt ( View from all angles. )
-    \amu_shell   ifurls ( "yes 'https://royasutton.github.io/openscad-amu^' | head -6" )
-    \amu_shell   count6 ( "seq -f '(%g)' -s '^' 6" )
+    \amu_seq     ifurls ( format='https://royasutton.github.io/openscad-amu' last=6 ++number )
+    \amu_seq     count6 ( format='(%d)' last=6 ++number )
     \amu_combine ititle ( j=" " f="^" t=";" p="Viewed from the" "front.;right side.;left side.;top.;bottom.;back." )
     \amu_combine hfiles ( p="vehicle_test" suffix=".png" "car" "12" "green" "left front back top bottom right" "320x240" )
     \amu_combine lfiles ( p="vehicle_test" suffix=".eps" "car" "12" "green" "left front back top bottom right" "320x240" )
-    \amu_shell   tcols3 ( "seq -f 'Column (%g)' -s '^' 3" )
+    \amu_seq     tcols3 ( prefix="Column (" suffix=")" last=3 ++roman )
 
     \htmlonly
       \amu_image_table ( f=html cdl="${hfiles}" iw="320" t="${theadt}" ctl="${ititle}" ccl="${ititle}" chl="${tcols3}" cul="${ifurls}" )
@@ -190,10 +190,10 @@
   \subsection appendix Appendix: All Generated Images
 
     \amu_define  id     ( table_of_all )
-    \amu_shell   tcolsw ( "seq -f 'Col (%g)' -s '^' 10" )
+    \amu_seq     tcolsw ( prefix="Col (" suffix=")" last=10 ++roman )
     \amu_define  theadt ( Table of all Generated Images. )
-    \amu_shell   iheadt ( "seq -f 'h%g' -s '^' 84" )
-    \amu_shell   countw ( "seq -f '(%g)' -s '^' 84" )
+    \amu_seq     iheadt ( format='h%d' last=84 ++number )
+    \amu_seq     countw ( format='(%d)' last=84 ++number )
     \amu_combine ititle ( joiner=" " separator="^" tokenizer=" " prefix="a"
                           "car truck van"
                           "with" "12 17" "wheels" "thats"

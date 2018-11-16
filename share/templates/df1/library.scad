@@ -32,8 +32,8 @@
       )
 
     \amu_make png_files ( append=scope2 extension=png )
-    \amu_shell file_cnt ( "echo ${png_files} | wc -w" )
-    \amu_shell   labels ( "seq -f '(%g)' -s '^' ${file_cnt}" )
+    \amu_word  file_cnt ( words="${png_files}" ++count )
+    \amu_seq     labels ( prefix="(" suffix=")" last=${file_cnt} ++number )
 
     \htmlonly
       \amu_image_table

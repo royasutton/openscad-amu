@@ -107,6 +107,8 @@ ODIF::ODIF_Scanner::bif_eval(void)
         result.append( UTIL::unquote( vm.expand(efs) ) );
 
       // expand and append positional argument text
+      // do not unquote value, quotations in positional
+      // arguments assumed to have significance.
       result.append( vm.expand_text( it->value ) );
     }
     // argument is named or flag
@@ -119,12 +121,14 @@ ODIF::ODIF_Scanner::bif_eval(void)
         update_local = ( atoi( it->value.c_str() ) > 0 );
       else
       // add name=value pair to variable map
+      // unquote value before storing. no need to expand
+      // text as this is done recursively by class 'env_var'.
       {
         // local
-        if ( update_local ) vm.store( it->name, it->value );
+        if ( update_local ) vm.store( it->name, UTIL::unquote( it->value ) );
 
         // global
-        if ( update_global ) varm.store( it->name, it->value );
+        if ( update_global ) varm.store( it->name, UTIL::unquote( it->value ) );
       }
     }
   }
@@ -2333,16 +2337,18 @@ ODIF::ODIF_Scanner::bif_filename(void)
     :----------:|:---:|:-------:|:--------------------------
       text      | t   |         | text string to seach
       search    | s   | []      | search regular expression
-      replace   | r   | []      | replacement format string
+      replace   | r   | []      | format string for matched text
 
     Flags.
 
      flags      | sc  | default | description
-    :----------:|:---:|:-------:|:--------------------------------
+    :----------:|:---:|:-------:|:------------------------------------
       global    | g   | true    | replace all occurances
+      no_copy   | n   | false   | do not copy text that do not match
       literal   | l   | false   | treat format string as literal
       perl      | p   | false   | recognize perl format sequences
       sed       | e   | false   | recognize sed format sequences
+      all       | a   | false   | recognize all format sequences
 
     For more information on how to specify and use function arguments
     see \ref openscad_dif_sm_a.
@@ -2363,9 +2369,11 @@ ODIF::ODIF_Scanner::bif_replace(void)
   "replace",  "r",
 
   "global",   "g",
+  "no_copy",  "n",
   "literal",  "l",
   "perl",     "p",
-  "sed",      "e"
+  "sed",      "e",
+  "all",      "a"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
@@ -2376,9 +2384,11 @@ ODIF::ODIF_Scanner::bif_replace(void)
   string replace  = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
   bool global     = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool no_copy    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool literal    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool perl       = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool sed        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool all        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -2411,11 +2421,592 @@ ODIF::ODIF_Scanner::bif_replace(void)
   flags = regex_constants::format_default;
 
   if ( !global )  flags = flags | regex_constants::format_first_only;
+  if ( no_copy )  flags = flags | regex_constants::format_no_copy;
+
   if ( literal )  flags = flags | regex_constants::format_literal;
   if ( perl )     flags = flags | regex_constants::format_perl;
   if ( sed )      flags = flags | regex_constants::format_sed;
+  if ( all )      flags = flags | regex_constants::format_all;
 
   result = regex_replace( text, sre, replace, flags );
+
+  return ( result );
+}
+
+/***************************************************************************//**
+  \details
+
+    Count or select a word from a list of words.
+
+    The options and flags (and their short codes) are summarized in the
+    following tables.
+
+    Options that require arguments.
+
+     options      | sc  | default         | description
+    :------------:|:---:|:---------------:|:-------------------------------------
+      words       | w   |                 | list of words
+      index       | i   |                 | return word \p i in list
+      tokenizer   | t   | [~^,[:space:]]  | tokenizer to separate words in list
+      separator   | r   | [^]             | separator for resulting list
+
+    Flags that produce output.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      count    | c   | false   | return number of words in list
+      first    | f   | false   | return first word in list
+      last     | l   | false   | return last word in list
+      list     | s   | false   | return word list
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_word(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "words",      "w",
+  "index",      "i",
+
+  "tokenizer",  "t",
+  "separator",  "r",
+
+  "count",      "c",
+  "first",      "f",
+  "last",       "l",
+  "list",       "s"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // generate options help string.
+  size_t ap=16;
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  //
+  // assemble result
+  //
+  string result;
+
+  string tokl = "~^, "; // assign default token list
+  string wsep = "^";    // assign default output file separator
+
+  vector<string> wl_v;
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+    bool flag = ( atoi( v.c_str() ) > 0 );   // assign flag value
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if (!(n.compare(vana[0])&&n.compare(vana[1])))
+      { // word list
+        string wl_s = unquote( v );
+
+        typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+        boost::char_separator<char> wsep( tokl.c_str() );
+        tokenizer wl_tok( wl_s, wsep );
+
+        wl_v.clear();
+         for ( tokenizer::iterator wit=wl_tok.begin(); wit!=wl_tok.end(); ++wit )
+          wl_v.push_back( boost::trim_copy( *wit ) );
+      }
+
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // index
+        size_t i = atoi( v.c_str() );
+
+        if ( (i>0) && (i<wl_v.size()) )
+        {
+          if ( result.size() ) result.append( wsep );
+            result.append( wl_v[ i - 1 ] );
+        }
+      }
+
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])))
+      { // tokenizer
+        tokl = unquote( v );
+      }
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])))
+      { // separator
+        wsep = unquote( v );
+      }
+
+      //
+      // flags
+      //
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      { // count
+        if ( result.size() ) result.append( wsep );
+          result.append( UTIL::to_string(wl_v.size()) );
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      { // first
+        if ( ! wl_v.empty() )
+        {
+          if ( result.size() ) result.append( wsep );
+            result.append( wl_v[ 0 ] );
+        }
+      }
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      { // last
+        if ( ! wl_v.empty() )
+        {
+          if ( result.size() ) result.append( wsep );
+            result.append( wl_v[ wl_v.size() -1 ] );
+        }
+      }
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      { // list
+        for ( vector<string>::const_iterator wit=wl_v.begin(); wit!=wl_v.end(); ++wit )
+        {
+          if ( result.size() ) result.append( wsep );
+          result.append( *wit );
+        }
+      }
+
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  return ( result );
+}
+
+/***************************************************************************//**
+  \details
+
+    Generate a sequence of numbers.
+
+    The options and flags (and their short codes) are summarized in the
+    following tables.
+
+    Options that require arguments.
+
+     options      | sc  | default | description
+    :------------:|:---:|:-------:|:------------------------------
+      first       | f   | 1       | start of sequence
+      incr        | i   | 1       | sequence increment
+      last        | l   |         | end of sequence
+      prefix      | p   | []      | element prefix text
+      suffix      | s   | []      | element suffix text
+      separator   | r   | [^]     | separator for resulting list
+      format      | o   | []      | format using [printf] function
+
+    Flags that produce output.
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      number   | n   | false   | generate numerical sequence
+      roman    | m   | false   | generate roman numeral sequence
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+
+    [printf]: https://en.wikipedia.org/wiki/Printf_format_string
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_seq(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "first",      "f",
+  "incr",       "i",
+  "last",       "l",
+  "prefix",     "p",
+  "suffix",     "s",
+  "separator",  "r",
+  "format",     "o",
+
+  "number",     "n",
+  "roman",      "m"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // generate options help string.
+  size_t ap=18;
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  //
+  // assemble result
+  //
+  string result;
+
+  int first = 1;
+  int incr  = 1;
+  int last  = 0;
+
+  string prefix;
+  string suffix;
+
+  string wsep = "^";
+
+  string format;
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = it->value;
+    bool flag = ( atoi( v.c_str() ) > 0 );   // assign flag value
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if (!(n.compare(vana[0])&&n.compare(vana[1])))
+      { // first
+        first = atoi( unquote( v ).c_str() );
+      }
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // incr
+        incr = atoi( unquote( v ).c_str() );
+      }
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])))
+      { // last
+        last = atoi( unquote( v ).c_str() );
+      }
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])))
+      { // prefix
+        prefix = unquote( v );
+      }
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])))
+      { // suffix
+        suffix = unquote( v );
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])))
+      { // separator
+        wsep = unquote( v );
+      }
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])))
+      { // format
+        format = unquote( v );
+      }
+
+      //
+      // flags
+      //
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      { // number
+        for (int seq = first; seq <= last; seq += incr)
+        {
+          if ( result.size() ) result.append( wsep );
+          if ( prefix.size() ) result.append( prefix );
+
+          if ( format.size() )
+          {
+            // determine buffer requirement
+            size_t bsize = snprintf(NULL, 0, format.c_str(), seq);
+
+            if ( bsize > 0 )
+            {
+              char buffer[bsize+1];
+              snprintf(buffer, bsize+1, format.c_str(), seq);
+              result.append( buffer );
+            }
+          }
+          else
+          {
+            result.append(UTIL::to_string( seq ));
+          }
+
+          if ( suffix.size() ) result.append( suffix );
+        }
+      }
+      else if (!(n.compare(vana[16])&&n.compare(vana[17])) && flag)
+      { // roman
+        for (int seq = first; seq <= last; seq += incr)
+        {
+          if ( result.size() ) result.append( wsep );
+          if ( prefix.size() ) result.append( prefix );
+
+          if ( format.size() )
+          {
+            // determine buffer requirement
+            size_t bsize = snprintf(NULL, 0, format.c_str(),
+                                    UTIL::to_roman_numeral( seq ).c_str());;
+
+            if ( bsize > 0 )
+            {
+              char buffer[bsize+1];
+              snprintf(buffer, bsize+1, format.c_str(),
+                       UTIL::to_roman_numeral( seq ).c_str());
+              result.append( buffer );
+            }
+          }
+          else
+          {
+            result.append(UTIL::to_roman_numeral( seq ));
+          }
+
+          if ( suffix.size() ) result.append( suffix );
+        }
+      }
+
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  return ( result );
+}
+
+/***************************************************************************//**
+  \details
+
+    Perform operations on text files.
+
+    The options and flags (and their short codes) are summarized in the
+    following tables.
+
+    Options that require arguments.
+
+     options      | sc  | default | description
+    :------------:|:---:|:-------:|:------------------------------
+      file        | f   |         | name of file
+      first       | i   | 1       | start line of file
+      last        | t   | 0       | end line of file, 0=<eof>
+      separator   | s   | []      | separator for joining results
+
+    Flags that modify the output
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      rmecho   | o   | false   | remove OpenSCAD quoted [ECHO: "..."]
+      rmnl     | r   | false   | remove line-feeds / carriage returns
+      eval     | e   | false   | expand variables in text
+
+    Flags that produce output
+
+     flags     | sc  | default | description
+    :---------:|:---:|:-------:|:-----------------------------------------
+      read     | rd  | false   | return processed \p file contents
+      lines    | lc  | false   | return processed line count
+      chars    | cc  | false   | return processed character count
+      max      | xl  | false   | return processed max line size
+      min      | nl  | false   | return processed min line size
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+
+    [printf]: https://en.wikipedia.org/wiki/Printf_format_string
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_file(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "file",       "f",
+
+  "first",      "i",
+  "last",       "t",
+
+  "separator",  "s",
+
+  "rmecho",     "o",
+  "rmnl",       "r",
+  "eval",       "e",
+
+  "read",       "rd",
+  "lines",      "lc",
+  "chars",      "cc",
+  "max",        "xl",
+  "min",        "nl"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  size_t ap=0;
+  string file = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+
+  uint first  = atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ); ap+=2;
+  uint last   = atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ); ap+=2;
+
+  string wsep = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+
+  bool rmecho = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool rmnl   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool eval   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+
+  bool read   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool lines  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool chars  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool maxln  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool minln  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  // validate named arguments: (must be one of the declared options).
+  vector<string> av = fx_argv.names_v(true, false);
+  for ( vector<string>::iterator it=av.begin(); it!=av.end(); ++it )
+    if ( vans.find( *it ) == vans.end() )
+      return( amu_error_msg(*it + " invalid option. " + help) );
+
+  //
+  // general argument validation:
+  //
+
+  // enforce zero positional arguments (except arg0).
+  if ( fx_argv.size(false, true) != 1 )
+    return(amu_error_msg("requires zero positional argument. " + help));
+
+  string result;
+
+  bool found = false;
+  string rl = file_rl( file, NO_FORMAT_OUTPUT, found );
+
+  if ( found  )
+  {
+    uint file_line  = 0;          // current line of input file
+
+    uint text_line  = 0;          // current stats of processed file
+    uint char_count = 0;
+    uint line_max   = 0;
+    uint line_min   = UINT_MAX;
+
+    string line;
+    string text;
+
+    ifstream ifs ( rl.c_str() );
+
+    if ( ifs.is_open() )
+    {
+      while ( !ifs.eof() )
+      {
+        getline(ifs, line);
+        file_line++;
+
+        if ( (file_line >= first) && ( (last == 0) || (file_line<=last) ) )
+        {
+          text_line++;
+
+          // remove OpenSCAD echo
+          if ( rmecho )
+          { // format [ECHO: " ... content ... "\n]
+            // remove leading 'ECHO: "' iff at pos==0
+            if ( line.find( "ECHO: \"" ) == 0 )
+            {
+              line.erase( 0, 7 );
+
+              // remove '"' at end of line
+              if ( line.at( line.length() -1) == '\"' )
+                line.erase( line.length() -1, 1 );
+              else
+                line.append( "< " + amu_error_msg("end of line quotation missing") );
+            }
+          }
+
+          // eval variables
+          if ( eval )
+            line = varm.expand_text(line);
+
+          if (line.size() > line_max)
+            line_max = line.size();
+
+          if ( line.size() && (line.size() < line_min) )
+            line_min = line.size();
+
+          // handle end of line
+          if ( rmnl )
+            line += wsep;
+          else
+            line += "\n";
+
+          char_count += line.size();
+
+          text.append( line );
+        }
+      }
+
+      ifs.close();
+    }
+
+    //
+    // produce output
+    //
+
+    if ( read )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( text );
+    }
+
+    if ( lines )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( UTIL::to_string( text_line ) );
+    }
+
+    if ( chars )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( UTIL::to_string( char_count ) );
+    }
+
+    if ( maxln )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( UTIL::to_string( line_max ) );
+    }
+
+    if ( minln )
+    {
+      if ( result.size() ) result.append( wsep );
+      result.append( UTIL::to_string( line_min ) );
+    }
+  }
+  else
+  {
+    if ( result.size() ) result.append( " " );
+    result.append( amu_error_msg("file not found: " + file) );
+  }
 
   return ( result );
 }

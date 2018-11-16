@@ -309,11 +309,14 @@ namespace UTIL{
                                             const boost::filesystem::path &from_path,
                                             const bool parent=false);
 
-  //!make a directory path including all missing parents.
+  //! make a directory path including all missing parents.
   bool make_dir(const std::string &d,
                       std::string &m,
                 const bool &p=false,
                 const std::string &a="");
+
+  //! convert a decimal to a roman numeral
+  std::string to_roman_numeral(const int &n);
 
 } /* end namespace UTIL */
 
