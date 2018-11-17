@@ -2927,19 +2927,36 @@ ODIF::ODIF_Scanner::bif_file(void)
         {
           text_line++;
 
-          // remove OpenSCAD echo
+          // remove echo
           if ( rmecho )
-          { // format [ECHO: " ... content ... "\n]
-            // remove leading 'ECHO: "' iff at pos==0
-            if ( line.find( "ECHO: \"" ) == 0 )
-            {
-              line.erase( 0, 7 );
+          { // format [[ECHO:][ ][" ... echo-content ... "]endl]
 
-              // remove '"' at end of line
-              if ( line.at( line.length() -1) == '\"' )
-                line.erase( line.length() -1, 1 );
-              else
-                line.append( "< " + amu_error_msg("end of line quotation missing") );
+            // [ECHO:]
+            if ( line.find( "ECHO:" ) == 0 )
+            { // 'ECHO:' iff at pos==0
+              line.erase( 0, 5 );
+
+              // [ ] single space character at pos==0
+              // if ( line.find_first_of( " " ) == 0 )
+              //  line.erase( 0, 1 );
+
+              // [ ] all white space from pos==0
+              size_t p = line.find_first_not_of( " \t" );
+              if ( (p != 0) && (p != string::npos) )
+                line.erase( 0, p );
+
+              // [" ... echo-content ... "]
+              if ( line.find_first_of( "\"" ) == 0 )
+              { // open quote at pos==0
+                line.erase( 0, 1 );
+
+                // close quote at pos=eol
+                size_t l = line.length();
+                if ( (l != 0) && (line.find_last_of( "\"" ) == (l-1)) )
+                  line.erase( l-1, 1 );
+                else
+                  line.append( "< " + amu_error_msg("close quote missing") );
+              }
             }
           }
 
