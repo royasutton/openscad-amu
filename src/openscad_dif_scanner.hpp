@@ -39,11 +39,11 @@
 
 #include "openscad_dif_util.hpp"
 
-#include <iostream>
 #include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
+// #include <iostream>
+// #include <sstream>
+// #include <string>
+// #include <vector>
 
 //! \ingroup openscad_dif_src
 //! @{

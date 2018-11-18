@@ -31,14 +31,9 @@
 *******************************************************************************/
 
 #include "openscad_dif_scanner.hpp"
-
-#include <boost/filesystem.hpp>
-#include <boost/tokenizer.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
-#include <boost/xpressive/xpressive.hpp>
-
 #include <set>
+
+// #include <boost/filesystem.hpp>
 
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
