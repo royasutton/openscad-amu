@@ -110,24 +110,24 @@
 
   | Internal Commands                                                 | Description
   |:------------------------------------------------------------------|:---------------------------------
-  | \ref ODIF::ODIF_Scanner::def_init()         "\\amu_define"        | define text macro
-  | \ref ODIF::ODIF_Scanner::bif_eval()         "\\amu_eval"          | evaluate arguments
-  | \ref ODIF::ODIF_Scanner::bif_shell()        "\\amu_shell"         | execute shell command
-  | \ref ODIF::ODIF_Scanner::bif_combine()      "\\amu_combine"       | combine words
-  | \ref ODIF::ODIF_Scanner::bif_table()        "\\amu_table"         | generate a text table
-  | \ref ODIF::ODIF_Scanner::bif_image_table()  "\\amu_image_table"   | generate an image table
-  | \ref ODIF::ODIF_Scanner::bif_viewer()       "\\amu_viewer"        | file viewer
-  | \ref ODIF::ODIF_Scanner::bif_make()         "\\amu_make"          | make script interface
-  | \ref ODIF::ODIF_Scanner::bif_copy()         "\\amu_copy"          | copy references
-  | \ref ODIF::ODIF_Scanner::bif_find()         "\\amu_find"          | search for output files
-  | \ref ODIF::ODIF_Scanner::bif_scope()        "\\amu_scope"         | query scope data
-  | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_source"        | query source filename
-  | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_pathid"        | generate source path identifier
-  | \ref ODIF::ODIF_Scanner::bif_filename()     "\\amu_filename"      | operations for filename lists
-  | \ref ODIF::ODIF_Scanner::bif_replace()      "\\amu_replace"       | text search and replace operation
+  | \ref ODIF::ODIF_Scanner::def_init()         "\\amu_define"        | Define text macro
+  | \ref ODIF::ODIF_Scanner::bif_eval()         "\\amu_eval"          | Evaluate arguments
+  | \ref ODIF::ODIF_Scanner::bif_shell()        "\\amu_shell"         | Execute shell command
+  | \ref ODIF::ODIF_Scanner::bif_make()         "\\amu_make"          | Make script interface
+  | \ref ODIF::ODIF_Scanner::bif_scope()        "\\amu_scope"         | Query scope data
+  | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_source"        | Query source filename
+  | \ref ODIF::ODIF_Scanner::bif_copy()         "\\amu_copy"          | Copy references
+  | \ref ODIF::ODIF_Scanner::bif_find()         "\\amu_find"          | Search for output files
+  | \ref ODIF::ODIF_Scanner::bif_pathid()       "\\amu_pathid"        | Generate source path identifier
+  | \ref ODIF::ODIF_Scanner::bif_filename()     "\\amu_filename"      | Operations for filename lists
+  | \ref ODIF::ODIF_Scanner::bif_file()         "\\amu_file"          | Perform operations on text files
+  | \ref ODIF::ODIF_Scanner::bif_combine()      "\\amu_combine"       | Combine words
+  | \ref ODIF::ODIF_Scanner::bif_replace()      "\\amu_replace"       | Text search and replace operation
   | \ref ODIF::ODIF_Scanner::bif_word()         "\\amu_word"          | Count or select words from a list
   | \ref ODIF::ODIF_Scanner::bif_seq()          "\\amu_seq"           | Generate a sequence of numbers
-  | \ref ODIF::ODIF_Scanner::bif_file()         "\\amu_file"          | Perform operations on text files
+  | \ref ODIF::ODIF_Scanner::bif_table()        "\\amu_table"         | Generate a text table
+  | \ref ODIF::ODIF_Scanner::bif_image_table()  "\\amu_image_table"   | Generate an image table
+  | \ref ODIF::ODIF_Scanner::bif_viewer()       "\\amu_viewer"        | Graphics file viewer
 
   External commands also exists and can be found in the directory:
   <tt><install-prefix>/functions/</tt>.
