@@ -2799,10 +2799,11 @@ ODIF::ODIF_Scanner::bif_seq(void)
     Options that require arguments.
 
      options      | sc  | default | description
-    :------------:|:---:|:-------:|:------------------------------
-      file        | f   |         | name of file
+    :------------:|:---:|:-------:|:--------------------------------------
+      file        | f   |         | name of source file
+      text        | t   |         | use content of text as source file
       first       | i   | 1       | start line of file
-      last        | t   | 0       | end line of file, 0=<eof>
+      last        | l   | 0       | end line of file, 0=<eof>
       separator   | s   | []      | separator for joining results
 
     Flags that modify the output
@@ -2838,9 +2839,10 @@ ODIF::ODIF_Scanner::bif_file(void)
   string vana[] =
   {
   "file",       "f",
+  "text",       "t",
 
   "first",      "i",
-  "last",       "t",
+  "last",       "l",
 
   "separator",  "s",
 
@@ -2859,11 +2861,12 @@ ODIF::ODIF_Scanner::bif_file(void)
   // assign local variable values: positions must match declaration above.
   size_t ap=0;
   string file = unquote_trim(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string text = unquote     (fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
   uint first  = atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ); ap+=2;
   uint last   = atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ); ap+=2;
 
-  string wsep = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string wsep = unquote     (fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
   bool rmecho = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool rmnl   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
@@ -2897,92 +2900,122 @@ ODIF::ODIF_Scanner::bif_file(void)
   if ( fx_argv.size(false, true) != 1 )
     return(amu_error_msg("requires zero positional argument. " + help));
 
+  // file and text arguments mutually exclusive
+  if ( !file.empty() && !text.empty() )
+    return(amu_error_msg("file and text arguments mutually exclusive. " + help));
+
   string result;
 
-  bool found = false;
-  string rl = file_rl( file, NO_FORMAT_OUTPUT, found );
+  bool ids_ready = false;
 
-  if ( found  )
+  ifstream      ifs;          // file stream
+  istringstream iss;          // string stream
+
+  if ( !file.empty() )
+  { // use file stream
+    bool found = false;
+    string rl = file_rl( file, NO_FORMAT_OUTPUT, found );
+
+    if ( found  )
+    {
+      ifs.open( rl.c_str() );
+      ids_ready = ifs.is_open();
+
+      if ( !ids_ready )
+        result.append( amu_error_msg("unable to open: " + file) );
+    }
+    else
+      result.append( amu_error_msg("unable to find: " + file) );
+  }
+  else if ( !text.empty() )
+  { // use text stream
+    iss.str( text );
+    ids_ready = true;
+  }
+  else
+  { // error: no source
+    result.append( amu_error_msg("no source file or text.") );
+    ids_ready = false;
+  }
+
+  // assign input data stream source
+  istream& ids = ifs.is_open() ? static_cast<istream&>(ifs)
+                               : static_cast<istream&>(iss);
+
+  if ( ids_ready  )
   {
-    uint file_line  = 0;          // current line of input file
+    uint ids_line   = 0;          // current line of input
 
-    uint text_line  = 0;          // current stats of processed file
+    uint text_line  = 0;          // current stats of processed input
     uint char_count = 0;
     uint line_max   = 0;
     uint line_min   = UINT_MAX;
 
     string line;
-    string text;
+    string data;
 
-    ifstream ifs ( rl.c_str() );
-
-    if ( ifs.is_open() )
+    while ( !ids.eof() )
     {
-      while ( !ifs.eof() )
+      getline(ids, line);
+      ids_line++;
+
+      if ( (ids_line >= first) && ( (last == 0) || (ids_line<=last) ) )
       {
-        getline(ifs, line);
-        file_line++;
+        text_line++;
 
-        if ( (file_line >= first) && ( (last == 0) || (file_line<=last) ) )
-        {
-          text_line++;
+        // remove echo
+        if ( rmecho )
+        { // format [[ECHO:][ ][" ... echo-content ... "]endl]
 
-          // remove echo
-          if ( rmecho )
-          { // format [[ECHO:][ ][" ... echo-content ... "]endl]
+          // [ECHO:]
+          if ( line.find( "ECHO:" ) == 0 )
+          { // 'ECHO:' iff at pos==0
+            line.erase( 0, 5 );
 
-            // [ECHO:]
-            if ( line.find( "ECHO:" ) == 0 )
-            { // 'ECHO:' iff at pos==0
-              line.erase( 0, 5 );
+            // [ ] single space character at pos==0
+            // if ( line.find_first_of( " " ) == 0 )
+            //  line.erase( 0, 1 );
 
-              // [ ] single space character at pos==0
-              // if ( line.find_first_of( " " ) == 0 )
-              //  line.erase( 0, 1 );
+            // [ ] all white space from pos==0
+            size_t p = line.find_first_not_of( " \t" );
+            if ( (p != 0) && (p != string::npos) )
+              line.erase( 0, p );
 
-              // [ ] all white space from pos==0
-              size_t p = line.find_first_not_of( " \t" );
-              if ( (p != 0) && (p != string::npos) )
-                line.erase( 0, p );
+            // [" ... echo-content ... "]
+            if ( line.find_first_of( "\"" ) == 0 )
+            { // open quote at pos==0
+              line.erase( 0, 1 );
 
-              // [" ... echo-content ... "]
-              if ( line.find_first_of( "\"" ) == 0 )
-              { // open quote at pos==0
-                line.erase( 0, 1 );
-
-                // close quote at pos=eol
-                size_t l = line.length();
-                if ( (l != 0) && (line.find_last_of( "\"" ) == (l-1)) )
-                  line.erase( l-1, 1 );
-                else
-                  line.append( "< " + amu_error_msg("close quote missing") );
-              }
+              // close quote at pos=eol
+              size_t l = line.length();
+              if ( (l != 0) && (line.find_last_of( "\"" ) == (l-1)) )
+                line.erase( l-1, 1 );
+              else
+                line.append( "< " + amu_error_msg("close quote missing") );
             }
           }
-
-          // eval variables
-          if ( eval )
-            line = varm.expand_text(line);
-
-          if (line.size() > line_max)
-            line_max = line.size();
-
-          if ( line.size() && (line.size() < line_min) )
-            line_min = line.size();
-
-          // handle end of line
-          if ( rmnl )
-            line += wsep;
-          else
-            line += "\n";
-
-          char_count += line.size();
-
-          text.append( line );
         }
-      }
 
-      ifs.close();
+        // eval variables
+        if ( eval )
+          line = varm.expand_text(line);
+
+        if (line.size() > line_max)
+          line_max = line.size();
+
+        if ( line.size() && (line.size() < line_min) )
+          line_min = line.size();
+
+        // handle end of line
+        if ( rmnl )
+          line += wsep;
+        else
+          line += "\n";
+
+        char_count += line.size();
+
+        data.append( line );
+      }
     }
 
     //
@@ -2992,7 +3025,7 @@ ODIF::ODIF_Scanner::bif_file(void)
     if ( read )
     {
       if ( result.size() ) result.append( wsep );
-      result.append( text );
+      result.append( data );
     }
 
     if ( lines )
@@ -3019,11 +3052,10 @@ ODIF::ODIF_Scanner::bif_file(void)
       result.append( UTIL::to_string( line_min ) );
     }
   }
-  else
-  {
-    if ( result.size() ) result.append( " " );
-    result.append( amu_error_msg("file not found: " + file) );
-  }
+
+  // close file if open
+  if ( ifs.is_open() )
+    ifs.close();
 
   return ( result );
 }
