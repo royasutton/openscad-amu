@@ -272,19 +272,19 @@ ODIF::ODIF_Scanner::bif_replace(void)
 
   using namespace boost::xpressive;
   sregex sre = sregex::compile( search );
-  regex_constants::match_flag_type flags;
+  regex_constants::match_flag_type fmt_f;
 
-  flags = regex_constants::format_default;
+  fmt_f = regex_constants::format_default;
 
-  if ( !global )        flags = flags | regex_constants::format_first_only;
-  if ( no_copy )        flags = flags | regex_constants::format_no_copy;
+  if ( !global )        fmt_f = fmt_f | regex_constants::format_first_only;
+  if ( no_copy )        fmt_f = fmt_f | regex_constants::format_no_copy;
 
-  if ( fmt_literal )    flags = flags | regex_constants::format_literal;
-  if ( fmt_perl )       flags = flags | regex_constants::format_perl;
-  if ( fmt_sed )        flags = flags | regex_constants::format_sed;
-  if ( fmt_all )        flags = flags | regex_constants::format_all;
+  if ( fmt_literal )    fmt_f = fmt_f | regex_constants::format_literal;
+  if ( fmt_perl )       fmt_f = fmt_f | regex_constants::format_perl;
+  if ( fmt_sed )        fmt_f = fmt_f | regex_constants::format_sed;
+  if ( fmt_all )        fmt_f = fmt_f | regex_constants::format_all;
 
-  result = regex_replace( text, sre, replace, flags );
+  result = regex_replace( text, sre, replace, fmt_f );
 
   return ( result );
 }
