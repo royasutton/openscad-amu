@@ -190,14 +190,19 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
 
     Flags.
 
-     flags      | sc  | default | description
-    :----------:|:---:|:-------:|:------------------------------------
-      global    | g   | true    | replace all occurances
-      no_copy   | n   | false   | do not copy text that do not match
-      literal   | l   | false   | treat format string as literal
-      perl      | p   | false   | recognize perl format sequences
-      sed       | e   | false   | recognize sed format sequences
-      all       | a   | false   | recognize all format sequences
+     flags          | sc  | default | description
+    :--------------:|:---:|:-------:|:------------------------------------
+      global        | g   | true    | replace all occurances
+      no_copy       | n   | false   | do not copy text that do not match
+
+    Format flags.
+
+     flags          | sc  | default | description
+    :--------------:|:---:|:-------:|:------------------------------------
+      fmt_literal   | fl  | false   | treat format string as literal
+      fmt_perl      | fp  | false   | recognize perl format sequences
+      fmt_sed       | fs  | false   | recognize sed format sequences
+      fmt_all       | fa  | false   | recognize all format sequences
 
     For more information on how to specify and use function arguments
     see \ref openscad_dif_sm_a.
@@ -213,31 +218,33 @@ ODIF::ODIF_Scanner::bif_replace(void)
   // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
   string vana[] =
   {
-  "text",     "t",
-  "search",   "s",
-  "replace",  "r",
+  "text",           "t",
+  "search",         "s",
+  "replace",        "r",
 
-  "global",   "g",
-  "no_copy",  "n",
-  "literal",  "l",
-  "perl",     "p",
-  "sed",      "e",
-  "all",      "a"
+  "global",         "g",
+  "no_copy",        "n",
+
+  "fmt_literal",    "fl",
+  "fmt_perl",       "fp",
+  "fmt_sed",        "fs",
+  "fmt_all",        "fa"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
   // assign local variable values: positions must match declaration above.
   size_t ap=0;
-  string text     = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string search   = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string replace  = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string text         = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string search       = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string replace      = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
-  bool global     = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool no_copy    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool literal    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool perl       = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool sed        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool all        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool global         = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool no_copy        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+
+  bool fmt_literal    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool fmt_perl       = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool fmt_sed        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool fmt_all        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -269,13 +276,13 @@ ODIF::ODIF_Scanner::bif_replace(void)
 
   flags = regex_constants::format_default;
 
-  if ( !global )  flags = flags | regex_constants::format_first_only;
-  if ( no_copy )  flags = flags | regex_constants::format_no_copy;
+  if ( !global )        flags = flags | regex_constants::format_first_only;
+  if ( no_copy )        flags = flags | regex_constants::format_no_copy;
 
-  if ( literal )  flags = flags | regex_constants::format_literal;
-  if ( perl )     flags = flags | regex_constants::format_perl;
-  if ( sed )      flags = flags | regex_constants::format_sed;
-  if ( all )      flags = flags | regex_constants::format_all;
+  if ( fmt_literal )    flags = flags | regex_constants::format_literal;
+  if ( fmt_perl )       flags = flags | regex_constants::format_perl;
+  if ( fmt_sed )        flags = flags | regex_constants::format_sed;
+  if ( fmt_all )        flags = flags | regex_constants::format_all;
 
   result = regex_replace( text, sre, replace, flags );
 
