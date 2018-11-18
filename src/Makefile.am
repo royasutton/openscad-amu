@@ -47,7 +47,10 @@ openscad_dif_SOURCES = \
 	openscad_dif_lexer.cc \
 	openscad_dif_scanner.hpp \
 	openscad_dif_scanner.cpp \
-	openscad_dif_scanner_bif.cpp \
+	openscad_dif_scanner_bif1.cpp \
+	openscad_dif_scanner_bif2.cpp \
+	openscad_dif_scanner_bif3.cpp \
+	openscad_dif_scanner_bif4.cpp \
 	openscad_dif_util.hpp \
 	openscad_dif_util.cpp \
 	openscad_dif_main.cpp
