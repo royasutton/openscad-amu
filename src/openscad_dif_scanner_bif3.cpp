@@ -174,8 +174,8 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
 /***************************************************************************//**
   \details
 
-    Perform search and replace on text. Regular expression support is
-    provided by the [boost] regex_replace() library function.
+    Perform search and replace on text using the [boost] regular
+    expression libraries [regex] and [xpressive].
 
     The options and flags (and their short codes) are summarized in the
     following tables.
@@ -188,26 +188,60 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
       search    | s   | []      | search regular expression
       replace   | r   | []      | format string for matched text
 
-    Flags.
+    Regex [syntax flags][syntax_option_type].
 
-     flags          | sc  | default | description
-    :--------------:|:---:|:-------:|:------------------------------------
-      global        | g   | true    | replace all occurances
-      no_copy       | n   | false   | do not copy text that do not match
+     flags                | sc    | description
+    :--------------------:|:-----:|:------------------------------------
+      icase               | sic   | match without regard to case
+      nosubs              | sns   | no sub-expression matches are stored
+      optimize            | soe   | optimize regular expression
+      collate             | sce   | ranges "[a-b]" are locale sensitive
+      single_line         | ssl   | ^ and $ do not match at line breaks
+      not_dot_null        | snn   | '.' does not match null character
+      not_dot_newline     | snl   | '.' does not match newline character
+      ignore_white_space  | sis   | ignore non-escaped white-space
 
-    Format flags.
+    Match [behavior flags][match_flag_type].
 
-     flags          | sc  | default | description
-    :--------------:|:---:|:-------:|:------------------------------------
-      fmt_literal   | fl  | false   | treat format string as literal
-      fmt_perl      | fp  | false   | recognize perl format sequences
-      fmt_sed       | fs  | false   | recognize sed format sequences
-      fmt_all       | fa  | false   | recognize all format sequences
+     flags                | sc    | description
+    :--------------------:|:-----:|:------------------------------------
+      match_not_bol       | mbl   | ^ not matched in [first,first)
+      match_not_eol       | mel   | $ not matched in [last,last)
+      match_not_bow       | mbw   | \\b not matched in [first,first)
+      match_not_eow       | mew   | \\b not matched in [last,last)
+      match_any           | maa   | on multi-match any are acceptable
+      match_not_null      | mnn   | do not match against empty sequence
+      match_continuous    | mcf   | must match a sub-sequence from first
+      match_partial       | mpa   | on no match, partial is acceptable
+      match_prev_avail    | mpr   | --first is a valid iterator position
+
+    Match [behavior flags][match_flag_type].
+
+     flags                | sc    | description
+    :--------------------:|:-----:|:------------------------------------
+      format_sed          | fsd   | use sed format construction rules
+      format_perl         | fpl   | use perl format construction rules
+      format_no_copy      | fnc   | do not copy non-matching characters
+      format_first_only   | ffo   | output first match occurrence only
+      format_literal      | flf   | treat the format string as a literal
+      format_all          | fas   | enable all syntax extensions
+
+    Also see [format string syntax] and [character class names] in the
+    boost documentation.
 
     For more information on how to specify and use function arguments
     see \ref openscad_dif_sm_a.
 
     [boost]: https://www.boost.org
+
+    [regex]: https://www.boost.org/doc/libs/1_58_0/libs/regex/doc/html/index.html
+    [xpressive]: https://www.boost.org/doc/libs/1_58_0/doc/html/xpressive/user_s_guide.html
+
+    [syntax_option_type]: https://www.boost.org/doc/libs/1_58_0/libs/regex/doc/html/boost_regex/ref/syntax_option_type.html
+    [match_flag_type]: https://www.boost.org/doc/libs/1_58_0/libs/regex/doc/html/boost_regex/ref/match_flag_type.html
+
+    [format string syntax]: https://www.boost.org/doc/libs/1_58_0/libs/regex/doc/html/boost_regex/format.html
+    [character class names]: https://www.boost.org/doc/libs/1_58_0/libs/regex/doc/html/boost_regex/syntax/character_classes.html
 *******************************************************************************/
 string
 ODIF::ODIF_Scanner::bif_replace(void)
@@ -218,33 +252,69 @@ ODIF::ODIF_Scanner::bif_replace(void)
   // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
   string vana[] =
   {
-  "text",           "t",
-  "search",         "s",
-  "replace",        "r",
+  "text",               "t",
+  "search",             "s",
+  "replace",            "r",
 
-  "global",         "g",
-  "no_copy",        "n",
+  "icase",              "sic",
+  "nosubs",             "sns",
+  "optimize",           "soe",
+  "collate",            "sce",
+  "single_line",        "ssl",
+  "not_dot_null",       "snn",
+  "not_dot_newline",    "snl",
+  "ignore_white_space", "sis",
 
-  "fmt_literal",    "fl",
-  "fmt_perl",       "fp",
-  "fmt_sed",        "fs",
-  "fmt_all",        "fa"
+  "match_not_bol",      "mbl",
+  "match_not_eol",      "mel",
+  "match_not_bow",      "mbw",
+  "match_not_eow",      "mew",
+  "match_any",          "maa",
+  "match_not_null",     "mnn",
+  "match_continuous",   "mcf",
+  "match_partial",      "mpa",
+  "match_prev_avail",   "mpr",
+
+  "format_sed",         "fsd",
+  "format_perl",        "fpl",
+  "format_no_copy",     "fnc",
+  "format_first_only",  "ffo",
+  "format_literal",     "flf",
+  "format_all",         "fas"
   };
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
   // assign local variable values: positions must match declaration above.
   size_t ap=0;
-  string text         = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string search       = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
-  string replace      = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string text     = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string search   = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
+  string replace  = unquote(fx_argv.arg_firstof("",vana[ap],vana[ap+1])); ap+=2;
 
-  bool global         = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool no_copy        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool sic = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool sns = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool soe = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool sce = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool ssl = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool snn = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool snl = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool sis = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
 
-  bool fmt_literal    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool fmt_perl       = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool fmt_sed        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool fmt_all        = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool mbl = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool mel = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool mbw = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool mew = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool maa = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool mnn = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool mcf = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool mpa = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool mpr = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+
+  bool fsd = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool fpl = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool fnc = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool ffo = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool flf = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool fas = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
 
   // generate options help string.
   string help = "options: [";
@@ -271,20 +341,78 @@ ODIF::ODIF_Scanner::bif_replace(void)
   string result;
 
   using namespace boost::xpressive;
-  sregex sre = sregex::compile( search );
-  regex_constants::match_flag_type fmt_f;
 
-  fmt_f = regex_constants::format_default;
+  // regex syntax flag
+  regex_constants::syntax_option_type res_f;
 
-  if ( !global )        fmt_f = fmt_f | regex_constants::format_first_only;
-  if ( no_copy )        fmt_f = fmt_f | regex_constants::format_no_copy;
+  /*
+    "icase",              "sic",
+    "nosubs",             "sns",
+    "optimize",           "soe",
+    "collate",            "sce",
+    "single_line",        "ssl",
+    "not_dot_null",       "snn",
+    "not_dot_newline",    "snl",
+    "ignore_white_space", "sis",
+  */
 
-  if ( fmt_literal )    fmt_f = fmt_f | regex_constants::format_literal;
-  if ( fmt_perl )       fmt_f = fmt_f | regex_constants::format_perl;
-  if ( fmt_sed )        fmt_f = fmt_f | regex_constants::format_sed;
-  if ( fmt_all )        fmt_f = fmt_f | regex_constants::format_all;
+  res_f = regex_constants::ECMAScript;
 
-  result = regex_replace( text, sre, replace, fmt_f );
+  if ( sic ) res_f = res_f | regex_constants::icase;
+  if ( sns ) res_f = res_f | regex_constants::nosubs;
+  if ( soe ) res_f = res_f | regex_constants::optimize;
+  if ( sce ) res_f = res_f | regex_constants::collate;
+  if ( ssl ) res_f = res_f | regex_constants::single_line;
+  if ( snn ) res_f = res_f | regex_constants::not_dot_null;
+  if ( snl ) res_f = res_f | regex_constants::not_dot_newline;
+  if ( sis ) res_f = res_f | regex_constants::ignore_white_space;
+
+  sregex sre = sregex::compile( search, res_f );
+
+  // regex algorithms behavior flag
+  regex_constants::match_flag_type rab_f;
+
+  /*
+    "match_not_bol",      "mbl",
+    "match_not_eol",      "mel",
+    "match_not_bow",      "mbw",
+    "match_not_eow",      "mew",
+    "match_any",          "maa",
+    "match_not_null",     "mnn",
+    "match_continuous",   "mcf",
+    "match_partial",      "mpa",
+    "match_prev_avail",   "mpr",
+  */
+
+  rab_f = regex_constants::match_default | regex_constants::format_default;
+
+  if ( mbl ) rab_f = rab_f | regex_constants::match_not_bol;
+  if ( mel ) rab_f = rab_f | regex_constants::match_not_eol;
+  if ( mbw ) rab_f = rab_f | regex_constants::match_not_bow;
+  if ( mew ) rab_f = rab_f | regex_constants::match_not_eow;
+  if ( maa ) rab_f = rab_f | regex_constants::match_any;
+  if ( mnn ) rab_f = rab_f | regex_constants::match_not_null;
+  if ( mcf ) rab_f = rab_f | regex_constants::match_continuous;
+  if ( mpa ) rab_f = rab_f | regex_constants::match_partial;
+  if ( mpr ) rab_f = rab_f | regex_constants::match_prev_avail;
+
+  /*
+    "format_sed",         "fsd",
+    "format_perl",        "fpl",
+    "format_no_copy",     "fnc",
+    "format_first_only",  "ffo",
+    "format_literal",     "flf",
+    "format_all",         "fas"
+  */
+
+  if ( fsd ) rab_f = rab_f | regex_constants::format_sed;
+  if ( fpl ) rab_f = rab_f | regex_constants::format_perl;
+  if ( fnc ) rab_f = rab_f | regex_constants::format_no_copy;
+  if ( ffo ) rab_f = rab_f | regex_constants::format_first_only;
+  if ( flf ) rab_f = rab_f | regex_constants::format_literal;
+  if ( fas ) rab_f = rab_f | regex_constants::format_all;
+
+  result = regex_replace( text, sre, replace, rab_f );
 
   return ( result );
 }
