@@ -157,8 +157,9 @@ amu_escaped                       "\\"[\\@]
 <AMUMDEFINE>.                     { abort("in define", lineno(), YYText()); }
 
 <DEFINEARG>\)                     { apt(); def_pend(); yy_pop_state(); }
-<DEFINEARG>{ws}+                  { apt(); def_app(" "); }
-<DEFINEARG>{nr}+                  { apt(); def_app(" "); }
+<DEFINEARG>\\{nr}                 { apt(); def_app(""); }
+<DEFINEARG>\n                     { apt(); def_app("\n"); }
+<DEFINEARG>\r                     { apt(); def_app("\r"); }
 <DEFINEARG>.                      { apt(); def_app(); }
 <DEFINEARG><<EOF>>                { abort("unterminated define arguments", fi_bline); }
 
