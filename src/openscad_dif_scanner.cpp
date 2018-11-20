@@ -500,7 +500,7 @@ ODIF::ODIF_Scanner::def_pend(void)
 }
 
 void
-ODIF::ODIF_Scanner::def_set_name(void)
+ODIF::ODIF_Scanner::def_set_tovar(void)
 {
   if ( def_name.length() )
     abort("previously defined var: " + def_name, lineno(), YYText());

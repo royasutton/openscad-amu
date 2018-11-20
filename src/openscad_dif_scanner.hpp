@@ -288,7 +288,7 @@ class ODIF_Scanner : public yyFlexLexer{
     void def_pend(void);
 
     //! store parsed definition variable name.
-    void def_set_name(void);
+    void def_set_tovar(void);
     //! append the string s to the definition text.
     void def_app(const std::string &s) { def_text+=s; }
     //! append the current parsed text to the definition text.

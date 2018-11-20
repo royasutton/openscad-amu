@@ -166,7 +166,7 @@ amu_escaped                       "\\"[\\@]
     amu_define var ( text of definition with ${variables} )
   */
 
-<AMUDEF>{id}                      { apt(); def_set_name(); }
+<AMUDEF>{id}                      { apt(); def_set_tovar(); }
 <AMUDEF>\(                        { apt(); BEGIN(AMUDEFARG); }
 <AMUDEF>{ws}+                     { apt(); }
 <AMUDEF>{nr}                      { apt(); }
