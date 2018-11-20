@@ -176,7 +176,7 @@ amu_escaped                       "\\"[\\@]
 <AMUDEFARG>\\{nr}                 { apt(); def_app(""); }
 <AMUDEFARG>{nr}                   { apt(); def_app(); }
 <AMUDEFARG>.                      { apt(); def_app(); }
-<AMUDEFARG><<EOF>>                { abort("unterminated define arguments", fi_bline); }
+<AMUDEFARG><<EOF>>                { abort("unterminated define arguments", def_bline); }
 
 %%
 
