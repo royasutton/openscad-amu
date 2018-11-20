@@ -276,7 +276,7 @@ class ODIF_Scanner : public yyFlexLexer{
   //////////////////////////////////////////////////////////////////////////////
   // amu_define
   //////////////////////////////////////////////////////////////////////////////
-    std::string def_name;               //!< parsed amu definition name.
+    std::string def_tovar;              //!< parsed amu definition variable name.
     std::string def_text;               //!< parsed amu definition text.
 
     size_t      def_bline;              //!< beginning line of parsed amu definition.

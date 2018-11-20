@@ -469,7 +469,7 @@ ODIF::ODIF_Scanner::def_init(void)
   apt_clear();
   apt();
 
-  def_name.clear();
+  def_tovar.clear();
   def_text.clear();
 
   def_bline = lineno();
@@ -482,16 +482,16 @@ ODIF::ODIF_Scanner::def_pend(void)
 
   // if variable name not specified, copy definition to output
   // otherwise store in variable map.
-  if ( def_name.length() == 0 )
+  if ( def_tovar.length() == 0 )
     scanner_output( def_text );
   else
   {
-    varm.store( def_name, def_text );
+    varm.store( def_tovar, def_text );
 
-    filter_debug( def_name + "=[" + def_text + "]" );
+    filter_debug( def_tovar + "=[" + def_text + "]" );
   }
 
-  def_name.clear();
+  def_tovar.clear();
   def_text.clear();
 
   // output blank lines to maintain file length when definitions are
@@ -502,9 +502,9 @@ ODIF::ODIF_Scanner::def_pend(void)
 void
 ODIF::ODIF_Scanner::def_set_tovar(void)
 {
-  if ( def_name.length() )
-    abort("previously defined var: " + def_name, lineno(), YYText());
-  def_name=YYText();
+  if ( def_tovar.length() )
+    abort("previously defined var: " + def_tovar, lineno(), YYText());
+  def_tovar=YYText();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
