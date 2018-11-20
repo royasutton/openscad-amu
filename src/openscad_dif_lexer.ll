@@ -79,9 +79,11 @@ amu_escaped                       "\\"[\\@]
 
 %%
 
-  /* outside comments:
+  /*
+    outside of comments:
       (1) replace OpenSCAD commands with C equivalents,
-      (2) output everything else unchanged */
+      (2) output everything else unchanged
+  */
 
 <INITIAL>{comment_open}           { scanner_echo(); yy_push_state(COMMENT); }
 <INITIAL>{comment_line}           { scanner_echo(); yy_push_state(COMMENTLN); }
@@ -90,9 +92,11 @@ amu_escaped                       "\\"[\\@]
 <INITIAL>{nr}                     { scanner_echo(); }
 <INITIAL>.                        { scanner_echo(); }
 
-  /* inside comments:
+  /*
+    inside comment block:
       (1) match and handle amu functions
-      (2) output everything else unchanged */
+      (2) output everything else unchanged
+  */
 
 <COMMENT>{comment_close}          { scanner_echo(); yy_pop_state(); }
 <COMMENT><<EOF>>                  { abort("unterminated comment"); }
@@ -104,14 +108,18 @@ amu_escaped                       "\\"[\\@]
 <COMMENT>{nr}                     { scanner_echo(); }
 <COMMENT>.                        { scanner_echo(); }
 
-  /* comment line: (outside of comment block)
-      (1) output everything unchanged until end of line */
+  /*
+    on comment line, outside of comment block:
+      (1) output everything unchanged until end of line
+  */
 
 <COMMENTLN>{nr}                   { scanner_echo(); yy_pop_state(); }
 <COMMENTLN>.                      { scanner_echo(); }
 
-  /* parse amu function:
-      \amu_func1 var ( a1 a2 'a3' "a 4" file="all" ) */
+  /*
+    amu_func:
+    amu_func var ( a1 a2 'a3' "a 4" file="all" )
+  */
 
 <AMUFN>{id}                       { apt(); fx_set_tovar(); }
 <AMUFN>\(                         { apt(); BEGIN(AMUFNARG); }
@@ -119,7 +127,9 @@ amu_escaped                       "\\"[\\@]
 <AMUFN>{nr}                       { apt(); }
 <AMUFN>.                          { abort("in function name", lineno(), YYText()); }
 
-  /* parse arguments */
+  /*
+    amu function arguments:
+  */
 
 <AMUFNARG>{id}                    { apt(); fx_store_arg(); }
 <AMUFNARG>{id_var}                { apt(); fx_store_arg_expanded(); }
@@ -136,7 +146,9 @@ amu_escaped                       "\\"[\\@]
 <AMUFNARG>.                       { abort("in function arguments", lineno(), YYText()); }
 <AMUFNARG><<EOF>>                 { abort("unterminated function arguments", fi_bline); }
 
-  /* parse single and double quoted argument */
+  /*
+    amu function single and double quoted arguments:
+  */
 
 <AMUFNAQS>\'                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
 <AMUFNAQD>\"                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
@@ -149,8 +161,10 @@ amu_escaped                       "\\"[\\@]
 <AMUFNAQS><<EOF>>                 { abort("unterminated single quote", fi_bline); }
 <AMUFNAQD><<EOF>>                 { abort("unterminated double quote", fi_bline); }
 
-  /* parse amu define:
-      \amu_define var ( text of definition with ${variables} ) */
+  /*
+    amu_define:
+    amu_define var ( text of definition with ${variables} )
+  */
 
 <AMUDEF>{id}                      { apt(); def_set_name(); }
 <AMUDEF>\(                        { apt(); BEGIN(AMUDEFARG); }
