@@ -158,8 +158,7 @@ amu_escaped                       "\\"[\\@]
 
 <DEFINEARG>\)                     { apt(); def_pend(); yy_pop_state(); }
 <DEFINEARG>\\{nr}                 { apt(); def_app(""); }
-<DEFINEARG>\n                     { apt(); def_app("\n"); }
-<DEFINEARG>\r                     { apt(); def_app("\r"); }
+<DEFINEARG>{nr}                   { apt(); def_app(); }
 <DEFINEARG>.                      { apt(); def_app(); }
 <DEFINEARG><<EOF>>                { abort("unterminated define arguments", fi_bline); }
 
