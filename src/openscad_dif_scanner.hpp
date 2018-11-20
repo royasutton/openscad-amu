@@ -56,6 +56,10 @@ namespace ODIF{
 //! Class that implements the OpenSCAD Doxygen input filter scanner.
 class ODIF_Scanner : public yyFlexLexer{
   public:
+  //////////////////////////////////////////////////////////////////////////////
+  // scanner public
+  //////////////////////////////////////////////////////////////////////////////
+
     using FlexLexer::yylex;
 
     //! \brief scanner constructor.
@@ -164,7 +168,9 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string get_makefile_ext(void) { return makefile_ext; }
 
   private:
-    // scanner
+  //////////////////////////////////////////////////////////////////////////////
+  // scanner private
+  //////////////////////////////////////////////////////////////////////////////
     bool scanner_output_on;                 //!< scanner output on.
     bool debug_filter;                      //!< filter debugging output.
 
@@ -194,6 +200,9 @@ class ODIF_Scanner : public yyFlexLexer{
 
     std::string makefile_ext;               //!< makefile extension.
 
+  //////////////////////////////////////////////////////////////////////////////
+  // general
+  //////////////////////////////////////////////////////////////////////////////
     //! write the entire string s to the scanner output.
     void scanner_output(const std::string& s) { scanner_output( s.c_str(), s.length() ); }
     //! write the first size characters of buf to the scanner output.
@@ -209,8 +218,9 @@ class ODIF_Scanner : public yyFlexLexer{
 
     env_var     varm;                   //!< scanner environment variable map.
 
-
-    // amu parsed text
+  //////////////////////////////////////////////////////////////////////////////
+  // amu parsed text
+  //////////////////////////////////////////////////////////////////////////////
     std::string amu_parsed_text;        //!< complete text of parsed amu commands.
     size_t      amu_parsed_leng;        //!< character count parsed for 'amu_parsed_text'.
 
@@ -219,8 +229,9 @@ class ODIF_Scanner : public yyFlexLexer{
     //! append the current match text to complete text of parsed amu commands.
     void apt(void) { amu_parsed_text+=YYText(); amu_parsed_leng+=YYLeng(); }
 
-
-    // amu function
+  //////////////////////////////////////////////////////////////////////////////
+  // amu_* function
+  //////////////////////////////////////////////////////////////////////////////
     std::string fx_name;                //!< parsed amu function name.
     std::string fx_tovar;               //!< parsed amu function output variable name.
     func_args   fx_argv;                //!< parsed amu function arguments class.
@@ -261,8 +272,9 @@ class ODIF_Scanner : public yyFlexLexer{
     //! increment or decrement variable with post or pre assignment.
     void fx_incr_arg(bool post=true);
 
-
-    // amu define
+  //////////////////////////////////////////////////////////////////////////////
+  // amu_define
+  //////////////////////////////////////////////////////////////////////////////
     std::string def_name;               //!< parsed amu definition name.
     std::string def_text;               //!< parsed amu definition text.
 
@@ -281,6 +293,10 @@ class ODIF_Scanner : public yyFlexLexer{
     //! append the current parsed text to the definition text.
     void def_app(void) { def_text+=YYText(); }
 
+  //////////////////////////////////////////////////////////////////////////////
+  // utility
+  //////////////////////////////////////////////////////////////////////////////
+
     //! output filter debugging message to standard output and standard error.
     void filter_debug( const std::string& m, const bool& h=true,
                        const bool& f=true, const bool& s=true);
@@ -290,9 +306,10 @@ class ODIF_Scanner : public yyFlexLexer{
                          bool& found, const bool& extension=true,
                          const bool& copy=true, const bool& rid=false);
 
-
-    // built-in amu functions (bif)
-    // see: openscad_dif_scanner_bif.cpp
+  //////////////////////////////////////////////////////////////////////////////
+  // amu built-in functions (bif)
+  // openscad_dif_scanner_bif{1,2,3,4}.cpp
+  //////////////////////////////////////////////////////////////////////////////
     //! evaluate and output the function arguments.
     std::string bif_eval(void);
     //! execute a shell command and output its results.
