@@ -102,32 +102,33 @@
   or decrement the global variable \p i).
 
 
-  \subsection openscad_dif_sm_adc Additional Doxygen Commands
+  \subsection openscad_dif_sm_adc Doxygen Commands Summary
 
   In addition to the normal Doxygen [special commands], here is a list
   of additional filter-provided commands that can be used for document
-  markup:
+  markup. The documentation for these commands may be found in section
+  the \ref openscad_dif_sm_afc "additional commands".
 
-  | Internal Commands                                                 | Description
-  |:------------------------------------------------------------------|:---------------------------------
-  | \ref ODIF::ODIF_Scanner::def_init()         "\\amu_define"        | Define text macro
-  | \ref ODIF::ODIF_Scanner::bif_eval()         "\\amu_eval"          | Evaluate arguments
-  | \ref ODIF::ODIF_Scanner::bif_shell()        "\\amu_shell"         | Execute shell command
-  | \ref ODIF::ODIF_Scanner::bif_make()         "\\amu_make"          | Make script interface
-  | \ref ODIF::ODIF_Scanner::bif_scope()        "\\amu_scope"         | Query scope data
-  | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_source"        | Query source filename
-  | \ref ODIF::ODIF_Scanner::bif_copy()         "\\amu_copy"          | Copy references
-  | \ref ODIF::ODIF_Scanner::bif_find()         "\\amu_find"          | Search for output files
-  | \ref ODIF::ODIF_Scanner::bif_pathid()       "\\amu_pathid"        | Generate source path identifier
-  | \ref ODIF::ODIF_Scanner::bif_filename()     "\\amu_filename"      | Operations for filename lists
-  | \ref ODIF::ODIF_Scanner::bif_file()         "\\amu_file"          | Perform operations on text files
-  | \ref ODIF::ODIF_Scanner::bif_combine()      "\\amu_combine"       | Combine words
-  | \ref ODIF::ODIF_Scanner::bif_replace()      "\\amu_replace"       | Text search and replace operation
-  | \ref ODIF::ODIF_Scanner::bif_word()         "\\amu_word"          | Count or select words from a list
-  | \ref ODIF::ODIF_Scanner::bif_seq()          "\\amu_seq"           | Generate a sequence of numbers
-  | \ref ODIF::ODIF_Scanner::bif_table()        "\\amu_table"         | Generate a text table
-  | \ref ODIF::ODIF_Scanner::bif_image_table()  "\\amu_image_table"   | Generate an image table
-  | \ref ODIF::ODIF_Scanner::bif_viewer()       "\\amu_viewer"        | Graphics file viewer
+  | Internal Commands               | Description
+  |:--------------------------------|:------------------------------------
+  | \ref dif_afc_amu_define         | Define text macro
+  | \ref dif_afc_amu_eval           | Evaluate arguments
+  | \ref dif_afc_amu_shell          | Execute shell command
+  | \ref dif_afc_amu_make           | Make script interface
+  | \ref dif_afc_amu_scope          | Query scope data
+  | \ref dif_afc_amu_source         | Query source filename
+  | \ref dif_afc_amu_copy           | Copy references
+  | \ref dif_afc_amu_find           | Search for output files
+  | \ref dif_afc_amu_pathid         | Generate source path identifier
+  | \ref dif_afc_amu_filename       | Operations for filename lists
+  | \ref dif_afc_amu_file           | Perform operations on text files
+  | \ref dif_afc_amu_combine        | Combine words
+  | \ref dif_afc_amu_replace        | Text search and replace operation
+  | \ref dif_afc_amu_word           | Count or select words from a list
+  | \ref dif_afc_amu_seq            | Generate a sequence of numbers
+  | \ref dif_afc_amu_table          | Generate a text table
+  | \ref dif_afc_amu_image_table    | Generate an image table
+  | \ref dif_afc_amu_viewer         | Graphics file viewer
 
   External commands also exists and can be found in the directory:
   <tt><install-prefix>/functions/</tt>.
@@ -191,7 +192,7 @@
   \endverbatim
 
 
-  \subsection openscad_dif_sm_afc Adding Filter Commands
+  \subsection openscad_dif_sm_afc_add Adding Filter Commands
 
   Additional internal commands can be added to the filter by coding the
   function in C++ and incorporating it into the source. External
@@ -208,6 +209,63 @@
   <tt>amu_<function></tt> that it does not recognize, it checks this
   location and if it finds a match this external command is called to
   handle the command. See examples there as a starting point.
+
+
+  \section openscad_dif_sm_afc Additional Commands (openscad-dif)
+
+    \subsection dif_afc_amu_combine \\amu_combine
+    \copydetails ODIF::ODIF_Scanner::bif_combine()
+
+    \subsection dif_afc_amu_copy \\amu_copy
+    \copydetails ODIF::ODIF_Scanner::bif_copy()
+
+    \subsection dif_afc_amu_define \\amu_define
+    \copydetails ODIF::ODIF_Scanner::def_init()
+
+    \subsection dif_afc_amu_eval \\amu_eval
+    \copydetails ODIF::ODIF_Scanner::bif_eval()
+
+    \subsection dif_afc_amu_file \\amu_file
+    \copydetails ODIF::ODIF_Scanner::bif_file()
+
+    \subsection dif_afc_amu_filename \\amu_filename
+    \copydetails ODIF::ODIF_Scanner::bif_filename()
+
+    \subsection dif_afc_amu_find \\amu_find
+    \copydetails ODIF::ODIF_Scanner::bif_find()
+
+    \subsection dif_afc_amu_image_table \\amu_image_table
+    \copydetails ODIF::ODIF_Scanner::bif_image_table()
+
+    \subsection dif_afc_amu_make \\amu_make
+    \copydetails ODIF::ODIF_Scanner::bif_make()
+
+    \subsection dif_afc_amu_pathid \\amu_pathid
+    \copydetails ODIF::ODIF_Scanner::bif_pathid()
+
+    \subsection dif_afc_amu_replace \\amu_replace
+    \copydetails ODIF::ODIF_Scanner::bif_replace()
+
+    \subsection dif_afc_amu_scope \\amu_scope
+    \copydetails ODIF::ODIF_Scanner::bif_scope()
+
+    \subsection dif_afc_amu_seq \\amu_seq
+    \copydetails ODIF::ODIF_Scanner::bif_seq()
+
+    \subsection dif_afc_amu_shell \\amu_shell
+    \copydetails ODIF::ODIF_Scanner::bif_shell()
+
+    \subsection dif_afc_amu_source \\amu_source
+    \copydetails ODIF::ODIF_Scanner::bif_source()
+
+    \subsection dif_afc_amu_table \\amu_table
+    \copydetails ODIF::ODIF_Scanner::bif_table()
+
+    \subsection dif_afc_amu_viewer \\amu_viewer
+    \copydetails ODIF::ODIF_Scanner::bif_viewer()
+
+    \subsection dif_afc_amu_word \\amu_word
+    \copydetails ODIF::ODIF_Scanner::bif_word()
 
 *******************************************************************************/
 
