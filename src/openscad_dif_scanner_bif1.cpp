@@ -56,10 +56,10 @@ namespace bfs = boost::filesystem;
     \p ++/--local control if the respective variable scope will be
     updated for subsequent assignments.
 
-    Flag               | Default  | Description
-    :------------------|:--------:|:------------------------------
-    ++local, --local   | true     | update local variable scope
-    ++global, --global | false    | update global variable scope
+     flags              | default | description
+    :-------------------|:-------:|:------------------------------
+     ++local, --local   | true    | update local variable scope
+     ++global, --global | false   | update global variable scope
 
     \em Positional arguments are expanded and appended to the return
     value. Each argument is separated by a configurable feild

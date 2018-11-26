@@ -391,24 +391,19 @@ ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
 
   \details
 
-    For the current text returned by the lexer matching
-    <tt>("++"|"--"){id}</tt> or <tt>{id}("++"|"--")</tt>, such as
-    <tt>var++</tt> or <tt>--var</tt>, get the operator and variable name. Then
-    lookup the current value of the variable from the environment variable map
-    and update its value based on the operation. If a named function argument
-    has been specified using \ref ODIF::func_args::set_next_name, then assign
-    the pre or post operation value to a function argument with this name.
-    Finally, store the updated value. Variables with trailing operators are stored
-    in the environment variable map, while variable with preceding operators are
-    stored as a named function argument in the form of
-    <tt>(variable-name)=(post-operation-value)</tt>.
+    Function arguments can make use of pre and post <tt>++</tt> and/or
+    <tt>\-\-</tt> operations. Post operations use global environment
+    variables. Pre operations use environment variables local to the
+    function. Function flags make use of pre operations. Prefix a flag
+    with <tt>++</tt> to enable it and <tt>\-\-</tt> to disable it. For
+    example \p ++name enables \p name and \p \-\-name disables it.
 
      operation | behavior
-    :---------:|:----------------------------------------------
-      x++      | store increment as environment variable
-      ++x      | store increment as function argument (x=${x})
-      y=x++    | store function argument (y=(${x}))
-      y=++x    | store function argument (y=(${x}+1))
+    :---------:|:---------------------------------------------------------
+      x++      | increment global environment variable
+      ++x      | increment local environment variable
+      y=x++    | assign function value (y=(${x})) with post increment
+      y=++x    | increment local and assign function value (y=(${x}))
 
 *******************************************************************************/
 void
