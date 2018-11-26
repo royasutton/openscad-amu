@@ -282,7 +282,7 @@ ODIF::ODIF_Scanner::bif_find(void)
         files = UTIL::unquote_trim( v );
       }
       else if (!(n.compare(vana[2])&&n.compare(vana[3])))
-      { // abort
+      { // nfl (file not found limit)
         nfl = atoi( v.c_str() );
       }
       else if (!(n.compare(vana[4])&&n.compare(vana[5])))
