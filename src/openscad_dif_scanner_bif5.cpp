@@ -1,6 +1,6 @@
 /***************************************************************************//**
 
-  \file   openscad_dif_scanner_bif_if.cpp
+  \file   openscad_dif_scanner_bif5.cpp
 
   \author Roy Allen Sutton
   \date   2018
