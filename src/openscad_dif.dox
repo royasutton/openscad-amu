@@ -114,6 +114,7 @@
   |:--------------------------------|:------------------------------------
   | \ref dif_afc_amu_define         | Define text macro
   | \ref dif_afc_amu_if             | Conditional text output
+  | \ref dif_afc_amu_foreach        | Enumerated textual substitution
   | \ref dif_afc_amu_eval           | Evaluate arguments
   | \ref dif_afc_amu_shell          | Execute shell command
   | \ref dif_afc_amu_make           | Make script interface
@@ -235,6 +236,9 @@
 
     \subsection dif_afc_amu_find \\amu_find
     \copydetails ODIF::ODIF_Scanner::bif_find()
+
+    \subsection dif_afc_amu_foreach \\amu_foreach
+    \copydetails ODIF::ODIF_Scanner::bif_foreach()
 
     \subsection dif_afc_amu_if \\amu_if
     \copydetails ODIF::ODIF_Scanner::if_init()

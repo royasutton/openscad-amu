@@ -396,11 +396,13 @@ class ODIF_Scanner : public yyFlexLexer{
     //! generate a file viewer for various file formates (png, svg, stl, video, etc.).
     std::string bif_viewer(void);
 
-  // openscad_dif_scanner_bif_if.cpp
+  // openscad_dif_scanner_bif5.cpp
     //! evaluate single argument if expressions.
     bool bif_if_exp_1a(std::string s);
     //! evaluate double argument if expressions.
     bool bif_if_exp_2a(std::string s);
+    //! textual variable substitution for each word of a list.
+    std::string bif_foreach(void);
 };
 
 } /* end namespace ODIF */

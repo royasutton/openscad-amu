@@ -512,7 +512,7 @@ ODIF::ODIF_Scanner::bif_word(void)
         tokenizer wl_tok( wl_s, wsep );
 
         wl_v.clear();
-         for ( tokenizer::iterator wit=wl_tok.begin(); wit!=wl_tok.end(); ++wit )
+        for ( tokenizer::iterator wit=wl_tok.begin(); wit!=wl_tok.end(); ++wit )
           wl_v.push_back( boost::trim_copy( *wit ) );
       }
 
@@ -770,6 +770,101 @@ ODIF::ODIF_Scanner::bif_seq(void)
   }
 
   return ( result );
+}
+
+/***************************************************************************//**
+
+  \details
+
+    Create local copy of the global variable map, assign each word from
+    the word list to a local variable, one at a time performing an
+    evaluation on the text.
+
+    The options and their short codes are summarized in the following
+    table.
+
+     options     | sc  | default        | description
+    :-----------:|:---:|:--------------:|:--------------------------------
+      var        | v   | x              | text variable identifier
+      words      | w   |                | enumerated word list
+      text       | t   |                | evaluation text
+      separator  | s   | [,]            | result separator
+      tokenizer  | o   | [,[:space:]]   | word list tokenizers
+
+    The substitution variable should be escaped in the evaluation text
+    definition to postpone its expansion to the loop iteration.
+
+    \b Example:
+    \code
+    \amu_foreach(words="1 2 3 4" text="\li word [\${x}]." separator="")
+    \endcode
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_foreach(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "var",        "v",
+  "words",      "w",
+  "text",       "t",
+  "separator",  "s",
+  "tokenizer",  "o"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  // do not trim to allow combining of natural language.
+  size_t ap=0;
+  string var    = unquote(fx_argv.arg_firstof( "x",vana[ap],vana[ap+1])); ap+=2;
+  string words  = unquote(fx_argv.arg_firstof(  "",vana[ap],vana[ap+1])); ap+=2;
+  string text   = unquote(fx_argv.arg_firstof(  "",vana[ap],vana[ap+1])); ap+=2;
+  string rsep   = unquote(fx_argv.arg_firstof( ",",vana[ap],vana[ap+1])); ap+=2;
+  string wtok   = unquote(fx_argv.arg_firstof(" ,",vana[ap],vana[ap+1])); ap+=2;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  // validate named arguments: (must be one of the declared options).
+  vector<string> av = fx_argv.names_v(true, false);
+  for ( vector<string>::iterator it=av.begin(); it!=av.end(); ++it )
+    if ( vans.find( *it ) == vans.end() )
+      return( amu_error_msg(*it + " invalid option. " + help) );
+
+  //
+  // assemble result
+  //
+  string result;
+
+  // create local copy of the global variable scope map
+  env_var vm = varm;
+
+  typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+  boost::char_separator<char> wsep( wtok.c_str() );
+  tokenizer wl_tok( words, wsep );
+
+  // iterate over the word list, update variable, and evaluate text
+  for ( tokenizer::iterator wit=wl_tok.begin(); wit!=wl_tok.end(); ++wit )
+  {
+    vm.store( var, *wit );
+
+    if ( result.size() ) result.append( rsep );
+    result += vm.expand_text( text );
+  }
+
+  return( result );
 }
 
 

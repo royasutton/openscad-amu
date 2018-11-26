@@ -290,6 +290,11 @@ ODIF::ODIF_Scanner::fx_end(void)
     has_result=true;
     result=bif_file();
   }
+  else if (fx_name.compare("foreach")==0)
+  {
+    has_result=true;
+    result=bif_foreach();
+  }
   else
   {
     /* check external function */
