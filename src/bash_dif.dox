@@ -11,9 +11,10 @@
 
 /***************************************************************************//**
   \page bash_dif_doc Program Usage (bash-dif)
+  \tableofcontents
 
 
-  \section bash_dif_sm Documenting Bash script
+  \section bash_dif_sm Documenting Bash scripts
 
   This filter may be used to markup bash scripts for use with Doygen.
   See [Documenting the code][docblocks] in the Doxygen manual for

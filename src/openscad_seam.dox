@@ -11,6 +11,8 @@
 
 /***************************************************************************//**
   \page openscad_seam_doc Program Usage (openscad-seam)
+  \tableofcontents
+
 
   OpenSCAD script extractor and auto-make tool (seam).
 

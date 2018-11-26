@@ -11,6 +11,7 @@
 
 /***************************************************************************//**
   \page openscad_dif_doc Program Usage (openscad-dif)
+  \tableofcontents
 
 
   \section openscad_dif_sm Documenting OpenSCAD scripts
