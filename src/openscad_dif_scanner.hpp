@@ -40,6 +40,7 @@
 #include "openscad_dif_util.hpp"
 
 #include <fstream>
+#include <stack>
 // #include <iostream>
 // #include <sstream>
 // #include <string>
@@ -234,7 +235,7 @@ class ODIF_Scanner : public yyFlexLexer{
   // amu_* function
   //////////////////////////////////////////////////////////////////////////////
     std::string fx_name;                //!< parsed amu function name.
-    std::string fx_tovar;               //!< parsed amu function output variable name.
+    std::string fx_var;                 //!< parsed amu function output variable name.
     func_args   fx_argv;                //!< parsed amu function arguments class.
 
     std::string fx_qarg;                //!< parsed amu quoted argument string.
@@ -242,13 +243,13 @@ class ODIF_Scanner : public yyFlexLexer{
     size_t      fi_bline;               //!< beginning line of parsed amu function.
     size_t      fi_eline;               //!< ending line of parsed amu function.
 
-    //! store parsed function name, reset related state, and begin parsing amu function.
+    //! begin amu builtin function handler
     void fx_init(void);
-    //! end of parsed amu function definition handler.
-    void fx_pend(void);
+    //! end amu builtin function handler
+    void fx_end(void);
 
     //! store parsed function output variable name.
-    void fx_set_tovar(void);
+    void fx_set_var(void);
     //! store parsed variable name for argument form name=<value>.
     void fx_set_arg_name(void);
 
@@ -276,23 +277,60 @@ class ODIF_Scanner : public yyFlexLexer{
   //////////////////////////////////////////////////////////////////////////////
   // amu_define
   //////////////////////////////////////////////////////////////////////////////
-    std::string def_tovar;              //!< parsed amu definition variable name.
+    std::string def_var;                //!< parsed amu definition variable name.
     std::string def_text;               //!< parsed amu definition text.
 
     size_t      def_bline;              //!< beginning line of parsed amu definition.
     size_t      def_eline;              //!< ending line of parsed amu definition.
 
-    //! store parsed function name, reset related state, and begin parsing amu function.
+    //! begin amu_define handler
     void def_init(void);
-    //! end of parsed amu function definition handler.
-    void def_pend(void);
+    //! end amu_define handler.
+    void def_end(void);
 
     //! store parsed definition variable name.
-    void def_set_tovar(void);
+    void def_set_var(void);
     //! append the string s to the definition text.
     void def_app(const std::string &s) { def_text+=s; }
     //! append the current parsed text to the definition text.
     void def_app(void) { def_text+=YYText(); }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // amu_if
+  //////////////////////////////////////////////////////////////////////////////
+    std::string if_var;                 //!< parsed amu if variable name.
+    std::string if_text;                //!< amu if matched case result text.
+    std::string if_case_text;           //!< parsed amu if case body text.
+
+    bool        if_matched;             //!< if output state variable
+    bool        if_case_true;           //!< if case output state variable
+    bool        if_else_true;           //!< if else output state variable
+
+    std::stack<char> if_opr;            //!< if operation stack
+    std::stack<bool> if_val;            //!< if value stack
+
+    size_t      if_bline;               //!< beginning line of parsed amu if.
+    size_t      if_eline;               //!< ending line of parsed amu if.
+
+    //! begin amu_if handler
+    void if_init(void);
+    //! start new if case handler
+    void if_init_case(bool expr);
+    //! end amu_if expression handler
+    void if_eval_expr(void);
+    //! expand parsed variable and store as if case text.
+    void if_get_var_text(void) { if_case_text+=varm.expand( YYText() ); }
+    //! output case text as condition indicate
+    void if_end_case(void);
+    //! end amu_if handler
+    void if_end(void);
+
+    //! store parsed definition variable name.
+    void if_set_var(void);
+    //! append the string s to the body text.
+    void if_app(const std::string &s) { if_case_text+=s; }
+    //! append the current parsed text to the body text.
+    void if_app(void) { if_case_text+=YYText(); }
 
   //////////////////////////////////////////////////////////////////////////////
   // utility
@@ -357,6 +395,12 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string bif_image_table(void);
     //! generate a file viewer for various file formates (png, svg, stl, video, etc.).
     std::string bif_viewer(void);
+
+  // openscad_dif_scanner_bif_if.cpp
+    //! evaluate single argument if expressions.
+    bool bif_if_exp_1a(std::string s);
+    //! evaluate double argument if expressions.
+    bool bif_if_exp_2a(std::string s);
 };
 
 } /* end namespace ODIF */

@@ -170,7 +170,7 @@ ODIF::ODIF_Scanner::fx_init(void)
   apt();
 
   fx_name.clear();
-  fx_tovar.clear();
+  fx_var.clear();
   fx_argv.clear();
 
   fx_qarg.clear();
@@ -197,7 +197,7 @@ ODIF::ODIF_Scanner::fx_init(void)
 
 *******************************************************************************/
 void
-ODIF::ODIF_Scanner::fx_pend(void)
+ODIF::ODIF_Scanner::fx_end(void)
 {
   fi_eline = lineno();
 
@@ -331,13 +331,13 @@ ODIF::ODIF_Scanner::fx_pend(void)
   if ( has_result )
   {
     // output result to scanner or store to variable map
-    if ( fx_tovar.length() == 0 )
+    if ( fx_var.length() == 0 )
       scanner_output( result );
     else
     {
-      varm.store(fx_tovar, result);
+      varm.store(fx_var, result);
 
-      filter_debug( fx_tovar + "=[" + result + "]" );
+      filter_debug( fx_var + "=[" + result + "]" );
     }
   }
   else
@@ -351,11 +351,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
 }
 
 void
-ODIF::ODIF_Scanner::fx_set_tovar(void)
+ODIF::ODIF_Scanner::fx_set_var(void)
 {
-  if ( fx_tovar.length() )
-    abort("previously defined var: " + fx_tovar, lineno(), YYText());
-  fx_tovar = YYText();
+  if ( fx_var.length() )
+    abort("previously defined var: " + fx_var, lineno(), YYText());
+  fx_var = YYText();
 }
 
 void
@@ -469,29 +469,29 @@ ODIF::ODIF_Scanner::def_init(void)
   apt_clear();
   apt();
 
-  def_tovar.clear();
+  def_var.clear();
   def_text.clear();
 
   def_bline = lineno();
 }
 
 void
-ODIF::ODIF_Scanner::def_pend(void)
+ODIF::ODIF_Scanner::def_end(void)
 {
   def_eline = lineno();
 
   // if variable name not specified, copy definition to output
   // otherwise store in variable map.
-  if ( def_tovar.length() == 0 )
+  if ( def_var.length() == 0 )
     scanner_output( def_text );
   else
   {
-    varm.store( def_tovar, def_text );
+    varm.store( def_var, def_text );
 
-    filter_debug( def_tovar + "=[" + def_text + "]" );
+    filter_debug( def_var + "=[" + def_text + "]" );
   }
 
-  def_tovar.clear();
+  def_var.clear();
   def_text.clear();
 
   // output blank lines to maintain file length when definitions are
@@ -500,11 +500,232 @@ ODIF::ODIF_Scanner::def_pend(void)
 }
 
 void
-ODIF::ODIF_Scanner::def_set_tovar(void)
+ODIF::ODIF_Scanner::def_set_var(void)
 {
-  if ( def_tovar.length() )
-    abort("previously defined var: " + def_tovar, lineno(), YYText());
-  def_tovar=YYText();
+  if ( def_var.length() )
+    abort("previously defined var: " + def_var, lineno(), YYText());
+  def_var=YYText();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// amu_if
+////////////////////////////////////////////////////////////////////////////////
+
+/***************************************************************************//**
+
+  \details
+
+    Output conditional text when an expression evaluates to true.
+
+    \code
+    \amu_if <variable> ( expression )
+    {
+      conditional text
+    }
+    else if ( expression )
+    {
+      conditional text
+    }
+    else if ( expression )
+      ${variable}
+    else
+    {
+      unconditional text
+    }
+    endif
+    \endcode
+
+    White space between an \c else and \c if is optional. \c elseif and
+    \c else \c if are equivalent.
+
+    Expression value constants are case insensitive:
+
+     value true  | value false
+    :-----------:|:-----------:
+     true        | false
+     t           | f
+     1           | 0
+
+    Expressions may be combined as follows:
+
+    \verbatim
+    ( expression )
+       Returns  the  value of expression.  This may be used to
+       override the normal precedence of operators.
+    ! expression
+       True if expression is false.
+    expression1 && expression2
+       True if both expression1 and expression2 are true.
+    expression1 || expression2
+       True if either expression1 or expression2 is true.
+    \endverbatim
+
+    The && and || operators evaluate expression2 even if the value of
+    expression1 is sufficient to determine the return value of the
+    entire conditional expression.
+
+    Expression can be composed using several built-in test functions.
+
+    \b Example:
+    \code
+    \amu_if ( -z ${error_test} )
+    {
+      The error test output is empty.
+    }
+    elseif ( ${error_count} > 0 )
+    {
+      The error count is ${error_count}
+    }
+    else
+    {
+      No reportable errors.
+    }
+    endif
+    \endcode
+
+*******************************************************************************/
+void
+ODIF::ODIF_Scanner::if_init(void)
+{
+  apt_clear();
+  apt();
+
+  if_var.clear();
+  if_text.clear();
+
+  if_matched = false;
+  if_case_true = false;
+  if_else_true = false;
+
+  if_bline = lineno();
+}
+
+void
+ODIF::ODIF_Scanner::if_init_case(bool expr)
+{
+  // previous else with no expression must be last case
+  if ( if_else_true )
+    abort("case after else", lineno(), YYText());
+
+  // clear case body text
+  if_case_text.clear();
+
+  // clear operation and value stack
+  while ( ! if_opr.empty() )  if_opr.pop();
+  while ( ! if_val.empty() )  if_val.pop();
+
+  if ( expr )
+  {
+    if_opr.push( '(' );     // start new if case expression
+    if_case_true = false;
+  }
+  else if ( !if_matched )
+  {
+    if_else_true = true;    // select else case
+  }
+}
+
+void
+ODIF::ODIF_Scanner::if_eval_expr(void)
+{
+  bool end_expr = false;
+
+  while ( !if_opr.empty() && !end_expr )
+  {
+    char op = if_opr.top();
+
+    switch( op )
+    {
+      case '(' :
+        // group ( expression )
+        end_expr = true;
+        break;
+
+      case '!' :
+        // negate: ! expression
+        if_val.top() = ! if_val.top();
+        break;
+
+      case '&' :
+        // and: expression1 && expression2
+      case '|' :
+        //  or: expression1 || expression2
+        bool a1;
+        bool a2;
+
+        if (if_val.empty())
+          abort("missing value 1", lineno(), YYText());
+
+        a1 = if_val.top();
+        if_val.pop();
+
+        if (if_val.empty())
+          abort("missing value 2", lineno(), YYText());
+
+        a2 = if_val.top();
+        if_val.pop();
+
+        if ( op == '&' )
+          if_val.push( a1 && a2 );
+        else
+          if_val.push( a1 || a2 );
+        break;
+    }
+
+    if_opr.pop();
+  }
+
+  if ( if_opr.empty() )
+  { // operation stack is empty result is top value.
+    if ( if_val.size() == 1 )
+      if_case_true = if_val.top();
+    else
+      abort("expression error", lineno(), YYText());
+  }
+}
+
+void
+ODIF::ODIF_Scanner::if_end_case(void)
+{
+  if ( !if_matched  && (if_case_true || if_else_true) )
+  {
+    if_matched = true;
+
+    // expand case body text and assign as result
+    if_text = varm.expand_text( if_case_text );
+  }
+}
+
+void
+ODIF::ODIF_Scanner::if_end(void)
+{
+  if_eline = lineno();
+
+  // if variable name not specified, copy definition to output
+  // otherwise store in variable map.
+  if ( if_var.length() == 0 )
+    scanner_output( if_text );
+  else
+  {
+    varm.store( if_var, if_text );
+
+    filter_debug( if_var + "=[" + if_text + "]" );
+  }
+
+  if_var.clear();
+  if_text.clear();
+
+  // output blank lines to maintain file length when definitions are
+  // broken across multiple lines (don't begin and end on the same line).
+  for(size_t i=if_bline; i<if_eline; i++) scanner_output("\n");
+}
+
+void
+ODIF::ODIF_Scanner::if_set_var(void)
+{
+  if ( if_var.length() )
+    abort("previously defined var: " + if_var, lineno(), YYText());
+  if_var=YYText();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
