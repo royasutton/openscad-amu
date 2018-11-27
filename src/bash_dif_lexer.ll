@@ -50,6 +50,10 @@ using namespace std;
 //! \ingroup bash_dif_src
 //! @{
 
+////////////////////////////////////////////////////////////////////////////////
+// classes
+////////////////////////////////////////////////////////////////////////////////
+
 //! class to create function prototypes for documented bash scripts.
 class Block
 {
@@ -172,6 +176,10 @@ Block::format( void ) {
   return( formated_text );
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// utility functions
+////////////////////////////////////////////////////////////////////////////////
+
 //! report error message m and abort. report line number n and context t if provided.
 void
 abort( const string& m, const int &n = 0, const string &t = "" ) {
@@ -184,6 +192,10 @@ abort( const string& m, const int &n = 0, const string &t = "" ) {
 
   exit( EXIT_FAILURE );
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// scanner allocation
+////////////////////////////////////////////////////////////////////////////////
 
 //! comment block global variable allocation.
 Block cb;
@@ -202,11 +214,15 @@ Block cb;
 %option nodefault
 %option debug
 
+  /* scanner states */
+
 %s COMMENT READCL READAP READFN
 
 ws                                [ \t]
 nr                                [\n\r]
+
   /* id with and without spaces */
+
 id                                [_\\\-.[:alnum:]]+
 ids                               [ _\\\-.[:alnum:]]+
 
@@ -218,13 +234,19 @@ ecmt                              "#"+"/"
 
   /* match from beginning of line only for cmtld, cmtli */
   /* pass comment line */
+
 cmtld                             ^{ws}*"##"[#]*
+
   /* coment line in comment */
+
 cmtli                             ^{ws}*"#"[#]*
+
   /* escape comment in comment */
+
 esccc                             [\\]"#"
 
   /* append trailing whitespace {ws} to avoid substring matching */
+
 kw_afn                            [\\@](?i:afn){ws}
 kw_aparam                         [\\@](?i:aparam){ws}
 kw_aparami                        [\\@](?i:aparami){ws}
@@ -232,14 +254,20 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
 
 %%
 
-  /* outsize comment block */
+  /*
+    outside comment block
+  */
+
 <INITIAL>{bcmt}                   { cb.app_text( "/**" ); yy_push_state(COMMENT); }
 <INITIAL>{cmtld}                  { cb.app_text( "///" ); yy_push_state(READCL); }
 <INITIAL>{nr}                     { cb.app_text( YYText() ); cout << cb.format(); }
 <INITIAL>.                        ;
 <INITIAL><<EOF>>                  { cout << cb.format(); return 0; }
 
-  /* inside comment block */
+  /*
+    inside comment block
+  */
+
 <COMMENT>{bcmt}                   { abort("nested comment blocks", lineno(), YYText()); }
 <COMMENT>{ecmt}                   { cb.app_text( " */" );  yy_pop_state(); }
 <COMMENT>{esccc}                  { cb.app_text( "#" ); }
@@ -248,11 +276,17 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
 <COMMENT>.                        { cb.app_text( YYText() ); }
 <COMMENT><<EOF>>                  { abort("unterminated comment block", lineno()); }
 
-  /* read comment line outside of comment block */
+  /*
+    read comment line outside of comment block
+  */
+
 <READCL>{nr}                      { cb.app_text( YYText() ); yy_pop_state(); }
 <READCL>.                         { cb.app_text( YYText() ); }
 
-  /* keyword processing */
+  /*
+    keyword processing
+  */
+
 <COMMENT,READCL>{kw_afn}          { yy_push_state(READFN); }
 <COMMENT,READCL>{kw_aparam}       { cb.clear_cp();
                                     string mt = YYText();
@@ -270,13 +304,19 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
                                     cb.app_text( kw + " " + cb.get_cpd() );
                                     yy_push_state(READAP); }
 
-  /* function name */
+  /*
+    function name
+  */
+
 <READFN>{id}                      { cb.set_fn( YYText() ); yy_pop_state(); }
 <READFN>{ws}+                     ;
 <READFN>{nr}                      { abort("missing function name", lineno() ); }
 <READFN>.                         { abort("invalid function name", lineno(), YYText()); }
 
-  /* function parameter type, direction, and name */
+  /*
+    function parameter type, direction, and name
+  */
+
 <READAP>{type}                    { string mt = YYText();
                                     cb.set_cpt( mt.substr(1,mt.length()-2) ); }
 <READAP>{dir}                     { cb.set_cpd( YYText() );
@@ -293,6 +333,12 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 //! \ingroup bash_dif_src
 //! @{
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// main
+//
+////////////////////////////////////////////////////////////////////////////////
 
 //! program main.
 int
