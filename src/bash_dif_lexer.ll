@@ -38,6 +38,7 @@
 %{
 
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <queue>
 
@@ -180,17 +181,39 @@ Block::format( void ) {
 // utility functions
 ////////////////////////////////////////////////////////////////////////////////
 
-//! report error message m and abort. report line number n and context t if provided.
+//! convert an unsigned integer to a string.
+string
+to_string(const long v)
+{
+  ostringstream os;
+
+  os << dec << v;
+
+  return ( os.str() );
+}
+
+//! report error message m, line number n and context t with optinal abort.
 void
-abort( const string& m, const int &n = 0, const string &t = "" ) {
-  cerr << "ERROR: " << m;
+error( const string& m, const int &n = 0, const string &t = "", bool a = false ) {
+  string om;
 
-  if( n )           cerr << ", at line " << n;
-  if( t.length() )  cerr << ", near [" << t << "]";
+  om = "ERROR in input, " + m;
 
-  cerr << ", aborting..." << endl;
+  if( n )           om += ", at line " + to_string( n );
+  if( t.length() )  om += ", near [" + t + "]";
 
-  exit( EXIT_FAILURE );
+  if( a )
+    om += ", aborting..." ;
+  else
+    om += ", continuing..." ;
+
+  cerr << om << endl;
+  cout << "<tt>" << om << "</tt><br>";
+
+  if( a )
+    exit( EXIT_FAILURE );
+  else
+    return;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,6 +227,8 @@ Block cb;
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 %}
+
+  /* scanner options */
 
 %option c++
 %option prefix="bash_dif"
@@ -268,13 +293,13 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
     inside comment block
   */
 
-<COMMENT>{bcmt}                   { abort("nested comment blocks", lineno(), YYText()); }
+<COMMENT>{bcmt}                   { error("nested comment blocks", lineno(), YYText()); }
 <COMMENT>{ecmt}                   { cb.app_text( " */" );  yy_pop_state(); }
 <COMMENT>{esccc}                  { cb.app_text( "#" ); }
 <COMMENT>{cmtli}                  { cb.app_text( " *" ); }
 <COMMENT>{nr}                     { cb.app_text( YYText() ); }
 <COMMENT>.                        { cb.app_text( YYText() ); }
-<COMMENT><<EOF>>                  { abort("unterminated comment block", lineno()); }
+<COMMENT><<EOF>>                  { error("unterminated comment block", lineno()); }
 
   /*
     read comment line outside of comment block
@@ -310,8 +335,8 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
 
 <READFN>{id}                      { cb.set_fn( YYText() ); yy_pop_state(); }
 <READFN>{ws}+                     ;
-<READFN>{nr}                      { abort("missing function name", lineno() ); }
-<READFN>.                         { abort("invalid function name", lineno(), YYText()); }
+<READFN>{nr}                      { error("missing function name", lineno() ); }
+<READFN>.                         { error("invalid function name", lineno(), YYText()); }
 
   /*
     function parameter type, direction, and name
@@ -325,8 +350,8 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
                                     cb.app_text( " " + cb.get_cpn() );
                                     cb.push_cp(); yy_pop_state(); }
 <READAP>{ws}+                     ;
-<READAP>{nr}                      { abort("missing parameter name", lineno()); }
-<READAP>.                         { abort("invalid parameter name", lineno(), YYText()); }
+<READAP>{nr}                      { error("missing parameter name", lineno()); }
+<READAP>.                         { error("invalid parameter name", lineno(), YYText()); }
 
 %%
 
@@ -383,6 +408,7 @@ main( int argc, char** argv ) {
   std::ifstream infile ( arg1.c_str() );
 
   if ( infile.good() ) {
+
     bash_difFlexLexer* lexer = new bash_difFlexLexer( &infile , &cout );
 
     while( lexer->yylex() != 0 )
