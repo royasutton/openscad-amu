@@ -47,6 +47,8 @@ using namespace std;
 
 %}
 
+  /* scanner options */
+
 %option c++
 %option yyclass="ODIF::ODIF_Scanner"
 %option stack
@@ -133,7 +135,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
   */
 
 <COMMENT>{comment_close}          { scanner_echo(); yy_pop_state(); }
-<COMMENT><<EOF>>                  { abort("unterminated comment"); }
+<COMMENT><<EOF>>                  { error("unterminated comment", lineno()); }
 <COMMENT>{amu_esc}                { /* remove escape char, output the rest */
                                     string mt = YYText();
                                     scanner_output( mt.substr(1,mt.length()-1) ); }
@@ -160,7 +162,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFN>\(                         { apt(); BEGIN(AMUFNARG); }
 <AMUFN>{ws}+                      { apt(); }
 <AMUFN>{nr}                       { apt(); }
-<AMUFN>.                          { abort("in function name", lineno(), YYText()); }
+<AMUFN>.                          { error("in function variable name", lineno(), YYText()); }
 
   /*
     amu function arguments:
@@ -178,8 +180,8 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNARG>\)                      { apt(); fx_end(); yy_pop_state(); }
 <AMUFNARG>{ws}+                   { apt(); }
 <AMUFNARG>{nr}                    { apt(); }
-<AMUFNARG>.                       { abort("in function arguments", lineno(), YYText()); }
-<AMUFNARG><<EOF>>                 { abort("unterminated function arguments", fi_bline); }
+<AMUFNARG>.                       { error("in function arguments", lineno(), YYText()); }
+<AMUFNARG><<EOF>>                 { error("unterminated function arguments", fi_bline); }
 
   /*
     amu function single and double quoted arguments:
@@ -193,8 +195,8 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNAQS,AMUFNAQD>{id_var}       { apt(); fx_app_qarg_expanded(); }
 <AMUFNAQS,AMUFNAQD>{nr}           { apt(); fx_app_qarg(); }
 <AMUFNAQS,AMUFNAQD>.              { apt(); fx_app_qarg(); }
-<AMUFNAQS><<EOF>>                 { abort("unterminated single quote", fi_bline); }
-<AMUFNAQD><<EOF>>                 { abort("unterminated double quote", fi_bline); }
+<AMUFNAQS><<EOF>>                 { error("unterminated single quote", fi_bline); }
+<AMUFNAQD><<EOF>>                 { error("unterminated double quote", fi_bline); }
 
   /*
     amu_define:
@@ -205,13 +207,13 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUDEF>\(                        { apt(); BEGIN(AMUDEFARG); }
 <AMUDEF>{ws}+                     { apt(); }
 <AMUDEF>{nr}                      { apt(); }
-<AMUDEF>.                         { abort("in define", lineno(), YYText()); }
+<AMUDEF>.                         { error("in define variable name", lineno(), YYText()); }
 
 <AMUDEFARG>\)                     { apt(); def_end(); yy_pop_state(); }
 <AMUDEFARG>\\{nr}                 { apt(); def_app(""); }
 <AMUDEFARG>{nr}                   { apt(); def_app(); }
 <AMUDEFARG>.                      { apt(); def_app(); }
-<AMUDEFARG><<EOF>>                { abort("unterminated define arguments", def_bline); }
+<AMUDEFARG><<EOF>>                { error("unterminated define arguments", def_bline); }
 
   /*
     amu_if:
@@ -222,7 +224,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUIF>\(                         { apt(); if_init_case(true); BEGIN(AMUIFEXPR); }
 <AMUIF>{ws}+                      { apt(); }
 <AMUIF>{nr}                       { apt(); }
-<AMUIF>.                          { abort("in if", lineno(), YYText()); }
+<AMUIF>.                          { error("in if variable name", lineno(), YYText()); }
 
 <AMUIFEXPR>\)                     { apt(); if_eval_expr(); if (if_opr.empty()) BEGIN(AMUIFTEXT); }
 <AMUIFEXPR>\(                     { apt(); if_opr.push('('); }
@@ -235,30 +237,30 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUIFEXPR>{if_expr_2a}           { apt(); if_val.push(bif_if_exp_2a( YYText() )); }
 <AMUIFEXPR>{ws}+                  { apt(); }
 <AMUIFEXPR>{nr}                   { apt(); }
-<AMUIFEXPR>.                      { abort("in if expression", lineno(), YYText()); }
-<AMUIFEXPR><<EOF>>                { abort("unterminated if expression", if_bline); }
+<AMUIFEXPR>.                      { error("in if expression", lineno(), YYText()); }
+<AMUIFEXPR><<EOF>>                { error("unterminated if expression", if_bline); }
 
 <AMUIFTEXT>{id_var}               { apt(); if_get_var_text(); if_end_case(); BEGIN(AMUIFELSE); }
 <AMUIFTEXT>\{                     { apt(); BEGIN(AMUIFTEXTBLOCK); }
 <AMUIFTEXT>{ws}+                  { apt(); }
 <AMUIFTEXT>{nr}                   { apt(); }
-<AMUIFTEXT>.                      { abort("in if case body", lineno(), YYText()); }
-<AMUIFTEXT><<EOF>>                { abort("unterminated if case body", if_bline); }
+<AMUIFTEXT>.                      { error("in if case body", lineno(), YYText()); }
+<AMUIFTEXT><<EOF>>                { error("unterminated if case body", if_bline); }
 
 <AMUIFTEXTBLOCK>{id_var}          { apt(); if_app(); }
 <AMUIFTEXTBLOCK>\}                { apt(); if_end_case(); BEGIN(AMUIFELSE); }
 <AMUIFTEXTBLOCK>\\{nr}            { apt(); if_app(""); }
 <AMUIFTEXTBLOCK>{nr}              { apt(); if_app(); }
 <AMUIFTEXTBLOCK>.                 { apt(); if_app(); }
-<AMUIFTEXTBLOCK><<EOF>>           { abort("unterminated if case body block", if_bline); }
+<AMUIFTEXTBLOCK><<EOF>>           { error("unterminated if case body block", if_bline); }
 
 <AMUIFELSE>"else"{wsnr}*"if"      { apt(); BEGIN(AMUIF);}
 <AMUIFELSE>"else"                 { apt(); if_init_case(false); BEGIN(AMUIFTEXT);}
 <AMUIFELSE>"endif"                { apt(); if_end(); yy_pop_state(); }
 <AMUIFELSE>{ws}+                  { apt(); }
 <AMUIFELSE>{nr}                   { apt(); }
-<AMUIFELSE>.                      { abort("in if else", lineno(), YYText()); }
-<AMUIFELSE><<EOF>>                { abort("unterminated if", if_bline); }
+<AMUIFELSE>.                      { error("in if else", lineno(), YYText()); }
+<AMUIFELSE><<EOF>>                { error("unterminated if", if_bline); }
 
 %%
 

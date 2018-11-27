@@ -212,8 +212,9 @@ class ODIF_Scanner : public yyFlexLexer{
     //! copy to entire lexed text (yytext) to the scanner output.
     void scanner_echo(void) { scanner_output( YYText(), YYLeng() ); }
 
-    //! output the error message m and abort the scanner.
-    void abort(const std::string& m, const int &n = 0, const std::string &t = "");
+    //! output the error message m to stderr and the scanner output with optional abort.
+    void error(const std::string& m, const int &n = 0,
+               const std::string &t = "", bool a = false);
 
     //! generate standard error message string with message m.
     std::string amu_error_msg(const std::string& m);

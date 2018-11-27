@@ -105,6 +105,7 @@ ODIF::ODIF_Scanner::init(void)
   bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
   // setup predefined environment variables
   varm.store( "EFS", " " );
+
   varm.store( "ABS_FILE_NAME", ifap.string() );
   varm.store( "ABS_PATH_NAME", ifap.parent_path().string() );
   varm.store( "FILE_NAME", ifrp.string() );
@@ -131,32 +132,49 @@ ODIF::ODIF_Scanner::scanner_output( const char* buf, int size )
 }
 
 void
-ODIF::ODIF_Scanner::abort(const string& m, const int &n, const string &t)
+ODIF::ODIF_Scanner::error(const string& m, const int &n,
+                          const string &t, bool a)
 {
-  cerr << endl << ops << m;
+  string om;
 
-  if( n )           cerr << ", at line " << n;
-  if( t.length() )  cerr << ", near [" << t << "]";
+  om = ops + "ERROR in "
+     + varm.expand( varm.get_prefix() + "FILE_NAME" + varm.get_suffix() )
+     +  ", " + m;
 
-  cerr << ", aborting..." << endl;
+  if( n )           om += ", at line " + UTIL::to_string( n );
+  if( t.length() )  om += ", near [" + t + "]";
 
-  exit( EXIT_FAILURE );
+  if( a )
+    om += ", aborting..." ;
+  else
+    om += ", continuing..." ;
+
+  cerr << om << endl;
+  scanner_output( "<tt>" + om + "</tt><br>" );
+
+  if( a )
+    exit( EXIT_FAILURE );
+  else
+    return;
 }
 
 string
 ODIF::ODIF_Scanner::amu_error_msg(const string& m)
 {
-  ostringstream os;
+  string om;
 
-  os << "<tt>"
-     << ops
-     << input_name
-     << ", line " << dec << lineno() << ", "
-     << UTIL::get_word(amu_parsed_text, 1)
-     << " " << m
-     << "</tt>";
+  om  = ops + "ERROR in "
+      + varm.expand( varm.get_prefix() + "FILE_NAME" + varm.get_suffix() )
+      + ", at line " + UTIL::to_string( lineno() );
 
-  return ( os.str() );
+  // delete command characters [\@] from parsed text to prevent them
+  // from being interpreted by doxygen and/or the html browser.
+  om += ", near [" + UTIL::replace_chars( amu_parsed_text, "\\@" ) + "]"
+      +  ", " + m;
+
+  cerr << om << endl;
+
+  return( "<tt>" + om + "</tt><br>" );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -359,7 +377,7 @@ void
 ODIF::ODIF_Scanner::fx_set_var(void)
 {
   if ( fx_var.length() )
-    abort("previously defined var: " + fx_var, lineno(), YYText());
+    error("previously defined var: " + fx_var, lineno(), YYText());
   fx_var = YYText();
 }
 
@@ -503,7 +521,7 @@ void
 ODIF::ODIF_Scanner::def_set_var(void)
 {
   if ( def_var.length() )
-    abort("previously defined var: " + def_var, lineno(), YYText());
+    error("previously defined var: " + def_var, lineno(), YYText());
   def_var=YYText();
 }
 
@@ -605,7 +623,7 @@ ODIF::ODIF_Scanner::if_init_case(bool expr)
 {
   // previous else with no expression must be last case
   if ( if_else_true )
-    abort("case after else", lineno(), YYText());
+    error("case after else", lineno(), YYText());
 
   // clear case body text
   if_case_text.clear();
@@ -650,20 +668,24 @@ ODIF::ODIF_Scanner::if_eval_expr(void)
         // and: expression1 && expression2
       case '|' :
         //  or: expression1 || expression2
-        bool a1;
-        bool a2;
+        bool a1 = false;
+        bool a2 = false;
 
         if (if_val.empty())
-          abort("missing value 1", lineno(), YYText());
-
-        a1 = if_val.top();
-        if_val.pop();
+          error("missing value 1 for " + string(op=='&'?"&&":"||"), lineno(), YYText());
+        else
+        {
+          a1 = if_val.top();
+          if_val.pop();
+        }
 
         if (if_val.empty())
-          abort("missing value 2", lineno(), YYText());
-
-        a2 = if_val.top();
-        if_val.pop();
+          error("missing value 2 for " + string(op=='&'?"&&":"||"), lineno(), YYText());
+        else
+        {
+          a2 = if_val.top();
+          if_val.pop();
+        }
 
         if ( op == '&' )
           if_val.push( a1 && a2 );
@@ -680,7 +702,7 @@ ODIF::ODIF_Scanner::if_eval_expr(void)
     if ( if_val.size() == 1 )
       if_case_true = if_val.top();
     else
-      abort("expression error", lineno(), YYText());
+      error("expression error", lineno(), YYText());
   }
 }
 
@@ -724,7 +746,7 @@ void
 ODIF::ODIF_Scanner::if_set_var(void)
 {
   if ( if_var.length() )
-    abort("previously defined var: " + if_var, lineno(), YYText());
+    error("previously defined var: " + if_var, lineno(), YYText());
   if_var=YYText();
 }
 
