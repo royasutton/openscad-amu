@@ -38,6 +38,7 @@
 %{
 
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <queue>
 
@@ -49,6 +50,10 @@ using namespace std;
 
 //! \ingroup bash_dif_src
 //! @{
+
+////////////////////////////////////////////////////////////////////////////////
+// classes
+////////////////////////////////////////////////////////////////////////////////
 
 //! class to create function prototypes for documented bash scripts.
 class Block
@@ -172,18 +177,48 @@ Block::format( void ) {
   return( formated_text );
 }
 
-//! report error message m and abort. report line number n and context t if provided.
-void
-abort( const string& m, const int &n = 0, const string &t = "" ) {
-  cerr << "ERROR: " << m;
+////////////////////////////////////////////////////////////////////////////////
+// utility functions
+////////////////////////////////////////////////////////////////////////////////
 
-  if( n )           cerr << ", at line " << n;
-  if( t.length() )  cerr << ", near [" << t << "]";
+//! convert an unsigned integer to a string.
+string
+to_string(const long v)
+{
+  ostringstream os;
 
-  cerr << ", aborting..." << endl;
+  os << dec << v;
 
-  exit( EXIT_FAILURE );
+  return ( os.str() );
 }
+
+//! report error message m, line number n and context t with optinal abort.
+void
+error( const string& m, const int &n = 0, const string &t = "", bool a = false ) {
+  string om;
+
+  om = "ERROR in input, " + m;
+
+  if( n )           om += ", at line " + to_string( n );
+  if( t.length() )  om += ", near [" + t + "]";
+
+  if( a )
+    om += ", aborting..." ;
+  else
+    om += ", continuing..." ;
+
+  cerr << om << endl;
+  cout << "<tt>" << om << "</tt><br>";
+
+  if( a )
+    exit( EXIT_FAILURE );
+  else
+    return;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// scanner allocation
+////////////////////////////////////////////////////////////////////////////////
 
 //! comment block global variable allocation.
 Block cb;
@@ -192,6 +227,8 @@ Block cb;
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 %}
+
+  /* scanner options */
 
 %option c++
 %option prefix="bash_dif"
@@ -202,11 +239,15 @@ Block cb;
 %option nodefault
 %option debug
 
+  /* scanner states */
+
 %s COMMENT READCL READAP READFN
 
 ws                                [ \t]
 nr                                [\n\r]
+
   /* id with and without spaces */
+
 id                                [_\\\-.[:alnum:]]+
 ids                               [ _\\\-.[:alnum:]]+
 
@@ -218,13 +259,19 @@ ecmt                              "#"+"/"
 
   /* match from beginning of line only for cmtld, cmtli */
   /* pass comment line */
+
 cmtld                             ^{ws}*"##"[#]*
+
   /* coment line in comment */
+
 cmtli                             ^{ws}*"#"[#]*
+
   /* escape comment in comment */
+
 esccc                             [\\]"#"
 
   /* append trailing whitespace {ws} to avoid substring matching */
+
 kw_afn                            [\\@](?i:afn){ws}
 kw_aparam                         [\\@](?i:aparam){ws}
 kw_aparami                        [\\@](?i:aparami){ws}
@@ -232,27 +279,39 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
 
 %%
 
-  /* outsize comment block */
+  /*
+    outside comment block
+  */
+
 <INITIAL>{bcmt}                   { cb.app_text( "/**" ); yy_push_state(COMMENT); }
 <INITIAL>{cmtld}                  { cb.app_text( "///" ); yy_push_state(READCL); }
 <INITIAL>{nr}                     { cb.app_text( YYText() ); cout << cb.format(); }
 <INITIAL>.                        ;
 <INITIAL><<EOF>>                  { cout << cb.format(); return 0; }
 
-  /* inside comment block */
-<COMMENT>{bcmt}                   { abort("nested comment blocks", lineno(), YYText()); }
+  /*
+    inside comment block
+  */
+
+<COMMENT>{bcmt}                   { error("nested comment blocks", lineno(), YYText()); }
 <COMMENT>{ecmt}                   { cb.app_text( " */" );  yy_pop_state(); }
 <COMMENT>{esccc}                  { cb.app_text( "#" ); }
 <COMMENT>{cmtli}                  { cb.app_text( " *" ); }
 <COMMENT>{nr}                     { cb.app_text( YYText() ); }
 <COMMENT>.                        { cb.app_text( YYText() ); }
-<COMMENT><<EOF>>                  { abort("unterminated comment block", lineno()); }
+<COMMENT><<EOF>>                  { error("unterminated comment block", lineno()); }
 
-  /* read comment line outside of comment block */
+  /*
+    read comment line outside of comment block
+  */
+
 <READCL>{nr}                      { cb.app_text( YYText() ); yy_pop_state(); }
 <READCL>.                         { cb.app_text( YYText() ); }
 
-  /* keyword processing */
+  /*
+    keyword processing
+  */
+
 <COMMENT,READCL>{kw_afn}          { yy_push_state(READFN); }
 <COMMENT,READCL>{kw_aparam}       { cb.clear_cp();
                                     string mt = YYText();
@@ -270,13 +329,19 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
                                     cb.app_text( kw + " " + cb.get_cpd() );
                                     yy_push_state(READAP); }
 
-  /* function name */
+  /*
+    function name
+  */
+
 <READFN>{id}                      { cb.set_fn( YYText() ); yy_pop_state(); }
 <READFN>{ws}+                     ;
-<READFN>{nr}                      { abort("missing function name", lineno() ); }
-<READFN>.                         { abort("invalid function name", lineno(), YYText()); }
+<READFN>{nr}                      { error("missing function name", lineno() ); }
+<READFN>.                         { error("invalid function name", lineno(), YYText()); }
 
-  /* function parameter type, direction, and name */
+  /*
+    function parameter type, direction, and name
+  */
+
 <READAP>{type}                    { string mt = YYText();
                                     cb.set_cpt( mt.substr(1,mt.length()-2) ); }
 <READAP>{dir}                     { cb.set_cpd( YYText() );
@@ -285,14 +350,20 @@ kw_aparamo                        [\\@](?i:aparamo){ws}
                                     cb.app_text( " " + cb.get_cpn() );
                                     cb.push_cp(); yy_pop_state(); }
 <READAP>{ws}+                     ;
-<READAP>{nr}                      { abort("missing parameter name", lineno()); }
-<READAP>.                         { abort("invalid parameter name", lineno(), YYText()); }
+<READAP>{nr}                      { error("missing parameter name", lineno()); }
+<READAP>.                         { error("invalid parameter name", lineno(), YYText()); }
 
 %%
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 //! \ingroup bash_dif_src
 //! @{
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// main
+//
+////////////////////////////////////////////////////////////////////////////////
 
 //! program main.
 int
@@ -337,6 +408,7 @@ main( int argc, char** argv ) {
   std::ifstream infile ( arg1.c_str() );
 
   if ( infile.good() ) {
+
     bash_difFlexLexer* lexer = new bash_difFlexLexer( &infile , &cout );
 
     while( lexer->yylex() != 0 )

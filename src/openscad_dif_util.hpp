@@ -37,9 +37,9 @@
 
 #include <iostream>
 #include <sstream>
-#include <map>
-#include <vector>
 #include <string>
+#include <vector>
+#include <map>
 
 //! \ingroup openscad_dif_src
 //! @{

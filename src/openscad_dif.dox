@@ -11,6 +11,7 @@
 
 /***************************************************************************//**
   \page openscad_dif_doc Program Usage (openscad-dif)
+  \tableofcontents
 
 
   \section openscad_dif_sm Documenting OpenSCAD scripts
@@ -28,7 +29,7 @@
   following table. See the flex documentation on [patterns] for more
   information.
 
-   patterns   | behavior
+   pattern    | description
   :----------:|:--------------------------------
    "//"       | comment. ignored by filter.
    "//"[/!]?  | documentation pass to Doxygen.
@@ -64,16 +65,16 @@
 
   The following table list the predefined variables.
 
-  Name                | Description
+   name               | description
   :-------------------|:------------------------------
-  EFS                 | amu_eval feild separator
-  ABS_FILE_NAME       | absolute input file file name
-  ABS_PATH_NAME       | absolute input file path name
-  FILE_NAME           | input file file name
-  PATH_NAME           | input file path name
-  BASE_NAME           | input file base name
-  STEM_NAME           | input file stem name
-  EXTN_AME            | input file extension name
+   EFS                | amu_eval feild separator
+   ABS_FILE_NAME      | absolute input file file name
+   ABS_PATH_NAME      | absolute input file path name
+   FILE_NAME          | input file file name
+   PATH_NAME          | input file path name
+   BASE_NAME          | input file base name
+   STEM_NAME          | input file stem name
+   EXTN_AME           | input file extension name
 
 
   \subsection openscad_dif_sm_a Arguments
@@ -81,60 +82,60 @@
   There are four categories that are used  by functions as summarized
   in the following table:
 
-  Type        | Example         | Scope
-  :-----------|:---------------:|:------:
-  positional  | value           | local
-  named       | name=value      | local
-  flag        | ++flag /--flag  | local
-  incr/decr   | var++ / var--   | global
+   type       | example           | scope
+  :-----------|:-----------------:|:------:
+   positional | value             | local
+   named      | name=value        | local
+   flag       | ++flag / \-\-flag | local
+   incr/decr  | var++ / var\-\-   | global
 
-  Except where noted otherwise, \p positional, \p named, and \p flag
-  assignments have a local scope to the function where they are used.
-  The \p incr/decr argument values are global across all function for
-  an input file. A named argument takes the form of <tt>name=value</tt>
-  where \p name is a variable identifier and \p value is the content to
-  be assigend to the specified variable. A value, for positional or
-  named arguments, should be quoted with single or double quotes when
-  it contains spaces. Prefix a flag with \c ++ to enable it and \c \-\-
-  to disable it. For example \p ++name enables the argument \p name and
-  \p --name disables it. \p incr/decr will always operate on and update
-  the global variable scope (ex: \p i++ or \p i-- will always increment
-  or decrement the global variable \p i).
+  Except where noted, \p positional, \p named, and \p flag assignments
+  types have \em local scope to the function where they are defined.
+  The \p incr/decr assigned values have \em global scope across all
+  functions for the current file. A named argument takes the form
+  <tt>name=value</tt>, where \p name is a variable identifier and \p
+  value is the content to assign. A single value must be identified by
+  matching single or double quotes when it contains one or more spaces.
+
+  \copydetails ODIF::ODIF_Scanner::fx_incr_arg()
 
 
-  \subsection openscad_dif_sm_adc Additional Doxygen Commands
+  \subsection openscad_dif_sm_adc Doxygen Commands Summary
 
   In addition to the normal Doxygen [special commands], here is a list
   of additional filter-provided commands that can be used for document
-  markup:
+  markup. The documentation for these commands may be found in section
+  the \ref openscad_dif_sm_afc "additional commands".
 
-  | Internal Commands                                                 | Description
-  |:------------------------------------------------------------------|:---------------------------------
-  | \ref ODIF::ODIF_Scanner::def_init()         "\\amu_define"        | define text macro
-  | \ref ODIF::ODIF_Scanner::bif_eval()         "\\amu_eval"          | evaluate arguments
-  | \ref ODIF::ODIF_Scanner::bif_shell()        "\\amu_shell"         | execute shell command
-  | \ref ODIF::ODIF_Scanner::bif_combine()      "\\amu_combine"       | combine words
-  | \ref ODIF::ODIF_Scanner::bif_table()        "\\amu_table"         | generate a text table
-  | \ref ODIF::ODIF_Scanner::bif_image_table()  "\\amu_image_table"   | generate an image table
-  | \ref ODIF::ODIF_Scanner::bif_viewer()       "\\amu_viewer"        | file viewer
-  | \ref ODIF::ODIF_Scanner::bif_make()         "\\amu_make"          | make script interface
-  | \ref ODIF::ODIF_Scanner::bif_copy()         "\\amu_copy"          | copy references
-  | \ref ODIF::ODIF_Scanner::bif_find()         "\\amu_find"          | search for output files
-  | \ref ODIF::ODIF_Scanner::bif_scope()        "\\amu_scope"         | query scope data
-  | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_source"        | query source filename
-  | \ref ODIF::ODIF_Scanner::bif_source()       "\\amu_pathid"        | generate source path identifier
-  | \ref ODIF::ODIF_Scanner::bif_filename()     "\\amu_filename"      | operations for filename lists
-  | \ref ODIF::ODIF_Scanner::bif_replace()      "\\amu_replace"       | text search and replace operation
-  | \ref ODIF::ODIF_Scanner::bif_word()         "\\amu_word"          | Count or select words from a list
-  | \ref ODIF::ODIF_Scanner::bif_seq()          "\\amu_seq"           | Generate a sequence of numbers
-  | \ref ODIF::ODIF_Scanner::bif_file()         "\\amu_file"          | Perform operations on text files
+  | internal commands               | description
+  |:--------------------------------|:------------------------------------
+  | \ref dif_afc_amu_define         | Define text macro
+  | \ref dif_afc_amu_if             | Conditional text output
+  | \ref dif_afc_amu_foreach        | Enumerated textual substitution
+  | \ref dif_afc_amu_eval           | Evaluate arguments
+  | \ref dif_afc_amu_shell          | Execute shell command
+  | \ref dif_afc_amu_make           | Make script interface
+  | \ref dif_afc_amu_scope          | Query scope data
+  | \ref dif_afc_amu_source         | Query source filename
+  | \ref dif_afc_amu_copy           | Copy references
+  | \ref dif_afc_amu_find           | Search for output files
+  | \ref dif_afc_amu_pathid         | Generate source path identifier
+  | \ref dif_afc_amu_filename       | Operations for filename lists
+  | \ref dif_afc_amu_file           | Perform operations on text files
+  | \ref dif_afc_amu_combine        | Combine words
+  | \ref dif_afc_amu_replace        | Text search and replace operation
+  | \ref dif_afc_amu_word           | Count or select words from a list
+  | \ref dif_afc_amu_seq            | Generate a sequence of numbers
+  | \ref dif_afc_amu_table          | Generate a text table
+  | \ref dif_afc_amu_image_table    | Generate an image table
+  | \ref dif_afc_amu_viewer         | Graphics file viewer
 
   External commands also exists and can be found in the directory:
   <tt><install-prefix>/functions/</tt>.
 
   Here is a list:
 
-  | External Commands                 | Description
+  | external commands                 | description
   |:----------------------------------|:--------------------------------
   | \\amu_date                        | current date and/or time
   | \\amu_list                        | format arguments into a list
@@ -191,7 +192,7 @@
   \endverbatim
 
 
-  \subsection openscad_dif_sm_afc Adding Filter Commands
+  \subsection openscad_dif_sm_afc_add Adding Filter Commands
 
   Additional internal commands can be added to the filter by coding the
   function in C++ and incorporating it into the source. External
@@ -208,6 +209,71 @@
   <tt>amu_<function></tt> that it does not recognize, it checks this
   location and if it finds a match this external command is called to
   handle the command. See examples there as a starting point.
+
+
+  \section openscad_dif_sm_afc Additional Commands (openscad-dif)
+
+    \subsection dif_afc_amu_combine \\amu_combine
+    \copydetails ODIF::ODIF_Scanner::bif_combine()
+
+    \subsection dif_afc_amu_copy \\amu_copy
+    \copydetails ODIF::ODIF_Scanner::bif_copy()
+
+    \subsection dif_afc_amu_define \\amu_define
+    \copydetails ODIF::ODIF_Scanner::def_init()
+
+    \subsection dif_afc_amu_eval \\amu_eval
+    \copydetails ODIF::ODIF_Scanner::bif_eval()
+
+    \subsection dif_afc_amu_file \\amu_file
+    \copydetails ODIF::ODIF_Scanner::bif_file()
+
+    \subsection dif_afc_amu_filename \\amu_filename
+    \copydetails ODIF::ODIF_Scanner::bif_filename()
+
+    \subsection dif_afc_amu_find \\amu_find
+    \copydetails ODIF::ODIF_Scanner::bif_find()
+
+    \subsection dif_afc_amu_foreach \\amu_foreach
+    \copydetails ODIF::ODIF_Scanner::bif_foreach()
+
+    \subsection dif_afc_amu_if \\amu_if
+    \copydetails ODIF::ODIF_Scanner::if_init()
+    \copydetails ODIF::ODIF_Scanner::bif_if_exp_1a()
+    \copydetails ODIF::ODIF_Scanner::bif_if_exp_2a()
+
+    \subsection dif_afc_amu_image_table \\amu_image_table
+    \copydetails ODIF::ODIF_Scanner::bif_image_table()
+
+    \subsection dif_afc_amu_make \\amu_make
+    \copydetails ODIF::ODIF_Scanner::bif_make()
+
+    \subsection dif_afc_amu_pathid \\amu_pathid
+    \copydetails ODIF::ODIF_Scanner::bif_pathid()
+
+    \subsection dif_afc_amu_replace \\amu_replace
+    \copydetails ODIF::ODIF_Scanner::bif_replace()
+
+    \subsection dif_afc_amu_scope \\amu_scope
+    \copydetails ODIF::ODIF_Scanner::bif_scope()
+
+    \subsection dif_afc_amu_seq \\amu_seq
+    \copydetails ODIF::ODIF_Scanner::bif_seq()
+
+    \subsection dif_afc_amu_shell \\amu_shell
+    \copydetails ODIF::ODIF_Scanner::bif_shell()
+
+    \subsection dif_afc_amu_source \\amu_source
+    \copydetails ODIF::ODIF_Scanner::bif_source()
+
+    \subsection dif_afc_amu_table \\amu_table
+    \copydetails ODIF::ODIF_Scanner::bif_table()
+
+    \subsection dif_afc_amu_viewer \\amu_viewer
+    \copydetails ODIF::ODIF_Scanner::bif_viewer()
+
+    \subsection dif_afc_amu_word \\amu_word
+    \copydetails ODIF::ODIF_Scanner::bif_word()
 
 *******************************************************************************/
 

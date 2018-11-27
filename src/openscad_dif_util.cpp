@@ -574,20 +574,33 @@ UTIL::unquote(const string &s)
 {
   string r = s;
 
-  // search substring for first and last quote characters if any
+  // remove outermost matching quotations
+  // (1) quotes must be outermost text, excluding whitespace
+  // (2) quotes must be matching set
+  // (3) leading and trailing whitespace before and after
+  //     the outermost quotation are discarded.
 
-  size_t fp = s.find_first_of("\"\'");
-  size_t lp = s.find_last_of("\"\'");
+  // locate outer bounds of non-white space text
+  size_t fc = s.find_first_not_of(" \f\n\r\t\v");
+  size_t lc = s.find_last_not_of(" \f\n\r\t\v");
 
-  // make sure different character pointers
-  if ( fp != lp ) {
-    // make sure the characters match: ie '' or ""
-    if ( s.at(fp) == s.at(lp) ) {
-      // check for quoted NULL ""
-      if ( (lp-fp) < 2 )
+  // locate outermost quotations
+  size_t fq = s.find_first_of("\"\'");
+  size_t lq = s.find_last_of("\"\'");
+
+  // unquote iff:
+  // (1) not one in the same (character or string::npos)
+  // (2) first non-white space character is first quote
+  // (3) last non-white space character is last quote
+  // (4) the quote characters are a matched pair
+  if ( (fq != lq) && (fc == fq) && (lc == lq) )
+  {
+    if ( s.at(fq) == s.at(lq) )     // quotate character must match: ie '' or ""
+    {
+      if ( (lq-fq) < 2 )            // check for quoted null string ""
         r.clear();
       else
-        r = s.substr( fp+1, lp-1 );
+        r = s.substr( fq+1, lq-1 ); // copy string between quotes
     }
   }
 

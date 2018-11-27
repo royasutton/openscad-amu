@@ -11,9 +11,10 @@
 
 /***************************************************************************//**
   \page bash_dif_doc Program Usage (bash-dif)
+  \tableofcontents
 
 
-  \section bash_dif_sm Documenting Bash script
+  \section bash_dif_sm Documenting Bash scripts
 
   This filter may be used to markup bash scripts for use with Doygen.
   See [Documenting the code][docblocks] in the Doxygen manual for
@@ -40,17 +41,18 @@
 
   \subsection bash_dif_sm_adc Additional Doxygen Commands
 
-  In addition to all of the normal Doxygen [special commands,]
-  (http://www.stack.nl/~dimitri/doxygen/manual/commands.html)
-  here is a list of additional filter-provided ones that can be used for
-  document markup:
+  In addition to the normal Doxygen [special commands], here is a list
+  of additional filter-provided commands that can be used for document
+  markup:
 
   | Additional Commands             | Description
   |:--------------------------------|:--------------------------
   | \\afn id                        | function name
-  | \\aparam	<type> [direction] id | function parameter
+  | \\aparam  <type> [direction] id | function parameter
   | \\aparami <type> id             | function parameter input
   | \\aparamo <type> id             | function parameter output
+
+  [special commands]: http://www.stack.nl/~dimitri/doxygen/manual/commands.html
 
 
   \subsection bash_dif_sm_me Example Markup

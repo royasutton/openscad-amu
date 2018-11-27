@@ -47,6 +47,8 @@ using namespace std;
 
 %}
 
+  /* scanner options */
+
 %option c++
 %option yyclass="ODIF::ODIF_Scanner"
 %option stack
@@ -56,7 +58,14 @@ using namespace std;
 %option yylineno
 %option debug
 
-%s COMMENT READCL AMUFUNC FUNCARG FUNCARGDQ FUNCARGSQ AMUMDEFINE DEFINEARG
+  /* scanner states */
+
+%s COMMENT COMMENTLN
+%s AMUFN AMUFNARG AMUFNAQS AMUFNAQD
+%s AMUDEF AMUDEFARG
+%s AMUIF AMUIFEXPR AMUIFTEXT AMUIFTEXTBLOCK AMUIFELSE
+
+  /* comments and whitespace */
 
 comment_line                      "//"[/!]?
 comment_open                      "/*"[*!]?
@@ -64,103 +73,194 @@ comment_close                     "*"+"/"
 
 ws                                [ \t]
 nr                                [\n\r]
+wsnr                              ({ws}|{nr})
+
+  /* identifiers, variables, and paths */
 
 id                                [_[:alnum:]]+
 id_var                            "${"{id}"}"
+path                              [_./\-\\[:alnum:]]+
+
+  /* functions */
+
+amu_esc                           "\\"[\\@]
+amu_define                        [\\@](?i:amu_define)
+amu_if                            [\\@](?i:amu_if)
+amu_bif                           [\\@](?i:amu)_{id}
+
+  /* increment operations */
 
 incr_var_pre                      ("++"|"--"){id}
 incr_var_post                     {id}("++"|"--")
 
-amu_func                          [\\@](?i:amu)_{id}
-amu_define                        [\\@](?i:amu_define)
-amu_escaped                       "\\"[\\@]
+  /* amu_if values, operations, arguments, and expressions */
+
+if_val_true                       ("1"|(?i:t)|(?i:true))
+if_val_false                      ("0"|(?i:f)|(?i:false))
+
+if_opr_not                        "!"
+if_opr_and                        "&&"
+if_opr_or                         "\|\|"
+
+if_func_1a                        "-"[nzdl]
+if_func_2a                        ("=="|"!="|"<"|">"|"<="|">=")
+
+if_arg_uq                         ({id}|{id_var}|{path})
+if_arg_sq                         \'{if_arg_uq}?\'
+if_arg_dq                         \"{if_arg_uq}?\"
+if_arg                            ({if_arg_uq}|{if_arg_sq}|{if_arg_dq})
+
+if_expr_1a                        {if_func_1a}{wsnr}+{if_arg}
+if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 
 %%
 
-  /* outside comments:
+  /*
+    outside of comments:
       (1) replace OpenSCAD commands with C equivalents,
-      (2) output everything else unchanged */
+      (2) output everything else unchanged
+  */
 
 <INITIAL>{comment_open}           { scanner_echo(); yy_push_state(COMMENT); }
-<INITIAL>{comment_line}           { scanner_echo(); yy_push_state(READCL); }
+<INITIAL>{comment_line}           { scanner_echo(); yy_push_state(COMMENTLN); }
 <INITIAL>include                  { scanner_output( "#include", 8 ); }
 <INITIAL>use                      { scanner_output( "#include", 8 ); }
 <INITIAL>{nr}                     { scanner_echo(); }
 <INITIAL>.                        { scanner_echo(); }
 
-  /* inside comments:
+  /*
+    inside comment block:
       (1) match and handle amu functions
-      (2) output everything else unchanged */
+      (2) output everything else unchanged
+  */
 
 <COMMENT>{comment_close}          { scanner_echo(); yy_pop_state(); }
-<COMMENT><<EOF>>                  { abort("unterminated comment"); }
-<COMMENT>{amu_define}             { def_init(); yy_push_state(AMUMDEFINE); }
-<COMMENT>{amu_func}               { fx_init(); yy_push_state(AMUFUNC); }
-<COMMENT>{amu_escaped}            { /* remove prefixed escape char, output the rest */
+<COMMENT><<EOF>>                  { error("unterminated comment", lineno()); }
+<COMMENT>{amu_esc}                { /* remove escape char, output the rest */
                                     string mt = YYText();
                                     scanner_output( mt.substr(1,mt.length()-1) ); }
+<COMMENT>{amu_define}             { def_init(); yy_push_state(AMUDEF); }
+<COMMENT>{amu_if}                 { if_init(); yy_push_state(AMUIF); }
+<COMMENT>{amu_bif}                { fx_init(); yy_push_state(AMUFN); }
 <COMMENT>{nr}                     { scanner_echo(); }
 <COMMENT>.                        { scanner_echo(); }
 
-  /* comment line: (outside of comment block)
-      (1) output everything unchanged until end of line */
+  /*
+    on comment line, outside of comment block:
+      (1) output everything unchanged until end of line
+  */
 
-<READCL>{nr}                      { scanner_echo(); yy_pop_state(); }
-<READCL>.                         { scanner_echo(); }
+<COMMENTLN>{nr}                   { scanner_echo(); yy_pop_state(); }
+<COMMENTLN>.                      { scanner_echo(); }
 
-  /* parse amu function:
-      \amu_func1 var ( a1 a2 'a3' "a 4" file="all" ) */
+  /*
+    amu_bif:
+    amu_bif var ( a1 a2 'a3' "a 4" file="all" )
+  */
 
-<AMUFUNC>{id}                     { apt(); fx_set_tovar(); }
-<AMUFUNC>\(                       { apt(); BEGIN(FUNCARG); }
-<AMUFUNC>{ws}+                    { apt(); }
-<AMUFUNC>{nr}                     { apt(); }
-<AMUFUNC>.                        { abort("in function name", lineno(), YYText()); }
+<AMUFN>{id}                       { apt(); fx_set_var(); }
+<AMUFN>\(                         { apt(); BEGIN(AMUFNARG); }
+<AMUFN>{ws}+                      { apt(); }
+<AMUFN>{nr}                       { apt(); }
+<AMUFN>.                          { error("in function variable name", lineno(), YYText()); }
 
-  /* parse arguments */
+  /*
+    amu function arguments:
+  */
 
-<FUNCARG>{id}                     { apt(); fx_store_arg(); }
-<FUNCARG>{id_var}                 { apt(); fx_store_arg_expanded(); }
-<FUNCARG>\\{id_var}               { apt(); fx_store_arg_escaped(); }
-<FUNCARG>\\.                      { apt(); fx_store_arg_escaped(); }
-<FUNCARG>{id}=                    { apt(); fx_set_arg_name(); }
-<FUNCARG>{incr_var_pre}           { apt(); fx_incr_arg(false); }
-<FUNCARG>{incr_var_post}          { apt(); fx_incr_arg(true); }
-<FUNCARG>\'                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGSQ); }
-<FUNCARG>\"                       { apt(); fx_app_qarg(); yy_push_state(FUNCARGDQ); }
-<FUNCARG>\)                       { apt(); fx_pend(); yy_pop_state(); }
-<FUNCARG>{ws}+                    { apt(); }
-<FUNCARG>{nr}                     { apt(); }
-<FUNCARG>.                        { abort("in function arguments", lineno(), YYText()); }
-<FUNCARG><<EOF>>                  { abort("unterminated function arguments", fi_bline); }
+<AMUFNARG>{id}                    { apt(); fx_store_arg(); }
+<AMUFNARG>{id_var}                { apt(); fx_store_arg_expanded(); }
+<AMUFNARG>\\{id_var}              { apt(); fx_store_arg_escaped(); }
+<AMUFNARG>\\.                     { apt(); fx_store_arg_escaped(); }
+<AMUFNARG>{id}=                   { apt(); fx_set_arg_name(); }
+<AMUFNARG>{incr_var_pre}          { apt(); fx_incr_arg(false); }
+<AMUFNARG>{incr_var_post}         { apt(); fx_incr_arg(true); }
+<AMUFNARG>\'                      { apt(); fx_app_qarg(); yy_push_state(AMUFNAQS); }
+<AMUFNARG>\"                      { apt(); fx_app_qarg(); yy_push_state(AMUFNAQD); }
+<AMUFNARG>\)                      { apt(); fx_end(); yy_pop_state(); }
+<AMUFNARG>{ws}+                   { apt(); }
+<AMUFNARG>{nr}                    { apt(); }
+<AMUFNARG>.                       { error("in function arguments", lineno(), YYText()); }
+<AMUFNARG><<EOF>>                 { error("unterminated function arguments", fi_bline); }
 
-  /* parse single and double quoted argument */
+  /*
+    amu function single and double quoted arguments:
+  */
 
-<FUNCARGSQ>\'                     { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
-<FUNCARGDQ>\"                     { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
-<FUNCARGSQ,FUNCARGDQ>\\\'         { apt(); fx_app_qarg_escaped(); }
-<FUNCARGSQ,FUNCARGDQ>\\\"         { apt(); fx_app_qarg_escaped(); }
-<FUNCARGSQ,FUNCARGDQ>\\{id_var}   { apt(); fx_app_qarg_escaped(); }
-<FUNCARGSQ,FUNCARGDQ>{id_var}     { apt(); fx_app_qarg_expanded(); }
-<FUNCARGSQ,FUNCARGDQ>{nr}         { apt(); fx_app_qarg(); }
-<FUNCARGSQ,FUNCARGDQ>.            { apt(); fx_app_qarg(); }
-<FUNCARGSQ><<EOF>>                { abort("unterminated single quote", fi_bline); }
-<FUNCARGDQ><<EOF>>                { abort("unterminated double quote", fi_bline); }
+<AMUFNAQS>\'                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
+<AMUFNAQD>\"                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
+<AMUFNAQS,AMUFNAQD>\\\'           { apt(); fx_app_qarg_escaped(); }
+<AMUFNAQS,AMUFNAQD>\\\"           { apt(); fx_app_qarg_escaped(); }
+<AMUFNAQS,AMUFNAQD>\\{id_var}     { apt(); fx_app_qarg_escaped(); }
+<AMUFNAQS,AMUFNAQD>{id_var}       { apt(); fx_app_qarg_expanded(); }
+<AMUFNAQS,AMUFNAQD>{nr}           { apt(); fx_app_qarg(); }
+<AMUFNAQS,AMUFNAQD>.              { apt(); fx_app_qarg(); }
+<AMUFNAQS><<EOF>>                 { error("unterminated single quote", fi_bline); }
+<AMUFNAQD><<EOF>>                 { error("unterminated double quote", fi_bline); }
 
-  /* parse amu define:
-      \amu_define var ( text of definition with ${variables} ) */
+  /*
+    amu_define:
+    amu_define var ( text of definition with ${variables} )
+  */
 
-<AMUMDEFINE>{id}                  { apt(); def_set_name(); }
-<AMUMDEFINE>\(                    { apt(); BEGIN(DEFINEARG); }
-<AMUMDEFINE>{ws}+                 { apt(); }
-<AMUMDEFINE>{nr}                  { apt(); }
-<AMUMDEFINE>.                     { abort("in define", lineno(), YYText()); }
+<AMUDEF>{id}                      { apt(); def_set_var(); }
+<AMUDEF>\(                        { apt(); BEGIN(AMUDEFARG); }
+<AMUDEF>{ws}+                     { apt(); }
+<AMUDEF>{nr}                      { apt(); }
+<AMUDEF>.                         { error("in define variable name", lineno(), YYText()); }
 
-<DEFINEARG>\)                     { apt(); def_pend(); yy_pop_state(); }
-<DEFINEARG>{ws}+                  { apt(); def_app(" "); }
-<DEFINEARG>{nr}+                  { apt(); def_app(" "); }
-<DEFINEARG>.                      { apt(); def_app(); }
-<DEFINEARG><<EOF>>                { abort("unterminated define arguments", fi_bline); }
+<AMUDEFARG>\)                     { apt(); def_end(); yy_pop_state(); }
+<AMUDEFARG>\\{nr}                 { apt(); def_app(""); }
+<AMUDEFARG>{nr}                   { apt(); def_app(); }
+<AMUDEFARG>.                      { apt(); def_app(); }
+<AMUDEFARG><<EOF>>                { error("unterminated define arguments", def_bline); }
+
+  /*
+    amu_if:
+    amu_if var ( expr ) { text } else*if ( expr ) ${var} else { text } endif
+  */
+
+<AMUIF>{id}                       { apt(); if_set_var(); }
+<AMUIF>\(                         { apt(); if_init_case(true); BEGIN(AMUIFEXPR); }
+<AMUIF>{ws}+                      { apt(); }
+<AMUIF>{nr}                       { apt(); }
+<AMUIF>.                          { error("in if variable name", lineno(), YYText()); }
+
+<AMUIFEXPR>\)                     { apt(); if_eval_expr(); if (if_opr.empty()) BEGIN(AMUIFTEXT); }
+<AMUIFEXPR>\(                     { apt(); if_opr.push('('); }
+<AMUIFEXPR>{if_opr_not}           { apt(); if_opr.push('!'); }
+<AMUIFEXPR>{if_opr_and}           { apt(); if_opr.push('&'); }
+<AMUIFEXPR>{if_opr_or}            { apt(); if_opr.push('|'); }
+<AMUIFEXPR>{if_val_true}          { apt(); if_val.push(true); }
+<AMUIFEXPR>{if_val_false}         { apt(); if_val.push(false); }
+<AMUIFEXPR>{if_expr_1a}           { apt(); if_val.push(bif_if_exp_1a( YYText() )); }
+<AMUIFEXPR>{if_expr_2a}           { apt(); if_val.push(bif_if_exp_2a( YYText() )); }
+<AMUIFEXPR>{ws}+                  { apt(); }
+<AMUIFEXPR>{nr}                   { apt(); }
+<AMUIFEXPR>.                      { error("in if expression", lineno(), YYText()); }
+<AMUIFEXPR><<EOF>>                { error("unterminated if expression", if_bline); }
+
+<AMUIFTEXT>{id_var}               { apt(); if_get_var_text(); if_end_case(); BEGIN(AMUIFELSE); }
+<AMUIFTEXT>\{                     { apt(); BEGIN(AMUIFTEXTBLOCK); }
+<AMUIFTEXT>{ws}+                  { apt(); }
+<AMUIFTEXT>{nr}                   { apt(); }
+<AMUIFTEXT>.                      { error("in if case body", lineno(), YYText()); }
+<AMUIFTEXT><<EOF>>                { error("unterminated if case body", if_bline); }
+
+<AMUIFTEXTBLOCK>{id_var}          { apt(); if_app(); }
+<AMUIFTEXTBLOCK>\}                { apt(); if_end_case(); BEGIN(AMUIFELSE); }
+<AMUIFTEXTBLOCK>\\{nr}            { apt(); if_app(""); }
+<AMUIFTEXTBLOCK>{nr}              { apt(); if_app(); }
+<AMUIFTEXTBLOCK>.                 { apt(); if_app(); }
+<AMUIFTEXTBLOCK><<EOF>>           { error("unterminated if case body block", if_bline); }
+
+<AMUIFELSE>"else"{wsnr}*"if"      { apt(); BEGIN(AMUIF);}
+<AMUIFELSE>"else"                 { apt(); if_init_case(false); BEGIN(AMUIFTEXT);}
+<AMUIFELSE>"endif"                { apt(); if_end(); yy_pop_state(); }
+<AMUIFELSE>{ws}+                  { apt(); }
+<AMUIFELSE>{nr}                   { apt(); }
+<AMUIFELSE>.                      { error("in if else", lineno(), YYText()); }
+<AMUIFELSE><<EOF>>                { error("unterminated if", if_bline); }
 
 %%
 

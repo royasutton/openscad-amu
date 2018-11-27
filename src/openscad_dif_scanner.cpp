@@ -43,6 +43,9 @@
 using namespace std;
 namespace bfs=boost::filesystem;
 
+////////////////////////////////////////////////////////////////////////////////
+// scanner public
+////////////////////////////////////////////////////////////////////////////////
 
 ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
 {
@@ -102,6 +105,7 @@ ODIF::ODIF_Scanner::init(void)
   bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
   // setup predefined environment variables
   varm.store( "EFS", " " );
+
   varm.store( "ABS_FILE_NAME", ifap.string() );
   varm.store( "ABS_PATH_NAME", ifap.parent_path().string() );
   varm.store( "FILE_NAME", ifrp.string() );
@@ -115,6 +119,10 @@ ODIF::ODIF_Scanner::init(void)
   fx_argv.set_prefix("arg");
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// general
+////////////////////////////////////////////////////////////////////////////////
+
 void
 ODIF::ODIF_Scanner::scanner_output( const char* buf, int size )
 {
@@ -124,33 +132,54 @@ ODIF::ODIF_Scanner::scanner_output( const char* buf, int size )
 }
 
 void
-ODIF::ODIF_Scanner::abort(const string& m, const int &n, const string &t)
+ODIF::ODIF_Scanner::error(const string& m, const int &n,
+                          const string &t, bool a)
 {
-  cerr << endl << ops << m;
+  string om;
 
-  if( n )           cerr << ", at line " << n;
-  if( t.length() )  cerr << ", near [" << t << "]";
+  om = ops + "ERROR in "
+     + varm.expand( varm.get_prefix() + "FILE_NAME" + varm.get_suffix() )
+     +  ", " + m;
 
-  cerr << ", aborting..." << endl;
+  if( n )           om += ", at line " + UTIL::to_string( n );
+  if( t.length() )  om += ", near [" + t + "]";
 
-  exit( EXIT_FAILURE );
+  if( a )
+    om += ", aborting..." ;
+  else
+    om += ", continuing..." ;
+
+  cerr << om << endl;
+  scanner_output( "<tt>" + om + "</tt><br>" );
+
+  if( a )
+    exit( EXIT_FAILURE );
+  else
+    return;
 }
 
 string
 ODIF::ODIF_Scanner::amu_error_msg(const string& m)
 {
-  ostringstream os;
+  string om;
 
-  os << "<tt>"
-     << ops
-     << input_name
-     << ", line " << dec << lineno() << ", "
-     << UTIL::get_word(amu_parsed_text, 1)
-     << " " << m
-     << "</tt>";
+  om  = ops + "ERROR in "
+      + varm.expand( varm.get_prefix() + "FILE_NAME" + varm.get_suffix() )
+      + ", at line " + UTIL::to_string( lineno() );
 
-  return ( os.str() );
+  // delete command characters [\@] from parsed text to prevent them
+  // from being interpreted by doxygen and/or the html browser.
+  om += ", near [" + UTIL::replace_chars( amu_parsed_text, "\\@" ) + "]"
+      +  ", " + m;
+
+  cerr << om << endl;
+
+  return( "<tt>" + om + "</tt><br>" );
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// amu_* function
+////////////////////////////////////////////////////////////////////////////////
 
 void
 ODIF::ODIF_Scanner::fx_init(void)
@@ -159,7 +188,7 @@ ODIF::ODIF_Scanner::fx_init(void)
   apt();
 
   fx_name.clear();
-  fx_tovar.clear();
+  fx_var.clear();
   fx_argv.clear();
 
   fx_qarg.clear();
@@ -186,7 +215,7 @@ ODIF::ODIF_Scanner::fx_init(void)
 
 *******************************************************************************/
 void
-ODIF::ODIF_Scanner::fx_pend(void)
+ODIF::ODIF_Scanner::fx_end(void)
 {
   fi_eline = lineno();
 
@@ -279,6 +308,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
     has_result=true;
     result=bif_file();
   }
+  else if (fx_name.compare("foreach")==0)
+  {
+    has_result=true;
+    result=bif_foreach();
+  }
   else
   {
     /* check external function */
@@ -320,13 +354,13 @@ ODIF::ODIF_Scanner::fx_pend(void)
   if ( has_result )
   {
     // output result to scanner or store to variable map
-    if ( fx_tovar.length() == 0 )
+    if ( fx_var.length() == 0 )
       scanner_output( result );
     else
     {
-      varm.store(fx_tovar, result);
+      varm.store(fx_var, result);
 
-      filter_debug( fx_tovar + "=[" + result + "]" );
+      filter_debug( fx_var + "=[" + result + "]" );
     }
   }
   else
@@ -340,11 +374,11 @@ ODIF::ODIF_Scanner::fx_pend(void)
 }
 
 void
-ODIF::ODIF_Scanner::fx_set_tovar(void)
+ODIF::ODIF_Scanner::fx_set_var(void)
 {
-  if ( fx_tovar.length() )
-    abort("previously defined var: " + fx_tovar, lineno(), YYText());
-  fx_tovar = YYText();
+  if ( fx_var.length() )
+    error("previously defined var: " + fx_var, lineno(), YYText());
+  fx_var = YYText();
 }
 
 void
@@ -375,24 +409,19 @@ ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
 
   \details
 
-    For the current text returned by the lexer matching
-    <tt>("++"|"--"){id}</tt> or <tt>{id}("++"|"--")</tt>, such as
-    <tt>var++</tt> or <tt>--var</tt>, get the operator and variable name. Then
-    lookup the current value of the variable from the environment variable map
-    and update its value based on the operation. If a named function argument
-    has been specified using \ref ODIF::func_args::set_next_name, then assign
-    the pre or post operation value to a function argument with this name.
-    Finally, store the updated value. Variables with trailing operators are stored
-    in the environment variable map, while variable with preceding operators are
-    stored as a named function argument in the form of
-    <tt>(variable-name)=(post-operation-value)</tt>.
+    Function arguments can make use of pre and post <tt>++</tt> and/or
+    <tt>\-\-</tt> operations. Post operations use global environment
+    variables. Pre operations use environment variables local to the
+    function. Function flags make use of pre operations. Prefix a flag
+    with <tt>++</tt> to enable it and <tt>\-\-</tt> to disable it. For
+    example \p ++name enables \p name and \p \-\-name disables it.
 
      operation | behavior
-    :---------:|:----------------------------------------------
-      x++      | store increment as environment variable
-      ++x      | store increment as function argument (x=${x})
-      y=x++    | store function argument (y=(${x}))
-      y=++x    | store function argument (y=(${x}+1))
+    :---------:|:---------------------------------------------------------
+      x++      | increment global environment variable
+      ++x      | increment local environment variable
+      y=x++    | assign function value (y=(${x})) with post increment
+      y=++x    | increment local and assign function value (y=(${x}))
 
 *******************************************************************************/
 void
@@ -439,6 +468,9 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
   else                          fx_argv.store( vn, UTIL::to_string(new_val) );  // ++var
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// amu_define
+////////////////////////////////////////////////////////////////////////////////
 
 /***************************************************************************//**
 
@@ -455,29 +487,29 @@ ODIF::ODIF_Scanner::def_init(void)
   apt_clear();
   apt();
 
-  def_name.clear();
+  def_var.clear();
   def_text.clear();
 
   def_bline = lineno();
 }
 
 void
-ODIF::ODIF_Scanner::def_pend(void)
+ODIF::ODIF_Scanner::def_end(void)
 {
   def_eline = lineno();
 
   // if variable name not specified, copy definition to output
   // otherwise store in variable map.
-  if ( def_name.length() == 0 )
+  if ( def_var.length() == 0 )
     scanner_output( def_text );
   else
   {
-    varm.store( def_name, def_text );
+    varm.store( def_var, def_text );
 
-    filter_debug( def_name + "=[" + def_text + "]" );
+    filter_debug( def_var + "=[" + def_text + "]" );
   }
 
-  def_name.clear();
+  def_var.clear();
   def_text.clear();
 
   // output blank lines to maintain file length when definitions are
@@ -486,12 +518,241 @@ ODIF::ODIF_Scanner::def_pend(void)
 }
 
 void
-ODIF::ODIF_Scanner::def_set_name(void)
+ODIF::ODIF_Scanner::def_set_var(void)
 {
-  if ( def_name.length() )
-    abort("previously defined var: " + def_name, lineno(), YYText());
-  def_name=YYText();
+  if ( def_var.length() )
+    error("previously defined var: " + def_var, lineno(), YYText());
+  def_var=YYText();
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// amu_if
+////////////////////////////////////////////////////////////////////////////////
+
+/***************************************************************************//**
+
+  \details
+
+    Output conditional text when an expression evaluates to true.
+
+    \code
+    \amu_if <variable> ( expression )
+    {
+      conditional text
+    }
+    else if ( expression )
+    {
+      conditional text
+    }
+    else if ( expression )
+      ${variable}
+    else
+    {
+      unconditional text
+    }
+    endif
+    \endcode
+
+    White space between an \c else and \c if is optional. \c elseif and
+    \c else \c if are equivalent.
+
+    Expression value constants are case insensitive:
+
+     value true  | value false
+    :-----------:|:-----------:
+     true        | false
+     t           | f
+     1           | 0
+
+    Expressions may be combined as follows:
+
+    \verbatim
+    ( expression )
+       Returns  the  value of expression.  This may be used to
+       override the normal precedence of operators.
+    ! expression
+       True if expression is false.
+    expression1 && expression2
+       True if both expression1 and expression2 are true.
+    expression1 || expression2
+       True if either expression1 or expression2 is true.
+    \endverbatim
+
+    The && and || operators evaluate expression2 even if the value of
+    expression1 is sufficient to determine the return value of the
+    entire conditional expression.
+
+    Expression can be composed using several built-in test functions.
+
+    \b Example:
+    \code
+    \amu_if ( -z ${error_test} )
+    {
+      The error test output is empty.
+    }
+    elseif ( ${error_count} > 0 )
+    {
+      The error count is ${error_count}
+    }
+    else
+    {
+      No reportable errors.
+    }
+    endif
+    \endcode
+
+*******************************************************************************/
+void
+ODIF::ODIF_Scanner::if_init(void)
+{
+  apt_clear();
+  apt();
+
+  if_var.clear();
+  if_text.clear();
+
+  if_matched = false;
+  if_case_true = false;
+  if_else_true = false;
+
+  if_bline = lineno();
+}
+
+void
+ODIF::ODIF_Scanner::if_init_case(bool expr)
+{
+  // previous else with no expression must be last case
+  if ( if_else_true )
+    error("case after else", lineno(), YYText());
+
+  // clear case body text
+  if_case_text.clear();
+
+  // clear operation and value stack
+  while ( ! if_opr.empty() )  if_opr.pop();
+  while ( ! if_val.empty() )  if_val.pop();
+
+  if ( expr )
+  {
+    if_opr.push( '(' );     // start new if case expression
+    if_case_true = false;
+  }
+  else if ( !if_matched )
+  {
+    if_else_true = true;    // select else case
+  }
+}
+
+void
+ODIF::ODIF_Scanner::if_eval_expr(void)
+{
+  bool end_expr = false;
+
+  while ( !if_opr.empty() && !end_expr )
+  {
+    char op = if_opr.top();
+
+    switch( op )
+    {
+      case '(' :
+        // group ( expression )
+        end_expr = true;
+        break;
+
+      case '!' :
+        // negate: ! expression
+        if_val.top() = ! if_val.top();
+        break;
+
+      case '&' :
+        // and: expression1 && expression2
+      case '|' :
+        //  or: expression1 || expression2
+        bool a1 = false;
+        bool a2 = false;
+
+        if (if_val.empty())
+          error("missing value 1 for " + string(op=='&'?"&&":"||"), lineno(), YYText());
+        else
+        {
+          a1 = if_val.top();
+          if_val.pop();
+        }
+
+        if (if_val.empty())
+          error("missing value 2 for " + string(op=='&'?"&&":"||"), lineno(), YYText());
+        else
+        {
+          a2 = if_val.top();
+          if_val.pop();
+        }
+
+        if ( op == '&' )
+          if_val.push( a1 && a2 );
+        else
+          if_val.push( a1 || a2 );
+        break;
+    }
+
+    if_opr.pop();
+  }
+
+  if ( if_opr.empty() )
+  { // operation stack is empty result is top value.
+    if ( if_val.size() == 1 )
+      if_case_true = if_val.top();
+    else
+      error("expression error", lineno(), YYText());
+  }
+}
+
+void
+ODIF::ODIF_Scanner::if_end_case(void)
+{
+  if ( !if_matched  && (if_case_true || if_else_true) )
+  {
+    if_matched = true;
+
+    // expand case body text and assign as result
+    if_text = varm.expand_text( if_case_text );
+  }
+}
+
+void
+ODIF::ODIF_Scanner::if_end(void)
+{
+  if_eline = lineno();
+
+  // if variable name not specified, copy definition to output
+  // otherwise store in variable map.
+  if ( if_var.length() == 0 )
+    scanner_output( if_text );
+  else
+  {
+    varm.store( if_var, if_text );
+
+    filter_debug( if_var + "=[" + if_text + "]" );
+  }
+
+  if_var.clear();
+  if_text.clear();
+
+  // output blank lines to maintain file length when definitions are
+  // broken across multiple lines (don't begin and end on the same line).
+  for(size_t i=if_bline; i<if_eline; i++) scanner_output("\n");
+}
+
+void
+ODIF::ODIF_Scanner::if_set_var(void)
+{
+  if ( if_var.length() )
+    error("previously defined var: " + if_var, lineno(), YYText());
+  if_var=YYText();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// utility
+////////////////////////////////////////////////////////////////////////////////
 
 void
 ODIF::ODIF_Scanner::filter_debug(
