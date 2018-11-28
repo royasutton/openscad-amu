@@ -150,7 +150,7 @@ ODIF::ODIF_Scanner::error(const string& m, const int &n,
     om += ", continuing..." ;
 
   cerr << om << endl;
-  scanner_output( "<tt>" + om + "</tt><br>" );
+  scanner_output( "<tt>" + om + "</tt><br>\n" );
 
   if( a )
     exit( EXIT_FAILURE );

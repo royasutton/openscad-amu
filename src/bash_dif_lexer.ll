@@ -208,7 +208,7 @@ error( const string& m, const int &n = 0, const string &t = "", bool a = false )
     om += ", continuing..." ;
 
   cerr << om << endl;
-  cout << "<tt>" << om << "</tt><br>";
+  cout << "<tt>" << om << "</tt><br>\n";
 
   if( a )
     exit( EXIT_FAILURE );
