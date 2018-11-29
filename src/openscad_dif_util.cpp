@@ -594,13 +594,15 @@ UTIL::unquote(const string &s)
   // (3) last non-white space character is last quote
   // (4) the quote characters are a matched pair
   if ( (fq != lq) && (fc == fq) && (lc == lq) )
-  {
-    if ( s.at(fq) == s.at(lq) )     // quotate character must match: ie '' or ""
+  { // quotate character must match: ie '' or ""
+    if ( s.at(fq) == s.at(lq) )
     {
-      if ( (lq-fq) < 2 )            // check for quoted null string ""
+      if ( (lq-fq) < 2 )
+        // check for quoted null string ""
         r.clear();
       else
-        r = s.substr( fq+1, lq-1 ); // copy string between quotes
+        // copy string between quotes
+        r = s.substr( fq+1, lq-1-fq );
     }
   }
 
