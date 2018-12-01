@@ -52,7 +52,7 @@ using namespace std;
 %option c++
 %option yyclass="ODIF::ODIF_Scanner"
 %option stack
-%option yywrap
+%option noyywrap
 %option nounput
 %option default
 %option yylineno
@@ -62,6 +62,7 @@ using namespace std;
 
 %s COMMENT COMMENTLN
 %s AMUFN AMUFNARG AMUFNAQS AMUFNAQD
+%s AMUINC AMUINCFILE
 %s AMUDEF AMUDEFARG
 %s AMUIF AMUIFEXPR AMUIFTEXT AMUIFTEXTBLOCK AMUIFELSE
 
@@ -84,6 +85,7 @@ path                              [_./\-\\[:alnum:]]+
   /* functions */
 
 amu_esc                           "\\"[\\@]
+amu_include                       [\\@](?i:amu_include)
 amu_define                        [\\@](?i:amu_define)
 amu_if                            [\\@](?i:amu_if)
 amu_bif                           [\\@](?i:amu)_{id}
@@ -92,6 +94,12 @@ amu_bif                           [\\@](?i:amu)_{id}
 
 incr_var_pre                      ("++"|"--"){id}
 incr_var_post                     {id}("++"|"--")
+
+  /* amu_include arguments */
+
+inc_copy                          ((?i:copy)|(?i:c))
+inc_no_switch                     ((?i:no_switch)|(?i:n))
+inc_search                        ((?i:search)|(?i:s))
 
   /* amu_if values, operations, arguments, and expressions */
 
@@ -135,10 +143,10 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
   */
 
 <COMMENT>{comment_close}          { scanner_echo(); yy_pop_state(); }
-<COMMENT><<EOF>>                  { error("unterminated comment", lineno()); }
 <COMMENT>{amu_esc}                { /* remove escape char, output the rest */
                                     string mt = YYText();
                                     scanner_output( mt.substr(1,mt.length()-1) ); }
+<COMMENT>{amu_include}            { inc_init(); yy_push_state(AMUINC); }
 <COMMENT>{amu_define}             { def_init(); yy_push_state(AMUDEF); }
 <COMMENT>{amu_if}                 { if_init(); yy_push_state(AMUIF); }
 <COMMENT>{amu_bif}                { fx_init(); yy_push_state(AMUFN); }
@@ -197,6 +205,25 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNAQS,AMUFNAQD>.              { apt(); fx_app_qarg(); }
 <AMUFNAQS><<EOF>>                 { error("unterminated single quote", fi_bline); }
 <AMUFNAQD><<EOF>>                 { error("unterminated double quote", fi_bline); }
+
+  /*
+    amu_include:
+    amu_include copy no_switch ( ${var1}/path/${var2}/file )
+  */
+
+<AMUINC>\(                        { apt(); BEGIN(AMUINCFILE); }
+<AMUINC>{inc_copy}                { apt(); inc_set_copy(true); }
+<AMUINC>{inc_no_switch}           { apt(); inc_set_switch(false); }
+<AMUINC>{inc_search}              { apt(); inc_set_search(true); }
+<AMUINC>{ws}+                     { apt(); }
+<AMUINC>{nr}                      { apt(); }
+<AMUINC>.                         { error("in include", lineno(), YYText()); }
+
+<AMUINCFILE>\)                    { apt(); inc_end(); yy_pop_state(); }
+<AMUINCFILE>\\{nr}                { apt(); inc_app(""); }
+<AMUINCFILE>{nr}                  { apt(); inc_app(); }
+<AMUINCFILE>.                     { apt(); inc_app(); }
+<AMUINCFILE><<EOF>>               { error("unterminated include filename", inc_bline); }
 
   /*
     amu_define:
@@ -265,13 +292,6 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 %%
 
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
-//! \ingroup openscad_dif_src
-//! @{
-
-//! Lexer end-of-file handler.
-int yyFlexLexer::yywrap(void) { return 1; }
-
-//! @}
 
 
 /*******************************************************************************

@@ -75,9 +75,6 @@ class ODIF_Scanner : public yyFlexLexer{
     //! start scanning input file.
     int scan(void);
 
-    //! reset scanner to initial condition.
-    void init(void);
-
     //! turn scanner debugging on or off.
     void set_debug(bool f) { yy_flex_debug = f; }
 
@@ -178,8 +175,15 @@ class ODIF_Scanner : public yyFlexLexer{
 
     std::string ops;                        //!< output prefix string.
 
-    std::string input_name;                 //!< scanner input file name.
-    std::ifstream input_file;               //!< scanner input file.
+    struct ifs_s {                          //!< input file structure.
+      std::string   name;                   //!< file name.
+      std::ifstream *ifs;                   //!< file stream pointer.
+      int           line;                   //!< file line number.
+    };
+
+    std::vector<ifs_s> ifs_v;               //!< vector of input files.
+
+    env_var varm;                           //!< global environment variable map.
 
     std::string config_prefix;              //!< scanner configuration file path prefix.
     std::string rootscope;                  //!< scanner root scope name.
@@ -205,6 +209,12 @@ class ODIF_Scanner : public yyFlexLexer{
   //////////////////////////////////////////////////////////////////////////////
   // general
   //////////////////////////////////////////////////////////////////////////////
+    //! open named file, add input stream to stack, and start processing to it.
+    void start_file( const std::string file );
+    //! override of lexer base class end-of-file handler virtual function.
+    int yywrap(void);
+    //! return the filename of the root input file.
+    std::string get_input_name(bool root = true);
     //! write the entire string s to the scanner output.
     void scanner_output(const std::string& s) { scanner_output( s.c_str(), s.length() ); }
     //! write the first size characters of buf to the scanner output.
@@ -218,8 +228,6 @@ class ODIF_Scanner : public yyFlexLexer{
 
     //! generate standard error message string with message m.
     std::string amu_error_msg(const std::string& m);
-
-    env_var     varm;                   //!< scanner environment variable map.
 
   //////////////////////////////////////////////////////////////////////////////
   // amu parsed text
@@ -303,17 +311,17 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string if_text;                //!< amu if matched case result text.
     std::string if_case_text;           //!< parsed amu if case body text.
 
-    bool        if_matched;             //!< if output state variable
-    bool        if_case_true;           //!< if case output state variable
-    bool        if_else_true;           //!< if else output state variable
+    bool        if_matched;             //!< if output state variable.
+    bool        if_case_true;           //!< if case output state variable.
+    bool        if_else_true;           //!< if else output state variable.
 
-    std::stack<char> if_opr;            //!< if operation stack
-    std::stack<bool> if_val;            //!< if value stack
+    std::stack<char> if_opr;            //!< if operation stack.
+    std::stack<bool> if_val;            //!< if value stack.
 
     size_t      if_bline;               //!< beginning line of parsed amu if.
     size_t      if_eline;               //!< ending line of parsed amu if.
 
-    //! begin amu_if handler
+    //! begin amu_if handler.
     void if_init(void);
     //! start new if case handler
     void if_init_case(bool expr);
@@ -332,6 +340,35 @@ class ODIF_Scanner : public yyFlexLexer{
     void if_app(const std::string &s) { if_case_text+=s; }
     //! append the current parsed text to the body text.
     void if_app(void) { if_case_text+=YYText(); }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // amu_include
+  //////////////////////////////////////////////////////////////////////////////
+    std::string inc_text;               //!< parsed include argument text.
+
+    bool        inc_copy;               //!< include output state variable.
+    bool        inc_switch;             //!< include behavior state variable.
+    bool        inc_search;             //!< include behavior state variable.
+
+    size_t      inc_bline;              //!< beginning line of include.
+    size_t      inc_eline;              //!< ending line of include.
+
+    //! begin amu_include handler.
+    void inc_init(void);
+    //! end amu_include handler.
+    void inc_end(void);
+
+    //! append the string s to the body text.
+    void inc_app(const std::string &s) { inc_text+=s; }
+    //! append the current parsed text to the body text.
+    void inc_app(void) { inc_text+=YYText(); }
+
+    //! set include output state variable.
+    void inc_set_copy(bool s) { inc_copy=s; }
+    //! set include behavior state variable.
+    void inc_set_switch(bool s) { inc_switch=s; }
+    //! set include behavior state variable.
+    void inc_set_search(bool s) { inc_search=s; }
 
   //////////////////////////////////////////////////////////////////////////////
   // utility

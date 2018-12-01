@@ -354,7 +354,7 @@ ODIF::ODIF_Scanner::bif_find(void)
 /***************************************************************************//**
   \details
 
-    Return information about source path.
+    Return information about input path components.
 
     The options and flags (and their short codes) are summarized in the
     following tables.
@@ -425,7 +425,7 @@ ODIF::ODIF_Scanner::bif_pathid(void)
 
   string result;
 
-  bfs::path input_path = input_name;
+  bfs::path input_path = get_input_name( true );
   bfs::path parent_path;
 
   string path_joiner = "_";

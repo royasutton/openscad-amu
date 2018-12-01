@@ -66,7 +66,7 @@
   The following table list the predefined variables.
 
    name               | description
-  :-------------------|:------------------------------
+  :-------------------|:----------------------------------
    EFS                | amu_eval feild separator
    ABS_FILE_NAME      | absolute input file file name
    ABS_PATH_NAME      | absolute input file path name
@@ -75,6 +75,8 @@
    BASE_NAME          | input file base name
    STEM_NAME          | input file stem name
    EXTN_AME           | input file extension name
+   FILE_CURRENT       | current input file name
+   FILE_LIST          | list of all included input files
 
 
   \subsection openscad_dif_sm_a Arguments
@@ -109,6 +111,7 @@
 
   | internal commands               | description
   |:--------------------------------|:------------------------------------
+  | \ref dif_afc_amu_include        | Include a file into input
   | \ref dif_afc_amu_define         | Define text macro
   | \ref dif_afc_amu_if             | Conditional text output
   | \ref dif_afc_amu_foreach        | Enumerated textual substitution
@@ -244,6 +247,9 @@
 
     \subsection dif_afc_amu_image_table \\amu_image_table
     \copydetails ODIF::ODIF_Scanner::bif_image_table()
+
+    \subsection dif_afc_amu_include \\amu_include
+    \copydetails ODIF::ODIF_Scanner::inc_init()
 
     \subsection dif_afc_amu_make \\amu_make
     \copydetails ODIF::ODIF_Scanner::bif_make()

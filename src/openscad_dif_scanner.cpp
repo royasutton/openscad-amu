@@ -52,36 +52,9 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
   // initialize output prefix string
   set_ops( s );
 
-  input_name = f;
+  // default operation
   scanner_output_on = true;
   debug_filter = false;
-
-  init();
-}
-
-ODIF::ODIF_Scanner::~ODIF_Scanner(void)
-{
-  if ( input_file.is_open() ) {
-    input_file.close();
-  }
-}
-
-void
-ODIF::ODIF_Scanner::init(void)
-{
-  if ( input_file.is_open() ) {
-    input_file.close();
-  }
-
-  input_file.open( input_name.c_str() );
-
-  if ( !input_file.good() ) {
-    cerr << ops << "unable to open input file [" << input_name << "]";
-    LexerError(", aborting...");
-  }
-
-  // set lexer input to opened input file
-  switch_streams( &input_file );
 
   // initialize variable map
   varm.clear();
@@ -101,11 +74,13 @@ ODIF::ODIF_Scanner::init(void)
   varm.set_report( true );
   varm.set_report_message("<tt><UNDEFINED></tt>");
 
-  bfs::path ifap ( input_name );
+  // relative path name of the root input file 'f'
+  bfs::path ifap = f;
   bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
   // setup predefined environment variables
   varm.store( "EFS", " " );
 
+  // setup root file name variables
   varm.store( "ABS_FILE_NAME", ifap.string() );
   varm.store( "ABS_PATH_NAME", ifap.parent_path().string() );
   varm.store( "FILE_NAME", ifrp.string() );
@@ -117,11 +92,111 @@ ODIF::ODIF_Scanner::init(void)
   // initialize function argument positional prefix
   fx_argv.clear();
   fx_argv.set_prefix("arg");
+
+  // initialize include file variables
+  varm.store( "FILE_CURRENT", "" );
+  varm.store( "FILE_LIST", "" );
+
+  // clear the input file stream vector
+  ifs_v.clear();
+
+  // the passed file 'f' is the root input file
+  start_file( f );
+}
+
+ODIF::ODIF_Scanner::~ODIF_Scanner(void)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // general
 ////////////////////////////////////////////////////////////////////////////////
+
+void
+ODIF::ODIF_Scanner::start_file( const string file )
+{
+  ifstream *ifs = new ifstream();
+
+  // open file stream
+  ifs->open( file.c_str() );
+
+  if ( !ifs->good() )
+    error( "unable to open input file", lineno(), file, true );
+
+  // get relative path name for file with root path
+  string file_relative_path;
+
+  bfs::path ifap = file;
+  if ( ifap.has_root_path() )
+  {
+    bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
+    file_relative_path = ifrp.string();
+  }
+  else
+  {
+    file_relative_path = file;
+  }
+
+  // append to ${FILE_LIST}
+  string list = varm.expand( varm.get_prefix() + "FILE_LIST" + varm.get_suffix() );
+  if ( list.length() ) list += " ";
+  list += file_relative_path;
+  varm.store( "FILE_LIST", list );
+
+  // update ${FILE_CURRENT}
+  varm.store( "FILE_CURRENT", file_relative_path );
+
+  // save line number update of current stream if it exists
+  if ( ! ifs_v.empty() )
+    ifs_v.back().line = yylineno;
+
+  // add next stream to back of input stream vector
+  ifs_s ifs_next = { file_relative_path, ifs, 1 };
+  ifs_v.push_back( ifs_next );
+
+  // reset line number count for next file
+  yylineno = 1;
+
+  // switch input stream
+  switch_streams( ifs );
+}
+
+int
+ODIF::ODIF_Scanner::yywrap(void)
+{
+  if ( ifs_v.empty() )          // input stream vector empty
+    return 1;
+
+  ifs_v.back().ifs->close();    // close current file
+  delete ifs_v.back().ifs;      // free storage
+  ifs_v.pop_back();             // discard and get next stream
+
+  if ( ifs_v.empty() )          // has last file has been closed?
+    return 1;
+
+  // update ${FILE_CURRENT}
+  varm.store( "FILE_CURRENT", ifs_v.back().name );
+
+  // restore saved line number count
+  yylineno = ifs_v.back().line;
+
+  // return to previous input stream
+  switch_streams( ifs_v.back().ifs );
+
+  return 0;
+}
+
+string
+ODIF::ODIF_Scanner::get_input_name(bool root)
+{
+  if ( ifs_v.empty() )              // no input streams
+    return "none";
+
+  if ( root )
+    return ( ifs_v.front().name );  // first is root
+  else
+    return ( ifs_v.back().name );   // last is current
+}
 
 void
 ODIF::ODIF_Scanner::scanner_output( const char* buf, int size )
@@ -138,22 +213,18 @@ ODIF::ODIF_Scanner::error(const string& m, const int &n,
   string om;
 
   om = ops + "ERROR in "
-     + varm.expand( varm.get_prefix() + "FILE_NAME" + varm.get_suffix() )
+     + varm.expand( varm.get_prefix() + "FILE_CURRENT" + varm.get_suffix() )
      +  ", " + m;
 
   if( n )           om += ", at line " + UTIL::to_string( n );
   if( t.length() )  om += ", near [" + t + "]";
-
-  if( a )
-    om += ", aborting..." ;
-  else
-    om += ", continuing..." ;
+  if( !a )          om += ", continuing..." ;
 
   cerr << om << endl;
   scanner_output( "<tt>" + om + "</tt><br>\n" );
 
   if( a )
-    exit( EXIT_FAILURE );
+    LexerError( string(ops + "aborting...").c_str() );
   else
     return;
 }
@@ -164,7 +235,7 @@ ODIF::ODIF_Scanner::amu_error_msg(const string& m)
   string om;
 
   om  = ops + "ERROR in "
-      + varm.expand( varm.get_prefix() + "FILE_NAME" + varm.get_suffix() )
+      + varm.expand( varm.get_prefix() + "FILE_CURRENT" + varm.get_suffix() )
       + ", at line " + UTIL::to_string( lineno() );
 
   // delete command characters [\@] from parsed text to prevent them
@@ -748,6 +819,103 @@ ODIF::ODIF_Scanner::if_set_var(void)
   if ( if_var.length() )
     error("previously defined var: " + if_var, lineno(), YYText());
   if_var=YYText();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// amu_include
+////////////////////////////////////////////////////////////////////////////////
+
+/***************************************************************************//**
+
+  \details
+
+    Include a file into the current input stream, switch and process it
+    until its end, and then return to resume and complete the current.
+
+     options    | sc  | description
+    :----------:|:---:|:--------------------------------------
+     copy       | c   | copy the file contents to the output
+     no_switch  | n   | do not switch the input stream
+     search     | s   | search include paths for file
+
+    The options change the commands default behavior and are useful
+    during development and debugging. When using these options, they
+    are placed after the include command and before the opening
+    parentheses as shown in the example.
+
+    \b Example:
+    \code
+    \amu_include ( ${root}/path/file )
+
+    \amu_include copy no_switch ( ${root}/path/debuging )
+    \endcode
+
+*******************************************************************************/
+void
+ODIF::ODIF_Scanner::inc_init(void)
+{
+  apt_clear();
+  apt();
+
+  inc_text.clear();
+
+  inc_copy = false;
+  inc_switch = true;
+  inc_search = false;
+
+  inc_bline = lineno();
+}
+
+void
+ODIF::ODIF_Scanner::inc_end(void)
+{
+  inc_eline = lineno();
+
+  // unquote and expand variables in argument text
+  string file_arg = varm.expand_text( UTIL::unquote_trim( inc_text ) );
+
+  string file_inc;
+
+  if ( inc_search )
+  { // search for include file
+    bool found = false;
+    file_inc = file_rl( file_arg, NO_FORMAT_OUTPUT, found );
+
+    if ( ! found  )
+      error( "unable to find file" , lineno(), file_arg, true );
+  }
+  else
+  {  // use named argument
+    file_inc = file_arg;
+  }
+
+  // copy file to output
+  if ( inc_copy )
+  {
+    ifstream ifs( file_inc.c_str() );
+
+    if ( ! ifs.is_open() )
+      error( "unable to read file" , lineno(), file_arg, true );
+
+    string line;
+    while ( !ifs.eof() )
+    {
+      getline( ifs, line );
+      scanner_output( line + "\n" );
+    }
+
+    ifs.close();
+  }
+
+  // switch stream to file
+  if ( inc_switch )
+    start_file( file_inc );
+
+  inc_text.clear();
+
+  // output blank lines to maintain file length when definitions are
+  // broken across multiple lines (don't begin and end on the same line).
+  for(size_t i=inc_bline; i<inc_eline; i++) scanner_output("\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

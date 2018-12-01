@@ -612,7 +612,7 @@ ODIF::ODIF_Scanner::bif_scope(void)
 /***************************************************************************//**
   \details
 
-    Return information about source input file.
+    Return information about input file components.
 
     The options and flags (and their short codes) are summarized in the
     following tables.
@@ -680,13 +680,13 @@ ODIF::ODIF_Scanner::bif_source(void)
   { // get absolute path
     path_type = "absolute";
 
-    input_path = input_name;
+    input_path = get_input_name( true );
   }
   else
   { // get relative path
     path_type = "relative";
 
-    input_path = input_name;
+    input_path = get_input_name( true );
     input_path = UTIL::get_relative_path(input_path, bfs::current_path());
   }
 
