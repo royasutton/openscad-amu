@@ -198,12 +198,14 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 
 <AMUFNAQS>\'                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
 <AMUFNAQD>\"                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
+
 <AMUFNAQS,AMUFNAQD>\\\'           { apt(); fx_app_qarg_escaped(); }
 <AMUFNAQS,AMUFNAQD>\\\"           { apt(); fx_app_qarg_escaped(); }
 <AMUFNAQS,AMUFNAQD>\\{id_var}     { apt(); fx_app_qarg_escaped(); }
 <AMUFNAQS,AMUFNAQD>{id_var}       { apt(); fx_app_qarg_expanded(); }
 <AMUFNAQS,AMUFNAQD>{nr}           { apt(); fx_app_qarg(); }
 <AMUFNAQS,AMUFNAQD>.              { apt(); fx_app_qarg(); }
+
 <AMUFNAQS><<EOF>>                 { error("unterminated single quote", fi_bline); }
 <AMUFNAQD><<EOF>>                 { error("unterminated double quote", fi_bline); }
 
