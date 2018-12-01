@@ -123,35 +123,24 @@ ODIF::ODIF_Scanner::start_file( const string file )
   if ( !ifs->good() )
     error( "unable to open input file", lineno(), file, true );
 
-  // get relative path name for file with root path
-  string file_relative_path;
-
-  bfs::path ifap = file;
-  if ( ifap.has_root_path() )
-  {
-    bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
-    file_relative_path = ifrp.string();
-  }
-  else
-  {
-    file_relative_path = file;
-  }
+  // get canonical file path
+  string file_path = bfs::canonical( bfs::path(file) ).string();
 
   // append to ${FILE_LIST}
   string list = varm.expand( varm.get_prefix() + "FILE_LIST" + varm.get_suffix() );
   if ( list.length() ) list += " ";
-  list += file_relative_path;
+  list += file_path;
   varm.store( "FILE_LIST", list );
 
   // update ${FILE_CURRENT}
-  varm.store( "FILE_CURRENT", file_relative_path );
+  varm.store( "FILE_CURRENT", file_path );
 
   // save line number update of current stream if it exists
   if ( ! ifs_v.empty() )
     ifs_v.back().line = yylineno;
 
   // add next stream to back of input stream vector
-  ifs_s ifs_next = { file_relative_path, ifs, 1 };
+  ifs_s ifs_next = { file_path, ifs, 1 };
   ifs_v.push_back( ifs_next );
 
   // reset line number count for next file
