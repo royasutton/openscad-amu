@@ -64,7 +64,7 @@ using namespace std;
 %s AMUFN AMUFNARG AMUFNAQS AMUFNAQD
 %s AMUINC AMUINCFILE
 %s AMUDEF AMUDEFARG
-%s AMUIF AMUIFEXPR AMUIFTEXT AMUIFTEXTBLOCK AMUIFELSE
+%s AMUIF AMUIFEXPR AMUIFTEXT AMUIFTEXTBLCK AMUIFELSE
 
   /* comments and whitespace */
 
@@ -269,18 +269,18 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUIFEXPR><<EOF>>                { error("unterminated if expression", if_bline); }
 
 <AMUIFTEXT>{id_var}               { apt(); if_get_var_text(); if_end_case(); BEGIN(AMUIFELSE); }
-<AMUIFTEXT>\{                     { apt(); BEGIN(AMUIFTEXTBLOCK); }
+<AMUIFTEXT>\{                     { apt(); BEGIN(AMUIFTEXTBLCK); }
 <AMUIFTEXT>{ws}+                  { apt(); }
 <AMUIFTEXT>{nr}                   { apt(); }
 <AMUIFTEXT>.                      { error("in if case body", lineno(), YYText()); }
 <AMUIFTEXT><<EOF>>                { error("unterminated if case body", if_bline); }
 
-<AMUIFTEXTBLOCK>{id_var}          { apt(); if_app(); }
-<AMUIFTEXTBLOCK>\}                { apt(); if_end_case(); BEGIN(AMUIFELSE); }
-<AMUIFTEXTBLOCK>\\{nr}            { apt(); if_app(""); }
-<AMUIFTEXTBLOCK>{nr}              { apt(); if_app(); }
-<AMUIFTEXTBLOCK>.                 { apt(); if_app(); }
-<AMUIFTEXTBLOCK><<EOF>>           { error("unterminated if case body block", if_bline); }
+<AMUIFTEXTBLCK>{id_var}           { apt(); if_app(); }
+<AMUIFTEXTBLCK>\}                 { apt(); if_end_case(); BEGIN(AMUIFELSE); }
+<AMUIFTEXTBLCK>\\{nr}             { apt(); if_app(""); }
+<AMUIFTEXTBLCK>{nr}               { apt(); if_app(); }
+<AMUIFTEXTBLCK>.                  { apt(); if_app(); }
+<AMUIFTEXTBLCK><<EOF>>            { error("unterminated if case body block", if_bline); }
 
 <AMUIFELSE>"else"{wsnr}*"if"      { apt(); BEGIN(AMUIF);}
 <AMUIFELSE>"else"                 { apt(); if_init_case(false); BEGIN(AMUIFTEXT);}
