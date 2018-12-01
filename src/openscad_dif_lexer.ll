@@ -3,7 +3,7 @@
   \file   openscad_dif_lexer.ll
 
   \author Roy Allen Sutton
-  \date   2016-2017
+  \date   2016-2018
 
   \copyright
 
@@ -60,7 +60,7 @@ using namespace std;
 
   /* scanner states */
 
-%s COMMENT COMMENTLN
+%s COMBLCK COMLINE
 %s AMUFN AMUFNARG AMUFNAQS AMUFNAQD
 %s AMUINC AMUINCFILE
 %s AMUDEF AMUDEFARG
@@ -125,41 +125,42 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 
   /*
     outside of comments:
-      (1) replace OpenSCAD commands with C equivalents,
-      (2) output everything else unchanged
+      + replace OpenSCAD commands with C equivalents,
+      + output everything else unchanged
   */
 
-<INITIAL>{comment_open}           { scanner_echo(); yy_push_state(COMMENT); }
-<INITIAL>{comment_line}           { scanner_echo(); yy_push_state(COMMENTLN); }
+<INITIAL>{comment_open}           { scanner_echo(); yy_push_state(COMBLCK); }
+<INITIAL>{comment_line}           { scanner_echo(); yy_push_state(COMLINE); }
 <INITIAL>include                  { scanner_output( "#include", 8 ); }
 <INITIAL>use                      { scanner_output( "#include", 8 ); }
 <INITIAL>{nr}                     { scanner_echo(); }
 <INITIAL>.                        { scanner_echo(); }
 
   /*
-    inside comment block:
-      (1) match and handle amu functions
-      (2) output everything else unchanged
+    comments:
+      + escaped amu function reduction
+      + match and handle amu functions
+      + output everything else unchanged
+
+    inside block:
+      + output new lines
+      + exit comment when block is closed
+
+    on line:
+      + exit comment at end of line
   */
 
-<COMMENT>{comment_close}          { scanner_echo(); yy_pop_state(); }
-<COMMENT>{amu_esc}                { /* remove escape char, output the rest */
-                                    string mt = YYText();
-                                    scanner_output( mt.substr(1,mt.length()-1) ); }
-<COMMENT>{amu_include}            { inc_init(); yy_push_state(AMUINC); }
-<COMMENT>{amu_define}             { def_init(); yy_push_state(AMUDEF); }
-<COMMENT>{amu_if}                 { if_init(); yy_push_state(AMUIF); }
-<COMMENT>{amu_bif}                { fx_init(); yy_push_state(AMUFN); }
-<COMMENT>{nr}                     { scanner_echo(); }
-<COMMENT>.                        { scanner_echo(); }
+<COMBLCK,COMLINE>{amu_esc}        { fx_remove_esc(); }
+<COMBLCK,COMLINE>{amu_include}    { inc_init(); yy_push_state(AMUINC); }
+<COMBLCK,COMLINE>{amu_define}     { def_init(); yy_push_state(AMUDEF); }
+<COMBLCK,COMLINE>{amu_if}         { if_init(); yy_push_state(AMUIF); }
+<COMBLCK,COMLINE>{amu_bif}        { fx_init(); yy_push_state(AMUFN); }
+<COMBLCK,COMLINE>.                { scanner_echo(); }
 
-  /*
-    on comment line, outside of comment block:
-      (1) output everything unchanged until end of line
-  */
+<COMBLCK>{nr}                     { scanner_echo(); }
+<COMBLCK>{comment_close}          { scanner_echo(); yy_pop_state(); }
 
-<COMMENTLN>{nr}                   { scanner_echo(); yy_pop_state(); }
-<COMMENTLN>.                      { scanner_echo(); }
+<COMLINE>{nr}                     { scanner_echo(); yy_pop_state(); }
 
   /*
     amu_bif:

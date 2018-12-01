@@ -252,6 +252,10 @@ class ODIF_Scanner : public yyFlexLexer{
     size_t      fi_bline;               //!< beginning line of parsed amu function.
     size_t      fi_eline;               //!< ending line of parsed amu function.
 
+    //! remove escape char from amu_* function.
+    void fx_remove_esc(void)  { std::string t = YYText();
+                                scanner_output( t.substr(1,t.length()-1) ); }
+
     //! begin amu builtin function handler
     void fx_init(void);
     //! end amu builtin function handler
