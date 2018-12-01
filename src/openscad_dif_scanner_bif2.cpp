@@ -354,7 +354,7 @@ ODIF::ODIF_Scanner::bif_find(void)
 /***************************************************************************//**
   \details
 
-    Return information about input path components.
+    Return information about initial input path components.
 
     The options and flags (and their short codes) are summarized in the
     following tables.
