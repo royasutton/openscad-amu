@@ -33,8 +33,10 @@
 #include "openscad_dif_scanner.hpp"
 
 #include <boost/filesystem.hpp>
+#include <boost/assign/list_of.hpp>
 
 #include <set>
+// #include <map>
 
 #if defined(HAVE_CONFIG_H)
 #include "config.h"
@@ -279,103 +281,47 @@ ODIF::ODIF_Scanner::fx_end(void)
 {
   fi_eline = lineno();
 
-  string result;
-  bool has_result = false;
+  // prototype of build-in function: string functionname( void );
+  typedef map< string, string (ODIF::ODIF_Scanner::*)(void) > function_table_type;
 
-  /* check build-in functions */
-  if      (fx_name.compare("eval")==0)
-  {
-    has_result=true;
-    result=bif_eval();
-  }
-  else if (fx_name.compare("shell")==0)
-  {
-    has_result=true;
-    result=bif_shell();
-  }
-  else if (fx_name.compare("combine")==0)
-  {
-    has_result=true;
-    result=bif_combine();
-  }
-  else if (fx_name.compare("table")==0)
-  {
-    has_result=true;
-    result=bif_table();
-  }
-  else if (fx_name.compare("image_table")==0)
-  {
-    has_result=true;
-    result=bif_image_table();
-  }
-  else if (fx_name.compare("viewer")==0)
-  {
-    has_result=true;
-    result=bif_viewer();
-  }
-  else if (fx_name.compare("make")==0)
-  {
-    has_result=true;
-    result=bif_make();
-  }
-  else if (fx_name.compare("copy")==0)
-  {
-    has_result=true;
-    result=bif_copy();
-  }
-  else if (fx_name.compare("find")==0)
-  {
-    has_result=true;
-    result=bif_find();
-  }
-  else if (fx_name.compare("scope")==0)
-  {
-    has_result=true;
-    result=bif_scope();
-  }
-  else if (fx_name.compare("source")==0)
-  {
-    has_result=true;
-    result=bif_source();
-  }
-  else if (fx_name.compare("pathid")==0)
-  {
-    has_result=true;
-    result=bif_pathid();
-  }
-  else if (fx_name.compare("filename")==0)
-  {
-    has_result=true;
-    result=bif_filename();
-  }
-  else if (fx_name.compare("replace")==0)
-  {
-    has_result=true;
-    result=bif_replace();
-  }
-  else if (fx_name.compare("word")==0)
-  {
-    has_result=true;
-    result=bif_word();
-  }
-  else if (fx_name.compare("seq")==0)
-  {
-    has_result=true;
-    result=bif_seq();
-  }
-  else if (fx_name.compare("file")==0)
-  {
-    has_result=true;
-    result=bif_file();
-  }
-  else if (fx_name.compare("foreach")==0)
-  {
-    has_result=true;
-    result=bif_foreach();
+  // function jump table
+  static function_table_type function_table = boost::assign::map_list_of
+      ("combine",       &ODIF::ODIF_Scanner::bif_combine)
+      ("copy",          &ODIF::ODIF_Scanner::bif_copy)
+      ("eval",          &ODIF::ODIF_Scanner::bif_eval)
+      ("file",          &ODIF::ODIF_Scanner::bif_file)
+      ("filename",      &ODIF::ODIF_Scanner::bif_filename)
+      ("find",          &ODIF::ODIF_Scanner::bif_find)
+      ("foreach",       &ODIF::ODIF_Scanner::bif_foreach)
+      ("image_table",   &ODIF::ODIF_Scanner::bif_image_table)
+      ("make",          &ODIF::ODIF_Scanner::bif_make)
+      ("pathid",        &ODIF::ODIF_Scanner::bif_pathid)
+      ("replace",       &ODIF::ODIF_Scanner::bif_replace)
+      ("scope",         &ODIF::ODIF_Scanner::bif_scope)
+      ("seq",           &ODIF::ODIF_Scanner::bif_seq)
+      ("shell",         &ODIF::ODIF_Scanner::bif_shell)
+      ("source",        &ODIF::ODIF_Scanner::bif_source)
+      ("table",         &ODIF::ODIF_Scanner::bif_table)
+      ("viewer",        &ODIF::ODIF_Scanner::bif_viewer)
+      ("word",          &ODIF::ODIF_Scanner::bif_word)
+  ;
+
+  string result;
+  bool success = false;
+
+  //
+  // locate and call named function
+  //
+
+  function_table_type::iterator entry = function_table.find ( fx_name );
+  if ( entry != function_table.end() )
+  { // found in function table
+    result = (this->*(entry->second))();
+    success = true;
   }
   else
   {
-    /* check external function */
+    /* check external functions */
     bfs::path exfx_path;
 
     exfx_path  = lib_path;
@@ -397,7 +343,7 @@ ODIF::ODIF_Scanner::fx_end(void)
         }
 
         filter_debug( scmd );
-        UTIL::sys_command( scmd, result, has_result, false, false );
+        UTIL::sys_command( scmd, result, success, false, false );
       }
       else
       {
@@ -411,7 +357,7 @@ ODIF::ODIF_Scanner::fx_end(void)
     }
   }
 
-  if ( has_result )
+  if ( success )
   {
     // output result to scanner or store to variable map
     if ( fx_var.length() == 0 )
