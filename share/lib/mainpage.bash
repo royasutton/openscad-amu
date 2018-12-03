@@ -104,8 +104,8 @@
 
   [OpenSCAD]: http://www.openscad.org/
 
-  [Doxygen]: http://www.stack.nl/~dimitri/doxygen/index.html
-  [special commands]: http://www.stack.nl/~dimitri/doxygen/manual/commands.html
+  [Doxygen]: http://www.doxygen.nl
+  [special commands]: http://www.doxygen.nl/manual/commands.html
 
   [html-example]: ../../../examples/build/html/index.html
   [pdf-example]: ../../../examples/build/latex/refman.pdf
@@ -183,7 +183,7 @@
         }
 
         g  [shape=box peripheries=2 style="filled" label="openscad-dif\n(Doxygen filter)" URL="\ref openscad_dif_ht"];
-        h  [shape=box peripheries=2 label="Doxygen" URL="http://www.stack.nl/~dimitri/doxygen"];
+        h  [shape=box peripheries=2 label="Doxygen" URL="http://www.doxygen.nl"];
         i  [shape=folder label="Generated\nDocumentation\nhtml, pdf, etc." URL="../../../examples/build/html/index.html"];
 
         a2->{b g}; a3->h; b->{c d};
@@ -228,7 +228,7 @@
 
     [openscad-amu]: https://royasutton.github.io/openscad-amu
     [OpenSCAD]: http://www.openscad.org
-    [Doxygen]: http://www.stack.nl/~dimitri/doxygen
+    [Doxygen]: http://www.doxygen.nl
     [GNU Make]: https://www.gnu.org/software/make
     [GNU Bash]: https://www.gnu.org/software/bash
 ###############################################################################/

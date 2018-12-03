@@ -140,7 +140,7 @@
         cell_urls="
           http://www.openscad.org
           https://royasutton.github.io/openscad-amu
-          http://www.stack.nl/~dimitri/doxygen
+          http://www.doxygen.nl
           https://www.gnu.org/software/make
         "
       )

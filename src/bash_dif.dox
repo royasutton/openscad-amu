@@ -20,7 +20,7 @@
   See [Documenting the code][docblocks] in the Doxygen manual for
   information.
 
-  [docblocks]: http://www.stack.nl/~dimitri/doxygen/manual/docblocks.html
+  [docblocks]: http://www.doxygen.nl/manual/docblocks.html
 
 
   \subsection bash_dif_sm_cs Comment Sections
@@ -52,7 +52,7 @@
   | \\aparami <type> id             | function parameter input
   | \\aparamo <type> id             | function parameter output
 
-  [special commands]: http://www.stack.nl/~dimitri/doxygen/manual/commands.html
+  [special commands]: http://www.doxygen.nl/manual/commands.html
 
 
   \subsection bash_dif_sm_me Example Markup

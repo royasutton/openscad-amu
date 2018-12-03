@@ -20,7 +20,7 @@
   Doygen. See [Documenting the code][docblocks] in the Doxygen manual
   for information.
 
-  [docblocks]: http://www.stack.nl/~dimitri/doxygen/manual/docblocks.html
+  [docblocks]: http://www.doxygen.nl/manual/docblocks.html
 
 
   \subsection openscad_dif_sm_cs Comment Sections
@@ -150,7 +150,7 @@
   | \\amu_date                        | current date and/or time
   | \\amu_list                        | format arguments into a list
 
-  [special commands]: http://www.stack.nl/~dimitri/doxygen/manual/commands.html
+  [special commands]: http://www.doxygen.nl/manual/commands.html
 
 
   \subsection openscad_dif_sm_me Example Markup

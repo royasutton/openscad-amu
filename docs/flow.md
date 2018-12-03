@@ -21,7 +21,7 @@ example [Library Documentation] index.
 
 [openscad-amu]: https://royasutton.github.io/openscad-amu
 [OpenSCAD]: http://www.openscad.org
-[Doxygen]: http://www.stack.nl/~dimitri/doxygen
+[Doxygen]: http://www.doxygen.nl
 [GNU Make]: https://www.gnu.org/software/make
 [GNU Bash]: https://www.gnu.org/software/bash
 
