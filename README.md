@@ -171,7 +171,7 @@ you can contact the maintainer of the project or file an [issue].
 
 [OpenSCAD]: http://www.openscad.org/
 
-[Doxygen]: http://www.stack.nl/~dimitri/doxygen/index.html
+[Doxygen]: http://www.doxygen.nl
 
 [git]: http://git-scm.com/
 [GitHub]: http://github.com/

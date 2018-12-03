@@ -20,7 +20,7 @@
   Doygen. See [Documenting the code][docblocks] in the Doxygen manual
   for information.
 
-  [docblocks]: http://www.stack.nl/~dimitri/doxygen/manual/docblocks.html
+  [docblocks]: http://www.doxygen.nl/manual/docblocks.html
 
 
   \subsection openscad_dif_sm_cs Comment Sections
@@ -30,25 +30,20 @@
   information.
 
    pattern    | description
-  :----------:|:--------------------------------
-   "//"       | comment. ignored by filter.
-   "//"[/!]?  | documentation pass to Doxygen.
-   "/*"[*!]?  | open a comment block.
-   "*"+"/"    | close comment block.
+  :----------:|:--------------------------------------
+   "//"       | ignored comment lines.
+   "//"[/!]?  | comment line.
+   "/*"[*!]?  | begin a comment block.
+   "*"+"/"    | end comment block.
+   "/""+"+    | begin a nested comment block.
+   "+"+"/"    | end nested comment block.
 
-  The filter provides additional command functions that take the form:
+  The filter supports nested comments which are useful for documenting
+  the bahavior of include files and macros. A single level of nesting
+  is permitted and must exists within a normal comment blocks. The
+  content of nested comment blocks is discarded by the filter.
 
-  \code{.C}
-  \amu_<function> <variable> ( <arguments> )
-  \endcode
-
-  The \em variable must be the first word that follows the function name,
-  but does not have to be on the same line if present. The \em arguments,
-  including the opening and closing parenthesis can also be split across
-  any number of lines. The \em arguments may be blank, however, the
-  parenthesis are required.
-
-  [patterns]: http://flex.sourceforge.net/manual/Patterns.html
+  [patterns]: https://westes.github.io/flex/manual/Patterns.html
 
 
   \subsection openscad_dif_sm_v Variabes
@@ -66,7 +61,7 @@
   The following table list the predefined variables.
 
    name               | description
-  :-------------------|:------------------------------
+  :-------------------|:----------------------------------
    EFS                | amu_eval feild separator
    ABS_FILE_NAME      | absolute input file file name
    ABS_PATH_NAME      | absolute input file path name
@@ -75,6 +70,8 @@
    BASE_NAME          | input file base name
    STEM_NAME          | input file stem name
    EXTN_AME           | input file extension name
+   FILE_CURRENT       | current input file name
+   FILE_LIST          | list of all included input files
 
 
   \subsection openscad_dif_sm_a Arguments
@@ -102,6 +99,18 @@
 
   \subsection openscad_dif_sm_adc Doxygen Commands Summary
 
+  The filter provides additional command functions that take the form:
+
+  \code{.C}
+  \amu_<function> <variable> ( <arguments> )
+  \endcode
+
+  The \em variable must be the first word that follows the function
+  name, but does not have to be on the same line if present. The \em
+  arguments, including the opening and closing parenthesis can also be
+  split across any number of lines. The \em arguments may be blank,
+  however, the parenthesis are required.
+
   In addition to the normal Doxygen [special commands], here is a list
   of additional filter-provided commands that can be used for document
   markup. The documentation for these commands may be found in section
@@ -109,6 +118,7 @@
 
   | internal commands               | description
   |:--------------------------------|:------------------------------------
+  | \ref dif_afc_amu_include        | Include a file into input
   | \ref dif_afc_amu_define         | Define text macro
   | \ref dif_afc_amu_if             | Conditional text output
   | \ref dif_afc_amu_foreach        | Enumerated textual substitution
@@ -140,7 +150,7 @@
   | \\amu_date                        | current date and/or time
   | \\amu_list                        | format arguments into a list
 
-  [special commands]: http://www.stack.nl/~dimitri/doxygen/manual/commands.html
+  [special commands]: http://www.doxygen.nl/manual/commands.html
 
 
   \subsection openscad_dif_sm_me Example Markup
@@ -165,6 +175,9 @@
    module example() { }
 
   /***************************************************************//**
+   *
+   *      /+   This note will be removed by the filter. +/
+   *
    * \page imt Image Table
    *
    * \amu_define  var1  ( table_of_all )
@@ -244,6 +257,9 @@
 
     \subsection dif_afc_amu_image_table \\amu_image_table
     \copydetails ODIF::ODIF_Scanner::bif_image_table()
+
+    \subsection dif_afc_amu_include \\amu_include
+    \copydetails ODIF::ODIF_Scanner::inc_init()
 
     \subsection dif_afc_amu_make \\amu_make
     \copydetails ODIF::ODIF_Scanner::bif_make()

@@ -141,8 +141,8 @@ you can contact the maintainer of the project or file an [issue].
 
 [OpenSCAD]: http://www.openscad.org/
 
-[Doxygen]: http://www.stack.nl/~dimitri/doxygen/index.html
-[special commands]: http://www.stack.nl/~dimitri/doxygen/manual/commands.html
+[Doxygen]: http://www.doxygen.nl
+[special commands]: http://www.doxygen.nl/manual/commands.html
 
 [git]: http://git-scm.com/
 [GitHub]: http://github.com/
