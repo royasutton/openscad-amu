@@ -60,17 +60,23 @@ using namespace std;
 
   /* scanner states */
 
-%s COMBLCK COMLINE
+%s COMBLCK COMLINE COMNEST
 %s AMUFN AMUFNARG AMUFNAQS AMUFNAQD
 %s AMUINC AMUINCFILE
 %s AMUDEF AMUDEFARG
 %s AMUIF AMUIFEXPR AMUIFTEXT AMUIFTEXTBLCK AMUIFELSE
 
-  /* comments and whitespace */
+  /* comment lines, blocks, and nested blocks */
 
-comment_line                      "//"[/!]?
-comment_open                      "/*"[*!]?
-comment_close                     "*"+"/"
+com_line                          "//"[/!]?
+
+com_blck_open                     "/*"[*!]?
+com_blck_clse                     "*"+"/"
+
+com_nest_open                     "/""+"+
+com_nest_clse                     "+"+"/"
+
+  /* whitespace */
 
 ws                                [ \t]
 nr                                [\n\r]
@@ -129,8 +135,8 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
       + output everything else unchanged
   */
 
-<INITIAL>{comment_open}           { scanner_echo(); yy_push_state(COMBLCK); }
-<INITIAL>{comment_line}           { scanner_echo(); yy_push_state(COMLINE); }
+<INITIAL>{com_blck_open}          { scanner_echo(); yy_push_state(COMBLCK); }
+<INITIAL>{com_line}               { scanner_echo(); yy_push_state(COMLINE); }
 <INITIAL>include                  { scanner_output( "#include", 8 ); }
 <INITIAL>use                      { scanner_output( "#include", 8 ); }
 <INITIAL>{nr}                     { scanner_echo(); }
@@ -157,10 +163,22 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <COMBLCK,COMLINE>{amu_bif}        { fx_init(); yy_push_state(AMUFN); }
 <COMBLCK,COMLINE>.                { scanner_echo(); }
 
+<COMBLCK>{com_nest_open}          { nc_init(); yy_push_state(COMNEST); }
 <COMBLCK>{nr}                     { scanner_echo(); }
-<COMBLCK>{comment_close}          { scanner_echo(); yy_pop_state(); }
+<COMBLCK>{com_blck_clse}          { scanner_echo(); yy_pop_state(); }
 
 <COMLINE>{nr}                     { scanner_echo(); yy_pop_state(); }
+
+  /*
+    nested comments:
+      + output nothing
+      + exit comment when block is closed
+  */
+
+<COMNEST>{com_nest_clse}          { nc_end(); yy_pop_state(); }
+<COMNEST>{nr}                     { }
+<COMNEST>.                        { }
+<COMNEST><<EOF>>                  { abort("unterminated nested comment block", nc_bline); }
 
   /*
     amu_bif:
@@ -190,7 +208,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNARG>{ws}+                   { apt(); }
 <AMUFNARG>{nr}                    { apt(); }
 <AMUFNARG>.                       { error("in function arguments", lineno(), YYText()); }
-<AMUFNARG><<EOF>>                 { error("unterminated function arguments", fi_bline); }
+<AMUFNARG><<EOF>>                 { abort("unterminated function arguments", fi_bline); }
 
   /*
     amu function single and double quoted arguments:
@@ -206,8 +224,8 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNAQS,AMUFNAQD>{nr}           { apt(); fx_app_qarg(); }
 <AMUFNAQS,AMUFNAQD>.              { apt(); fx_app_qarg(); }
 
-<AMUFNAQS><<EOF>>                 { error("unterminated single quote", fi_bline); }
-<AMUFNAQD><<EOF>>                 { error("unterminated double quote", fi_bline); }
+<AMUFNAQS><<EOF>>                 { abort("unterminated single quote", fi_bline); }
+<AMUFNAQD><<EOF>>                 { abort("unterminated double quote", fi_bline); }
 
   /*
     amu_include:
@@ -226,7 +244,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUINCFILE>\\{nr}                { apt(); inc_app(""); }
 <AMUINCFILE>{nr}                  { apt(); inc_app(); }
 <AMUINCFILE>.                     { apt(); inc_app(); }
-<AMUINCFILE><<EOF>>               { error("unterminated include filename", inc_bline); }
+<AMUINCFILE><<EOF>>               { abort("unterminated include filename", inc_bline); }
 
   /*
     amu_define:
@@ -243,7 +261,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUDEFARG>\\{nr}                 { apt(); def_app(""); }
 <AMUDEFARG>{nr}                   { apt(); def_app(); }
 <AMUDEFARG>.                      { apt(); def_app(); }
-<AMUDEFARG><<EOF>>                { error("unterminated define arguments", def_bline); }
+<AMUDEFARG><<EOF>>                { abort("unterminated define arguments", def_bline); }
 
   /*
     amu_if:
@@ -268,21 +286,21 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUIFEXPR>{ws}+                  { apt(); }
 <AMUIFEXPR>{nr}                   { apt(); }
 <AMUIFEXPR>.                      { error("in if expression", lineno(), YYText()); }
-<AMUIFEXPR><<EOF>>                { error("unterminated if expression", if_bline); }
+<AMUIFEXPR><<EOF>>                { abort("unterminated if expression", if_bline); }
 
 <AMUIFTEXT>{id_var}               { apt(); if_get_var_text(); if_end_case(); BEGIN(AMUIFELSE); }
 <AMUIFTEXT>\{                     { apt(); BEGIN(AMUIFTEXTBLCK); }
 <AMUIFTEXT>{ws}+                  { apt(); }
 <AMUIFTEXT>{nr}                   { apt(); }
 <AMUIFTEXT>.                      { error("in if case body", lineno(), YYText()); }
-<AMUIFTEXT><<EOF>>                { error("unterminated if case body", if_bline); }
+<AMUIFTEXT><<EOF>>                { abort("unterminated if case body", if_bline); }
 
 <AMUIFTEXTBLCK>{id_var}           { apt(); if_app(); }
 <AMUIFTEXTBLCK>\}                 { apt(); if_end_case(); BEGIN(AMUIFELSE); }
 <AMUIFTEXTBLCK>\\{nr}             { apt(); if_app(""); }
 <AMUIFTEXTBLCK>{nr}               { apt(); if_app(); }
 <AMUIFTEXTBLCK>.                  { apt(); if_app(); }
-<AMUIFTEXTBLCK><<EOF>>            { error("unterminated if case body block", if_bline); }
+<AMUIFTEXTBLCK><<EOF>>            { abort("unterminated if case body block", if_bline); }
 
 <AMUIFELSE>"else"{wsnr}*"if"      { apt(); BEGIN(AMUIF);}
 <AMUIFELSE>"else"                 { apt(); if_init_case(false); BEGIN(AMUIFTEXT);}
@@ -290,7 +308,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUIFELSE>{ws}+                  { apt(); }
 <AMUIFELSE>{nr}                   { apt(); }
 <AMUIFELSE>.                      { error("in if else", lineno(), YYText()); }
-<AMUIFELSE><<EOF>>                { error("unterminated if", if_bline); }
+<AMUIFELSE><<EOF>>                { abort("unterminated if", if_bline); }
 
 %%
 

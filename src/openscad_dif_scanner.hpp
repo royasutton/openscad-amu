@@ -225,6 +225,9 @@ class ODIF_Scanner : public yyFlexLexer{
     //! output the error message m to stderr and the scanner output with optional abort.
     void error(const std::string& m, const int &n = 0,
                const std::string &t = "", bool a = false);
+    //! output the error message m to stderr and the scanner output and abort.
+    void abort(const std::string& m, const int &n = 0,
+               const std::string &t = "") { error(m, n, t, true); }
 
     //! generate standard error message string with message m.
     std::string amu_error_msg(const std::string& m);
@@ -373,6 +376,17 @@ class ODIF_Scanner : public yyFlexLexer{
     void inc_set_switch(bool s) { inc_switch=s; }
     //! set include behavior state variable.
     void inc_set_search(bool s) { inc_search=s; }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // nested comment block
+  //////////////////////////////////////////////////////////////////////////////
+    size_t      nc_bline;               //!< beginning line of nested comment block.
+    size_t      nc_eline;               //!< ending line of nested comment block.
+
+    //! begin nested comment block handler.
+    void nc_init(void);
+    //! end nested comment block handler.
+    void nc_end(void);
 
   //////////////////////////////////////////////////////////////////////////////
   // utility

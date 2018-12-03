@@ -123,7 +123,7 @@ ODIF::ODIF_Scanner::start_file( const string file )
   ifs->open( file.c_str() );
 
   if ( !ifs->good() )
-    error( "unable to open input file", lineno(), file, true );
+    abort( "unable to open input file", lineno(), file );
 
   // get canonical file path
   string file_path = bfs::canonical( bfs::path(file) ).string();
@@ -817,7 +817,7 @@ ODIF::ODIF_Scanner::inc_end(void)
     file_inc = file_rl( file_arg, NO_FORMAT_OUTPUT, found );
 
     if ( ! found  )
-      error( "unable to find file" , lineno(), file_arg, true );
+      abort( "unable to find file" , lineno(), file_arg );
   }
   else
   {  // use named argument
@@ -830,7 +830,7 @@ ODIF::ODIF_Scanner::inc_end(void)
     ifstream ifs( file_inc.c_str() );
 
     if ( ! ifs.is_open() )
-      error( "unable to read file" , lineno(), file_arg, true );
+      abort( "unable to read file" , lineno(), file_arg );
 
     string line;
     while ( !ifs.eof() )
@@ -851,6 +851,26 @@ ODIF::ODIF_Scanner::inc_end(void)
   // output blank lines to maintain file length when definitions are
   // broken across multiple lines (don't begin and end on the same line).
   for(size_t i=inc_bline; i<inc_eline; i++) scanner_output("\n");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// nested comment block
+////////////////////////////////////////////////////////////////////////////////
+
+void
+ODIF::ODIF_Scanner::nc_init(void)
+{
+  nc_bline = lineno();
+}
+
+void
+ODIF::ODIF_Scanner::nc_end(void)
+{
+  nc_eline = lineno();
+
+  // output blank lines to maintain file length when definitions are
+  // broken across multiple lines (don't begin and end on the same line).
+  for(size_t i=nc_bline; i<nc_eline; i++) scanner_output("\n");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -884,8 +904,6 @@ ODIF::ODIF_Scanner::filter_debug(
         scanner_output( "\\endif\n" );
       }
     }
-
-
 
     cerr << ops << "(line " << dec << lineno() << ") " << m << endl;
   }
