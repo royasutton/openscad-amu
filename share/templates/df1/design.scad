@@ -151,11 +151,6 @@
 
     Compiled: \amu_eval ( ${compiled} ).
 
-  \note design.scad contains global members, but library.scad does not.
-
-  \warning global members should ordinarily be avoided in libraries. using
-           modules and/or functions with parameters facilitates reuse.
-
   \todo remaining documentation.
 *******************************************************************************/
 
