@@ -114,6 +114,14 @@ void
 ODIF::ODIF_Scanner::update_varm(void)
 {
   // configuration variables
+  varm.store( "DOXYGEN_OUTPUT", get_doxygen_output() );
+  varm.store( "HTML_OUTPUT", get_html_output() );
+  varm.store( "LATEX_OUTPUT", get_latex_output() );
+  varm.store( "DOCBOOK_OUTPUT", get_docbook_output() );
+  varm.store( "RTF_OUTPUT", get_rtf_output() );
+
+  varm.store( "SCOPE_JOINER", get_scopejoiner() );
+
   varm.store( "OUTPUT_PREFIX", get_output_prefix() );
   varm.store( "OPENSCAD_PATH", get_openscad_path() );
   varm.store( "OPENSCAD_EXT", get_openscad_ext() );

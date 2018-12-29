@@ -91,9 +91,15 @@
 
    name               | description
   :-------------------|:----------------------------------
+   DOXYGEN_OUTPUT     | doxygen output rootpath
+   HTML_OUTPUT        | html output path name
+   LATEX_OUTPUT       | latex output path name
+   DOCBOOK_OUTPUT     | docbook output path name
+   RTF_OUTPUT         | rtf output path name
+   SCOPE_JOINER       | scope hierarchy joiner
    OUTPUT_PREFIX      | output prefix
-   OPENSCAD_PATH      | openscad path
-   OPENSCAD_EXT       | openscad extension
+   OPENSCAD_PATH      | openscad executable path
+   OPENSCAD_EXT       | openscad script extension
 
 
   \subsection openscad_dif_sm_a Arguments
