@@ -76,12 +76,13 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
   varm.set_report( true );
   varm.set_report_message("<tt><UNDEFINED></tt>");
 
+  //
+  // setup predefined environment variables
+  //
+
   // relative path name of the root input file 'f'
   bfs::path ifap = f;
   bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
-  // setup predefined environment variables
-  varm.store( "EFS", " " );
-
   // setup root file name variables
   varm.store( "ABS_FILE_NAME", ifap.string() );
   varm.store( "ABS_PATH_NAME", ifap.parent_path().string() );
@@ -91,13 +92,16 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
   varm.store( "STEM_NAME", ifrp.stem().string() );
   varm.store( "EXT_NAME", ifrp.extension().string() );
 
-  // initialize function argument positional prefix
-  fx_argv.clear();
-  fx_argv.set_prefix("arg");
+  // amu_eval feild separator
+  varm.store( "EFS", " " );
 
   // initialize include file variables
   varm.store( "FILE_CURRENT", "" );
   varm.store( "FILE_LIST", "" );
+
+  // initialize function argument positional prefix
+  fx_argv.clear();
+  fx_argv.set_prefix("arg");
 
   // clear the input file stream vector
   ifs_v.clear();
@@ -106,8 +110,13 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
   start_file( f );
 }
 
-ODIF::ODIF_Scanner::~ODIF_Scanner(void)
+void
+ODIF::ODIF_Scanner::update_varm(void)
 {
+  // configuration variables
+  varm.store( "OUTPUT_PREFIX", get_output_prefix() );
+  varm.store( "OPENSCAD_PATH", get_openscad_path() );
+  varm.store( "OPENSCAD_EXT", get_openscad_ext() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////

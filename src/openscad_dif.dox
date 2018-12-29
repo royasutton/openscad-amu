@@ -55,23 +55,45 @@
 
   These variables can be referenced in the context of other function
   \em arguments. A variable is referenced using the form:
-  <tt>${VAR}</tt>. Variable expansions are recursive and expansion can
-  be postponed using expansion escaping of the form: <tt>\\${VAR}</tt>.
+  <tt>${VAR}</tt>. Variable expansion is recursive and expansion can be
+  postponed using expansion escaping of the form: <tt>\\${VAR}</tt>.
 
-  The following table list the predefined variables.
+  \subsubsection openscad_dif_sm_av Automatic Variabes
+
+  The following tables list the predefined variables.
+
+  <b>Input File:</b>
+
+   name               | description
+  :-------------------|:----------------------------------
+   ABS_FILE_NAME      | absolute input file name
+   ABS_PATH_NAME      | absolute input path name
+   FILE_NAME          | input file name
+   PATH_NAME          | input file path name
+   BASE_NAME          | input file base name
+   STEM_NAME          | input file stem name
+   EXT_NAME           | input file extension name
+
+  <b>Include Files:</b>
+
+   name               | description
+  :-------------------|:----------------------------------
+   FILE_CURRENT       | current input file name
+   FILE_LIST          | list of all included input files
+
+  <b>Function Configuration:</b>
 
    name               | description
   :-------------------|:----------------------------------
    EFS                | amu_eval feild separator
-   ABS_FILE_NAME      | absolute input file file name
-   ABS_PATH_NAME      | absolute input file path name
-   FILE_NAME          | input file file name
-   PATH_NAME          | input file path name
-   BASE_NAME          | input file base name
-   STEM_NAME          | input file stem name
-   EXTN_AME           | input file extension name
-   FILE_CURRENT       | current input file name
-   FILE_LIST          | list of all included input files
+
+  <b>Seam Configuration:</b>
+
+   name               | description
+  :-------------------|:----------------------------------
+   OUTPUT_PREFIX      | output prefix
+   OPENSCAD_PATH      | openscad path
+   OPENSCAD_EXT       | openscad extension
 
 
   \subsection openscad_dif_sm_a Arguments
