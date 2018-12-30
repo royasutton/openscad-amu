@@ -465,7 +465,8 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
 
   // get the current value of the variable from the environment variable map
   long old_val = 0;
-  if ( varm.exists( vn ) ) {
+  if ( varm.exists( vn ) )
+  {
     string old_val_string = varm.expand("${" + vn + "}");
 
     if ( UTIL::is_number( old_val_string ) )
@@ -474,21 +475,21 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
 
   // update the variable value
   long new_val;
-  if ( op.compare("++") == 0 )  new_val = old_val + 1;
-  else                          new_val = old_val - 1;
+  if ( op.compare("++") == 0 )  new_val = old_val + 1;          // op='++'
+  else                          new_val = old_val - 1;          // op='--'
 
   // conditionally assign value the named function argument?
   if ( fx_argv.get_next_name().length() )
   {
-    if ( post )                 fx_argv.store( UTIL::to_string(old_val) );      // var++
-    else                        fx_argv.store( UTIL::to_string(new_val) );      // ++var
+    if ( post ) fx_argv.store( UTIL::to_string(old_val) );      // var++
+    else        fx_argv.store( UTIL::to_string(new_val) );      // ++var
   }
 
   // store variable:
   // var++ : as named function argument (name=count)
   // ++var : in the environment variable map
-  if ( post )                   varm.store( vn, UTIL::to_string(new_val) );     // var++
-  else                          fx_argv.store( vn, UTIL::to_string(new_val) );  // ++var
+  if ( post )   varm.store( vn, UTIL::to_string(new_val) );     // var++
+  else          fx_argv.store( vn, UTIL::to_string(new_val) );  // ++var
 }
 
 ////////////////////////////////////////////////////////////////////////////////
