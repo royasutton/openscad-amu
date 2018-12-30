@@ -42,7 +42,7 @@ using namespace std;
 /***************************************************************************//**
   \details
 
-    ### Single argument test functions ###
+    ### Single argument tests ###
 
     symbol  | test description
     :------:|:--------------------------------
@@ -87,7 +87,7 @@ ODIF::ODIF_Scanner::bif_if_exp_1a(string s)
 /***************************************************************************//**
   \details
 
-    ### Double argument test functions ###
+    ### Double argument tests ###
 
     symbol  | test description
     :------:|:----------------------------------------------

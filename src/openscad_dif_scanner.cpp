@@ -605,7 +605,7 @@ ODIF::ODIF_Scanner::def_set_var(void)
     expression1 is sufficient to determine the return value of the
     entire conditional expression.
 
-    Expression can be composed using several built-in test functions.
+    Expression can be composed using several built-in tests.
 
     \b Example:
     \code

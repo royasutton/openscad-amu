@@ -49,8 +49,8 @@
 
   \subsection openscad_dif_sm_acf AMU Functions
 
-  The filter provides additional Doxygen special command functions that
-  use the following form:
+  The filter provides additional Doxygen special commands/functions
+  that use the following form:
 
   \code
   \amu_NAME <variable> ( arguments ) { body }
