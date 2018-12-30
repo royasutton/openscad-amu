@@ -16,9 +16,9 @@
 
   \section openscad_dif_sm Documenting OpenSCAD scripts
 
-  This filter may be used to markup OpenSCAD scripts for use with
-  Doygen. See [Documenting the code][docblocks] in the Doxygen manual
-  for information.
+  This filter may be used to preprocess OpenSCAD scripts that have been
+  marked up with Doxygen-style documentation. See [Documenting the
+  code][docblocks] in the Doxygen manual for information.
 
   [docblocks]: http://www.doxygen.nl/manual/docblocks.html
 
@@ -38,29 +38,78 @@
    "/""+"+    | begin a nested comment block.
    "+"+"/"    | end nested comment block.
 
-  The filter supports nested comments which are useful for documenting
-  the bahavior of include files and macros. A single level of nesting
-  is permitted and must exists within a normal comment blocks. The
-  content of nested comment blocks is discarded by the filter.
+  As identified in the above table, the filter supports nested
+  comments, which are useful for documenting the bahavior of include
+  files and macros. A single level of nesting is permitted and must
+  exists within a normal comment block. The content of nested comment
+  blocks is discarded by the filter.
 
   [patterns]: https://westes.github.io/flex/manual/Patterns.html
 
 
-  \subsection openscad_dif_sm_v Variabes
+  \subsection openscad_dif_sm_acf AMU Functions
 
-  The result of a function will be copied to the output of the filter
-  operation unless a results variable name follows the function name.
-  When a variable name is provided, the command result is stored in the
-  specified variable and is not to copied to output.
+  The filter provides additional Doxygen special command functions that
+  use the following form:
 
-  These variables can be referenced in the context of other function
-  \em arguments. A variable is referenced using the form:
+  \code
+  \amu_NAME <variable> ( arguments ) { body }
+  \endcode
+
+  Where \em NAME is the function name, \em variable is an optional
+  output variable identifier, \em arguments are any function arguments,
+  and \em body is a specified text that the function will consider. The
+  parts of a function can be split across any number of lines.
+
+
+  \subsubsection openscad_dif_sm_v Variable
+
+  The result of most function will be copied to the output unless an
+  optional \em variable identifier follows the function name as shown
+  above. When a variable identifier is provided, the function result is
+  stored in the specified variable identifier and is not to copied to
+  output.
+
+  Variables can be referenced in the context of other function \em
+  arguments and \em bodies. A variable is referenced using the form:
   <tt>${VAR}</tt>. Variable expansion is recursive and expansion can be
-  postponed using expansion escaping of the form: <tt>\\${VAR}</tt>.
+  postponed using escaping as follows: <tt>\\${VAR}</tt>.
 
-  \subsubsection openscad_dif_sm_av Automatic Variabes
 
-  The following tables list the predefined variables.
+  \subsubsection openscad_dif_sm_a Arguments
+
+  The four types of arguments used in functions are summarized in the
+  following table:
+
+   type       | example           | scope
+  :-----------|:-----------------:|:------:
+   positional | value             | local
+   named      | name=value        | local
+   flag       | ++flag / \-\-flag | local
+   incr/decr  | var++ / var\-\-   | global
+
+  Except where noted, \p positional, \p named, and \p flag arguments
+  have \em local scope to the function where they are defined. The \p
+  incr/decr assigned values have \em global scope across all functions
+  for the current file. A named argument takes the form
+  <tt>name=value</tt>, where \p name is a variable identifier and \p
+  value is the content to assign. A single value must be identified by
+  matching single or double quotes when it contains one or more spaces.
+
+  \copydetails ODIF::ODIF_Scanner::fx_incr_arg()
+
+
+  \subsubsection openscad_dif_sm_b Body
+
+  Some functions, such as \ref dif_afc_amu_if operate on a specific
+  body of text. In those cases, the body is contained within a pair of
+  braces as shown in the function form above.
+
+
+  \subsubsection openscad_dif_sm_av Automatic Variables
+
+  The following tables list variables predefined or maintained by the
+  filter.
 
   <b>Input File:</b>
 
@@ -102,47 +151,12 @@
    OPENSCAD_EXT       | openscad script extension
 
 
-  \subsection openscad_dif_sm_a Arguments
-
-  There are four categories that are used  by functions as summarized
-  in the following table:
-
-   type       | example           | scope
-  :-----------|:-----------------:|:------:
-   positional | value             | local
-   named      | name=value        | local
-   flag       | ++flag / \-\-flag | local
-   incr/decr  | var++ / var\-\-   | global
-
-  Except where noted, \p positional, \p named, and \p flag assignments
-  types have \em local scope to the function where they are defined.
-  The \p incr/decr assigned values have \em global scope across all
-  functions for the current file. A named argument takes the form
-  <tt>name=value</tt>, where \p name is a variable identifier and \p
-  value is the content to assign. A single value must be identified by
-  matching single or double quotes when it contains one or more spaces.
-
-  \copydetails ODIF::ODIF_Scanner::fx_incr_arg()
-
-
-  \subsection openscad_dif_sm_adc Doxygen Commands Summary
-
-  The filter provides additional command functions that take the form:
-
-  \code{.C}
-  \amu_<function> <variable> ( <arguments> )
-  \endcode
-
-  The \em variable must be the first word that follows the function
-  name, but does not have to be on the same line if present. The \em
-  arguments, including the opening and closing parenthesis can also be
-  split across any number of lines. The \em arguments may be blank,
-  however, the parenthesis are required.
+  \subsection openscad_dif_sm_adc Doxygen Function Summary
 
   In addition to the normal Doxygen [special commands], here is a list
-  of additional filter-provided commands that can be used for document
-  markup. The documentation for these commands may be found in section
-  the \ref openscad_dif_sm_afc "additional commands".
+  of additional filter-provided command functions that can be used for
+  document markup. The documentation for these functions may be found
+  in section the \ref openscad_dif_sm_afc "filter commands".
 
   | internal commands               | description
   |:--------------------------------|:------------------------------------
@@ -169,7 +183,10 @@
   | \ref dif_afc_amu_viewer         | Graphics file viewer
 
   External commands also exists and can be found in the directory:
-  <tt><install-prefix>/functions/</tt>.
+
+  \code
+  <install-prefix>/functions/
+  \endcode
 
   Here is a list:
 
@@ -242,17 +259,17 @@
 
   External functions can be found at:
 
-  \code{.C}
-  <install-prefix>/functions/amu_<function>
+  \code
+  <install-prefix>/functions/amu_NAME
   \endcode
 
-  When the filter encounters a command of the form
-  <tt>amu_<function></tt> that it does not recognize, it checks this
-  location and if it finds a match this external command is called to
-  handle the command. See examples there as a starting point.
+  When the filter encounters a command of the form <tt>amu_NAME</tt>
+  that it does not recognize, it checks this location and if it finds a
+  match this external command is called to handle the command. See
+  examples there as a starting point.
 
 
-  \section openscad_dif_sm_afc Additional Commands (openscad-dif)
+  \section openscad_dif_sm_afc Filter Commands (openscad-dif)
 
     \subsection dif_afc_amu_combine \\amu_combine
     \copydetails ODIF::ODIF_Scanner::bif_combine()
