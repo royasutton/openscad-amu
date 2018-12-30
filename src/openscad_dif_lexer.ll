@@ -208,7 +208,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNARG>{ws}+                   { apt(); }
 <AMUFNARG>{nr}                    { apt(); }
 <AMUFNARG>.                       { error("in function arguments", lineno(), YYText()); }
-<AMUFNARG><<EOF>>                 { abort("unterminated function arguments", fi_bline); }
+<AMUFNARG><<EOF>>                 { abort("unterminated function arguments", fx_bline); }
 
   /*
     amu function single and double quoted arguments:
@@ -224,8 +224,8 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNAQS,AMUFNAQD>{nr}           { apt(); fx_app_qarg(); }
 <AMUFNAQS,AMUFNAQD>.              { apt(); fx_app_qarg(); }
 
-<AMUFNAQS><<EOF>>                 { abort("unterminated single quote", fi_bline); }
-<AMUFNAQD><<EOF>>                 { abort("unterminated double quote", fi_bline); }
+<AMUFNAQS><<EOF>>                 { abort("unterminated single quote", fx_bline); }
+<AMUFNAQD><<EOF>>                 { abort("unterminated double quote", fx_bline); }
 
   /*
     amu_include:

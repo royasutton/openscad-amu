@@ -272,8 +272,6 @@ ODIF::ODIF_Scanner::fx_init(void)
 
   fx_qarg.clear();
 
-  fi_bline = lineno();
-
   // remove '\amu_' from function name in matched text
   // might be good to convert name to all lower case.
   string mt = YYText();
@@ -281,6 +279,8 @@ ODIF::ODIF_Scanner::fx_init(void)
 
   // store function name as first argument.
   fx_store_arg( fx_name );
+
+  fx_bline = lineno();
 }
 
 /***************************************************************************//**
@@ -296,7 +296,7 @@ ODIF::ODIF_Scanner::fx_init(void)
 void
 ODIF::ODIF_Scanner::fx_end(void)
 {
-  fi_eline = lineno();
+  fx_eline = lineno();
 
   // prototype of build-in function: string functionname( void );
   typedef map< string, string (ODIF::ODIF_Scanner::*)(void) > function_table_type;
@@ -393,7 +393,7 @@ ODIF::ODIF_Scanner::fx_end(void)
 
   // output blank lines to maintain file length when functions are
   // broken across multiple lines (don't begin and end on the same line).
-  for(size_t i=fi_bline; i<fi_eline; i++) scanner_output("\n");
+  for(size_t i=fx_bline; i<fx_eline; i++) scanner_output("\n");
 }
 
 void
