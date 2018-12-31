@@ -654,6 +654,7 @@ ODIF::ODIF_Scanner::if_init_case(bool expr)
 
   // clear case body text
   if_case_text.clear();
+  if_case_level = 0;
 
   // clear operation and value stack
   while ( ! if_opr.empty() )  if_opr.pop();

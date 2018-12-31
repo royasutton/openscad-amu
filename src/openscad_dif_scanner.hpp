@@ -345,6 +345,8 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string if_text;                //!< amu if matched case result text.
     std::string if_case_text;           //!< parsed amu if case body text.
 
+    size_t      if_case_level;          //!< case text nested brace pair level.
+
     bool        if_matched;             //!< if output state variable.
     bool        if_case_true;           //!< if case output state variable.
     bool        if_else_true;           //!< if else output state variable.

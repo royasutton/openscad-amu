@@ -297,14 +297,15 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUIFEXPR><<EOF>>                { abort("unterminated if expression", if_bline); }
 
 <AMUIFTEXT>{id_var}               { apt(); if_get_var_text(); if_end_case(); BEGIN(AMUIFELSE); }
-<AMUIFTEXT>\{                     { apt(); BEGIN(AMUIFTEXTBLCK); }
+<AMUIFTEXT>\{                     { apt(); if_case_level++; BEGIN(AMUIFTEXTBLCK); }
 <AMUIFTEXT>{ws}+                  { apt(); }
 <AMUIFTEXT>{nr}                   { apt(); }
 <AMUIFTEXT>.                      { error("in if case body", lineno(), YYText()); }
 <AMUIFTEXT><<EOF>>                { abort("unterminated if case body", if_bline); }
 
-<AMUIFTEXTBLCK>{id_var}           { apt(); if_app(); }
-<AMUIFTEXTBLCK>\}                 { apt(); if_end_case(); BEGIN(AMUIFELSE); }
+<AMUIFTEXTBLCK>\}                 { apt(); if (--if_case_level) { if_app(); }
+                                           else { if_end_case(); BEGIN(AMUIFELSE); } }
+<AMUIFTEXTBLCK>\{                 { apt(); if_app(); if_case_level++; }
 <AMUIFTEXTBLCK>\\{nr}             { apt(); if_app(""); }
 <AMUIFTEXTBLCK>{nr}               { apt(); if_app(); }
 <AMUIFTEXTBLCK>.                  { apt(); if_app(); }
