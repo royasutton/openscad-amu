@@ -61,7 +61,7 @@ using namespace std;
   /* scanner states */
 
 %s COMBLCK COMLINE COMNEST
-%s AMUFN AMUFNARG AMUFNAQS AMUFNAQD
+%s AMUFN AMUFNARG AMUFNAQS AMUFNAQD AMUFNTEXTBLCK
 %s AMUINC AMUINCFILE
 %s AMUDEF AMUDEFARG
 %s AMUIF AMUIFEXPR AMUIFTEXT AMUIFTEXTBLCK AMUIFELSE
@@ -182,18 +182,17 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 
   /*
     amu_bif:
-    amu_bif var ( a1 a2 'a3' "a 4" file="all" )
+    amu_bif var ( a1 a2 'a3' "a 4" file="all" ) { text }
   */
 
 <AMUFN>{id}                       { apt(); fx_set_var(); }
 <AMUFN>\(                         { apt(); BEGIN(AMUFNARG); }
+<AMUFN>\{                         { apt(); fx_body_level++; BEGIN(AMUFNTEXTBLCK); }
 <AMUFN>{ws}+                      { apt(); }
 <AMUFN>{nr}                       { apt(); }
 <AMUFN>.                          { error("in function variable name", lineno(), YYText()); }
 
-  /*
-    amu function arguments:
-  */
+  /* amu_bif: ( arguments ) */
 
 <AMUFNARG>{id}                    { apt(); fx_store_arg(); }
 <AMUFNARG>{id_var}                { apt(); fx_store_arg_expanded(); }
@@ -204,15 +203,14 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNARG>{incr_var_post}         { apt(); fx_incr_arg(true); }
 <AMUFNARG>\'                      { apt(); fx_app_qarg(); yy_push_state(AMUFNAQS); }
 <AMUFNARG>\"                      { apt(); fx_app_qarg(); yy_push_state(AMUFNAQD); }
+<AMUFNARG>\){wsnr}*\{             { apt(); fx_body_level++; BEGIN(AMUFNTEXTBLCK); }
 <AMUFNARG>\)                      { apt(); fx_end(); yy_pop_state(); }
 <AMUFNARG>{ws}+                   { apt(); }
 <AMUFNARG>{nr}                    { apt(); }
 <AMUFNARG>.                       { error("in function arguments", lineno(), YYText()); }
 <AMUFNARG><<EOF>>                 { abort("unterminated function arguments", fx_bline); }
 
-  /*
-    amu function single and double quoted arguments:
-  */
+  /* amu_bif: ( 'arguments' and/or "arguments" )  */
 
 <AMUFNAQS>\'                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
 <AMUFNAQD>\"                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
@@ -226,6 +224,16 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 
 <AMUFNAQS><<EOF>>                 { abort("unterminated single quote", fx_bline); }
 <AMUFNAQD><<EOF>>                 { abort("unterminated double quote", fx_bline); }
+
+  /* amu_bif: { text block } */
+
+<AMUFNTEXTBLCK>\}                 { apt(); if (--fx_body_level) { fx_app_body(); }
+                                           else { fx_end(); yy_pop_state(); } }
+<AMUFNTEXTBLCK>\{                 { apt(); fx_app_body(); fx_body_level++; }
+<AMUFNTEXTBLCK>\\{nr}             { apt(); fx_app_body(""); }
+<AMUFNTEXTBLCK>{nr}               { apt(); fx_app_body(); }
+<AMUFNTEXTBLCK>.                  { apt(); fx_app_body(); }
+<AMUFNTEXTBLCK><<EOF>>            { abort("unterminated function body block", fx_bline); }
 
   /*
     amu_include:

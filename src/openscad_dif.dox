@@ -59,7 +59,8 @@
   Where \em NAME is the function name, \em variable is an optional
   output variable identifier, \em arguments are any function arguments,
   and \em body is a specified text that the function will consider. The
-  parts of a function can be split across any number of lines.
+  parts of a function can be split across any number of lines and some
+  functions do not require the arguments and/or body parts.
 
 
   \subsubsection openscad_dif_sm_v Variable

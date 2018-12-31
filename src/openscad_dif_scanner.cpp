@@ -272,6 +272,9 @@ ODIF::ODIF_Scanner::fx_init(void)
 
   fx_qarg.clear();
 
+  fx_body_text.clear();
+  fx_body_level = 0;
+
   // remove '\amu_' from function name in matched text
   // might be good to convert name to all lower case.
   string mt = YYText();

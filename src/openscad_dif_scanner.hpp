@@ -271,6 +271,9 @@ class ODIF_Scanner : public yyFlexLexer{
 
     std::string fx_qarg;                //!< parsed amu quoted argument string.
 
+    std::string fx_body_text;           //!< parsed amu function body text.
+    size_t      fx_body_level;          //!< body text nested brace pair level.
+
     size_t      fx_bline;               //!< beginning line of parsed amu function.
     size_t      fx_eline;               //!< ending line of parsed amu function.
 
@@ -305,6 +308,11 @@ class ODIF_Scanner : public yyFlexLexer{
     void fx_app_qarg_expanded(void) { fx_qarg+=varm.expand( YYText() ); }
     //! remove escaping in the escaped-parsed variable and append to the quoted argument string.
     void fx_app_qarg_escaped(void);
+
+    //! append the string s to the function body text.
+    void fx_app_body(const std::string &s) { fx_body_text+=s; }
+    //! append the current parsed text to the function body text.
+    void fx_app_body(void) { fx_body_text+=YYText(); }
 
     //! increment or decrement variable with post or pre assignment.
     void fx_incr_arg(bool post=true);
