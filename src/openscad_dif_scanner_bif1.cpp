@@ -82,7 +82,7 @@ ODIF::ODIF_Scanner::bif_eval(void)
   bool update_global = false;
 
   // create local copy of the global variable scope map
-  env_var vm = varm;
+  env_var vm = gevm;
 
   // setup feild separator variable vm reference
   string efs = vm.get_prefix() + "EFS" + vm.get_suffix();
@@ -123,7 +123,7 @@ ODIF::ODIF_Scanner::bif_eval(void)
         if ( update_local ) vm.store( it->name, UTIL::unquote( it->value ) );
 
         // global
-        if ( update_global ) varm.store( it->name, UTIL::unquote( it->value ) );
+        if ( update_global ) gevm.store( it->name, UTIL::unquote( it->value ) );
       }
     }
   }
@@ -219,7 +219,7 @@ ODIF::ODIF_Scanner::bif_shell(void)
   else
   {
     if (flag_eval)
-      result = varm.expand_text(result);
+      result = gevm.expand_text(result);
 
     return( result );
   }

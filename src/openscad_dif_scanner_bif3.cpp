@@ -848,7 +848,7 @@ ODIF::ODIF_Scanner::bif_foreach(void)
   string result;
 
   // create local copy of the global variable scope map
-  env_var vm = varm;
+  env_var vm = gevm;
 
   typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
   boost::char_separator<char> wsep( wtok.c_str() );

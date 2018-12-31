@@ -59,22 +59,22 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
   debug_filter = false;
 
   // initialize variable map
-  varm.clear();
+  gevm.clear();
 
   // must match equivalent definition for {id_var} in openscad_dif_lexer.ll
-  // lexer use flex while varm uses <boost/regex.hpp>
-  varm.set_prefix( "${" );
-  varm.set_suffix( "}" );
-  varm.set_regexp( "\\${[_[:alnum:]]+}" );
-  varm.set_escape_prefix( "\\\\" );
-  varm.set_escape_suffix( "" );
-  varm.set_escape_prefix_length( 1 );
-  varm.set_escape_suffix_length( 0 );
+  // lexer use flex while gevm uses <boost/regex.hpp>
+  gevm.set_prefix( "${" );
+  gevm.set_suffix( "}" );
+  gevm.set_regexp( "\\${[_[:alnum:]]+}" );
+  gevm.set_escape_prefix( "\\\\" );
+  gevm.set_escape_suffix( "" );
+  gevm.set_escape_prefix_length( 1 );
+  gevm.set_escape_suffix_length( 0 );
 
   // report options could be passed to the command line interface
   // for run-time configuration.
-  varm.set_report( true );
-  varm.set_report_message("<tt><UNDEFINED></tt>");
+  gevm.set_report( true );
+  gevm.set_report_message("<tt><UNDEFINED></tt>");
 
   //
   // setup predefined environment variables
@@ -84,20 +84,20 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
   bfs::path ifap = f;
   bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
   // setup root file name variables
-  varm.store( "ABS_FILE_NAME", ifap.string() );
-  varm.store( "ABS_PATH_NAME", ifap.parent_path().string() );
-  varm.store( "FILE_NAME", ifrp.string() );
-  varm.store( "PATH_NAME", ifrp.parent_path().string() );
-  varm.store( "BASE_NAME", ifrp.filename().string() );
-  varm.store( "STEM_NAME", ifrp.stem().string() );
-  varm.store( "EXT_NAME", ifrp.extension().string() );
+  gevm.store( "ABS_FILE_NAME", ifap.string() );
+  gevm.store( "ABS_PATH_NAME", ifap.parent_path().string() );
+  gevm.store( "FILE_NAME", ifrp.string() );
+  gevm.store( "PATH_NAME", ifrp.parent_path().string() );
+  gevm.store( "BASE_NAME", ifrp.filename().string() );
+  gevm.store( "STEM_NAME", ifrp.stem().string() );
+  gevm.store( "EXT_NAME", ifrp.extension().string() );
 
   // amu_eval feild separator
-  varm.store( "EFS", " " );
+  gevm.store( "EFS", " " );
 
   // initialize include file variables
-  varm.store( "FILE_CURRENT", "" );
-  varm.store( "FILE_LIST", "" );
+  gevm.store( "FILE_CURRENT", "" );
+  gevm.store( "FILE_LIST", "" );
 
   // initialize function argument positional prefix
   fx_argv.clear();
@@ -111,20 +111,20 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
 }
 
 void
-ODIF::ODIF_Scanner::update_varm(void)
+ODIF::ODIF_Scanner::update_gevm(void)
 {
   // configuration variables
-  varm.store( "DOXYGEN_OUTPUT", get_doxygen_output() );
-  varm.store( "HTML_OUTPUT", get_html_output() );
-  varm.store( "LATEX_OUTPUT", get_latex_output() );
-  varm.store( "DOCBOOK_OUTPUT", get_docbook_output() );
-  varm.store( "RTF_OUTPUT", get_rtf_output() );
+  gevm.store( "DOXYGEN_OUTPUT", get_doxygen_output() );
+  gevm.store( "HTML_OUTPUT", get_html_output() );
+  gevm.store( "LATEX_OUTPUT", get_latex_output() );
+  gevm.store( "DOCBOOK_OUTPUT", get_docbook_output() );
+  gevm.store( "RTF_OUTPUT", get_rtf_output() );
 
-  varm.store( "SCOPE_JOINER", get_scopejoiner() );
+  gevm.store( "SCOPE_JOINER", get_scopejoiner() );
 
-  varm.store( "OUTPUT_PREFIX", get_output_prefix() );
-  varm.store( "OPENSCAD_PATH", get_openscad_path() );
-  varm.store( "OPENSCAD_EXT", get_openscad_ext() );
+  gevm.store( "OUTPUT_PREFIX", get_output_prefix() );
+  gevm.store( "OPENSCAD_PATH", get_openscad_path() );
+  gevm.store( "OPENSCAD_EXT", get_openscad_ext() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,13 +146,13 @@ ODIF::ODIF_Scanner::start_file( const string file )
   string file_path = bfs::canonical( bfs::path(file) ).string();
 
   // append to ${FILE_LIST}
-  string list = varm.expand( varm.get_prefix() + "FILE_LIST" + varm.get_suffix() );
+  string list = gevm.expand( gevm.get_prefix() + "FILE_LIST" + gevm.get_suffix() );
   if ( list.length() ) list += " ";
   list += file_path;
-  varm.store( "FILE_LIST", list );
+  gevm.store( "FILE_LIST", list );
 
   // update ${FILE_CURRENT}
-  varm.store( "FILE_CURRENT", file_path );
+  gevm.store( "FILE_CURRENT", file_path );
 
   // save line number update of current stream if it exists
   if ( ! ifs_v.empty() )
@@ -183,7 +183,7 @@ ODIF::ODIF_Scanner::yywrap(void)
     return 1;
 
   // update ${FILE_CURRENT}
-  varm.store( "FILE_CURRENT", ifs_v.back().name );
+  gevm.store( "FILE_CURRENT", ifs_v.back().name );
 
   // restore saved line number count
   yylineno = ifs_v.back().line;
@@ -221,7 +221,7 @@ ODIF::ODIF_Scanner::error(const string& m, const int &n,
   string om;
 
   om = ops + "ERROR in "
-     + varm.expand( varm.get_prefix() + "FILE_CURRENT" + varm.get_suffix() )
+     + gevm.expand( gevm.get_prefix() + "FILE_CURRENT" + gevm.get_suffix() )
      +  ", " + m;
 
   if( n )           om += ", at line " + UTIL::to_string( n );
@@ -243,7 +243,7 @@ ODIF::ODIF_Scanner::amu_error_msg(const string& m)
   string om;
 
   om  = ops + "ERROR in "
-      + varm.expand( varm.get_prefix() + "FILE_CURRENT" + varm.get_suffix() )
+      + gevm.expand( gevm.get_prefix() + "FILE_CURRENT" + gevm.get_suffix() )
       + ", at line " + UTIL::to_string( lineno() );
 
   // delete command characters [\@] from parsed text to prevent them
@@ -384,7 +384,7 @@ ODIF::ODIF_Scanner::fx_end(void)
       scanner_output( result );
     else
     {
-      varm.store(fx_var, result);
+      gevm.store(fx_var, result);
 
       filter_debug( fx_var + "=[" + result + "]" );
     }
@@ -420,7 +420,7 @@ ODIF::ODIF_Scanner::fx_store_arg_escaped(void)
 {
   // remove 'escape-prefix' from variable name in matched text.
   string mt = YYText();
-  fx_argv.store( mt.substr(varm.get_escape_prefix_length(),mt.length()) );
+  fx_argv.store( mt.substr(gevm.get_escape_prefix_length(),mt.length()) );
 }
 
 void
@@ -428,7 +428,7 @@ ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
 {
   // remove 'escape-prefix' from variable name in matched text (first character)
   string mt = YYText();
-  fx_qarg+=mt.substr(varm.get_escape_prefix_length(),mt.length());
+  fx_qarg+=mt.substr(gevm.get_escape_prefix_length(),mt.length());
 }
 
 /***************************************************************************//**
@@ -468,9 +468,9 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
 
   // get the current value of the variable from the environment variable map
   long old_val = 0;
-  if ( varm.exists( vn ) )
+  if ( gevm.exists( vn ) )
   {
-    string old_val_string = varm.expand("${" + vn + "}");
+    string old_val_string = gevm.expand("${" + vn + "}");
 
     if ( UTIL::is_number( old_val_string ) )
       old_val = atoi( old_val_string.c_str() );
@@ -491,7 +491,7 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
   // store variable:
   // var++ : as named function argument (name=count)
   // ++var : in the environment variable map
-  if ( post )   varm.store( vn, UTIL::to_string(new_val) );     // var++
+  if ( post )   gevm.store( vn, UTIL::to_string(new_val) );     // var++
   else          fx_argv.store( vn, UTIL::to_string(new_val) );  // ++var
 }
 
@@ -531,7 +531,7 @@ ODIF::ODIF_Scanner::def_end(void)
     scanner_output( def_text );
   else
   {
-    varm.store( def_var, def_text );
+    gevm.store( def_var, def_text );
 
     filter_debug( def_var + "=[" + def_text + "]" );
   }
@@ -742,7 +742,7 @@ ODIF::ODIF_Scanner::if_end_case(void)
     if_matched = true;
 
     // expand case body text and assign as result
-    if_text = varm.expand_text( if_case_text );
+    if_text = gevm.expand_text( if_case_text );
   }
 }
 
@@ -757,7 +757,7 @@ ODIF::ODIF_Scanner::if_end(void)
     scanner_output( if_text );
   else
   {
-    varm.store( if_var, if_text );
+    gevm.store( if_var, if_text );
 
     filter_debug( if_var + "=[" + if_text + "]" );
   }
@@ -829,7 +829,7 @@ ODIF::ODIF_Scanner::inc_end(void)
   inc_eline = lineno();
 
   // unquote and expand variables in argument text
-  string file_arg = varm.expand_text( UTIL::unquote_trim( inc_text ) );
+  string file_arg = gevm.expand_text( UTIL::unquote_trim( inc_text ) );
 
   string file_inc;
 

@@ -727,8 +727,8 @@ main(int argc, char** argv)
     // other
     scanner.set_scope_id_mf( scope_id_mf );
 
-    // initialize variable map
-    scanner.update_varm();
+    // update global environment variable map
+    scanner.update_gevm();
 
     // process input file
     while( scanner.scan() != 0 )
