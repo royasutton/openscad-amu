@@ -42,7 +42,6 @@
 #endif
 
 using namespace std;
-namespace bfs = boost::filesystem;
 
 
 /***************************************************************************//**

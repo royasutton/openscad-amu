@@ -472,6 +472,8 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string bif_word(void);
     //! Generate a sequence of numbers.
     std::string bif_seq(void);
+    //! textual variable substitution for each word of a list.
+    std::string bif_foreach(void);
 
   // openscad_dif_scanner_bif4.cpp
     //! generate a table from a list of text phrases.
@@ -486,8 +488,6 @@ class ODIF_Scanner : public yyFlexLexer{
     bool bif_if_exp_1a(std::string s);
     //! evaluate double argument if expressions.
     bool bif_if_exp_2a(std::string s);
-    //! textual variable substitution for each word of a list.
-    std::string bif_foreach(void);
 };
 
 } /* end namespace ODIF */
