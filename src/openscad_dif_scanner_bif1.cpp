@@ -141,7 +141,7 @@ ODIF::ODIF_Scanner::bif_eval(void)
 
      flags   | sc  | default | description
     :-------:|:---:|:-------:|:-----------------------------------------
-      stderr | s   | false   | capture standard error output as well
+      stderr | s   | false   | capture standard error output
       rmnl   | r   | true    | remove line-feeds / carriage returns
       eval   | e   | false   | expand variables in text
 
@@ -247,7 +247,7 @@ ODIF::ODIF_Scanner::bif_shell(void)
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
-      stderr   | s   | false   | capture standard error output as well
+      stderr   | s   | false   | capture standard error output
       rmnl     | r   | true    | remove line-feeds / carriage returns
       pstarget | pst | false   | target is from parent source file
 
