@@ -3,7 +3,7 @@
   \file   openscad_dif_lexer.ll
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -219,6 +219,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNAQS,AMUFNAQD>\\\"           { apt(); fx_app_qarg_escaped(); }
 <AMUFNAQS,AMUFNAQD>\\{id_var}     { apt(); fx_app_qarg_escaped(); }
 <AMUFNAQS,AMUFNAQD>{id_var}       { apt(); fx_app_qarg_expanded(); }
+<AMUFNAQS,AMUFNAQD>\\{nr}         { apt(); fx_app_qarg(""); }
 <AMUFNAQS,AMUFNAQD>{nr}           { apt(); fx_app_qarg(); }
 <AMUFNAQS,AMUFNAQD>.              { apt(); fx_app_qarg(); }
 

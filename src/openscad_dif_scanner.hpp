@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.hpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -303,6 +303,8 @@ class ODIF_Scanner : public yyFlexLexer{
 
     //! store and clear the current quoted argument string.
     void fx_store_qarg(void) { fx_argv.store( fx_qarg ); fx_qarg.clear(); }
+    //! append the string s to the quoted argument string.
+    void fx_app_qarg(const std::string &s) { fx_qarg+=s; }
     //! append the current matched text to the quoted argument string.
     void fx_app_qarg(void) { fx_qarg+=YYText(); }
     //! expand parsed variable and append to the quoted argument string.
