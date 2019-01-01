@@ -179,7 +179,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments.
 
      options    | sc  | default | description
     :----------:|:---:|:-------:|:--------------------------
@@ -424,7 +424,7 @@ ODIF::ODIF_Scanner::bif_replace(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments.
 
      options      | sc  | default         | description
     :------------:|:---:|:---------------:|:-------------------------------------
@@ -586,7 +586,7 @@ ODIF::ODIF_Scanner::bif_word(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments.
 
      options      | sc  | default | description
     :------------:|:---:|:-------:|:------------------------------

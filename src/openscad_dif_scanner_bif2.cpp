@@ -359,7 +359,7 @@ ODIF::ODIF_Scanner::bif_find(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments.
 
      options      | sc  | default | description
     :------------:|:---:|:-------:|:-----------------------------------------
@@ -595,7 +595,7 @@ ODIF::ODIF_Scanner::bif_pathid(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments.
 
      options      | sc  | default       | description
     :------------:|:---:|:-------------:|:-----------------------------------------
@@ -757,7 +757,7 @@ ODIF::ODIF_Scanner::bif_filename(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments.
 
      options      | sc  | default | description
     :------------:|:---:|:-------:|:--------------------------------------

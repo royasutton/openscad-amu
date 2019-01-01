@@ -413,7 +413,7 @@ ODIF::ODIF_Scanner::bif_make(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments.
 
      options   | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------
