@@ -544,9 +544,6 @@ ODIF::ODIF_Scanner::def_end(void)
     filter_debug( def_var + "=[" + def_text + "]" );
   }
 
-  def_var.clear();
-  def_text.clear();
-
   // output blank lines to maintain file length when definitions are
   // broken across multiple lines (don't begin and end on the same line).
   for(size_t i=def_bline; i<def_eline; i++) scanner_output("\n");
@@ -773,9 +770,6 @@ ODIF::ODIF_Scanner::if_end(void)
     filter_debug( if_var + "=[" + if_text + "]" );
   }
 
-  if_var.clear();
-  if_text.clear();
-
   // output blank lines to maintain file length when definitions are
   // broken across multiple lines (don't begin and end on the same line).
   for(size_t i=if_bline; i<if_eline; i++) scanner_output("\n");
@@ -881,8 +875,6 @@ ODIF::ODIF_Scanner::inc_end(void)
   // switch stream to file
   if ( inc_switch )
     start_file( file_inc );
-
-  inc_text.clear();
 
   // output blank lines to maintain file length when definitions are
   // broken across multiple lines (don't begin and end on the same line).
