@@ -959,7 +959,7 @@ ODIF::ODIF_Scanner::bif_file(void)
 
         // eval variables
         if ( eval )
-          line = gevm.expand_text(line);
+          line = levm.expand_text(line);
 
         if (line.size() > line_max)
           line_max = line.size();

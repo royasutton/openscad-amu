@@ -201,6 +201,7 @@ class ODIF_Scanner : public yyFlexLexer{
     std::vector<ifs_s> ifs_v;               //!< vector of input files.
 
     env_var gevm;                           //!< global environment variable map.
+    env_var levm;                           //!< local environment variable map.
 
     std::string config_prefix;              //!< scanner configuration file path prefix.
     std::string rootscope;                  //!< scanner root scope name.
@@ -296,7 +297,7 @@ class ODIF_Scanner : public yyFlexLexer{
     //! store the current parsed text the function argument.
     void fx_store_arg(void) { fx_argv.store( YYText() ); }
     //! expand parsed variable and store to the function argument.
-    void fx_store_arg_expanded(void) { fx_argv.store( gevm.expand( YYText() ) ); }
+    void fx_store_arg_expanded(void) { fx_argv.store( levm.expand( YYText() ) ); }
     //! remove escaping in the escaped-parsed variable and store to the function argument.
     void fx_store_arg_escaped(void);
 
@@ -305,7 +306,7 @@ class ODIF_Scanner : public yyFlexLexer{
     //! append the current matched text to the quoted argument string.
     void fx_app_qarg(void) { fx_qarg+=YYText(); }
     //! expand parsed variable and append to the quoted argument string.
-    void fx_app_qarg_expanded(void) { fx_qarg+=gevm.expand( YYText() ); }
+    void fx_app_qarg_expanded(void) { fx_qarg+=levm.expand( YYText() ); }
     //! remove escaping in the escaped-parsed variable and append to the quoted argument string.
     void fx_app_qarg_escaped(void);
 
@@ -364,7 +365,7 @@ class ODIF_Scanner : public yyFlexLexer{
     //! end amu_if expression handler
     void if_eval_expr(void);
     //! expand parsed variable and store as if case text.
-    void if_get_var_text(void) { if_case_text+=gevm.expand( YYText() ); }
+    void if_get_var_text(void) { if_case_text+=levm.expand( YYText() ); }
     //! output case text as condition indicate
     void if_end_case(void);
     //! end amu_if handler

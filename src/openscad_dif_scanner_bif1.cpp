@@ -81,11 +81,8 @@ ODIF::ODIF_Scanner::bif_eval(void)
   bool update_local = true;
   bool update_global = false;
 
-  // create local copy of the global variable scope map
-  env_var vm = gevm;
-
-  // setup feild separator variable vm reference
-  string efs = vm.get_prefix() + "EFS" + vm.get_suffix();
+  // setup feild separator variable reference
+  string efs = levm.get_prefix() + "EFS" + levm.get_suffix();
 
   string result;
 
@@ -99,12 +96,12 @@ ODIF::ODIF_Scanner::bif_eval(void)
     {
       // append feild separator
       if ( result.length() != 0 )
-        result.append( UTIL::unquote( vm.expand(efs) ) );
+        result.append( UTIL::unquote( levm.expand(efs) ) );
 
       // expand and append positional argument text
       // do not unquote value, quotations in positional
       // arguments assumed to have significance.
-      result.append( vm.expand_text( it->value ) );
+      result.append( levm.expand_text( it->value ) );
     }
     // argument is named or flag
     else
@@ -120,7 +117,7 @@ ODIF::ODIF_Scanner::bif_eval(void)
       // text as this is done recursively by class 'env_var'.
       {
         // local
-        if ( update_local ) vm.store( it->name, UTIL::unquote( it->value ) );
+        if ( update_local ) levm.store( it->name, UTIL::unquote( it->value ) );
 
         // global
         if ( update_global ) gevm.store( it->name, UTIL::unquote( it->value ) );
@@ -219,7 +216,7 @@ ODIF::ODIF_Scanner::bif_shell(void)
   else
   {
     if (flag_eval)
-      result = gevm.expand_text(result);
+      result = levm.expand_text(result);
 
     return( result );
   }

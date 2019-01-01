@@ -263,6 +263,9 @@ ODIF::ODIF_Scanner::amu_error_msg(const string& m)
 void
 ODIF::ODIF_Scanner::fx_init(void)
 {
+  // update local copy of global variable map (memberwise)
+  levm = gevm;
+
   apt_clear();
   apt();
 
@@ -379,7 +382,7 @@ ODIF::ODIF_Scanner::fx_end(void)
 
   if ( success )
   {
-    // output result to scanner or store to variable map
+    // output result to scanner or store to global variable map
     if ( fx_var.length() == 0 )
       scanner_output( result );
     else
@@ -420,7 +423,7 @@ ODIF::ODIF_Scanner::fx_store_arg_escaped(void)
 {
   // remove 'escape-prefix' from variable name in matched text.
   string mt = YYText();
-  fx_argv.store( mt.substr(gevm.get_escape_prefix_length(),mt.length()) );
+  fx_argv.store( mt.substr(levm.get_escape_prefix_length(),mt.length()) );
 }
 
 void
@@ -428,26 +431,25 @@ ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
 {
   // remove 'escape-prefix' from variable name in matched text (first character)
   string mt = YYText();
-  fx_qarg+=mt.substr(gevm.get_escape_prefix_length(),mt.length());
+  fx_qarg+=mt.substr(levm.get_escape_prefix_length(),mt.length());
 }
 
 /***************************************************************************//**
 
   \details
 
-    Function arguments can make use of pre and post <tt>++</tt> and/or
-    <tt>\-\-</tt> operations. Post operations use global environment
-    variables. Pre operations use environment variables local to the
-    function. Function flags make use of pre operations. Prefix a flag
-    with <tt>++</tt> to enable it and <tt>\-\-</tt> to disable it. For
-    example \p ++name enables \p name and \p \-\-name disables it.
+    Function arguments may use pre and post <tt>'++'</tt> and/or
+    <tt>'\-\-'</tt> operations, where post have global scope and pre
+    have scope local to the function where they are defined. Prefix a
+    flag with <tt>++</tt> to enable it and <tt>\-\-</tt> to disable it.
+    For example \p ++name enables \p name and \p \-\-name disables it.
 
-     operation | behavior
-    :---------:|:---------------------------------------------------------
-      x++      | increment global environment variable
-      ++x      | increment local environment variable
-      y=x++    | assign function value (y=(${x})) with post increment
-      y=++x    | increment local and assign function value (y=(${x}))
+     operation | description
+    :---------:|:-------------------------------------------------------
+      x++      | increment global variable
+      ++x      | increment local variable
+      y=x++    | assign function argument ${x} then increment global x
+      y=++x    | increment local x then assign function argument ${x}
 
 *******************************************************************************/
 void
@@ -466,33 +468,36 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
      op=mt.substr(0, 2);
   }
 
-  // get the current value of the variable from the environment variable map
+  // get current value from local environment variable map
   long old_val = 0;
-  if ( gevm.exists( vn ) )
+  if ( levm.exists( vn ) )
   {
-    string old_val_string = gevm.expand("${" + vn + "}");
+    string old_val_string = levm.expand("${" + vn + "}");
 
     if ( UTIL::is_number( old_val_string ) )
       old_val = atoi( old_val_string.c_str() );
   }
 
-  // update the variable value
+  // compute new value
   long new_val;
-  if ( op.compare("++") == 0 )  new_val = old_val + 1;          // op='++'
-  else                          new_val = old_val - 1;          // op='--'
+  if ( op.compare("++") == 0 )  new_val = old_val + 1;          // op == '++'
+  else                          new_val = old_val - 1;          // op == '--'
 
-  // conditionally assign value the named function argument?
+  // store value to named argument with assignment identifier
   if ( fx_argv.get_next_name().length() )
   {
-    if ( post ) fx_argv.store( UTIL::to_string(old_val) );      // var++
-    else        fx_argv.store( UTIL::to_string(new_val) );      // ++var
+    if ( post ) fx_argv.store( UTIL::to_string(old_val) );      // id = var++
+    else        fx_argv.store( UTIL::to_string(new_val) );      // id = ++var
   }
 
-  // store variable:
-  // var++ : as named function argument (name=count)
-  // ++var : in the environment variable map
+  // store value (vn=new_val)
+  //  var++ : in global environment variable map
+  //  ++var : in function arguments
   if ( post )   gevm.store( vn, UTIL::to_string(new_val) );     // var++
   else          fx_argv.store( vn, UTIL::to_string(new_val) );  // ++var
+
+  // store value to local environment variable map
+  levm.store( vn, UTIL::to_string(new_val) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -511,6 +516,9 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
 void
 ODIF::ODIF_Scanner::def_init(void)
 {
+  // update local copy of global variable map (memberwise)
+  levm = gevm;
+
   apt_clear();
   apt();
 
@@ -526,7 +534,7 @@ ODIF::ODIF_Scanner::def_end(void)
   def_eline = lineno();
 
   // if variable name not specified, copy definition to output
-  // otherwise store in variable map.
+  // otherwise store in global variable map.
   if ( def_var.length() == 0 )
     scanner_output( def_text );
   else
@@ -632,6 +640,9 @@ ODIF::ODIF_Scanner::def_set_var(void)
 void
 ODIF::ODIF_Scanner::if_init(void)
 {
+  // update local copy of global variable map (memberwise)
+  levm = gevm;
+
   apt_clear();
   apt();
 
@@ -742,7 +753,7 @@ ODIF::ODIF_Scanner::if_end_case(void)
     if_matched = true;
 
     // expand case body text and assign as result
-    if_text = gevm.expand_text( if_case_text );
+    if_text = levm.expand_text( if_case_text );
   }
 }
 
@@ -752,7 +763,7 @@ ODIF::ODIF_Scanner::if_end(void)
   if_eline = lineno();
 
   // if variable name not specified, copy definition to output
-  // otherwise store in variable map.
+  // otherwise store in global variable map.
   if ( if_var.length() == 0 )
     scanner_output( if_text );
   else
@@ -811,6 +822,9 @@ ODIF::ODIF_Scanner::if_set_var(void)
 void
 ODIF::ODIF_Scanner::inc_init(void)
 {
+  // update local copy of global variable map (memberwise)
+  levm = gevm;
+
   apt_clear();
   apt();
 
@@ -829,7 +843,7 @@ ODIF::ODIF_Scanner::inc_end(void)
   inc_eline = lineno();
 
   // unquote and expand variables in argument text
-  string file_arg = gevm.expand_text( UTIL::unquote_trim( inc_text ) );
+  string file_arg = levm.expand_text( UTIL::unquote_trim( inc_text ) );
 
   string file_inc;
 

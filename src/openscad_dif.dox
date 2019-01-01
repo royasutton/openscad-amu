@@ -26,8 +26,7 @@
   \subsection openscad_dif_sm_cs Comment Sections
 
   Comment patters are identified according to the rules in the
-  following table. See the flex documentation on [patterns] for more
-  information.
+  following table.
 
    pattern    | description
   :----------:|:--------------------------------------
@@ -42,7 +41,8 @@
   comments, which are useful for documenting the bahavior of include
   files and macros. A single level of nesting is permitted and must
   exists within a normal comment block. The content of nested comment
-  blocks is discarded by the filter.
+  blocks is discarded by the filter. See the flex documentation for
+  more information on [patterns].
 
   [patterns]: https://westes.github.io/flex/manual/Patterns.html
 
@@ -57,10 +57,10 @@
   \endcode
 
   Where \em NAME is the function name, \em variable is an optional
-  output variable identifier, \em arguments are any function arguments,
-  and \em body is a specified text that the function will consider. The
-  parts of a function can be split across any number of lines and some
-  functions do not require the arguments and/or body parts.
+  output variable identifier, \em arguments modify the behavior of the
+  function, and \em body is a specified text that the function will
+  consider. The parts of a function can be split across lines and some
+  functions do not require arguments and/or a body.
 
 
   \subsubsection openscad_dif_sm_v Variable
@@ -68,8 +68,8 @@
   The result of most function will be copied to the output unless an
   optional \em variable identifier follows the function name as shown
   above. When a variable identifier is provided, the function result is
-  stored in the specified variable identifier and is not to copied to
-  output.
+  stored as a global variable in the specified variable identifier and
+  is not to copied to output.
 
   Variables can be referenced in the context of other function \em
   arguments and \em bodies. A variable is referenced using the form:
@@ -82,20 +82,24 @@
   The four types of arguments used in functions are summarized in the
   following table:
 
-   type       | example           | scope
-  :-----------|:-----------------:|:------:
-   positional | value             | local
-   named      | name=value        | local
-   flag       | ++flag / \-\-flag | local
-   incr/decr  | var++ / var\-\-   | global
+   type       | example           | description
+  :----------:|:-----------------:|:--------------------------------
+   positional | value             | local argument
+   named      | name=value        | local argument
+   flag       | ++flag / \-\-flag | local argument & local variable
+   incr/decr  | var++ / var\-\-   | global variable
 
-  Except where noted, \p positional, \p named, and \p flag arguments
-  have \em local scope to the function where they are defined. The \p
-  incr/decr assigned values have \em global scope across all functions
-  for the current file. A named argument takes the form
-  <tt>name=value</tt>, where \p name is a variable identifier and \p
-  value is the content to assign. A single value must be identified by
-  matching single or double quotes when it contains one or more spaces.
+  The \em positional, \em named, and \em flag types are used for local
+  arguments and have \em local scope to the function where they are
+  defined. A \em flag also defines a local variable within the scope of
+  the function. The \em incr/decr type defines a variable with \em
+  global scope across all functions for the current file. A named
+  argument takes the form <tt>name=value</tt>, where \em name is a
+  variable identifier and \em value is the content to assign. The
+  results of a \em flag or \em incr/decr operation can be assigned as a
+  named argument. When a value contains one or more spaces it must be
+  enclosed by matching single or double quotes to identify it as a
+  single value.
 
   \copydetails ODIF::ODIF_Scanner::fx_incr_arg()
 

@@ -67,7 +67,7 @@ ODIF::ODIF_Scanner::bif_if_exp_1a(string s)
   string ag = UTIL::get_word(s, 2);
 
   // unquote and expand argument
-  ag = gevm.expand_text( UTIL::unquote(ag) );
+  ag = levm.expand_text( UTIL::unquote(ag) );
 
   if ( op == "-n" )
     result = ( ag.size() > 0 );
@@ -76,7 +76,7 @@ ODIF::ODIF_Scanner::bif_if_exp_1a(string s)
     result = ( ag.size() == 0 );
 
   if ( op == "-d" )
-    result = ( ag.compare( gevm.get_report_message() ) != 0 );
+    result = ( ag.compare( levm.get_report_message() ) != 0 );
 
   if ( op == "-l" )
     file_rl( ag, NO_FORMAT_OUTPUT, result );
@@ -130,8 +130,8 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
   string a2 = UTIL::get_word(s, 3);
 
   // unquote and expand arguments
-  a1 = gevm.expand_text( UTIL::unquote(a1) );
-  a2 = gevm.expand_text( UTIL::unquote(a2) );
+  a1 = levm.expand_text( UTIL::unquote(a1) );
+  a2 = levm.expand_text( UTIL::unquote(a2) );
 
   // use numerical comparision
   if ( UTIL::is_number(a1) && UTIL::is_number(a2) )
