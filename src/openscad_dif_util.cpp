@@ -531,6 +531,26 @@ UTIL::sys_command(
 }
 
 string
+UTIL::indent(const string& t, const int n)
+{
+  istringstream iss(t);
+  string r, line;
+
+  while ( !iss.eof() )
+  {
+    getline(iss, line);
+
+    for (int i=0; i<n; i++)
+      r.append( " " );
+
+    r.append( line );
+    r.append( "\n" );
+  }
+
+  return r;
+}
+
+string
 UTIL::get_word(const string& w, const int n)
 {
   istringstream iss(w);
