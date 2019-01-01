@@ -3,7 +3,7 @@
   \file   openscad_dif_util.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -792,6 +792,46 @@ UTIL::to_roman_numeral(const int &n)
     }
 
   return ( rn );
+}
+
+std::string
+UTIL::openscad_rmecho_line(const std::string &line)
+{
+  //
+  // OpenSCAD ECHO format: [[ECHO:][ ][" ... echo-content ... "]endl]
+  //
+
+  std::string new_line = line;
+
+  // [ECHO:]
+  if ( new_line.find( "ECHO:" ) == 0 )
+  { // 'ECHO:' iff at pos==0
+    new_line.erase( 0, 5 );
+
+    // [ ] single space character at pos==0
+    // if ( new_line.find_first_of( " " ) == 0 )
+    //  new_line.erase( 0, 1 );
+
+    // [ ] all white space from pos==0
+    size_t p = new_line.find_first_not_of( " \t" );
+    if ( (p != 0) && (p != string::npos) )
+      new_line.erase( 0, p );
+
+    // [" ... echo-content ... "]
+    if ( new_line.find_first_of( "\"" ) == 0 )
+    { // open quote at pos==0
+      new_line.erase( 0, 1 );
+
+      // close quote at pos=eol
+      size_t l = new_line.length();
+      if ( (l != 0) && (new_line.find_last_of( "\"" ) == (l-1)) )
+        new_line.erase( l-1, 1 );
+      else
+        new_line.append( "<ERROR: close quote missing>" );
+    }
+  }
+
+  return ( new_line );
 }
 
 

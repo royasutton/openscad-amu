@@ -3,7 +3,7 @@
   \file   openscad_dif_util.hpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -320,6 +320,9 @@ namespace UTIL{
 
   //! convert a decimal to a roman numeral
   std::string to_roman_numeral(const int &n);
+
+  //! remove  ECHO from an OpenSCAD console output line
+  std::string openscad_rmecho_line(const std::string &line);
 
 } /* end namespace UTIL */
 
