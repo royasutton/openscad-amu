@@ -456,7 +456,7 @@ class ODIF_Scanner : public yyFlexLexer{
     std::string bif_pathid(void);
     //! perform operations on filename lists.
     std::string bif_filename(void);
-    //! Perform operations on text files.
+    //! perform operations on text files.
     std::string bif_file(void);
 
   // openscad_dif_scanner_bif3.cpp
@@ -469,9 +469,9 @@ class ODIF_Scanner : public yyFlexLexer{
                        const std::string &t );
     //! perform search and replace on text.
     std::string bif_replace(void);
-    //! Count or select words from a list.
+    //! count or select words from a list.
     std::string bif_word(void);
-    //! Generate a sequence of numbers.
+    //! generate a sequence of numbers.
     std::string bif_seq(void);
     //! textual variable substitution for each word of a list.
     std::string bif_foreach(void);
