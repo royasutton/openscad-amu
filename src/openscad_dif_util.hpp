@@ -323,6 +323,8 @@ namespace UTIL{
 
   //! remove  ECHO from an OpenSCAD console output line
   std::string openscad_rmecho_line(const std::string &line);
+  //! remove  ECHO from an OpenSCAD console output text
+  std::string openscad_rmecho_text(const std::string &text);
 
 } /* end namespace UTIL */
 

@@ -834,6 +834,25 @@ UTIL::openscad_rmecho_line(const std::string &line)
   return ( new_line );
 }
 
+std::string
+UTIL::openscad_rmecho_text(const std::string &text)
+{
+  istringstream iss(text);
+  string new_text;
+
+  while ( !iss.eof() )
+  {
+    string line;
+
+    getline(iss, line);
+    line = UTIL::openscad_rmecho_line(line);
+
+    new_text.append( line );
+    new_text.append( "\n" );
+  }
+
+  return new_text;
+}
 
 /*******************************************************************************
 // eof
