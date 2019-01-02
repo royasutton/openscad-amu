@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -905,6 +905,19 @@ ODIF::ODIF_Scanner::nc_end(void)
 // utility
 ////////////////////////////////////////////////////////////////////////////////
 
+/***************************************************************************//**
+
+  \param m          debug message.
+  \param h          start verbatim block.
+  \param f          end verbatim block.
+  \param s          output to scanner.
+
+  \details
+
+    Output the message \p m to the console via stderr. The message is
+    also copied to the scanner output when \p s is \b true.
+
+*******************************************************************************/
 void
 ODIF::ODIF_Scanner::filter_debug(
   const string& m,
@@ -915,17 +928,21 @@ ODIF::ODIF_Scanner::filter_debug(
 {
   if ( debug_filter )
   {
-    if (s )
+    // output to scanner
+    if ( s )
     {
+      // start new header verbatim block
       if ( h )
       {
         scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
         scanner_output( "\\verbatim\n" );
       }
 
+      // output message
       scanner_output( "(line " + UTIL::to_string( lineno() ) + ") " + m );
       scanner_output( "\n" );
 
+      // end header verbatim block
       if ( f )
       {
         scanner_output( "\\endverbatim\n" );
@@ -933,6 +950,7 @@ ODIF::ODIF_Scanner::filter_debug(
       }
     }
 
+    // output to console via stderr
     cerr << ops << "(line " << dec << lineno() << ") " << m << endl;
   }
 }
