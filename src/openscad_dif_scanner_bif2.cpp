@@ -359,14 +359,14 @@ ODIF::ODIF_Scanner::bif_find(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Named arguments.
+    Named arguments:
 
      options      | sc  | default | description
     :------------:|:---:|:-------:|:-----------------------------------------
       head        | h   |         | path name from head at location
       tail        | t   |         | path name from tail at location
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags        | sc  | default | description
     :------------:|:---:|:-------:|:-----------------------------------------
@@ -375,7 +375,7 @@ ODIF::ODIF_Scanner::bif_find(void)
       full_parent | fp  | false   | full parent path name to input from root
       path_parent | ap  | false   | full parent path name to input after root
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags        | sc  | default | description
     :------------:|:---:|:-------:|:-----------------------------------------
@@ -595,7 +595,7 @@ ODIF::ODIF_Scanner::bif_pathid(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Named arguments.
+    Named arguments:
 
      options      | sc  | default       | description
     :------------:|:---:|:-------------:|:-----------------------------------------
@@ -603,7 +603,7 @@ ODIF::ODIF_Scanner::bif_pathid(void)
       tokenizer   | t   | [,[:space:]]  | tokenizer to separate files in list
       separator   | r   | [[:space:]]   | file separator for resulting list
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -757,7 +757,7 @@ ODIF::ODIF_Scanner::bif_filename(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Named arguments.
+    Named arguments:
 
      options      | sc  | default | description
     :------------:|:---:|:-------:|:--------------------------------------
@@ -767,7 +767,7 @@ ODIF::ODIF_Scanner::bif_filename(void)
       last        | l   | 0       | end line of file, 0=<eof>
       separator   | s   | []      | separator for joining results
 
-    Flags that modify the output
+    Flags that modify the output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------

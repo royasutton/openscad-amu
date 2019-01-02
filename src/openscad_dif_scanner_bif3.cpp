@@ -179,7 +179,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Named arguments.
+    Named arguments:
 
      options    | sc  | default | description
     :----------:|:---:|:-------:|:--------------------------
@@ -424,7 +424,7 @@ ODIF::ODIF_Scanner::bif_replace(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Named arguments.
+    Named arguments:
 
      options      | sc  | default         | description
     :------------:|:---:|:---------------:|:-------------------------------------
@@ -433,7 +433,7 @@ ODIF::ODIF_Scanner::bif_replace(void)
       tokenizer   | t   | [~^,[:space:]]  | tokenizer to separate words in list
       separator   | r   | [^]             | separator for resulting list
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -586,7 +586,7 @@ ODIF::ODIF_Scanner::bif_word(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Named arguments.
+    Named arguments:
 
      options      | sc  | default | description
     :------------:|:---:|:-------:|:------------------------------
@@ -598,7 +598,7 @@ ODIF::ODIF_Scanner::bif_word(void)
       separator   | r   | [^]     | separator for resulting list
       format      | o   | []      | format using [printf] function
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------

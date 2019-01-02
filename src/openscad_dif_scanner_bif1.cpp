@@ -413,13 +413,13 @@ ODIF::ODIF_Scanner::bif_make(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Named arguments.
+    Named arguments:
 
      options   | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------
       index    | i   |         | return scope at specified index
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -428,7 +428,7 @@ ODIF::ODIF_Scanner::bif_make(void)
       join     | j   | false   | return scope joiner
       root     | r   | false   | return root scope
 
-    Flags that control the produced output.
+    Flags that control the produced output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -614,7 +614,7 @@ ODIF::ODIF_Scanner::bif_scope(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -624,7 +624,7 @@ ODIF::ODIF_Scanner::bif_scope(void)
       stem     | s   | false   | return source stemname
       ext      | e   | false   | return source file extension
 
-    Flags that control the produced output.
+    Flags that control the produced output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
