@@ -38,6 +38,7 @@
 #include "openscad_dif_util.hpp"
 
 #include <boost/regex.hpp>
+#include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 
 #if defined(HAVE_CONFIG_H)
@@ -867,6 +868,54 @@ UTIL::openscad_rmecho_text(const std::string &text)
   }
 
   return new_text;
+}
+
+std::string
+UTIL::get_feild(const size_t &num,
+                const std::string &str, const std::string &def_str,
+                const std::string &toks, const std::string &defs)
+{
+  typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+
+  // keep empty tokens without delimeters
+  boost::char_separator<char>
+      feild_separators( toks.c_str(), "", boost::keep_empty_tokens );
+
+  // tokenize 'str' to vector
+  tokenizer str_tokens( str, feild_separators );
+
+  vector<string> str_vector;
+  for ( tokenizer::iterator it=str_tokens.begin(); it!=str_tokens.end(); ++it )
+    str_vector.push_back( boost::trim_copy( *it ) );
+
+  string feild;
+
+  if ( num < str_vector.size() )
+  {
+    // get feild
+    feild = str_vector.at( num );
+
+    // when equal to 'defs' get default from 'def_str'
+    if ( feild.compare( defs ) == 0 )
+    {
+        // tokenize 'def_str' to vector
+        tokenizer def_str_tokens( def_str, feild_separators );
+
+        vector<string> def_str_vector;
+        for ( tokenizer::iterator it=def_str_tokens.begin(); it!=def_str_tokens.end(); ++it )
+          def_str_vector.push_back( boost::trim_copy( *it ) );
+
+        string feild_default;
+
+        if ( num < def_str_vector.size() )
+          feild_default = def_str_vector.at( num );
+
+        // assign default
+        feild = feild_default;
+    }
+  }
+
+  return ( feild );
 }
 
 /*******************************************************************************
