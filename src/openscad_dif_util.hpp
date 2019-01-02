@@ -283,8 +283,10 @@ namespace UTIL{
                     bool& success, const bool& standard_error=false,
                     const bool& replace_newlines=false);
 
-  //! rndent each line of t by n spaces.
-  std::string indent(const std::string& t, const int n);
+  //! indent a line l by n spaces.
+  std::string indent_line(const std::string& l, const int n);
+  //! indent each line of t by n spaces.
+  std::string indent_text(const std::string& t, const int n);
 
   //! return word number n from string w.
   std::string get_word(const std::string& w, const int n);

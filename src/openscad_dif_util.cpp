@@ -531,23 +531,38 @@ UTIL::sys_command(
 }
 
 string
-UTIL::indent(const string& t, const int n)
+UTIL::indent_line(const string& l, const int n)
+{
+  string new_line;
+
+  for (int i=0; i<n; i++)
+    new_line.append( " " );
+
+  new_line.append( l );
+
+  return new_line;
+}
+
+string
+UTIL::indent_text(const string& t, const int n)
 {
   istringstream iss(t);
-  string r, line;
+  string new_text;
 
   while ( !iss.eof() )
   {
+    string line;
+
     getline(iss, line);
 
     for (int i=0; i<n; i++)
-      r.append( " " );
+      new_text.append( " " );
 
-    r.append( line );
-    r.append( "\n" );
+    new_text.append( line );
+    new_text.append( "\n" );
   }
 
-  return r;
+  return new_text;
 }
 
 string
