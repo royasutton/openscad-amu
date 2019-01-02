@@ -283,6 +283,8 @@ namespace UTIL{
                     bool& success, const bool& standard_error=false,
                     const bool& replace_newlines=false);
 
+  //! return string indentation as the start of first non-space character.
+  size_t get_indent(const std::string& t);
   //! indent a line l by n spaces.
   std::string indent_line(const std::string& l, const int n);
   //! indent each line of t by n spaces.

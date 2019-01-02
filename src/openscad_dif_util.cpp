@@ -531,6 +531,19 @@ UTIL::sys_command(
     result = UTIL::replace_chars(result, "\n\r", ' ');
 }
 
+size_t
+UTIL::get_indent(const std::string& t)
+{
+  istringstream iss(t);
+  string line;
+
+  // move to first non-empty line
+  while ( line.empty() && !iss.eof() )
+    getline(iss, line);
+
+  return ( line.find_first_not_of( " \t" ) );
+}
+
 string
 UTIL::indent_line(const string& l, const int n)
 {
