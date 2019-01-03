@@ -163,7 +163,6 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <COMBLCK,COMLINE>{amu_bif}        { fx_init(); yy_push_state(AMUFN); }
 <COMBLCK,COMLINE>.                { scanner_echo(); }
 
-<COMBLCK>{com_nest_open}          { nc_init(); yy_push_state(COMNEST); }
 <COMBLCK>{nr}                     { scanner_echo(); }
 <COMBLCK>{com_blck_clse}          { scanner_echo(); yy_pop_state(); }
 
@@ -179,6 +178,10 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <COMNEST>{nr}                     { }
 <COMNEST>.                        { }
 <COMNEST><<EOF>>                  { abort("unterminated nested comment block", nc_bline); }
+
+  /* allowable entry into nested comments: */
+
+<COMBLCK,AMUFNARG,AMUFNTEXTBLCK,AMUIFEXPR,AMUIFTEXTBLCK>{com_nest_open} { nc_init(); yy_push_state(COMNEST); }
 
   /*
     amu_bif:
