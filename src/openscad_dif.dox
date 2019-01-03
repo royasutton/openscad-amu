@@ -172,6 +172,7 @@
   | \ref dif_afc_amu_eval           | Evaluate arguments
   | \ref dif_afc_amu_shell          | Execute shell command
   | \ref dif_afc_amu_make           | Make script interface
+  | \ref dif_afc_amu_openscad       | Run an in-line openscad script
   | \ref dif_afc_amu_scope          | Query scope data
   | \ref dif_afc_amu_source         | Query source filename
   | \ref dif_afc_amu_copy           | Copy references
@@ -313,6 +314,9 @@
 
     \subsection dif_afc_amu_make \\amu_make
     \copydetails ODIF::ODIF_Scanner::bif_make()
+
+    \subsection dif_afc_amu_openscad \\amu_openscad
+    \copydetails ODIF::ODIF_Scanner::bif_openscad()
 
     \subsection dif_afc_amu_pathid \\amu_pathid
     \copydetails ODIF::ODIF_Scanner::bif_pathid()
