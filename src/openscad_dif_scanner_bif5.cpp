@@ -261,12 +261,13 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
     \amu_openscad
     (
       args="
+      --D m=\\"cone\\"
       --D n=\'\"a cone\"\'
       --D r=\'[4, 1]\'
       --D h=8
       --D f=30
-      --D d=\'[\"a cone\", [4, 1], 8, 30]\'
-      --D e=\'[n, r, h, f]\'
+      --D d=\'[\"cone\", \"a cone\", [4, 1], 8, 30]\'
+      --D e=\'[m, n, r, h, f]\'
       --D c=true
       --autocenter --viewall --imgsize=320,240 --view axes --projection o
       --o ${get_png_file_stem}.png
@@ -281,7 +282,7 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
 
       if ( c == true )
       {
-        echo(n=n, r=r, h=h, f=f);
+        echo(m=m, n=n, r=r, h=h, f=f);
         echo(d=d);
         echo(e=e);
       }
