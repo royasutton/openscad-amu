@@ -376,10 +376,6 @@ ODIF::ODIF_Scanner::bif_openscad(void)
   // construct system command
   string command_string;
 
-  // XXX
-  // XXX escape single and double quotated values of argument XXX
-  // XXX
-
   // remove newlines
   command_string = replace_chars(get_openscad_path() + " " + args + " " + file, "\n\r", ' ');
 
