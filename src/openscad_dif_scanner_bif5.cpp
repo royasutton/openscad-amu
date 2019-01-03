@@ -243,6 +243,7 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
     :----------:|:---:|:-------:|:-----------------------------------------
       rmecho    | o   | false   | remove OpenSCAD quoted [ECHO: "..."]
       rmfile    | d   | true    | remove script file after compilation
+      debug     | g   | false   | include command debug infomation
 
     Flags that produce output:
 
@@ -320,6 +321,7 @@ ODIF::ODIF_Scanner::bif_openscad(void)
 
   "rmecho",           "o",
   "rmfile",           "d",
+  "debug",            "g",
 
   "command",          "x",
   "script",           "p",
@@ -342,7 +344,8 @@ ODIF::ODIF_Scanner::bif_openscad(void)
   string fmt_con        = unquote     (fx_argv.arg_firstof(fmt_con_def,vana[ap],vana[ap+1])); ap+=2;
 
   bool rmecho   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
-  bool rmscript = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool rmfile   = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool debug    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
 
   bool command  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool script   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
@@ -418,7 +421,7 @@ ODIF::ODIF_Scanner::bif_openscad(void)
   filter_debug( "command return: " + string(command_good?"ok":"fail"), false, false );
 
   // remove script file
-  if ( rmscript )
+  if ( rmfile )
   {
     if ( bfs::exists(file) && bfs::is_regular_file(file) )
     {
@@ -447,6 +450,12 @@ ODIF::ODIF_Scanner::bif_openscad(void)
 
   // start results on newline
   string result = "\n";
+
+  // include command debug infomation
+  if ( debug )
+  {
+    result += indent_text("\n\\verbatim\n" + command_string + "\n\\endverbatim\n\n", 4);
+  }
 
   // append command line arguments to result
   if ( command )
