@@ -381,7 +381,7 @@ ODIF::ODIF_Scanner::bif_openscad(void)
   // XXX
 
   // remove newlines
-  command_string = replace_chars(get_openscad_path() + args + file, "\n\r", ' ');
+  command_string = replace_chars(get_openscad_path() + " " + args + " " + file, "\n\r", ' ');
 
   filter_debug( "issuing command: " + command_string, false, false );
 
@@ -438,7 +438,7 @@ ODIF::ODIF_Scanner::bif_openscad(void)
 
     if ( !tt.empty() ) result += indent_line(tt + "\n", ti);
     if ( !po.empty() ) result += indent_line(po + "\n", ti);
-                       result += indent_text(openscad + args + file, oi);
+                       result += indent_text(openscad + " " + args + " " + file, oi);
     if ( !oo.empty() ) result += indent_line(oo + "\n", ti);
   }
 
