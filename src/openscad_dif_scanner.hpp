@@ -481,6 +481,8 @@ class ODIF_Scanner : public yyFlexLexer{
   // openscad_dif_scanner_bif4.cpp
     //! generate a table from a list of text phrases.
     std::string bif_table(void);
+    //! include an image.
+    std::string bif_image(void);
     //! generate an image table for a list of images.
     std::string bif_image_table(void);
     //! generate a file viewer for various file formates (png, svg, stl, video, etc.).

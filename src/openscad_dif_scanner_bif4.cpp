@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner_bif4.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -270,6 +270,168 @@ ODIF::ODIF_Scanner::bif_table(void)
 
   // end table
   result.append("</table>");
+
+  return( result );
+}
+
+/***************************************************************************//**
+  \details
+
+    Output an image in \c html or \c latex format. The options and
+    their short codes are summarized in the following table.
+
+     options            | sc  | default  | description
+    :------------------:|:---:|:--------:|:----------------------------
+      type              | o   | html     | output type (html or latex)
+      caption           | c   |          | caption
+      class             | d   | image    | css div class
+      width             | w   |          | width
+      height            | h   |          | height
+      begin             | b   |          | div initial text
+      end               | e   |          | div final text
+      file              | f   |          | image file
+      title             | t   |          | hover title
+      url               | u   |          | selection URL
+
+    When using \p url, the function may need to be enclosed by \p
+    \\htmlonly and \p \\endhtmlonly to prevent Doxygen from rewriting
+    the assigned url. Text with Doxygen managed links may be placed in
+    the \p begin and \p end text.
+
+    \b Example
+    \verbatim
+    \amu_image
+    (
+      caption="A Cone"
+        begin="See \ref library for details."
+          end="(Cone in [wikipedia])"
+         file="${get_png_file_stem}.png"
+        title="Base radius 4 top radius 1."
+    )
+    \endverbatim
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_image(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "type",     "o",
+  "caption",  "c",
+  "class",    "d",
+  "width",    "w",
+  "height",   "h",
+  "begin",    "b",
+  "end",      "e",
+  "file",     "f",
+  "title",    "t",
+  "url",      "u",
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  size_t ap=0;
+  string type       = unquote_trim(fx_argv.arg_firstof("html"  ,vana[ap],vana[ap+1])); ap+=2;
+  string caption    = unquote_trim(fx_argv.arg_firstof(""      ,vana[ap],vana[ap+1])); ap+=2;
+  string div_class  = unquote_trim(fx_argv.arg_firstof("image" ,vana[ap],vana[ap+1])); ap+=2;
+  string width      = unquote_trim(fx_argv.arg_firstof(""      ,vana[ap],vana[ap+1])); ap+=2;
+  string height     = unquote_trim(fx_argv.arg_firstof(""      ,vana[ap],vana[ap+1])); ap+=2;
+  string div_begin  = unquote_trim(fx_argv.arg_firstof(""      ,vana[ap],vana[ap+1])); ap+=2;
+  string div_end    = unquote_trim(fx_argv.arg_firstof(""      ,vana[ap],vana[ap+1])); ap+=2;
+  string file       = unquote_trim(fx_argv.arg_firstof(""      ,vana[ap],vana[ap+1])); ap+=2;
+  string title      = unquote_trim(fx_argv.arg_firstof(""      ,vana[ap],vana[ap+1])); ap+=2;
+  string url        = unquote_trim(fx_argv.arg_firstof(""      ,vana[ap],vana[ap+1])); ap+=2;
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  // validate named arguments: (must be one of the declared options).
+  vector<string> av = fx_argv.names_v(true, false);
+  for ( vector<string>::iterator it=av.begin(); it!=av.end(); ++it )
+    if ( vans.find( *it ) == vans.end() )
+      return( amu_error_msg(*it + " invalid option. " + help) );
+
+  //
+  // general argument validation:
+  //
+
+  // enforce zero positional arguments (except arg0).
+  if ( fx_argv.size(false, true) != 1 )
+    return(amu_error_msg("requires zero positional argument. " + help));
+
+  // required arguments: type must exists and be one of 'html' or 'latex'
+  if ( type.compare("html") && type.compare("latex") )
+    return( amu_error_msg( "type " + type + " is invalid. may be (html|latex).") );
+
+  string result;
+
+  // ----------------------------------------------------------------- //
+  //                            html image
+  // ----------------------------------------------------------------- //
+  if ( type.compare("html")==0 )
+  {
+    // div
+    result.append("<div class=\"" + div_class + "\">");
+
+    // div begin text
+    if ( div_begin.length() ) result.append( div_begin );
+
+    bool found = false;
+    string output = get_html_output();
+
+    // url
+    if ( url.length() )
+      result.append( "<a href=\"" + file_rl( url, output, found ) + "\">" );
+
+    // image
+    result.append( "<img src=\"" + file_rl( file, output, found ) + "\"" );
+
+    // title
+    if ( title.length() )
+    {
+      result.append(" title=\"" + title + "\"");
+      result.append(" alt=\"" + title + "\"");
+    }
+
+    if ( width.length() ) result.append(" width=\"" + width + "\"");
+    if ( height.length() ) result.append(" height=\"" + height + "\"");
+
+    // end image
+    result.append(">");
+
+    // end url
+    if ( url.length() ) result.append("</a>");
+
+    // caption
+    if ( caption.length() )
+      result.append("<div class=\"caption\">" + caption + "</div>");
+
+    // div end text
+    if ( div_end.length() ) result.append( div_end );
+
+    // div
+    result.append("</div>");
+  }
+
+  // ----------------------------------------------------------------- //
+  //                            latex image
+  // ----------------------------------------------------------------- //
+  if ( type.compare("latex")==0 )
+  {
+    result = amu_error_msg("unimplemented.");
+  }
 
   return( result );
 }

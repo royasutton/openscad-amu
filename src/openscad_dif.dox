@@ -185,6 +185,7 @@
   | \ref dif_afc_amu_word           | Count or select words from a list
   | \ref dif_afc_amu_seq            | Generate a sequence of numbers
   | \ref dif_afc_amu_table          | Generate a text table
+  | \ref dif_afc_amu_image          | Include an image
   | \ref dif_afc_amu_image_table    | Generate an image table
   | \ref dif_afc_amu_viewer         | Graphics file viewer
 
@@ -305,6 +306,9 @@
     \copydetails ODIF::ODIF_Scanner::if_init()
     \copydetails ODIF::ODIF_Scanner::bif_if_exp_1a()
     \copydetails ODIF::ODIF_Scanner::bif_if_exp_2a()
+
+    \subsection dif_afc_amu_image \\amu_image
+    \copydetails ODIF::ODIF_Scanner::bif_image()
 
     \subsection dif_afc_amu_image_table \\amu_image_table
     \copydetails ODIF::ODIF_Scanner::bif_image_table()
