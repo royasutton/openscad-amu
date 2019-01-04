@@ -55,6 +55,56 @@
   \section overview Overview
     Overview.
 
+  \subsection inline In-line script
+
+    \amu_define file_path_stem (${DOXYGEN_OUTPUT}${HTML_OUTPUT}/${OUTPUT_PREFIX}/${ext}/${STEM_NAME}_${name})
+    \amu_eval get_png_file_stem (name=test ext=png ${file_path_stem})
+
+    \amu_openscad
+    (
+      args="
+      --D m=\\"cone\\"
+      --D n=\'\"a cone\"\'
+      --D r=\'[4, 1]\'
+      --D h=8
+      --D f=30
+      --D d=\'[\"cone\", \"a cone\", [4, 1], 8, 30]\'
+      --D e=\'[m, n, r, h, f]\'
+      --D c=true
+      --autocenter --viewall --imgsize=320,240 --view axes --projection o
+      --o ${get_png_file_stem}.png
+      "
+
+      ++command ++script ++console
+    )
+    {
+      // in-line script demo
+
+      cylinder( r1=r[0], r2=r[1], h=h, $fn=f );
+
+      if ( c == true )
+      {
+        echo(m=m, n=n, r=r, h=h, f=f);
+        echo(d=d);
+        echo(e=e);
+      }
+    }
+
+    /+ \htmlonly +/
+    \amu_image
+    (
+      o=html
+      c="A Cone"
+      b="See the \ref library for details."
+      e="(Cone in [wikipedia])"
+      f="${get_png_file_stem}.png"
+      t="Base radius 4 top radius 1."
+      /+ u="${get_png_file_stem}.png" +/
+    )
+    /+ \endhtmlonly +/
+
+  [wikipedia]: https://en.wikipedia.org/wiki/Cone
+
   \subsection design Design
 
     \ref design.scad "Design Documentation."
