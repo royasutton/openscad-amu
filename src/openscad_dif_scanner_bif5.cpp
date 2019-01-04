@@ -243,6 +243,8 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
     :----------:|:---:|:-------:|:-----------------------------------------
       rmecho    | o   | false   | remove OpenSCAD quoted [ECHO: "..."]
       rmfile    | d   | true    | remove script file after compilation
+      shfile    | sf  | false   | show script file with command arguments
+      shbin     | sb  | true    | show openscad bin with command arguments
       debug     | g   | false   | include command debug infomation
 
     Flags that produce output:
@@ -322,6 +324,8 @@ ODIF::ODIF_Scanner::bif_openscad(void)
 
   "rmecho",           "o",
   "rmfile",           "d",
+  "shfile",           "sf",
+  "shbin",            "sb",
   "debug",            "g",
 
   "command",          "x",
@@ -346,6 +350,8 @@ ODIF::ODIF_Scanner::bif_openscad(void)
 
   bool rmecho   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool rmfile   = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool shfile   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool shbin    = ( atoi( unquote_trim(fx_argv.arg_firstof("1",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool debug    = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
 
   bool command  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
@@ -472,7 +478,12 @@ ODIF::ODIF_Scanner::bif_openscad(void)
 
     if ( !tt.empty() ) result += indent_line(tt + "\n", ti);
     if ( !po.empty() ) result += indent_line(po + "\n", ti);
-                       result += indent_text(openscad + " " + args + " " + file, oi);
+                       result += indent_text
+                                 (
+                                     (shbin?(openscad + " "):"")
+                                   + args
+                                   + (shfile?(" " + file):""), oi
+                                 );
     if ( !oo.empty() ) result += indent_line(oo + "\n", ti);
   }
 
