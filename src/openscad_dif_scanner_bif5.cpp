@@ -212,8 +212,8 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
       file            | f   | <auto-temp>                                 | script file name
       args            | a   |                                             | command line arguments
       ...             |     |                                             | ...
-      format_command  | fx  | "0,\code,\endcode,4,<b>Command:</b>"        | command output format
-      format_script   | fp  | "0,\code,\endcode,4,<b>Script:</b>"         | script output format
+      format_command  | fx  | "2,\code,\endcode,4,<b>Command:</b>"        | command output format
+      format_script   | fp  | "2,\code,\endcode,4,<b>Script:</b>"         | script output format
       format_console  | fc  | "2,\verbatim,\endverbatim,4,<b>Output:</b>" | console output format
 
     Text-block indentation affects the format behavior of Doxygen.
@@ -331,8 +331,8 @@ ODIF::ODIF_Scanner::bif_openscad(void)
   set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
 
   // output format defaults
-  string fmt_cmd_def = "0,\\code,\\endcode,4,<b>Command:</b>";
-  string fmt_scr_def = "0,\\code,\\endcode,4,<b>Script:</b>";
+  string fmt_cmd_def = "2,\\code,\\endcode,4,<b>Command:</b>";
+  string fmt_scr_def = "2,\\code,\\endcode,4,<b>Script:</b>";
   string fmt_con_def = "2,\\verbatim,\\endverbatim,4,<b>Output:</b>";
 
   // assign local variable values: positions must match declaration above.
