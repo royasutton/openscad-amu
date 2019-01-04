@@ -288,7 +288,7 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
       }
     }
 
-    \image html \amu_eval(${get_png_file_stem}).png "A Cone"
+    \amu_image (c="A Cone" f="${get_png_file_stem}.png")
     \endcode
 
     Comment blocks may not be used within the in-line script. Doxygen
