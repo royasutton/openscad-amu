@@ -80,8 +80,8 @@ else
 fi
 
 # openscad path
-AC_MSG_CHECKING([OpenSCAD])
-AC_PATH_PROG(OPENSCAD_PATH, openscad, false)
+AC_MSG_CHECKING([OpenSCAD nightly])
+AC_PATH_PROG(OPENSCAD_PATH, openscad-nightly, false)
 if test "$OPENSCAD_PATH" = false ; then
   OPENSCAD_PATH="openscad"
   AC_MSG_WARN([openscad not found, using ${OPENSCAD_PATH}... no])
