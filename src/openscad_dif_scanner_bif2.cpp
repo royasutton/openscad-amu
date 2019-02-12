@@ -752,7 +752,7 @@ ODIF::ODIF_Scanner::bif_filename(void)
 /***************************************************************************//**
   \details
 
-    Perform operations on text files.
+    Text file read operations.
 
     The options and flags (and their short codes) are summarized in the
     following tables.

@@ -170,18 +170,18 @@
   | \ref dif_afc_amu_define         | Define text macro
   | \ref dif_afc_amu_if             | Conditional text output
   | \ref dif_afc_amu_foreach        | Enumerated textual substitution
-  | \ref dif_afc_amu_eval           | Evaluate arguments
+  | \ref dif_afc_amu_eval           | Text variable expansion
   | \ref dif_afc_amu_shell          | Execute shell command
   | \ref dif_afc_amu_make           | Make script interface
   | \ref dif_afc_amu_openscad       | Run an in-line openscad script
   | \ref dif_afc_amu_scope          | Query scope data
   | \ref dif_afc_amu_source         | Query source filename
-  | \ref dif_afc_amu_copy           | Copy references
+  | \ref dif_afc_amu_copy           | Copy references to documentation
   | \ref dif_afc_amu_find           | Search for output files
   | \ref dif_afc_amu_pathid         | Generate source path identifier
   | \ref dif_afc_amu_filename       | Operations for filename lists
-  | \ref dif_afc_amu_file           | Perform operations on text files
-  | \ref dif_afc_amu_combine        | Combine words
+  | \ref dif_afc_amu_file           | Text file read operations
+  | \ref dif_afc_amu_combine        | Combine sets of words
   | \ref dif_afc_amu_replace        | Text search and replace operation
   | \ref dif_afc_amu_word           | Count or select words from a list
   | \ref dif_afc_amu_seq            | Generate a sequence of numbers
