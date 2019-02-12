@@ -114,6 +114,8 @@ void
 ODIF::ODIF_Scanner::update_gevm(void)
 {
   // configuration variables
+  gevm.store( "AUTO_CONFIG_PATH", get_config_prefix() );
+
   gevm.store( "DOXYGEN_OUTPUT", get_doxygen_output() );
   gevm.store( "HTML_OUTPUT", get_html_output() );
   gevm.store( "LATEX_OUTPUT", get_latex_output() );

@@ -145,6 +145,7 @@
 
    name               | description
   :-------------------|:----------------------------------
+   AUTO_CONFIG_PATH   | auto configuration path.
    DOXYGEN_OUTPUT     | doxygen output rootpath
    HTML_OUTPUT        | html output path name
    LATEX_OUTPUT       | latex output path name
