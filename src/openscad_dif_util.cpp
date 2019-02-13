@@ -694,6 +694,10 @@ UTIL::get_relative_path(
   boost::filesystem::path::const_iterator tit = to_path.begin();
   boost::filesystem::path::const_iterator fit = from_path.begin();
 
+  // remove leading '.' from both paths if any
+  while (tit !=   to_path.end() && (*tit) == ".") ++tit;
+  while (fit != from_path.end() && (*fit) == ".") ++fit;
+
   // loop while they are the same to find common parent path
   while (tit != to_path.end() && fit != from_path.end() && (*fit) == (*tit))
   {
