@@ -713,7 +713,10 @@ UTIL::get_relative_path(
     // in order to return to the common parent path
     while (fit != from_path.end())
     {
-      relative_path /= "..";
+      // ignore current directory reference
+      if ((*fit) != ".")
+        relative_path /= "..";
+
       ++fit;
     }
   }
@@ -721,7 +724,10 @@ UTIL::get_relative_path(
   // append remainder of to_path
   while (tit != to_path.end())
   {
-    relative_path /= *tit;
+    // ignore current directory reference
+    if ((*tit) != ".")
+      relative_path /= *tit;
+
     ++tit;
   }
 
