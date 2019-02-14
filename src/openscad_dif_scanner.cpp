@@ -1005,12 +1005,12 @@ ODIF::ODIF_Scanner::file_rl(
 )
 {
   bfs::path file_path ( file );
-  bfs::path location;
+  bfs::path file_found;
 
   found = false;
 
   //
-  // test if file has a parent path
+  // search include paths for file (test if file has a parent path).
   //
   if ( file_path.has_parent_path() )
   {
@@ -1027,7 +1027,7 @@ ODIF::ODIF_Scanner::file_rl(
       if ( exists(p) && is_regular_file(p) )
       {
         found = true;
-        location = p;
+        file_found = p;
 
         break;
       }
@@ -1048,7 +1048,7 @@ ODIF::ODIF_Scanner::file_rl(
       if ( exists(p) && is_regular_file(p) )
       {
         found = true;
-        location = p;
+        file_found = p;
 
         break;
       }
@@ -1056,91 +1056,143 @@ ODIF::ODIF_Scanner::file_rl(
   }
 
   string reference;
+
+  //
+  // found
+  //
   if ( found )
   {
-    filter_debug(" found.", false, false, false);
+    bfs::path target = file_found;
 
-    bfs::path target;
-    bfs::path rootoutpath;
+    filter_debug(" found [" + file_found.string() + "]", false, false, false);
 
+    //
+    // format output not specified, disabled
+    //
     if ( subdir.compare(NO_FORMAT_OUTPUT) == 0 )
     {
       filter_debug(" format output disabled.", false, false, false);
-      target = location;
     }
-    else if ( copy )
+
+    //
+    // format output specified
+    //
+    else
     {
-      bfs::path source  = location;
-      bfs::path outpath = get_doxygen_output();
-      bfs::path prefix  = UTIL::get_relative_path(source.parent_path(), outpath, true);
+      bfs::path outpath  = get_doxygen_output();
+                outpath /= subdir;
 
-      outpath /= subdir;
-      rootoutpath = outpath;
+      filter_debug(" root output path [" + outpath.string() + "]", false, false, false);
 
-      // set output filename
-      bfs::path outname;
-      if ( rid )
-      { // random output filename.
-        outname  = bfs::unique_path( bfs::path("%%%%-%%%%-%%%%-%%%%-%%%%-%%%%") );
-        outname += source.extension();
-      }
-      else
+      //
+      // copy to output
+      //
+      if ( copy )
       {
-        outname = location.filename();
-      }
+        bfs::path source = file_found;
+        bfs::path outname;
 
-      // prefix output file with input file prefix
-      if ( get_prefix_scripts() )
-      {
-        filter_debug(" relative prefix [" + prefix.string() + "]", false, false, false);
+        filter_debug(" copying...", false, false, false);
 
-        std::string m;
-        if ( UTIL::make_dir(prefix.string(), m, true, outpath.string()) )
-          filter_debug(" " + m, false, false, false);
-
-        outpath /= prefix;
-      }
-
-      // set target path and filename
-      target = outpath / outname.filename();
-
-      filter_debug(" copying to [" + target.string() + "]", false, false, false);
-
-      // skip copy when file of same size exists.
-      bool copy_needed = true;
-      if ( exists(target) && is_regular_file(target) )
-      {
-        if ( bfs::file_size( source ) == bfs::file_size( target ) )
+        // output file name
+        if ( rid )
         {
-          filter_debug("  same sized file exists.", false, false, false);
+          outname  = bfs::unique_path( bfs::path("%%%%-%%%%-%%%%-%%%%-%%%%-%%%%") );
+          outname += source.filename().extension();
 
-          copy_needed = false;
+          filter_debug(" rid [" + outname.string() + "]", false, false, false);
         }
         else
         {
-          bfs::remove( target );
+          outname = source.filename();
         }
+
+        // target prefix path relative to outpath
+        bfs::path prefix = UTIL::get_relative_path(source.parent_path(), outpath, true);
+
+        if ( ! prefix.empty() )
+        {
+          filter_debug(" adding target prefix [" + prefix.string() + "]", false, false, false);
+
+          // create output directory prefix path(s)
+          std::string m;
+          if ( UTIL::make_dir(prefix.string(), m, true, outpath.string()) )
+            filter_debug(" " + m, false, false, false);
+
+          target = outpath / prefix / outname;
+        }
+        else
+        {
+          target = outpath / outname;
+        }
+
+        filter_debug(" target [" + target.string() + "]", false, false, false);
+
+        bool copy_needed = true;
+
+        // skip copy when file of same size exists.
+        if ( exists(target) && is_regular_file(target) )
+        {
+          if ( bfs::file_size( source ) == bfs::file_size( target ) )
+          {
+            copy_needed = false;
+
+            filter_debug("  same sized target exists.", false, false, false);
+          }
+          else
+          { // differ in size, remove.
+            bfs::remove( target );
+          }
+        }
+
+        // could skip copy when source path is subdirectory of output path
+        // ie: (outpath / get_relative_path(source, outpath) == source)
+
+        if ( copy_needed )
+        {
+          // copy source to target
+          bfs::copy_file( source, target, bfs::copy_option::overwrite_if_exists );
+
+          filter_debug(" copy done.", false, false, false);
+        }
+
+        // remake return reference to target path relative to parent outpath
+        // remove outpath from: target = outpath / prefix / outname
+        target = UTIL::get_relative_path(target, outpath, true);
+
+        filter_debug(" make target reference relative to parent output path.", false, false, false);
       }
 
-      if ( copy_needed )
+      //
+      // do not copy to output
+      //
+      else
       {
-        // copy source to target
-        bfs::copy_file( source, target, bfs::copy_option::overwrite_if_exists );
-        filter_debug(" done.", false, false, false);
+        filter_debug(" copy disabled.", false, false, false);
+
+        // remake return reference to target path relative to outpath
+        // with full return to common parent via successive '../'
+        target = UTIL::get_relative_path(target, outpath, false);
+
+        filter_debug(" make target reference relative to output path.", false, false, false);
       }
-    }
 
-    // remake target path relative to rootoutpath
-    target = UTIL::get_relative_path(target, rootoutpath, true);
+    } // output specified
 
-    // return with or without extension
-    if ( extension == true )
+    //
+    // reference returned with or without extension
+    //
+    if ( extension )
       reference = target.string();
     else
       reference = target.stem().string();
   }
+
+  //
+  // not found
+  //
   else
-  { // file not found.
+  {
     filter_debug(" not found.", false, false, false);
 
     reference = file;
