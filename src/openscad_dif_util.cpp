@@ -743,7 +743,7 @@ UTIL::make_dir(const std::string &d,
   boost::filesystem::path b ( a );      // existing ancestors base path
   boost::filesystem::path n ( b / f );  // new complete target path
 
-  bool created = false;
+  bool ok = true;
 
   m = "makedir";
 
@@ -762,11 +762,12 @@ UTIL::make_dir(const std::string &d,
     // make sure parent path exists
     if ( boost::filesystem::exists( np ) && boost::filesystem::is_directory( np ) )
     { // make target path.
-      created = boost::filesystem::create_directory( n );
+      ok = boost::filesystem::create_directory( n );
       m += " [" + n.string() + "] 1 created";
     }
     else
     {
+      ok = false;
       m += " ERROR: parent path [" + np.string() + "] does not exists, not created.";
     }
   }
@@ -796,9 +797,8 @@ UTIL::make_dir(const std::string &d,
 
     // make missing parents of target directory path
     uint count = 0;
-    bool success = true;
 
-    while (nit != n.end() && success)
+    while (nit != n.end() && ok)
     {
       t /= *nit;
 
@@ -808,19 +808,18 @@ UTIL::make_dir(const std::string &d,
       }
       else
       {
-        success = boost::filesystem::create_directory( t );
+        ok = boost::filesystem::create_directory( t );
         m += "/<" + nit->string() + ">";
         count++;
       }
 
       ++nit;
     }
-    created = success;
 
     m += "] " + to_string( count ) + " created";
   }
 
-  return created;
+  return ok;
 }
 
 string
