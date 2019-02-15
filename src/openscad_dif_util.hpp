@@ -330,7 +330,9 @@ namespace UTIL{
   //! remove  ECHO from an OpenSCAD console output text
   std::string openscad_rmecho_text(const std::string &text);
 
-  //! return the feild num from string str tokenized by toks with default support.
+  //! return the vector of fields from string str tokenized by toks.
+  std::vector<std::string> get_field_vector(const std::string &str, const std::string &toks);
+  //! return the field num from string str tokenized by toks with default support.
   std::string get_field(const size_t &num,
                         const std::string &str, const std::string &def_str="",
                         const std::string &toks=",", const std::string &defs="-");

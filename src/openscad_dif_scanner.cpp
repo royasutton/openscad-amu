@@ -92,7 +92,7 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
   gevm.store( "STEM_NAME", ifrp.stem().string() );
   gevm.store( "EXT_NAME", ifrp.extension().string() );
 
-  // amu_eval feild separator
+  // amu_eval field separator
   gevm.store( "EFS", " " );
 
   // initialize include file variables

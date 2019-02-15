@@ -225,7 +225,7 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
     "<output-indent>, <pre-output>, <post-output>, <title-indent>, <title-text>"
     \endverbatim
 
-    The '-' character can be used to indicate that a feild should keep
+    The '-' character can be used to indicate that a field should keep
     its default value shows above.
 
     \b Examples:

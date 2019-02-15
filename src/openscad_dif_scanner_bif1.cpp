@@ -62,7 +62,7 @@ namespace bfs = boost::filesystem;
      ++global, --global | false   | update global variable scope
 
     \em Positional arguments are expanded and appended to the return
-    value. Each argument is separated by a configurable feild
+    value. Each argument is separated by a configurable field
     separator, ${EFS}. By default, ${EFS}='[:space:]'. Escaped
     variables are reduced and checked during subsequent expansions.
     Delayed expansion is required to access the value of a variable
@@ -81,7 +81,7 @@ ODIF::ODIF_Scanner::bif_eval(void)
   bool update_local = true;
   bool update_global = false;
 
-  // setup feild separator variable reference
+  // setup field separator variable reference
   string efs = levm.get_prefix() + "EFS" + levm.get_suffix();
 
   string result;
@@ -94,7 +94,7 @@ ODIF::ODIF_Scanner::bif_eval(void)
     // argument is positional
     if ( it->positional )
     {
-      // append feild separator
+      // append field separator
       if ( result.length() != 0 )
         result.append( UTIL::unquote( levm.expand(efs) ) );
 

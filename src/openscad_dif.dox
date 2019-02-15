@@ -139,7 +139,7 @@
 
    name               | description
   :-------------------|:----------------------------------
-   EFS                | amu_eval feild separator
+   EFS                | amu_eval field separator
 
   <b>Seam Configuration:</b>
 

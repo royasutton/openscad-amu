@@ -903,52 +903,57 @@ UTIL::openscad_rmecho_text(const std::string &text)
   return new_text;
 }
 
-std::string
-UTIL::get_field(const size_t &num,
-                const std::string &str, const std::string &def_str,
-                const std::string &toks, const std::string &defs)
+vector<string>
+UTIL::get_field_vector(const std::string &str, const std::string &toks)
 {
   typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
 
   // keep empty tokens without delimeters
   boost::char_separator<char>
-      feild_separators( toks.c_str(), "", boost::keep_empty_tokens );
+      field_separators( toks.c_str(), "", boost::keep_empty_tokens );
 
   // tokenize 'str' to vector
-  tokenizer str_tokens( str, feild_separators );
+  tokenizer str_tokens( str, field_separators );
 
   vector<string> str_vector;
   for ( tokenizer::iterator it=str_tokens.begin(); it!=str_tokens.end(); ++it )
     str_vector.push_back( boost::trim_copy( *it ) );
 
-  string feild;
+  return ( str_vector );
+}
+
+std::string
+UTIL::get_field(const size_t &num,
+                const std::string &str, const std::string &def_str,
+                const std::string &toks, const std::string &defs)
+{
+  string str_field;
+
+  // tokenize 'str' to vector
+  vector<string> str_vector = get_field_vector(str, toks);
 
   if ( num < str_vector.size() )
   {
-    // get feild
-    feild = str_vector.at( num );
+    // get field
+    str_field = str_vector.at( num );
 
-    // when equal to 'defs' get default from 'def_str'
-    if ( feild.compare( defs ) == 0 )
+    // when 'str_field' equal to 'defs' get default from 'def_str'
+    if ( str_field.compare( defs ) == 0 )
     {
-        // tokenize 'def_str' to vector
-        tokenizer def_str_tokens( def_str, feild_separators );
+      string def_field;
 
-        vector<string> def_str_vector;
-        for ( tokenizer::iterator it=def_str_tokens.begin(); it!=def_str_tokens.end(); ++it )
-          def_str_vector.push_back( boost::trim_copy( *it ) );
+      // tokenize 'def_str' to vector
+      vector<string> def_vector = get_field_vector(def_str, toks);
 
-        string feild_default;
+      if ( num < def_vector.size() )
+        def_field = def_vector.at( num );
 
-        if ( num < def_str_vector.size() )
-          feild_default = def_str_vector.at( num );
-
-        // assign default
-        feild = feild_default;
+      // assign default
+      str_field = def_field;
     }
   }
 
-  return ( feild );
+  return ( str_field );
 }
 
 /*******************************************************************************
