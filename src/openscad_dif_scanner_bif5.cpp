@@ -467,11 +467,11 @@ ODIF::ODIF_Scanner::bif_openscad(void)
   // append command line arguments to result
   if ( command )
   {
-    int    oi = atoi( get_feild( 0, fmt_cmd, fmt_cmd_def ).c_str() );
-    string po =       get_feild( 1, fmt_cmd, fmt_cmd_def );
-    string oo =       get_feild( 2, fmt_cmd, fmt_cmd_def );
-    int    ti = atoi( get_feild( 3, fmt_cmd, fmt_cmd_def ).c_str() );
-    string tt =       get_feild( 4, fmt_cmd, fmt_cmd_def );
+    int    oi = atoi( get_field( 0, fmt_cmd, fmt_cmd_def ).c_str() );
+    string po =       get_field( 1, fmt_cmd, fmt_cmd_def );
+    string oo =       get_field( 2, fmt_cmd, fmt_cmd_def );
+    int    ti = atoi( get_field( 3, fmt_cmd, fmt_cmd_def ).c_str() );
+    string tt =       get_field( 4, fmt_cmd, fmt_cmd_def );
 
     // indent path to same indentation as 'args'
     string openscad = indent_line( get_openscad_path(), get_indent(args) );
@@ -490,11 +490,11 @@ ODIF::ODIF_Scanner::bif_openscad(void)
   // append in-line script to result
   if ( script )
   {
-    int    oi = atoi( get_feild( 0, fmt_scr, fmt_scr_def ).c_str() );
-    string po =       get_feild( 1, fmt_scr, fmt_scr_def );
-    string oo =       get_feild( 2, fmt_scr, fmt_scr_def );
-    int    ti = atoi( get_feild( 3, fmt_scr, fmt_scr_def ).c_str() );
-    string tt =       get_feild( 4, fmt_scr, fmt_scr_def );
+    int    oi = atoi( get_field( 0, fmt_scr, fmt_scr_def ).c_str() );
+    string po =       get_field( 1, fmt_scr, fmt_scr_def );
+    string oo =       get_field( 2, fmt_scr, fmt_scr_def );
+    int    ti = atoi( get_field( 3, fmt_scr, fmt_scr_def ).c_str() );
+    string tt =       get_field( 4, fmt_scr, fmt_scr_def );
 
     if ( !tt.empty() ) result += indent_line(tt + "\n", ti);
     if ( !po.empty() ) result += indent_line(po + "\n", ti);
@@ -505,11 +505,11 @@ ODIF::ODIF_Scanner::bif_openscad(void)
   // append script console output to result
   if ( console )
   {
-    int    oi = atoi( get_feild( 0, fmt_con, fmt_con_def ).c_str() );
-    string po =       get_feild( 1, fmt_con, fmt_con_def );
-    string oo =       get_feild( 2, fmt_con, fmt_con_def );
-    int    ti = atoi( get_feild( 3, fmt_con, fmt_con_def ).c_str() );
-    string tt =       get_feild( 4, fmt_con, fmt_con_def );
+    int    oi = atoi( get_field( 0, fmt_con, fmt_con_def ).c_str() );
+    string po =       get_field( 1, fmt_con, fmt_con_def );
+    string oo =       get_field( 2, fmt_con, fmt_con_def );
+    int    ti = atoi( get_field( 3, fmt_con, fmt_con_def ).c_str() );
+    string tt =       get_field( 4, fmt_con, fmt_con_def );
 
     if ( !tt.empty() ) result += indent_line(tt + "\n", ti);
     if ( !po.empty() ) result += indent_line(po + "\n", ti);

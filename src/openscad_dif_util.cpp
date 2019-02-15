@@ -904,7 +904,7 @@ UTIL::openscad_rmecho_text(const std::string &text)
 }
 
 std::string
-UTIL::get_feild(const size_t &num,
+UTIL::get_field(const size_t &num,
                 const std::string &str, const std::string &def_str,
                 const std::string &toks, const std::string &defs)
 {

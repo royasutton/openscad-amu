@@ -331,7 +331,7 @@ namespace UTIL{
   std::string openscad_rmecho_text(const std::string &text);
 
   //! return the feild num from string str tokenized by toks with default support.
-  std::string get_feild(const size_t &num,
+  std::string get_field(const size_t &num,
                         const std::string &str, const std::string &def_str="",
                         const std::string &toks=",", const std::string &defs="-");
 
