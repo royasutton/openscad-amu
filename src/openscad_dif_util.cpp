@@ -38,7 +38,6 @@
 #include "openscad_dif_util.hpp"
 
 #include <boost/regex.hpp>
-#include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 
 #if defined(HAVE_CONFIG_H)
@@ -903,16 +902,23 @@ UTIL::openscad_rmecho_text(const std::string &text)
   return new_text;
 }
 
+/*
+  boost::empty_token_policy
+    { drop_empty_tokens | keep_empty_tokens }
+*/
 vector<string>
-UTIL::get_field_vector(const std::string &str, const std::string &toks)
+UTIL::string_tokenize_to_vector(
+  const std::string &str,
+  const std::string &toks,                      // dropped delimiters
+  const std::string &toks_keep,                 // kept delimiters
+  const boost::empty_token_policy empty_tokens
+)
 {
   typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
 
-  // keep empty tokens without delimeters
   boost::char_separator<char>
-      field_separators( toks.c_str(), "", boost::keep_empty_tokens );
+      field_separators( toks.c_str(), toks_keep.c_str(), empty_tokens );
 
-  // tokenize 'str' to vector
   tokenizer str_tokens( str, field_separators );
 
   vector<string> str_vector;
@@ -929,8 +935,8 @@ UTIL::get_field(const size_t &num,
 {
   string str_field;
 
-  // tokenize 'str' to vector
-  vector<string> str_vector = get_field_vector(str, toks);
+  vector<string> str_vector =
+    string_tokenize_to_vector(str, toks, "", boost::keep_empty_tokens);
 
   if ( num < str_vector.size() )
   {
@@ -942,8 +948,8 @@ UTIL::get_field(const size_t &num,
     {
       string def_field;
 
-      // tokenize 'def_str' to vector
-      vector<string> def_vector = get_field_vector(def_str, toks);
+      vector<string> def_vector =
+        string_tokenize_to_vector(def_str, toks, "", boost::keep_empty_tokens);
 
       if ( num < def_vector.size() )
         def_field = def_vector.at( num );

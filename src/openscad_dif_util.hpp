@@ -34,6 +34,7 @@
 #define __ODIF_UTIL_HPP__ 1
 
 #include <boost/filesystem.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -330,8 +331,13 @@ namespace UTIL{
   //! remove  ECHO from an OpenSCAD console output text
   std::string openscad_rmecho_text(const std::string &text);
 
-  //! return the vector of fields from string str tokenized by toks.
-  std::vector<std::string> get_field_vector(const std::string &str, const std::string &toks);
+  //! tokenize string to a vector of string on toks.
+  std::vector<std::string> string_tokenize_to_vector(
+    const std::string &str,
+    const std::string &toks = ",",
+    const std::string &toks_keep = "",
+    const boost::empty_token_policy empty_tokens = boost::drop_empty_tokens
+  );
   //! return the field num from string str tokenized by toks with default support.
   std::string get_field(const size_t &num,
                         const std::string &str, const std::string &def_str="",
