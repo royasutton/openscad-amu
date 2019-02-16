@@ -3,7 +3,7 @@
   \file   openscad_dif_util.hpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -34,6 +34,7 @@
 #define __ODIF_UTIL_HPP__ 1
 
 #include <boost/filesystem.hpp>
+#include <boost/tokenizer.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -283,6 +284,13 @@ namespace UTIL{
                     bool& success, const bool& standard_error=false,
                     const bool& replace_newlines=false);
 
+  //! return string indentation as the start of first non-space character.
+  size_t get_indent(const std::string& t);
+  //! indent a line l by n spaces.
+  std::string indent_line(const std::string& l, const int n);
+  //! indent each line of t by n spaces.
+  std::string indent_text(const std::string& t, const int n);
+
   //! return word number n from string w.
   std::string get_word(const std::string& w, const int n);
 
@@ -317,6 +325,23 @@ namespace UTIL{
 
   //! convert a decimal to a roman numeral
   std::string to_roman_numeral(const int &n);
+
+  //! remove  ECHO from an OpenSCAD console output line
+  std::string openscad_rmecho_line(const std::string &line);
+  //! remove  ECHO from an OpenSCAD console output text
+  std::string openscad_rmecho_text(const std::string &text);
+
+  //! tokenize string to a vector of string on toks.
+  std::vector<std::string> string_tokenize_to_vector(
+    const std::string &str,
+    const std::string &toks = ",",
+    const std::string &toks_keep = "",
+    const boost::empty_token_policy empty_tokens = boost::drop_empty_tokens
+  );
+  //! return the field num from string str tokenized by toks with default support.
+  std::string get_field(const size_t &num,
+                        const std::string &str, const std::string &def_str="",
+                        const std::string &toks=",", const std::string &defs="-");
 
 } /* end namespace UTIL */
 

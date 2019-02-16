@@ -271,6 +271,8 @@ main(int argc, char** argv)
     string output_prefix;
     string make_path      = __MAKE_PATH__;
     string makefile_ext   = ".makefile";
+    string openscad_path  = __OPENSCAD_PATH__;
+    string openscad_ext   = ".scad";
 
     // other
     vector<string> scope_id_mf;
@@ -344,7 +346,13 @@ main(int argc, char** argv)
           "GNU Make executable path.")
       ("makefile-ext",
           po::value<string>(&makefile_ext)->default_value(makefile_ext),
-          "Makefile file extension.")
+          "Makefile file extension.\n")
+      ("openscad-path",
+          po::value<string>(&openscad_path)->default_value(openscad_path),
+          "OpenSCAD executable path.")
+      ("openscad-ext",
+          po::value<string>(&openscad_ext)->default_value(openscad_ext),
+          "OpenSCAD script extension.")
     ;
 
     // all parsed options
@@ -713,10 +721,16 @@ main(int argc, char** argv)
     scanner.set_output_prefix( output_prefix );
     scanner.set_make_path( make_path );
     scanner.set_makefile_ext( makefile_ext );
+    scanner.set_openscad_path( openscad_path );
+    scanner.set_openscad_ext( openscad_ext );
 
     // other
     scanner.set_scope_id_mf( scope_id_mf );
 
+    // update global environment variable map
+    scanner.update_gevm();
+
+    // process input file
     while( scanner.scan() != 0 )
       ;
   }

@@ -16,9 +16,9 @@
 
   \section openscad_dif_sm Documenting OpenSCAD scripts
 
-  This filter may be used to markup OpenSCAD scripts for use with
-  Doygen. See [Documenting the code][docblocks] in the Doxygen manual
-  for information.
+  This filter may be used to preprocess OpenSCAD scripts that have been
+  marked up with Doxygen-style documentation. See [Documenting the
+  code][docblocks] in the Doxygen manual for information.
 
   [docblocks]: http://www.doxygen.nl/manual/docblocks.html
 
@@ -26,8 +26,7 @@
   \subsection openscad_dif_sm_cs Comment Sections
 
   Comment patters are identified according to the rules in the
-  following table. See the flex documentation on [patterns] for more
-  information.
+  following table.
 
    pattern    | description
   :----------:|:--------------------------------------
@@ -38,83 +37,132 @@
    "/""+"+    | begin a nested comment block.
    "+"+"/"    | end nested comment block.
 
-  The filter supports nested comments which are useful for documenting
-  the bahavior of include files and macros. A single level of nesting
-  is permitted and must exists within a normal comment blocks. The
-  content of nested comment blocks is discarded by the filter.
+  As identified in the above table, the filter supports nested
+  comments, which are useful for documenting the bahavior of include
+  files and macros. A single level of nesting is permitted and must
+  exists within a normal comment block. The content of nested comment
+  blocks is discarded by the filter. See the flex documentation for
+  more information on [patterns].
 
   [patterns]: https://westes.github.io/flex/manual/Patterns.html
 
 
-  \subsection openscad_dif_sm_v Variabes
+  \subsection openscad_dif_sm_acf AMU Functions
 
-  The result of a function will be copied to the output of the filter
-  operation unless a results variable name follows the function name.
-  When a variable name is provided, the command result is stored in the
-  specified variable and is not to copied to output.
+  The filter provides additional Doxygen special commands/functions
+  that use the following form:
 
-  These variables can be referenced in the context of other function
-  \em arguments. A variable is referenced using the form:
-  <tt>${VAR}</tt>. Variable expansions are recursive and expansion can
-  be postponed using expansion escaping of the form: <tt>\\${VAR}</tt>.
+  \code
+  \amu_NAME <variable> ( arguments ) { body }
+  \endcode
 
-  The following table list the predefined variables.
-
-   name               | description
-  :-------------------|:----------------------------------
-   EFS                | amu_eval feild separator
-   ABS_FILE_NAME      | absolute input file file name
-   ABS_PATH_NAME      | absolute input file path name
-   FILE_NAME          | input file file name
-   PATH_NAME          | input file path name
-   BASE_NAME          | input file base name
-   STEM_NAME          | input file stem name
-   EXTN_AME           | input file extension name
-   FILE_CURRENT       | current input file name
-   FILE_LIST          | list of all included input files
+  Where \em NAME is the function name, \em variable is an optional
+  output variable identifier, \em arguments modify the behavior of the
+  function, and \em body is a specified text that the function will
+  consider. The parts of a function can be split across lines and some
+  functions do not require arguments and/or a body.
 
 
-  \subsection openscad_dif_sm_a Arguments
+  \subsubsection openscad_dif_sm_v Variable
 
-  There are four categories that are used  by functions as summarized
-  in the following table:
+  The result of most function will be copied to the output unless an
+  optional \em variable identifier follows the function name as shown
+  above. When a variable identifier is provided, the function result is
+  stored as a global variable in the specified variable identifier and
+  is not to copied to output.
 
-   type       | example           | scope
-  :-----------|:-----------------:|:------:
-   positional | value             | local
-   named      | name=value        | local
-   flag       | ++flag / \-\-flag | local
-   incr/decr  | var++ / var\-\-   | global
+  Variables can be referenced in the context of other function \em
+  arguments and \em bodies. A variable is referenced using the form:
+  <tt>${VAR}</tt>. Variable expansion is recursive and expansion can be
+  postponed using escaping as follows: <tt>\\${VAR}</tt>.
 
-  Except where noted, \p positional, \p named, and \p flag assignments
-  types have \em local scope to the function where they are defined.
-  The \p incr/decr assigned values have \em global scope across all
-  functions for the current file. A named argument takes the form
-  <tt>name=value</tt>, where \p name is a variable identifier and \p
-  value is the content to assign. A single value must be identified by
-  matching single or double quotes when it contains one or more spaces.
+
+  \subsubsection openscad_dif_sm_a Arguments
+
+  The four types of arguments used in functions are summarized in the
+  following table:
+
+   type       | example           | description
+  :----------:|:-----------------:|:--------------------------------
+   positional | value             | local argument
+   named      | name=value        | local argument
+   flag       | ++flag / \-\-flag | local argument & local variable
+   incr/decr  | var++ / var\-\-   | global variable
+
+  The \em positional, \em named, and \em flag types are used for local
+  arguments and have \em local scope to the function where they are
+  defined. A \em flag also defines a local variable within the scope of
+  the function. The \em incr/decr type defines a variable with \em
+  global scope across all functions for the current file. A named
+  argument takes the form <tt>name=value</tt>, where \em name is a
+  variable identifier and \em value is the content to assign. The
+  results of a \em flag or \em incr/decr operation can be assigned as a
+  named argument. When a value contains one or more spaces it must be
+  enclosed by matching single or double quotes to identify it as a
+  single value.
 
   \copydetails ODIF::ODIF_Scanner::fx_incr_arg()
 
 
-  \subsection openscad_dif_sm_adc Doxygen Commands Summary
+  \subsubsection openscad_dif_sm_b Body
 
-  The filter provides additional command functions that take the form:
+  Some functions, such as \ref dif_afc_amu_if operate on a specific
+  body of text. In those cases, the body is contained within a pair of
+  braces as shown in the function form above.
 
-  \code{.C}
-  \amu_<function> <variable> ( <arguments> )
-  \endcode
 
-  The \em variable must be the first word that follows the function
-  name, but does not have to be on the same line if present. The \em
-  arguments, including the opening and closing parenthesis can also be
-  split across any number of lines. The \em arguments may be blank,
-  however, the parenthesis are required.
+  \subsubsection openscad_dif_sm_av Automatic Variables
+
+  The following tables list variables predefined or maintained by the
+  filter.
+
+  <b>Input File:</b>
+
+   name               | description
+  :-------------------|:----------------------------------
+   ABS_FILE_NAME      | absolute input file name
+   ABS_PATH_NAME      | absolute input path name
+   FILE_NAME          | input file name
+   PATH_NAME          | input file path name
+   BASE_NAME          | input file base name
+   STEM_NAME          | input file stem name
+   EXT_NAME           | input file extension name
+
+  <b>Include Files:</b>
+
+   name               | description
+  :-------------------|:----------------------------------
+   FILE_CURRENT       | current input file name
+   FILE_LIST          | list of all included input files
+
+  <b>Function Configuration:</b>
+
+   name               | description
+  :-------------------|:----------------------------------
+   EFS                | amu_eval field separator
+
+  <b>Seam Configuration:</b>
+
+   name               | description
+  :-------------------|:----------------------------------
+   AUTO_CONFIG_PATH   | auto configuration path.
+   DOXYGEN_OUTPUT     | doxygen output rootpath
+   HTML_OUTPUT        | html output path name
+   LATEX_OUTPUT       | latex output path name
+   DOCBOOK_OUTPUT     | docbook output path name
+   RTF_OUTPUT         | rtf output path name
+   SCOPE_JOINER       | scope hierarchy joiner
+   OUTPUT_PREFIX      | output prefix
+   OPENSCAD_PATH      | openscad executable path
+   OPENSCAD_EXT       | openscad script extension
+
+
+  \subsection openscad_dif_sm_adc Doxygen Function Summary
 
   In addition to the normal Doxygen [special commands], here is a list
-  of additional filter-provided commands that can be used for document
-  markup. The documentation for these commands may be found in section
-  the \ref openscad_dif_sm_afc "additional commands".
+  of additional filter-provided command functions that can be used for
+  document markup. The documentation for these functions may be found
+  in section the \ref openscad_dif_sm_afc "filter commands".
 
   | internal commands               | description
   |:--------------------------------|:------------------------------------
@@ -122,26 +170,32 @@
   | \ref dif_afc_amu_define         | Define text macro
   | \ref dif_afc_amu_if             | Conditional text output
   | \ref dif_afc_amu_foreach        | Enumerated textual substitution
-  | \ref dif_afc_amu_eval           | Evaluate arguments
+  | \ref dif_afc_amu_eval           | Text variable expansion
   | \ref dif_afc_amu_shell          | Execute shell command
   | \ref dif_afc_amu_make           | Make script interface
+  | \ref dif_afc_amu_openscad       | Run an in-line openscad script
   | \ref dif_afc_amu_scope          | Query scope data
   | \ref dif_afc_amu_source         | Query source filename
-  | \ref dif_afc_amu_copy           | Copy references
+  | \ref dif_afc_amu_copy           | Copy references to documentation
   | \ref dif_afc_amu_find           | Search for output files
   | \ref dif_afc_amu_pathid         | Generate source path identifier
+  | \ref dif_afc_amu_file           | Text file read operations
   | \ref dif_afc_amu_filename       | Operations for filename lists
-  | \ref dif_afc_amu_file           | Perform operations on text files
-  | \ref dif_afc_amu_combine        | Combine words
+  | \ref dif_afc_amu_filesystem     | Perform file system operations
+  | \ref dif_afc_amu_combine        | Combine sets of words
   | \ref dif_afc_amu_replace        | Text search and replace operation
   | \ref dif_afc_amu_word           | Count or select words from a list
   | \ref dif_afc_amu_seq            | Generate a sequence of numbers
   | \ref dif_afc_amu_table          | Generate a text table
+  | \ref dif_afc_amu_image          | Include an image
   | \ref dif_afc_amu_image_table    | Generate an image table
   | \ref dif_afc_amu_viewer         | Graphics file viewer
 
   External commands also exists and can be found in the directory:
-  <tt><install-prefix>/functions/</tt>.
+
+  \code
+  <install-prefix>/functions/
+  \endcode
 
   Here is a list:
 
@@ -214,17 +268,17 @@
 
   External functions can be found at:
 
-  \code{.C}
-  <install-prefix>/functions/amu_<function>
+  \code
+  <install-prefix>/functions/amu_NAME
   \endcode
 
-  When the filter encounters a command of the form
-  <tt>amu_<function></tt> that it does not recognize, it checks this
-  location and if it finds a match this external command is called to
-  handle the command. See examples there as a starting point.
+  When the filter encounters a command of the form <tt>amu_NAME</tt>
+  that it does not recognize, it checks this location and if it finds a
+  match this external command is called to handle the command. See
+  examples there as a starting point.
 
 
-  \section openscad_dif_sm_afc Additional Commands (openscad-dif)
+  \section openscad_dif_sm_afc Filter Commands (openscad-dif)
 
     \subsection dif_afc_amu_combine \\amu_combine
     \copydetails ODIF::ODIF_Scanner::bif_combine()
@@ -244,6 +298,9 @@
     \subsection dif_afc_amu_filename \\amu_filename
     \copydetails ODIF::ODIF_Scanner::bif_filename()
 
+    \subsection dif_afc_amu_filesystem \\amu_filesystem
+    \copydetails ODIF::ODIF_Scanner::bif_filesystem()
+
     \subsection dif_afc_amu_find \\amu_find
     \copydetails ODIF::ODIF_Scanner::bif_find()
 
@@ -255,6 +312,9 @@
     \copydetails ODIF::ODIF_Scanner::bif_if_exp_1a()
     \copydetails ODIF::ODIF_Scanner::bif_if_exp_2a()
 
+    \subsection dif_afc_amu_image \\amu_image
+    \copydetails ODIF::ODIF_Scanner::bif_image()
+
     \subsection dif_afc_amu_image_table \\amu_image_table
     \copydetails ODIF::ODIF_Scanner::bif_image_table()
 
@@ -263,6 +323,9 @@
 
     \subsection dif_afc_amu_make \\amu_make
     \copydetails ODIF::ODIF_Scanner::bif_make()
+
+    \subsection dif_afc_amu_openscad \\amu_openscad
+    \copydetails ODIF::ODIF_Scanner::bif_openscad()
 
     \subsection dif_afc_amu_pathid \\amu_pathid
     \copydetails ODIF::ODIF_Scanner::bif_pathid()

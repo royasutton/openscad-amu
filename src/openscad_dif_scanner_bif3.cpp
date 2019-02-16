@@ -42,7 +42,6 @@
 #endif
 
 using namespace std;
-namespace bfs = boost::filesystem;
 
 
 /***************************************************************************//**
@@ -180,7 +179,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments:
 
      options    | sc  | default | description
     :----------:|:---:|:-------:|:--------------------------
@@ -425,7 +424,7 @@ ODIF::ODIF_Scanner::bif_replace(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments:
 
      options      | sc  | default         | description
     :------------:|:---:|:---------------:|:-------------------------------------
@@ -434,7 +433,7 @@ ODIF::ODIF_Scanner::bif_replace(void)
       tokenizer   | t   | [~^,[:space:]]  | tokenizer to separate words in list
       separator   | r   | [^]             | separator for resulting list
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -587,7 +586,7 @@ ODIF::ODIF_Scanner::bif_word(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments:
 
      options      | sc  | default | description
     :------------:|:---:|:-------:|:------------------------------
@@ -599,7 +598,7 @@ ODIF::ODIF_Scanner::bif_word(void)
       separator   | r   | [^]     | separator for resulting list
       format      | o   | []      | format using [printf] function
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -848,9 +847,6 @@ ODIF::ODIF_Scanner::bif_foreach(void)
   //
   string result;
 
-  // create local copy of the global variable scope map
-  env_var vm = varm;
-
   typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
   boost::char_separator<char> wsep( wtok.c_str() );
   tokenizer wl_tok( words, wsep );
@@ -858,10 +854,10 @@ ODIF::ODIF_Scanner::bif_foreach(void)
   // iterate over the word list, update variable, and evaluate text
   for ( tokenizer::iterator wit=wl_tok.begin(); wit!=wl_tok.end(); ++wit )
   {
-    vm.store( var, *wit );
+    levm.store( var, *wit );
 
     if ( result.size() ) result.append( rsep );
-    result += vm.expand_text( text );
+    result += levm.expand_text( text );
   }
 
   return( result );

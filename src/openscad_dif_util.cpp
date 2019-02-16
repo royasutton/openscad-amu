@@ -3,7 +3,7 @@
   \file   openscad_dif_util.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -530,6 +530,54 @@ UTIL::sys_command(
     result = UTIL::replace_chars(result, "\n\r", ' ');
 }
 
+size_t
+UTIL::get_indent(const std::string& t)
+{
+  istringstream iss(t);
+  string line;
+
+  // move to first non-empty line
+  while ( line.empty() && !iss.eof() )
+    getline(iss, line);
+
+  return ( line.find_first_not_of( " \t" ) );
+}
+
+string
+UTIL::indent_line(const string& l, const int n)
+{
+  string new_line;
+
+  for (int i=0; i<n; i++)
+    new_line.append( " " );
+
+  new_line.append( l );
+
+  return new_line;
+}
+
+string
+UTIL::indent_text(const string& t, const int n)
+{
+  istringstream iss(t);
+  string new_text;
+
+  while ( !iss.eof() )
+  {
+    string line;
+
+    getline(iss, line);
+
+    for (int i=0; i<n; i++)
+      new_text.append( " " );
+
+    new_text.append( line );
+    new_text.append( "\n" );
+  }
+
+  return new_text;
+}
+
 string
 UTIL::get_word(const string& w, const int n)
 {
@@ -645,6 +693,10 @@ UTIL::get_relative_path(
   boost::filesystem::path::const_iterator tit = to_path.begin();
   boost::filesystem::path::const_iterator fit = from_path.begin();
 
+  // remove leading '.' from both paths if any
+  while (tit !=   to_path.end() && (*tit) == ".") ++tit;
+  while (fit != from_path.end() && (*fit) == ".") ++fit;
+
   // loop while they are the same to find common parent path
   while (tit != to_path.end() && fit != from_path.end() && (*fit) == (*tit))
   {
@@ -660,7 +712,10 @@ UTIL::get_relative_path(
     // in order to return to the common parent path
     while (fit != from_path.end())
     {
-      relative_path /= "..";
+      // ignore current directory reference
+      if ((*fit) != ".")
+        relative_path /= "..";
+
       ++fit;
     }
   }
@@ -668,7 +723,10 @@ UTIL::get_relative_path(
   // append remainder of to_path
   while (tit != to_path.end())
   {
-    relative_path /= *tit;
+    // ignore current directory reference
+    if ((*tit) != ".")
+      relative_path /= *tit;
+
     ++tit;
   }
 
@@ -685,7 +743,7 @@ UTIL::make_dir(const std::string &d,
   boost::filesystem::path b ( a );      // existing ancestors base path
   boost::filesystem::path n ( b / f );  // new complete target path
 
-  bool created = false;
+  bool ok = true;
 
   m = "makedir";
 
@@ -698,9 +756,20 @@ UTIL::make_dir(const std::string &d,
     m += " [" + n.string() + "] exists";
   }
   else if ( !p )
-  { // assume ancestors exists, and make target path.
-    created = boost::filesystem::create_directory( n );
-    m += "[" + n.string() + "] 1 created";
+  {
+    boost::filesystem::path np = n.parent_path();
+
+    // make sure parent path exists
+    if ( boost::filesystem::exists( np ) && boost::filesystem::is_directory( np ) )
+    { // make target path.
+      ok = boost::filesystem::create_directory( n );
+      m += " [" + n.string() + "] 1 created";
+    }
+    else
+    {
+      ok = false;
+      m += " ERROR: parent path [" + np.string() + "] does not exists, not created.";
+    }
   }
   else
   { // otherwise assume ancestors exists, and make missing parents of target path.
@@ -711,12 +780,16 @@ UTIL::make_dir(const std::string &d,
     boost::filesystem::path t;
 
     // ancestors: assume exists
+    uint level = 0;
+
     if ( !b.empty() )
     {
       boost::filesystem::path::const_iterator bit = b.begin();;
 
       while (bit != b.end() && nit != n.end())
       {
+        level++;
+
         ++bit;
         ++nit;
       }
@@ -728,31 +801,30 @@ UTIL::make_dir(const std::string &d,
 
     // make missing parents of target directory path
     uint count = 0;
-    bool success = true;
 
-    while (nit != n.end() && success)
+    while (nit != n.end() && ok)
     {
       t /= *nit;
 
       if ( boost::filesystem::exists( t ) && boost::filesystem::is_directory( t ) )
       {
-        m += "/" + nit->string();
+        m += (level?"/":"") + nit->string();
       }
       else
       {
-        success = boost::filesystem::create_directory( t );
+        ok = boost::filesystem::create_directory( t );
         m += "/<" + nit->string() + ">";
         count++;
       }
+      level++;
 
       ++nit;
     }
-    created = success;
 
     m += "] " + to_string( count ) + " created";
   }
 
-  return created;
+  return ok;
 }
 
 string
@@ -774,6 +846,125 @@ UTIL::to_roman_numeral(const int &n)
   return ( rn );
 }
 
+std::string
+UTIL::openscad_rmecho_line(const std::string &line)
+{
+  //
+  // OpenSCAD ECHO format: [[ECHO:][ ][" ... echo-content ... "]endl]
+  //
+
+  std::string new_line = line;
+
+  // [ECHO:]
+  if ( new_line.find( "ECHO:" ) == 0 )
+  { // 'ECHO:' iff at pos==0
+    new_line.erase( 0, 5 );
+
+    // [ ] single space character at pos==0
+    // if ( new_line.find_first_of( " " ) == 0 )
+    //  new_line.erase( 0, 1 );
+
+    // [ ] all white space from pos==0
+    size_t p = new_line.find_first_not_of( " \t" );
+    if ( (p != 0) && (p != string::npos) )
+      new_line.erase( 0, p );
+
+    // [" ... echo-content ... "]
+    if ( new_line.find_first_of( "\"" ) == 0 )
+    { // open quote at pos==0
+      new_line.erase( 0, 1 );
+
+      // close quote at pos=eol
+      size_t l = new_line.length();
+      if ( (l != 0) && (new_line.find_last_of( "\"" ) == (l-1)) )
+        new_line.erase( l-1, 1 );
+      else
+        new_line.append( "<ERROR: close quote missing>" );
+    }
+  }
+
+  return ( new_line );
+}
+
+std::string
+UTIL::openscad_rmecho_text(const std::string &text)
+{
+  istringstream iss(text);
+  string new_text;
+
+  while ( !iss.eof() )
+  {
+    string line;
+
+    getline(iss, line);
+    line = UTIL::openscad_rmecho_line(line);
+
+    new_text.append( line );
+    new_text.append( "\n" );
+  }
+
+  return new_text;
+}
+
+/*
+  boost::empty_token_policy
+    { drop_empty_tokens | keep_empty_tokens }
+*/
+vector<string>
+UTIL::string_tokenize_to_vector(
+  const std::string &str,
+  const std::string &toks,                      // dropped delimiters
+  const std::string &toks_keep,                 // kept delimiters
+  const boost::empty_token_policy empty_tokens
+)
+{
+  typedef boost::tokenizer< boost::char_separator<char> > tokenizer;
+
+  boost::char_separator<char>
+      field_separators( toks.c_str(), toks_keep.c_str(), empty_tokens );
+
+  tokenizer str_tokens( str, field_separators );
+
+  vector<string> str_vector;
+  for ( tokenizer::iterator it=str_tokens.begin(); it!=str_tokens.end(); ++it )
+    str_vector.push_back( boost::trim_copy( *it ) );
+
+  return ( str_vector );
+}
+
+std::string
+UTIL::get_field(const size_t &num,
+                const std::string &str, const std::string &def_str,
+                const std::string &toks, const std::string &defs)
+{
+  string str_field;
+
+  vector<string> str_vector =
+    string_tokenize_to_vector(str, toks, "", boost::keep_empty_tokens);
+
+  if ( num < str_vector.size() )
+  {
+    // get field
+    str_field = str_vector.at( num );
+
+    // when 'str_field' equal to 'defs' get default from 'def_str'
+    if ( str_field.compare( defs ) == 0 )
+    {
+      string def_field;
+
+      vector<string> def_vector =
+        string_tokenize_to_vector(def_str, toks, "", boost::keep_empty_tokens);
+
+      if ( num < def_vector.size() )
+        def_field = def_vector.at( num );
+
+      // assign default
+      str_field = def_field;
+    }
+  }
+
+  return ( str_field );
+}
 
 /*******************************************************************************
 // eof

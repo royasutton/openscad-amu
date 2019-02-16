@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner_bif2.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -359,14 +359,14 @@ ODIF::ODIF_Scanner::bif_find(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments:
 
      options      | sc  | default | description
     :------------:|:---:|:-------:|:-----------------------------------------
       head        | h   |         | path name from head at location
       tail        | t   |         | path name from tail at location
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags        | sc  | default | description
     :------------:|:---:|:-------:|:-----------------------------------------
@@ -375,7 +375,7 @@ ODIF::ODIF_Scanner::bif_find(void)
       full_parent | fp  | false   | full parent path name to input from root
       path_parent | ap  | false   | full parent path name to input after root
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags        | sc  | default | description
     :------------:|:---:|:-------:|:-----------------------------------------
@@ -595,7 +595,7 @@ ODIF::ODIF_Scanner::bif_pathid(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments:
 
      options      | sc  | default       | description
     :------------:|:---:|:-------------:|:-----------------------------------------
@@ -603,7 +603,7 @@ ODIF::ODIF_Scanner::bif_pathid(void)
       tokenizer   | t   | [,[:space:]]  | tokenizer to separate files in list
       separator   | r   | [[:space:]]   | file separator for resulting list
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -752,12 +752,12 @@ ODIF::ODIF_Scanner::bif_filename(void)
 /***************************************************************************//**
   \details
 
-    Perform operations on text files.
+    Text file read operations.
 
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments:
 
      options      | sc  | default | description
     :------------:|:---:|:-------:|:--------------------------------------
@@ -767,7 +767,7 @@ ODIF::ODIF_Scanner::bif_filename(void)
       last        | l   | 0       | end line of file, 0=<eof>
       separator   | s   | []      | separator for joining results
 
-    Flags that modify the output
+    Flags that modify the output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -926,40 +926,11 @@ ODIF::ODIF_Scanner::bif_file(void)
 
         // remove echo
         if ( rmecho )
-        { // format [[ECHO:][ ][" ... echo-content ... "]endl]
-
-          // [ECHO:]
-          if ( line.find( "ECHO:" ) == 0 )
-          { // 'ECHO:' iff at pos==0
-            line.erase( 0, 5 );
-
-            // [ ] single space character at pos==0
-            // if ( line.find_first_of( " " ) == 0 )
-            //  line.erase( 0, 1 );
-
-            // [ ] all white space from pos==0
-            size_t p = line.find_first_not_of( " \t" );
-            if ( (p != 0) && (p != string::npos) )
-              line.erase( 0, p );
-
-            // [" ... echo-content ... "]
-            if ( line.find_first_of( "\"" ) == 0 )
-            { // open quote at pos==0
-              line.erase( 0, 1 );
-
-              // close quote at pos=eol
-              size_t l = line.length();
-              if ( (l != 0) && (line.find_last_of( "\"" ) == (l-1)) )
-                line.erase( l-1, 1 );
-              else
-                line.append( "< " + amu_error_msg("close quote missing") );
-            }
-          }
-        }
+          line = UTIL::openscad_rmecho_line(line);
 
         // eval variables
         if ( eval )
-          line = varm.expand_text(line);
+          line = levm.expand_text(line);
 
         if (line.size() > line_max)
           line_max = line.size();

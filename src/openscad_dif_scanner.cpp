@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -59,45 +59,49 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
   debug_filter = false;
 
   // initialize variable map
-  varm.clear();
+  gevm.clear();
 
   // must match equivalent definition for {id_var} in openscad_dif_lexer.ll
-  // lexer use flex while varm uses <boost/regex.hpp>
-  varm.set_prefix( "${" );
-  varm.set_suffix( "}" );
-  varm.set_regexp( "\\${[_[:alnum:]]+}" );
-  varm.set_escape_prefix( "\\\\" );
-  varm.set_escape_suffix( "" );
-  varm.set_escape_prefix_length( 1 );
-  varm.set_escape_suffix_length( 0 );
+  // lexer use flex while gevm uses <boost/regex.hpp>
+  gevm.set_prefix( "${" );
+  gevm.set_suffix( "}" );
+  gevm.set_regexp( "\\${[_[:alnum:]]+}" );
+  gevm.set_escape_prefix( "\\\\" );
+  gevm.set_escape_suffix( "" );
+  gevm.set_escape_prefix_length( 1 );
+  gevm.set_escape_suffix_length( 0 );
 
   // report options could be passed to the command line interface
   // for run-time configuration.
-  varm.set_report( true );
-  varm.set_report_message("<tt><UNDEFINED></tt>");
+  gevm.set_report( true );
+  gevm.set_report_message("<tt><UNDEFINED></tt>");
+
+  //
+  // setup predefined environment variables
+  //
 
   // relative path name of the root input file 'f'
   bfs::path ifap = f;
   bfs::path ifrp = UTIL::get_relative_path(ifap, bfs::current_path());
-  // setup predefined environment variables
-  varm.store( "EFS", " " );
-
   // setup root file name variables
-  varm.store( "ABS_FILE_NAME", ifap.string() );
-  varm.store( "ABS_PATH_NAME", ifap.parent_path().string() );
-  varm.store( "FILE_NAME", ifrp.string() );
-  varm.store( "PATH_NAME", ifrp.parent_path().string() );
-  varm.store( "BASE_NAME", ifrp.filename().string() );
-  varm.store( "STEM_NAME", ifrp.stem().string() );
-  varm.store( "EXT_NAME", ifrp.extension().string() );
+  gevm.store( "ABS_FILE_NAME", ifap.string() );
+  gevm.store( "ABS_PATH_NAME", ifap.parent_path().string() );
+  gevm.store( "FILE_NAME", ifrp.string() );
+  gevm.store( "PATH_NAME", ifrp.parent_path().string() );
+  gevm.store( "BASE_NAME", ifrp.filename().string() );
+  gevm.store( "STEM_NAME", ifrp.stem().string() );
+  gevm.store( "EXT_NAME", ifrp.extension().string() );
+
+  // amu_eval field separator
+  gevm.store( "EFS", " " );
+
+  // initialize include file variables
+  gevm.store( "FILE_CURRENT", "" );
+  gevm.store( "FILE_LIST", "" );
 
   // initialize function argument positional prefix
   fx_argv.clear();
   fx_argv.set_prefix("arg");
-
-  // initialize include file variables
-  varm.store( "FILE_CURRENT", "" );
-  varm.store( "FILE_LIST", "" );
 
   // clear the input file stream vector
   ifs_v.clear();
@@ -106,8 +110,23 @@ ODIF::ODIF_Scanner::ODIF_Scanner(const string& f, const string& s)
   start_file( f );
 }
 
-ODIF::ODIF_Scanner::~ODIF_Scanner(void)
+void
+ODIF::ODIF_Scanner::update_gevm(void)
 {
+  // configuration variables
+  gevm.store( "AUTO_CONFIG_PATH", get_config_prefix() );
+
+  gevm.store( "DOXYGEN_OUTPUT", get_doxygen_output() );
+  gevm.store( "HTML_OUTPUT", get_html_output() );
+  gevm.store( "LATEX_OUTPUT", get_latex_output() );
+  gevm.store( "DOCBOOK_OUTPUT", get_docbook_output() );
+  gevm.store( "RTF_OUTPUT", get_rtf_output() );
+
+  gevm.store( "SCOPE_JOINER", get_scopejoiner() );
+
+  gevm.store( "OUTPUT_PREFIX", get_output_prefix() );
+  gevm.store( "OPENSCAD_PATH", get_openscad_path() );
+  gevm.store( "OPENSCAD_EXT", get_openscad_ext() );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,13 +148,13 @@ ODIF::ODIF_Scanner::start_file( const string file )
   string file_path = bfs::canonical( bfs::path(file) ).string();
 
   // append to ${FILE_LIST}
-  string list = varm.expand( varm.get_prefix() + "FILE_LIST" + varm.get_suffix() );
+  string list = gevm.expand( gevm.get_prefix() + "FILE_LIST" + gevm.get_suffix() );
   if ( list.length() ) list += " ";
   list += file_path;
-  varm.store( "FILE_LIST", list );
+  gevm.store( "FILE_LIST", list );
 
   // update ${FILE_CURRENT}
-  varm.store( "FILE_CURRENT", file_path );
+  gevm.store( "FILE_CURRENT", file_path );
 
   // save line number update of current stream if it exists
   if ( ! ifs_v.empty() )
@@ -166,7 +185,7 @@ ODIF::ODIF_Scanner::yywrap(void)
     return 1;
 
   // update ${FILE_CURRENT}
-  varm.store( "FILE_CURRENT", ifs_v.back().name );
+  gevm.store( "FILE_CURRENT", ifs_v.back().name );
 
   // restore saved line number count
   yylineno = ifs_v.back().line;
@@ -204,7 +223,7 @@ ODIF::ODIF_Scanner::error(const string& m, const int &n,
   string om;
 
   om = ops + "ERROR in "
-     + varm.expand( varm.get_prefix() + "FILE_CURRENT" + varm.get_suffix() )
+     + gevm.expand( gevm.get_prefix() + "FILE_CURRENT" + gevm.get_suffix() )
      +  ", " + m;
 
   if( n )           om += ", at line " + UTIL::to_string( n );
@@ -226,7 +245,7 @@ ODIF::ODIF_Scanner::amu_error_msg(const string& m)
   string om;
 
   om  = ops + "ERROR in "
-      + varm.expand( varm.get_prefix() + "FILE_CURRENT" + varm.get_suffix() )
+      + gevm.expand( gevm.get_prefix() + "FILE_CURRENT" + gevm.get_suffix() )
       + ", at line " + UTIL::to_string( lineno() );
 
   // delete command characters [\@] from parsed text to prevent them
@@ -246,6 +265,9 @@ ODIF::ODIF_Scanner::amu_error_msg(const string& m)
 void
 ODIF::ODIF_Scanner::fx_init(void)
 {
+  // update local copy of global variable map (memberwise)
+  levm = gevm;
+
   apt_clear();
   apt();
 
@@ -255,7 +277,8 @@ ODIF::ODIF_Scanner::fx_init(void)
 
   fx_qarg.clear();
 
-  fi_bline = lineno();
+  fx_body_text.clear();
+  fx_body_level = 0;
 
   // remove '\amu_' from function name in matched text
   // might be good to convert name to all lower case.
@@ -264,6 +287,8 @@ ODIF::ODIF_Scanner::fx_init(void)
 
   // store function name as first argument.
   fx_store_arg( fx_name );
+
+  fx_bline = lineno();
 }
 
 /***************************************************************************//**
@@ -279,7 +304,7 @@ ODIF::ODIF_Scanner::fx_init(void)
 void
 ODIF::ODIF_Scanner::fx_end(void)
 {
-  fi_eline = lineno();
+  fx_eline = lineno();
 
   // prototype of build-in function: string functionname( void );
   typedef map< string, string (ODIF::ODIF_Scanner::*)(void) > function_table_type;
@@ -291,10 +316,13 @@ ODIF::ODIF_Scanner::fx_end(void)
       ("eval",          &ODIF::ODIF_Scanner::bif_eval)
       ("file",          &ODIF::ODIF_Scanner::bif_file)
       ("filename",      &ODIF::ODIF_Scanner::bif_filename)
+      ("filesystem",    &ODIF::ODIF_Scanner::bif_filesystem)
       ("find",          &ODIF::ODIF_Scanner::bif_find)
       ("foreach",       &ODIF::ODIF_Scanner::bif_foreach)
+      ("image",         &ODIF::ODIF_Scanner::bif_image)
       ("image_table",   &ODIF::ODIF_Scanner::bif_image_table)
       ("make",          &ODIF::ODIF_Scanner::bif_make)
+      ("openscad",      &ODIF::ODIF_Scanner::bif_openscad)
       ("pathid",        &ODIF::ODIF_Scanner::bif_pathid)
       ("replace",       &ODIF::ODIF_Scanner::bif_replace)
       ("scope",         &ODIF::ODIF_Scanner::bif_scope)
@@ -359,12 +387,12 @@ ODIF::ODIF_Scanner::fx_end(void)
 
   if ( success )
   {
-    // output result to scanner or store to variable map
+    // output result to scanner or store to global variable map
     if ( fx_var.length() == 0 )
       scanner_output( result );
     else
     {
-      varm.store(fx_var, result);
+      gevm.store(fx_var, result);
 
       filter_debug( fx_var + "=[" + result + "]" );
     }
@@ -376,7 +404,7 @@ ODIF::ODIF_Scanner::fx_end(void)
 
   // output blank lines to maintain file length when functions are
   // broken across multiple lines (don't begin and end on the same line).
-  for(size_t i=fi_bline; i<fi_eline; i++) scanner_output("\n");
+  for(size_t i=fx_bline; i<fx_eline; i++) scanner_output("\n");
 }
 
 void
@@ -400,7 +428,7 @@ ODIF::ODIF_Scanner::fx_store_arg_escaped(void)
 {
   // remove 'escape-prefix' from variable name in matched text.
   string mt = YYText();
-  fx_argv.store( mt.substr(varm.get_escape_prefix_length(),mt.length()) );
+  fx_argv.store( mt.substr(levm.get_escape_prefix_length(),mt.length()) );
 }
 
 void
@@ -408,26 +436,25 @@ ODIF::ODIF_Scanner::fx_app_qarg_escaped(void)
 {
   // remove 'escape-prefix' from variable name in matched text (first character)
   string mt = YYText();
-  fx_qarg+=mt.substr(varm.get_escape_prefix_length(),mt.length());
+  fx_qarg+=mt.substr(levm.get_escape_prefix_length(),mt.length());
 }
 
 /***************************************************************************//**
 
   \details
 
-    Function arguments can make use of pre and post <tt>++</tt> and/or
-    <tt>\-\-</tt> operations. Post operations use global environment
-    variables. Pre operations use environment variables local to the
-    function. Function flags make use of pre operations. Prefix a flag
-    with <tt>++</tt> to enable it and <tt>\-\-</tt> to disable it. For
-    example \p ++name enables \p name and \p \-\-name disables it.
+    Function arguments may use pre and post <tt>'++'</tt> and/or
+    <tt>'\-\-'</tt> operations, where post have global scope and pre
+    have scope local to the function where they are defined. Prefix a
+    flag with <tt>++</tt> to enable it and <tt>\-\-</tt> to disable it.
+    For example \p ++name enables \p name and \p \-\-name disables it.
 
-     operation | behavior
-    :---------:|:---------------------------------------------------------
-      x++      | increment global environment variable
-      ++x      | increment local environment variable
-      y=x++    | assign function value (y=(${x})) with post increment
-      y=++x    | increment local and assign function value (y=(${x}))
+     operation | description
+    :---------:|:-------------------------------------------------------
+      x++      | increment global variable
+      ++x      | increment local variable
+      y=x++    | assign function argument ${x} then increment global x
+      y=++x    | increment local x then assign function argument ${x}
 
 *******************************************************************************/
 void
@@ -446,32 +473,36 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
      op=mt.substr(0, 2);
   }
 
-  // get the current value of the variable from the environment variable map
+  // get current value from local environment variable map
   long old_val = 0;
-  if ( varm.exists( vn ) ) {
-    string old_val_string = varm.expand("${" + vn + "}");
+  if ( levm.exists( vn ) )
+  {
+    string old_val_string = levm.expand("${" + vn + "}");
 
     if ( UTIL::is_number( old_val_string ) )
       old_val = atoi( old_val_string.c_str() );
   }
 
-  // update the variable value
+  // compute new value
   long new_val;
-  if ( op.compare("++") == 0 )  new_val = old_val + 1;
-  else                          new_val = old_val - 1;
+  if ( op.compare("++") == 0 )  new_val = old_val + 1;          // op == '++'
+  else                          new_val = old_val - 1;          // op == '--'
 
-  // conditionally assign value the named function argument?
+  // store value to named argument with assignment identifier
   if ( fx_argv.get_next_name().length() )
   {
-    if ( post )                 fx_argv.store( UTIL::to_string(old_val) );      // var++
-    else                        fx_argv.store( UTIL::to_string(new_val) );      // ++var
+    if ( post ) fx_argv.store( UTIL::to_string(old_val) );      // id = var++
+    else        fx_argv.store( UTIL::to_string(new_val) );      // id = ++var
   }
 
-  // store variable:
-  // var++ : as named function argument (name=count)
-  // ++var : in the environment variable map
-  if ( post )                   varm.store( vn, UTIL::to_string(new_val) );     // var++
-  else                          fx_argv.store( vn, UTIL::to_string(new_val) );  // ++var
+  // store value (vn=new_val)
+  //  var++ : in global environment variable map
+  //  ++var : in function arguments
+  if ( post )   gevm.store( vn, UTIL::to_string(new_val) );     // var++
+  else          fx_argv.store( vn, UTIL::to_string(new_val) );  // ++var
+
+  // store value to local environment variable map
+  levm.store( vn, UTIL::to_string(new_val) );
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -490,6 +521,9 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
 void
 ODIF::ODIF_Scanner::def_init(void)
 {
+  // update local copy of global variable map (memberwise)
+  levm = gevm;
+
   apt_clear();
   apt();
 
@@ -505,18 +539,15 @@ ODIF::ODIF_Scanner::def_end(void)
   def_eline = lineno();
 
   // if variable name not specified, copy definition to output
-  // otherwise store in variable map.
+  // otherwise store in global variable map.
   if ( def_var.length() == 0 )
     scanner_output( def_text );
   else
   {
-    varm.store( def_var, def_text );
+    gevm.store( def_var, def_text );
 
     filter_debug( def_var + "=[" + def_text + "]" );
   }
-
-  def_var.clear();
-  def_text.clear();
 
   // output blank lines to maintain file length when definitions are
   // broken across multiple lines (don't begin and end on the same line).
@@ -588,7 +619,7 @@ ODIF::ODIF_Scanner::def_set_var(void)
     expression1 is sufficient to determine the return value of the
     entire conditional expression.
 
-    Expression can be composed using several built-in test functions.
+    Expression can be composed using several built-in tests.
 
     \b Example:
     \code
@@ -611,6 +642,9 @@ ODIF::ODIF_Scanner::def_set_var(void)
 void
 ODIF::ODIF_Scanner::if_init(void)
 {
+  // update local copy of global variable map (memberwise)
+  levm = gevm;
+
   apt_clear();
   apt();
 
@@ -633,6 +667,7 @@ ODIF::ODIF_Scanner::if_init_case(bool expr)
 
   // clear case body text
   if_case_text.clear();
+  if_case_level = 0;
 
   // clear operation and value stack
   while ( ! if_opr.empty() )  if_opr.pop();
@@ -720,7 +755,7 @@ ODIF::ODIF_Scanner::if_end_case(void)
     if_matched = true;
 
     // expand case body text and assign as result
-    if_text = varm.expand_text( if_case_text );
+    if_text = levm.expand_text( if_case_text );
   }
 }
 
@@ -730,18 +765,15 @@ ODIF::ODIF_Scanner::if_end(void)
   if_eline = lineno();
 
   // if variable name not specified, copy definition to output
-  // otherwise store in variable map.
+  // otherwise store in global variable map.
   if ( if_var.length() == 0 )
     scanner_output( if_text );
   else
   {
-    varm.store( if_var, if_text );
+    gevm.store( if_var, if_text );
 
     filter_debug( if_var + "=[" + if_text + "]" );
   }
-
-  if_var.clear();
-  if_text.clear();
 
   // output blank lines to maintain file length when definitions are
   // broken across multiple lines (don't begin and end on the same line).
@@ -789,6 +821,9 @@ ODIF::ODIF_Scanner::if_set_var(void)
 void
 ODIF::ODIF_Scanner::inc_init(void)
 {
+  // update local copy of global variable map (memberwise)
+  levm = gevm;
+
   apt_clear();
   apt();
 
@@ -807,7 +842,7 @@ ODIF::ODIF_Scanner::inc_end(void)
   inc_eline = lineno();
 
   // unquote and expand variables in argument text
-  string file_arg = varm.expand_text( UTIL::unquote_trim( inc_text ) );
+  string file_arg = levm.expand_text( UTIL::unquote_trim( inc_text ) );
 
   string file_inc;
 
@@ -846,8 +881,6 @@ ODIF::ODIF_Scanner::inc_end(void)
   if ( inc_switch )
     start_file( file_inc );
 
-  inc_text.clear();
-
   // output blank lines to maintain file length when definitions are
   // broken across multiple lines (don't begin and end on the same line).
   for(size_t i=inc_bline; i<inc_eline; i++) scanner_output("\n");
@@ -877,6 +910,19 @@ ODIF::ODIF_Scanner::nc_end(void)
 // utility
 ////////////////////////////////////////////////////////////////////////////////
 
+/***************************************************************************//**
+
+  \param m          debug message.
+  \param h          start verbatim block.
+  \param f          end verbatim block.
+  \param s          output to scanner.
+
+  \details
+
+    Output the message \p m to the console via stderr. The message is
+    also copied to the scanner output when \p s is \b true.
+
+*******************************************************************************/
 void
 ODIF::ODIF_Scanner::filter_debug(
   const string& m,
@@ -887,17 +933,21 @@ ODIF::ODIF_Scanner::filter_debug(
 {
   if ( debug_filter )
   {
-    if (s )
+    // output to scanner
+    if ( s )
     {
+      // start new header verbatim block
       if ( h )
       {
         scanner_output( "\n\\if __INCLUDE_FILTER_DEBUG__\n" );
         scanner_output( "\\verbatim\n" );
       }
 
+      // output message
       scanner_output( "(line " + UTIL::to_string( lineno() ) + ") " + m );
       scanner_output( "\n" );
 
+      // end header verbatim block
       if ( f )
       {
         scanner_output( "\\endverbatim\n" );
@@ -905,6 +955,7 @@ ODIF::ODIF_Scanner::filter_debug(
       }
     }
 
+    // output to console via stderr
     cerr << ops << "(line " << dec << lineno() << ") " << m << endl;
   }
 }
@@ -955,12 +1006,12 @@ ODIF::ODIF_Scanner::file_rl(
 )
 {
   bfs::path file_path ( file );
-  bfs::path location;
+  bfs::path file_found;
 
   found = false;
 
   //
-  // test if file has a parent path
+  // search include paths for file (test if file has a parent path).
   //
   if ( file_path.has_parent_path() )
   {
@@ -977,7 +1028,7 @@ ODIF::ODIF_Scanner::file_rl(
       if ( exists(p) && is_regular_file(p) )
       {
         found = true;
-        location = p;
+        file_found = p;
 
         break;
       }
@@ -998,7 +1049,7 @@ ODIF::ODIF_Scanner::file_rl(
       if ( exists(p) && is_regular_file(p) )
       {
         found = true;
-        location = p;
+        file_found = p;
 
         break;
       }
@@ -1006,91 +1057,143 @@ ODIF::ODIF_Scanner::file_rl(
   }
 
   string reference;
+
+  //
+  // found
+  //
   if ( found )
   {
-    filter_debug(" found.", false, false, false);
+    bfs::path target = file_found;
 
-    bfs::path target;
-    bfs::path rootoutpath;
+    filter_debug(" found [" + file_found.string() + "]", false, false, false);
 
+    //
+    // format output not specified, disabled
+    //
     if ( subdir.compare(NO_FORMAT_OUTPUT) == 0 )
     {
       filter_debug(" format output disabled.", false, false, false);
-      target = location;
     }
-    else if ( copy )
+
+    //
+    // format output specified
+    //
+    else
     {
-      bfs::path source  = location;
-      bfs::path outpath = get_doxygen_output();
-      bfs::path prefix  = UTIL::get_relative_path(source.parent_path(), outpath, true);
+      bfs::path outpath  = get_doxygen_output();
+                outpath /= subdir;
 
-      outpath /= subdir;
-      rootoutpath = outpath;
+      filter_debug(" root output path [" + outpath.string() + "]", false, false, false);
 
-      // set output filename
-      bfs::path outname;
-      if ( rid )
-      { // random output filename.
-        outname  = bfs::unique_path( bfs::path("%%%%-%%%%-%%%%-%%%%-%%%%-%%%%") );
-        outname += source.extension();
-      }
-      else
+      //
+      // copy to output
+      //
+      if ( copy )
       {
-        outname = location.filename();
-      }
+        bfs::path source = file_found;
+        bfs::path outname;
 
-      // prefix output file with input file prefix
-      if ( get_prefix_scripts() )
-      {
-        filter_debug(" relative prefix [" + prefix.string() + "]", false, false, false);
+        filter_debug(" copying...", false, false, false);
 
-        std::string m;
-        if ( UTIL::make_dir(prefix.string(), m, true, outpath.string()) )
-          filter_debug(" " + m, false, false, false);
-
-        outpath /= prefix;
-      }
-
-      // set target path and filename
-      target = outpath / outname.filename();
-
-      filter_debug(" copying to [" + target.string() + "]", false, false, false);
-
-      // skip copy when file of same size exists.
-      bool copy_needed = true;
-      if ( exists(target) && is_regular_file(target) )
-      {
-        if ( bfs::file_size( source ) == bfs::file_size( target ) )
+        // output file name
+        if ( rid )
         {
-          filter_debug("  same sized file exists.", false, false, false);
+          outname  = bfs::unique_path( bfs::path("%%%%-%%%%-%%%%-%%%%-%%%%-%%%%") );
+          outname += source.filename().extension();
 
-          copy_needed = false;
+          filter_debug(" rid [" + outname.string() + "]", false, false, false);
         }
         else
         {
-          bfs::remove( target );
+          outname = source.filename();
         }
+
+        // target prefix path relative to outpath
+        bfs::path prefix = UTIL::get_relative_path(source.parent_path(), outpath, true);
+
+        if ( ! prefix.empty() )
+        {
+          filter_debug(" adding target prefix [" + prefix.string() + "]", false, false, false);
+
+          // create output directory prefix path(s)
+          std::string m;
+          if ( UTIL::make_dir(prefix.string(), m, true, outpath.string()) )
+            filter_debug(" " + m, false, false, false);
+
+          target = outpath / prefix / outname;
+        }
+        else
+        {
+          target = outpath / outname;
+        }
+
+        filter_debug(" target [" + target.string() + "]", false, false, false);
+
+        bool copy_needed = true;
+
+        // skip copy when file of same size exists.
+        if ( exists(target) && is_regular_file(target) )
+        {
+          if ( bfs::file_size( source ) == bfs::file_size( target ) )
+          {
+            copy_needed = false;
+
+            filter_debug("  same sized target exists.", false, false, false);
+          }
+          else
+          { // differ in size, remove.
+            bfs::remove( target );
+          }
+        }
+
+        // could skip copy when source path is subdirectory of output path
+        // ie: (outpath / get_relative_path(source, outpath) == source)
+
+        if ( copy_needed )
+        {
+          // copy source to target
+          bfs::copy_file( source, target, bfs::copy_option::overwrite_if_exists );
+
+          filter_debug(" copy done.", false, false, false);
+        }
+
+        // remake return reference to target path relative to parent outpath
+        // remove outpath from: target = outpath / prefix / outname
+        target = UTIL::get_relative_path(target, outpath, true);
+
+        filter_debug(" make target reference relative to parent output path.", false, false, false);
       }
 
-      if ( copy_needed )
+      //
+      // do not copy to output
+      //
+      else
       {
-        // copy source to target
-        bfs::copy_file( source, target, bfs::copy_option::overwrite_if_exists );
-        filter_debug(" done.", false, false, false);
+        filter_debug(" copy disabled.", false, false, false);
+
+        // remake return reference to target path relative to outpath
+        // with full return to common parent via successive '../'
+        target = UTIL::get_relative_path(target, outpath, false);
+
+        filter_debug(" make target reference relative to output path.", false, false, false);
       }
-    }
 
-    // remake target path relative to rootoutpath
-    target = UTIL::get_relative_path(target, rootoutpath, true);
+    } // output specified
 
-    // return with or without extension
-    if ( extension == true )
+    //
+    // reference returned with or without extension
+    //
+    if ( extension )
       reference = target.string();
     else
       reference = target.stem().string();
   }
+
+  //
+  // not found
+  //
   else
-  { // file not found.
+  {
     filter_debug(" not found.", false, false, false);
 
     reference = file;

@@ -3,7 +3,7 @@
   \file   openscad_dif_lexer.ll
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2019
 
   \copyright
 
@@ -61,7 +61,7 @@ using namespace std;
   /* scanner states */
 
 %s COMBLCK COMLINE COMNEST
-%s AMUFN AMUFNARG AMUFNAQS AMUFNAQD
+%s AMUFN AMUFNARG AMUFNAQS AMUFNAQD AMUFNTEXTBLCK
 %s AMUINC AMUINCFILE
 %s AMUDEF AMUDEFARG
 %s AMUIF AMUIFEXPR AMUIFTEXT AMUIFTEXTBLCK AMUIFELSE
@@ -163,7 +163,6 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <COMBLCK,COMLINE>{amu_bif}        { fx_init(); yy_push_state(AMUFN); }
 <COMBLCK,COMLINE>.                { scanner_echo(); }
 
-<COMBLCK>{com_nest_open}          { nc_init(); yy_push_state(COMNEST); }
 <COMBLCK>{nr}                     { scanner_echo(); }
 <COMBLCK>{com_blck_clse}          { scanner_echo(); yy_pop_state(); }
 
@@ -180,20 +179,23 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <COMNEST>.                        { }
 <COMNEST><<EOF>>                  { abort("unterminated nested comment block", nc_bline); }
 
+  /* allowable entry into nested comments: */
+
+<COMBLCK,AMUFNARG,AMUFNTEXTBLCK,AMUIFEXPR,AMUIFTEXTBLCK>{com_nest_open} { nc_init(); yy_push_state(COMNEST); }
+
   /*
     amu_bif:
-    amu_bif var ( a1 a2 'a3' "a 4" file="all" )
+    amu_bif var ( a1 a2 'a3' "a 4" file="all" ) { text }
   */
 
 <AMUFN>{id}                       { apt(); fx_set_var(); }
 <AMUFN>\(                         { apt(); BEGIN(AMUFNARG); }
+<AMUFN>\{                         { apt(); fx_body_level++; BEGIN(AMUFNTEXTBLCK); }
 <AMUFN>{ws}+                      { apt(); }
 <AMUFN>{nr}                       { apt(); }
 <AMUFN>.                          { error("in function variable name", lineno(), YYText()); }
 
-  /*
-    amu function arguments:
-  */
+  /* amu_bif: ( arguments ) */
 
 <AMUFNARG>{id}                    { apt(); fx_store_arg(); }
 <AMUFNARG>{id_var}                { apt(); fx_store_arg_expanded(); }
@@ -204,15 +206,14 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNARG>{incr_var_post}         { apt(); fx_incr_arg(true); }
 <AMUFNARG>\'                      { apt(); fx_app_qarg(); yy_push_state(AMUFNAQS); }
 <AMUFNARG>\"                      { apt(); fx_app_qarg(); yy_push_state(AMUFNAQD); }
+<AMUFNARG>\){wsnr}*\{             { apt(); fx_body_level++; BEGIN(AMUFNTEXTBLCK); }
 <AMUFNARG>\)                      { apt(); fx_end(); yy_pop_state(); }
 <AMUFNARG>{ws}+                   { apt(); }
 <AMUFNARG>{nr}                    { apt(); }
 <AMUFNARG>.                       { error("in function arguments", lineno(), YYText()); }
-<AMUFNARG><<EOF>>                 { abort("unterminated function arguments", fi_bline); }
+<AMUFNARG><<EOF>>                 { abort("unterminated function arguments", fx_bline); }
 
-  /*
-    amu function single and double quoted arguments:
-  */
+  /* amu_bif: ( 'arguments' and/or "arguments" )  */
 
 <AMUFNAQS>\'                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
 <AMUFNAQD>\"                      { apt(); fx_app_qarg(); fx_store_qarg(); yy_pop_state(); }
@@ -221,11 +222,22 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUFNAQS,AMUFNAQD>\\\"           { apt(); fx_app_qarg_escaped(); }
 <AMUFNAQS,AMUFNAQD>\\{id_var}     { apt(); fx_app_qarg_escaped(); }
 <AMUFNAQS,AMUFNAQD>{id_var}       { apt(); fx_app_qarg_expanded(); }
+<AMUFNAQS,AMUFNAQD>\\{nr}         { apt(); fx_app_qarg(""); }
 <AMUFNAQS,AMUFNAQD>{nr}           { apt(); fx_app_qarg(); }
 <AMUFNAQS,AMUFNAQD>.              { apt(); fx_app_qarg(); }
 
-<AMUFNAQS><<EOF>>                 { abort("unterminated single quote", fi_bline); }
-<AMUFNAQD><<EOF>>                 { abort("unterminated double quote", fi_bline); }
+<AMUFNAQS><<EOF>>                 { abort("unterminated single quote", fx_bline); }
+<AMUFNAQD><<EOF>>                 { abort("unterminated double quote", fx_bline); }
+
+  /* amu_bif: { text block } */
+
+<AMUFNTEXTBLCK>\}                 { apt(); if (--fx_body_level) { fx_app_body(); }
+                                           else { fx_end(); yy_pop_state(); } }
+<AMUFNTEXTBLCK>\{                 { apt(); fx_app_body(); fx_body_level++; }
+<AMUFNTEXTBLCK>\\{nr}             { apt(); fx_app_body(""); }
+<AMUFNTEXTBLCK>{nr}               { apt(); fx_app_body(); }
+<AMUFNTEXTBLCK>.                  { apt(); fx_app_body(); }
+<AMUFNTEXTBLCK><<EOF>>            { abort("unterminated function body block", fx_bline); }
 
   /*
     amu_include:
@@ -289,14 +301,15 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUIFEXPR><<EOF>>                { abort("unterminated if expression", if_bline); }
 
 <AMUIFTEXT>{id_var}               { apt(); if_get_var_text(); if_end_case(); BEGIN(AMUIFELSE); }
-<AMUIFTEXT>\{                     { apt(); BEGIN(AMUIFTEXTBLCK); }
+<AMUIFTEXT>\{                     { apt(); if_case_level++; BEGIN(AMUIFTEXTBLCK); }
 <AMUIFTEXT>{ws}+                  { apt(); }
 <AMUIFTEXT>{nr}                   { apt(); }
 <AMUIFTEXT>.                      { error("in if case body", lineno(), YYText()); }
 <AMUIFTEXT><<EOF>>                { abort("unterminated if case body", if_bline); }
 
-<AMUIFTEXTBLCK>{id_var}           { apt(); if_app(); }
-<AMUIFTEXTBLCK>\}                 { apt(); if_end_case(); BEGIN(AMUIFELSE); }
+<AMUIFTEXTBLCK>\}                 { apt(); if (--if_case_level) { if_app(); }
+                                           else { if_end_case(); BEGIN(AMUIFELSE); } }
+<AMUIFTEXTBLCK>\{                 { apt(); if_app(); if_case_level++; }
 <AMUIFTEXTBLCK>\\{nr}             { apt(); if_app(""); }
 <AMUIFTEXTBLCK>{nr}               { apt(); if_app(); }
 <AMUIFTEXTBLCK>.                  { apt(); if_app(); }

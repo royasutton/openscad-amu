@@ -62,7 +62,7 @@ namespace bfs = boost::filesystem;
      ++global, --global | false   | update global variable scope
 
     \em Positional arguments are expanded and appended to the return
-    value. Each argument is separated by a configurable feild
+    value. Each argument is separated by a configurable field
     separator, ${EFS}. By default, ${EFS}='[:space:]'. Escaped
     variables are reduced and checked during subsequent expansions.
     Delayed expansion is required to access the value of a variable
@@ -81,11 +81,8 @@ ODIF::ODIF_Scanner::bif_eval(void)
   bool update_local = true;
   bool update_global = false;
 
-  // create local copy of the global variable scope map
-  env_var vm = varm;
-
-  // setup feild separator variable vm reference
-  string efs = vm.get_prefix() + "EFS" + vm.get_suffix();
+  // setup field separator variable reference
+  string efs = levm.get_prefix() + "EFS" + levm.get_suffix();
 
   string result;
 
@@ -97,14 +94,14 @@ ODIF::ODIF_Scanner::bif_eval(void)
     // argument is positional
     if ( it->positional )
     {
-      // append feild separator
+      // append field separator
       if ( result.length() != 0 )
-        result.append( UTIL::unquote( vm.expand(efs) ) );
+        result.append( UTIL::unquote( levm.expand(efs) ) );
 
       // expand and append positional argument text
       // do not unquote value, quotations in positional
       // arguments assumed to have significance.
-      result.append( vm.expand_text( it->value ) );
+      result.append( levm.expand_text( it->value ) );
     }
     // argument is named or flag
     else
@@ -120,10 +117,10 @@ ODIF::ODIF_Scanner::bif_eval(void)
       // text as this is done recursively by class 'env_var'.
       {
         // local
-        if ( update_local ) vm.store( it->name, UTIL::unquote( it->value ) );
+        if ( update_local ) levm.store( it->name, UTIL::unquote( it->value ) );
 
         // global
-        if ( update_global ) varm.store( it->name, UTIL::unquote( it->value ) );
+        if ( update_global ) gevm.store( it->name, UTIL::unquote( it->value ) );
       }
     }
   }
@@ -144,7 +141,7 @@ ODIF::ODIF_Scanner::bif_eval(void)
 
      flags   | sc  | default | description
     :-------:|:---:|:-------:|:-----------------------------------------
-      stderr | s   | false   | capture standard error output as well
+      stderr | s   | false   | capture standard error output
       rmnl   | r   | true    | remove line-feeds / carriage returns
       eval   | e   | false   | expand variables in text
 
@@ -219,7 +216,7 @@ ODIF::ODIF_Scanner::bif_shell(void)
   else
   {
     if (flag_eval)
-      result = varm.expand_text(result);
+      result = levm.expand_text(result);
 
     return( result );
   }
@@ -250,7 +247,7 @@ ODIF::ODIF_Scanner::bif_shell(void)
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
-      stderr   | s   | false   | capture standard error output as well
+      stderr   | s   | false   | capture standard error output
       rmnl     | r   | true    | remove line-feeds / carriage returns
       pstarget | pst | false   | target is from parent source file
 
@@ -416,13 +413,13 @@ ODIF::ODIF_Scanner::bif_make(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Options that require arguments.
+    Named arguments:
 
      options   | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------
       index    | i   |         | return scope at specified index
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -431,7 +428,7 @@ ODIF::ODIF_Scanner::bif_make(void)
       join     | j   | false   | return scope joiner
       root     | r   | false   | return root scope
 
-    Flags that control the produced output.
+    Flags that control the produced output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -617,7 +614,7 @@ ODIF::ODIF_Scanner::bif_scope(void)
     The options and flags (and their short codes) are summarized in the
     following tables.
 
-    Flags that produce output.
+    Flags that produce output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
@@ -627,7 +624,7 @@ ODIF::ODIF_Scanner::bif_scope(void)
       stem     | s   | false   | return source stemname
       ext      | e   | false   | return source file extension
 
-    Flags that control the produced output.
+    Flags that control the produced output:
 
      flags     | sc  | default | description
     :---------:|:---:|:-------:|:-----------------------------------------
