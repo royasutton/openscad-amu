@@ -523,6 +523,194 @@ ODIF::ODIF_Scanner::bif_openscad(void)
   return( result );
 }
 
+/***************************************************************************//**
+  \details
+
+    Perform file system operations.
+
+    The options and flags (and their short codes) are summarized in the
+    following tables.
+
+    Named arguments:
+
+     options    | sc  | default | description
+    :----------:|:---:|:-------:|:----------------------------------------------
+      parent    | p   | <empty> | a parent path
+      mkrel     | mr  |         | return each path relative to parent path
+      mkrelp    | mrp |         | return each path relative to parent path (common)
+      mkdir     | md  |         | make one or more directories
+      mkdirp    | mdp |         | make directory paths including parents
+
+    Flags that produce output:
+
+     flags      | sc  | default | description
+    :----------:|:---:|:-------:|:----------------------------------------
+      uuid      | u   | false   | return a unique identifier
+
+    Flags that modify output:
+
+     flags      | sc  | default | description
+    :----------:|:---:|:-------:|:----------------------------------------
+      verbose   | v   | false   | use verbose output
+
+    The tokenizer character that separates list members are summarized
+    in the following table.
+
+     type     | any of
+    :--------:|:------------:
+     paths    | [,[:space:]]
+
+    For more information on how to specify and use function arguments
+    see \ref openscad_dif_sm_a.
+*******************************************************************************/
+string
+ODIF::ODIF_Scanner::bif_filesystem(void)
+{
+  using namespace UTIL;
+
+  // options declaration: vana & vans.
+  // !!DO NOT REORDER WITHOUT UPDATING POSITIONAL DEPENDENCIES BELOW!!
+  string vana[] =
+  {
+  "verbose",  "v",
+
+  "parent",   "p",
+  "mkrel",    "mr",
+  "mkrelp",   "mrp",
+  "mkdir",    "md",
+  "mkdirp",   "mdp",
+
+  "uuid",     "u"
+  };
+  set<string> vans(vana, vana + sizeof(vana)/sizeof(string));
+
+  // assign local variable values: positions must match declaration above.
+  size_t ap=14;
+  bool verbose  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[0],vana[1])).c_str() ) > 0 );
+  bfs::path parent;
+
+  // tokenizer delimiters
+  string toks = ", ";
+
+  // generate options help string.
+  string help = "options: [";
+  for(size_t it=0; it < ap; it+=2) {
+    if (it) help.append( ", " );
+    help.append( vana[it] + " (" + vana[it+1] + ")" );
+  }
+  help.append( "]" );
+
+  string result;
+
+  // iterate over the arguments, skipping function name (position zero)
+  for ( vector<func_args::arg_term>::iterator it=fx_argv.argv.begin()+1;
+                                              it!=fx_argv.argv.end();
+                                              ++it )
+  {
+    string n = it->name;
+    string v = unquote_trim(it->value);
+    bool flag = ( atoi( v.c_str() ) > 0 );   // assign flag value
+
+    if ( it->positional )
+    { // invalid
+      return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+    }
+    else
+    {
+      if      (
+                !(n.compare(vana[0])&&n.compare(vana[1]))     // verbose
+              )
+      {
+        // do nothing, control flags values set above.
+      }
+      else if (!(n.compare(vana[2])&&n.compare(vana[3])))
+      { // parent
+        parent = v;
+      }
+      else if (!(n.compare(vana[4])&&n.compare(vana[5])))
+      { // mkrel
+        vector<string> vv = string_tokenize_to_vector(v, toks);
+
+        for ( vector<string>::iterator it=vv.begin(); it != vv.end(); ++it)
+        {
+          bfs::path p = *it;
+
+          result.append
+          (
+            (result.empty()?"":",")
+            + get_relative_path(p, parent, false).string()
+          );
+        }
+      }
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])))
+      { // mkrelp
+        vector<string> vv = string_tokenize_to_vector(v, toks);
+
+        for ( vector<string>::iterator it=vv.begin(); it != vv.end(); ++it)
+        {
+          bfs::path p = *it;
+
+          result.append
+          (
+            (result.empty()?"":",")
+            + get_relative_path(p, parent, true).string()
+          );
+        }
+      }
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])))
+      { // mkdir
+        vector<string> vv = string_tokenize_to_vector(v, toks);
+
+        for ( vector<string>::iterator it=vv.begin(); it != vv.end(); ++it)
+        {
+          bfs::path p;
+
+          if ( parent.empty() ) p = *it;
+          else                  p = parent / *it;
+
+          std::string m;
+          bool ok = UTIL::make_dir(p.string(), m, false);
+
+          if ( verbose || !ok ) result.append( (result.empty()?"":", ") + m );
+        }
+      }
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])))
+      { // mkdirp
+        vector<string> vv = string_tokenize_to_vector(v, toks);
+
+        for ( vector<string>::iterator it=vv.begin(); it != vv.end(); ++it)
+        {
+          bfs::path p;
+
+          if ( parent.empty() ) p = *it;
+          else                  p = parent / *it;
+
+          std::string m;
+          bool ok = UTIL::make_dir(p.string(), m, true);
+
+          if ( verbose || !ok ) result.append( (result.empty()?"":", ") + m );
+        }
+      }
+
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      { // uuid
+        result.append
+        (
+          (result.empty()?"":" ")
+          + bfs::unique_path( bfs::path("%%%%-%%%%-%%%%-%%%%-%%%%-%%%%") ).string()
+        );
+      }
+
+      else
+      { // invalid
+        return( amu_error_msg(n + "=" + v + " invalid option. " + help) );
+      }
+    }
+  }
+
+  return ( result );
+}
+
 /*******************************************************************************
 // eof
 *******************************************************************************/

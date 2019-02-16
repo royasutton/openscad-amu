@@ -495,6 +495,8 @@ class ODIF_Scanner : public yyFlexLexer{
     bool bif_if_exp_2a(std::string s);
     //! run an in-line openscad script and return results.
     std::string bif_openscad(void);
+    //! perform file system operations.
+    std::string bif_filesystem(void);
 };
 
 } /* end namespace ODIF */

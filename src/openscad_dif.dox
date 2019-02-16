@@ -179,8 +179,9 @@
   | \ref dif_afc_amu_copy           | Copy references to documentation
   | \ref dif_afc_amu_find           | Search for output files
   | \ref dif_afc_amu_pathid         | Generate source path identifier
-  | \ref dif_afc_amu_filename       | Operations for filename lists
   | \ref dif_afc_amu_file           | Text file read operations
+  | \ref dif_afc_amu_filename       | Operations for filename lists
+  | \ref dif_afc_amu_filesystem     | Perform file system operations
   | \ref dif_afc_amu_combine        | Combine sets of words
   | \ref dif_afc_amu_replace        | Text search and replace operation
   | \ref dif_afc_amu_word           | Count or select words from a list
@@ -296,6 +297,9 @@
 
     \subsection dif_afc_amu_filename \\amu_filename
     \copydetails ODIF::ODIF_Scanner::bif_filename()
+
+    \subsection dif_afc_amu_filesystem \\amu_filesystem
+    \copydetails ODIF::ODIF_Scanner::bif_filesystem()
 
     \subsection dif_afc_amu_find \\amu_find
     \copydetails ODIF::ODIF_Scanner::bif_find()
