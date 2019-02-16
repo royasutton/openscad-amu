@@ -780,12 +780,16 @@ UTIL::make_dir(const std::string &d,
     boost::filesystem::path t;
 
     // ancestors: assume exists
+    uint level = 0;
+
     if ( !b.empty() )
     {
       boost::filesystem::path::const_iterator bit = b.begin();;
 
       while (bit != b.end() && nit != n.end())
       {
+        level++;
+
         ++bit;
         ++nit;
       }
@@ -804,7 +808,7 @@ UTIL::make_dir(const std::string &d,
 
       if ( boost::filesystem::exists( t ) && boost::filesystem::is_directory( t ) )
       {
-        m += (m.empty()?"":"/") + nit->string();
+        m += (level?"/":"") + nit->string();
       }
       else
       {
@@ -812,6 +816,7 @@ UTIL::make_dir(const std::string &d,
         m += "/<" + nit->string() + ">";
         count++;
       }
+      level++;
 
       ++nit;
     }
