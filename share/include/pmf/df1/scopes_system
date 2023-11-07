@@ -30,7 +30,7 @@
 # Commands
 #------------------------------------------------------------------------------#
 
-path_openscad := $(call first_of,openscad-nightly openscad)
+path_openscad := $(call first_of,openscad openscad-nightly)
 path_openscad_seam := \
   $(call first_of, \
     $(AMU_TOOL_PREFIX)openscad-seam-$(AMU_TOOL_VERSION) \
