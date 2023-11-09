@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2018 Roy Allen Sutton
+#  Copyright (C) 2016-2023 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).

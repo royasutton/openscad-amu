@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2018 Roy Allen Sutton
+#  Copyright (C) 2016-2023 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -107,24 +107,25 @@ $(this_guard) := $(notdir $(this_file))
 	# preferred tool version (leave blank to use default)
 	# AMU_TOOL_VERSION
 
-	# Include file directory prefix.
+	# Default include file directory prefix.
   ifndef AMU_PM_PREFIX
     AMU_PM_PREFIX	:= $(dir $(this_file))
     $(call amu_pm_m,setting: AMU_PM_PREFIX=$(AMU_PM_PREFIX))
   endif
 
-	# Design flow sub-directory.
+	# Default design flow sub-directory (end with slash).
   ifndef AMU_PM_DESIGN_FLOW
     AMU_PM_DESIGN_FLOW := df1/
     $(call amu_pm_m,setting: AMU_PM_DESIGN_FLOW=$(AMU_PM_DESIGN_FLOW))
   endif
 
-	# Makefile component list.
+	# Default Makefile component list.
   ifndef AMU_PM_COMPONENTS
     AMU_PM_COMPONENTS := scopes doxygen
     $(call amu_pm_m,setting: AMU_PM_COMPONENTS=$(AMU_PM_COMPONENTS))
   endif
 
+	# Optional makefile component list additions.
   ifdef AMU_PM_COMPONENTS_ADD
     AMU_PM_COMPONENTS += $(AMU_PM_COMPONENTS_ADD)
     $(call amu_pm_m,adding components: $(AMU_PM_COMPONENTS_ADD))
@@ -137,7 +138,7 @@ $(this_guard) := $(notdir $(this_file))
 
   $(call amu_pm_m,include [$($(this_guard))])
 
-	# components
+	# Design flow Components
 	amu_pm_init_components := \
 		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX),$(AMU_PM_DESIGN_FLOW), \
 			base $(AMU_PM_COMPONENTS), \
@@ -148,7 +149,7 @@ $(this_guard) := $(notdir $(this_file))
       $(eval include $(AMU_PM_PREFIX)$x) \
   )
 
-	# local components
+	# Local components
 	amu_pm_init_components_local := \
 		$(strip $(call AMU_PM_GET_COMPONENTS,,$(AMU_PM_COMPONENTS_LOCAL_PATH)/, \
 			$(AMU_PM_COMPONENTS_LOCAL), \
