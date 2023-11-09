@@ -156,7 +156,7 @@ AC_CONFIG_FILES([
   share/functions/Makefile
 
   share/include/Makefile
-  share/include/mf/Makefile
+  share/include/mfi/Makefile
   share/include/pmf/Makefile
   share/include/pmf/df1/Makefile
 
