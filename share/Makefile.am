@@ -10,7 +10,7 @@ SUBDIRS = \
 	scripts \
 	lib \
 	\
-	functions \
+	dif_external \
 	include \
 	templates
 

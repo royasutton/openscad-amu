@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# top_srcdir/share/functions
+# top_srcdir/share/dif_external
 #
 ##############################################################################
 
@@ -15,7 +15,7 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/functions
+install_path = $(version_path)/dif_external
 
 ##############################################################################
 # targets
