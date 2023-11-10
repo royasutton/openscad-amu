@@ -3,7 +3,7 @@
 # Process this file with autoconf to produce a configure script.
 #
 ##############################################################################
-AC_PREREQ(2.50)
+AC_PREREQ([2.71])
 
 # obtain source versions from git
 AC_REVISION([m4_esyscmd_s([git describe --tags --dirty --always])])
@@ -31,11 +31,11 @@ AM_INIT_AUTOMAKE([
 ##############################################################################
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_LIBTOOL
+LT_INIT
 
 # flex
 AC_MSG_CHECKING([fast lexical analyser generator (flex)])
-AC_PROG_LEX
+AC_PROG_LEX(yywrap)
 if test "x$LEX" != xflex; then
   LEX="$SHELL $missing_dir/missing flex"
   AC_SUBST([LEX_OUTPUT_ROOT], [lex.yy])
