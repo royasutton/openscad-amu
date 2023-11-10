@@ -146,8 +146,10 @@ yyFlexLexer::yywrap(void)
   if (need_sp)
     std::cerr
         << std::endl
-        << "# WARNING: Script ended with unterminated line." << std::endl
-        << "# WARNING: check for missing ';' at end of script." << std::endl
+        << "####################################################" << std::endl
+        << "# WARNING: Script ended with unterminated line.    #" << std::endl
+        << "# WARNING: check for missing ';' at end of script. #" << std::endl
+        << "####################################################" << std::endl
         << std::endl;
 
   return 1;

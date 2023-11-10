@@ -94,7 +94,7 @@ lib_list="
 "
 
 [[ -n $__VERBOSE__ ]] && \
-echo "loading automake utilities library functions:"
+echo "loading openscad-amu makefile script library functions:"
 
 for lib in $lib_list ; do
   [[ -n $__VERBOSE__ ]] && \
@@ -176,7 +176,7 @@ declare ext_log="log"
 declare -i print_textbox_term_width=$($sc_tput $sc_tput_opts)
 declare -i print_textbox_box_width=$((print_textbox_term_width * 95/100))
 
-# makefile textbox widths:
+# generated makefile textbox widths:
 declare -i makefile_textbox_term_width=80
 declare -i makefile_textbox_box_width=80
 

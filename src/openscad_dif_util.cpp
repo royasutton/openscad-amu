@@ -745,7 +745,7 @@ UTIL::make_dir(const std::string &d,
 
   bool ok = true;
 
-  m = "makedir";
+  m = "makedir-info";
 
   if ( n.empty() )
   { // target empty, do nothing.
@@ -795,7 +795,7 @@ UTIL::make_dir(const std::string &d,
       }
 
       // mark end
-      m += b.string() + "+";
+      m += b.string() + ":";
       t  = b;
     }
 
@@ -813,7 +813,7 @@ UTIL::make_dir(const std::string &d,
       else
       {
         ok = boost::filesystem::create_directory( t );
-        m += "/<" + nit->string() + ">";
+        m += "/+<" + nit->string() + ">";
         count++;
       }
       level++;
