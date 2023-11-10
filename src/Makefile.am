@@ -201,6 +201,7 @@ CLEANFILES = \
 
 clean-local:
 	-test -d doxygen && rm -rfv doxygen
+	-test -d .deps && rm -rfv .deps
 
 ##############################################################################
 # eof

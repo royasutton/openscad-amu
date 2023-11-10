@@ -1,13 +1,13 @@
 ##############################################################################
 #
-# top_srcdir/share/lib
+# top_srcdir/share/include/mfs_library
 #
 ##############################################################################
 
 files = \
 	mainpage.bash \
 	\
-	bootloader.bash \
+	amu_mfs_init.bash \
 	exception.bash \
 	make_makefile.bash \
 	openscad_opts.bash \
@@ -25,7 +25,7 @@ root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
 install_path = $(version_path)/lib
 
-install_path_doc = $(version_path)/doc/share/lib
+install_path_doc = $(version_path)/doc/share/include/mfs_library
 install_path_html = $(install_path_doc)/doxygen/html
 install_path_pdf = $(install_path_doc)/doxygen/latex
 install_path_man = $(install_path_doc)/doxygen/man

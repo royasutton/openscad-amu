@@ -1,4 +1,4 @@
-# share/Doxyfile
+# share/scripts/Doxyfile.in
 PROJECT_NAME           = "@PACKAGE_NAME@"
 PROJECT_NUMBER         = "@PACKAGE_VERSION@"
 PROJECT_BRIEF          =

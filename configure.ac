@@ -157,11 +157,10 @@ AC_CONFIG_FILES([
 
   share/include/Makefile
   share/include/mfi/Makefile
+  share/include/mfs_library/Makefile
+  share/include/mfs_library/Doxyfile
   share/include/pmf/Makefile
   share/include/pmf/df1/Makefile
-
-  share/lib/Makefile
-  share/lib/Doxyfile
 
   share/scripts/Makefile
   share/scripts/Doxyfile

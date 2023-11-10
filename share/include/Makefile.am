@@ -6,6 +6,7 @@
 
 SUBDIRS = \
 	mfi \
+	mfs_library \
 	pmf
 
 root_path = $(DESTDIR)$(pkgdatadir)

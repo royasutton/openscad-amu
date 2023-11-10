@@ -336,7 +336,7 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
 
   string scope_makefile = get_filename( makefile_ext );
   string scope_openscad = get_filename( openscad_ext );
-  string mfscript_init = "lib/bootloader.bash";
+  string mfscript_init = "include/mfs_library/amu_mfs_init.bash";
 
   boost::filesystem::path include_path;
 

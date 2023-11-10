@@ -4,9 +4,9 @@
   \dot "Compile-Scripting and Documentation-Generatation for OpenSCAD Designs."
     digraph example {
       node [shape=Mrecord, fontname=Helvetica, fontsize=10];
-      a [label="openscad-amu" URL="../../../lib/doxygen/html/index.html"];
+      a [label="openscad-amu" URL="../../../include/mfs_library/doxygen/html/index.html"];
       b [label="C++ Programs" URL="../../../../src/doxygen/html/index.html"];
-      c [label="Makefile Script Library" URL="../../../lib/doxygen/html/mslibrary.html"];
+      c [label="Makefile Script Library" URL="../../../include/mfs_library/doxygen/html/mslibrary.html"];
       d [label="Support Scripts" URL="index.html" style="filled"];
       a->b; a->c; a->d;
     }

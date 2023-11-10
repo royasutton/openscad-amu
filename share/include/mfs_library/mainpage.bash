@@ -50,8 +50,8 @@
         edge [arrowhead=vee];
         a  [shape=note label="Annotated\nSource\n(vehicle.scad)" URL="\ref vehicle.scad"];
         b  [shape=oval peripheries=2 label="Automated\nDesign\nFlow" URL="\ref design_flow"];
-        c  [shape=component label="Target (1)\n...\nTarget (96)" URL="../../../examples/build/html/stl/vehicle_test_car_17.stl"];
-        d  [shape=folder label="Design\nLibrary\nDocumentation" URL="../../../examples/build/html/index.html"];
+        c  [shape=component label="Target (1)\n...\nTarget (96)" URL="../../../../examples/build/html/stl/vehicle_test_car_17.stl"];
+        d  [shape=folder label="Design\nLibrary\nDocumentation" URL="../../../../examples/build/html/index.html"];
         a->b; b->{c d};
       }
     \enddot
@@ -107,8 +107,8 @@
   [Doxygen]: http://www.doxygen.nl
   [special commands]: http://www.doxygen.nl/manual/commands.html
 
-  [html-example]: ../../../examples/build/html/index.html
-  [pdf-example]: ../../../examples/build/latex/refman.pdf
+  [html-example]: ../../../../examples/build/html/index.html
+  [pdf-example]: ../../../../examples/build/latex/refman.pdf
 ###############################################################################/
 
 
@@ -173,10 +173,10 @@
             c  [shape=note label="OpenSCAD\nModeling\nScript\n(*.scad)" URL="\ref vehicle_document.scad"];
             d  [shape=note label="MFScript\nBuild\nScript\n(*.bash)" URL="\ref vehicle_document.bash"];
             e  [shape=note label="Makefile" URL="\ref vehicle_document.makefile"];
-            f1 [shape=component label="Targets\n(png)" URL="../../../examples/build/html/png/vehicle_test_car_17_green_diag_320x240.png"];
-            f2 [shape=component label="Targets\n(stl)" URL="../../../examples/build/html/stl/vehicle_test_car_17.stl"];
+            f1 [shape=component label="Targets\n(png)" URL="../../../../examples/build/html/png/vehicle_test_car_17_green_diag_320x240.png"];
+            f2 [shape=component label="Targets\n(stl)" URL="../../../../examples/build/html/stl/vehicle_test_car_17.stl"];
             f3 [shape=none label="..."];
-            fn [shape=component label="Targets\n(n)" URL="../../../examples/build"];
+            fn [shape=component label="Targets\n(n)" URL="../../../../examples/build"];
 
             c->e; d->e;
             e->f1; e->f2; e->f3 [style=invis]; e->fn;
@@ -184,7 +184,7 @@
 
         g  [shape=box peripheries=2 style="filled" label="openscad-dif\n(Doxygen filter)" URL="\ref openscad_dif_ht"];
         h  [shape=box peripheries=2 label="Doxygen" URL="http://www.doxygen.nl"];
-        i  [shape=folder label="Generated\nDocumentation\nhtml, pdf, etc." URL="../../../examples/build/html/index.html"];
+        i  [shape=folder label="Generated\nDocumentation\nhtml, pdf, etc." URL="../../../../examples/build/html/index.html"];
 
         a2->{b g}; a3->h; b->{c d};
         g->h; h->i;
@@ -299,8 +299,8 @@
     Here is the resulting library documentation ([HTML][html-example])
     (PDF).
 
-  [html-example]: ../../../examples/build/html/index.html
-  [pdf-example]: ../../../examples/build/latex/refman.pdf
+  [html-example]: ../../../../examples/build/html/index.html
+  [pdf-example]: ../../../../examples/build/latex/refman.pdf
 ###############################################################################/
 
 
@@ -325,7 +325,7 @@
 
   \section library_files Files
 
-    - bootloader.bash
+    - amu_mfs_init.bash
     - print.bash
     - print_textbox.bash
     - exception.bash
@@ -337,7 +337,7 @@
     To use the library functions, a script must first set the environment
     variable \c ${\__LIB_PATH\__}. Optionally, \c ${\__VERBOSE\__} can be
     set to \c true to enable verbose output within the library functions.
-    Next, source the \c bootloader.bash file to initialize the library.
+    Next, source the \c amu_mfs_init.bash file to initialize the library.
     See the \ref hello_world example below for an example.
 
   \section hello_world Hello World

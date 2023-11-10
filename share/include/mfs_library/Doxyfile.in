@@ -1,9 +1,9 @@
-# share/lib/Doxyfile
+# share/include/mfs_library/Doxyfile.in
 PROJECT_NAME           = "@PACKAGE_NAME@"
 PROJECT_NUMBER         = "@PACKAGE_VERSION@"
 PROJECT_BRIEF          =
 OUTPUT_DIRECTORY       = doxygen
-STRIP_FROM_PATH        = @abs_top_builddir@
+STRIP_FROM_PATH        = "@abs_top_builddir@"
 STRIP_FROM_INC_PATH    =
 OPTIMIZE_OUTPUT_FOR_C  = YES
 EXTENSION_MAPPING      = bash=C
@@ -19,9 +19,9 @@ WARN_LOGFILE           = doxygen.warn
 INPUT                  =
 FILE_PATTERNS          = *.bash
 RECURSIVE              = NO
-EXAMPLE_PATH           = @top_builddir@/share/examples \
-                         @top_builddir@/share/examples/build \
-                         @top_srcdir@/share/examples
+EXAMPLE_PATH           = "@top_builddir@/share/examples" \
+                         "@top_builddir@/share/examples/build" \
+                         "@top_srcdir@/share/examples"
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
 FILTER_PATTERNS        = *.bash=@top_builddir@/src/bash-dif
@@ -35,6 +35,6 @@ PAPER_TYPE             = letter
 GENERATE_MAN           = YES
 MAN_OUTPUT             = man
 GENERATE_TAGFILE       = doxygen.tagfile
-TAGFILES               = ../scripts/doxygen.tagfile=../../../scripts/doxygen/html \
-                         ../../src/doxygen.tagfile=../../../../src/doxygen/html
+TAGFILES               = ../../scripts/doxygen.tagfile=../../../../scripts/doxygen/html \
+                         ../../../src/doxygen.tagfile=../../../../../src/doxygen/html
 DOTFILE_DIRS           = @top_srcdir@/share/examples

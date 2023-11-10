@@ -1,7 +1,7 @@
-## Library bootloader.
+## Load and initialize makefile script library.
 #/##############################################################################
 #
-#   \file   bootloader.bash
+#   \file   amu_mfs_init.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
 #   \date   2016-2017
@@ -55,10 +55,10 @@ if [[ -z "${__LIB_PATH__}" ]] ; then
   exit 1
 fi
 
-# ${__LIB_PATH__}/lib must exist.
-if [[ ! -d "${__LIB_PATH__}/lib" ]] ; then
+# ${__LIB_PATH__}/include/mfs_library must exist.
+if [[ ! -d "${__LIB_PATH__}/include/mfs_library" ]] ; then
   echo >&2 "\${__LIB_PATH__}=[${__LIB_PATH__}] and" \
-           "${__LIB_PATH__}/lib directory does not exist, aborting."
+           "[${__LIB_PATH__}/include/mfs_library] directory does not exist, aborting."
   return 1 2>/dev/null
   exit 1
 fi
@@ -98,9 +98,9 @@ echo "loading automake utilities library functions:"
 
 for lib in $lib_list ; do
   [[ -n $__VERBOSE__ ]] && \
-  echo " " source ${__LIB_PATH__}/lib/$lib
+  echo " " source ${__LIB_PATH__}/include/mfs_library/$lib
 
-  source ${__LIB_PATH__}/lib/$lib
+  source ${__LIB_PATH__}/include/mfs_library/$lib
 done
 
 
