@@ -10,7 +10,7 @@ files_s = \
 files_d =
 
 files_am = \
-	mainpage.bash \
+	docs_scripts.bash \
 	\
 	segregate.bash
 

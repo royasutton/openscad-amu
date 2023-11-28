@@ -164,7 +164,7 @@ AC_CONFIG_FILES([
 
   share/scripts/Makefile
   share/scripts/Doxyfile
-  share/scripts/mainpage.bash
+  share/scripts/docs_scripts.bash
   share/scripts/segregate.bash
 
   share/templates/Makefile

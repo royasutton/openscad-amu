@@ -70,7 +70,8 @@ openscad_seam_SOURCES = \
 
 # doxygen documentation
 DOXYGEN_DOXFILES = \
-	mainpage.dox \
+	docs_programs.dox \
+	\
 	bash_dif.dox \
 	openscad_dif.dox \
 	openscad_seam.dox
