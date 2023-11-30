@@ -114,9 +114,10 @@ else
 endif
 
 # apply include and exclude filter
+# use default when configured to ignore filters
 scopes_scripts_selected := \
-  $(filter $(scopes_include_filter), \
-  $(filter-out $(scopes_exclude_filter), \
+  $(filter $(if $(ignore_scopes_include),%,$(scopes_include_filter)), \
+  $(filter-out $(if $(ignore_scopes_exclude),$(empty),$(scopes_exclude_filter)), \
     $(scopes_scripts_source) \
   ))
 
