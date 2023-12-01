@@ -39,8 +39,8 @@ $(foreach s,\
   $(src_files), \
   $(foreach c, \
     $(filter %$(mfs_ext), \
-    $(filter $(if $(ignore_scopes_include),%,$(scopes_include_filter)), \
-    $(filter-out $(if $(ignore_scopes_exclude),$(empty),$(scopes_exclude_filter)), \
+    $(filter $(if $(call bool_decode,$(ignore_scopes_include)),%,$(scopes_include_filter)), \
+    $(filter-out $(if $(call bool_decode,$(ignore_scopes_exclude)),$(empty),$(scopes_exclude_filter)), \
       $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
     ))), \
     $(eval $(call scopes_targets,$s,$(basename $c))) \
