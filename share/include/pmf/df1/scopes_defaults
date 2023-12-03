@@ -35,6 +35,10 @@ prefix_scopes_output_path               := $(true)
 prefix_scopes_output_prefix             := $(true)
 prefix_scopes_input_prefix              := $(false)
 
+# control for scopes script selection
+ignore_scopes_include                   := $(false)
+ignore_scopes_exclude                   := $(false)
+
 # add scope output to release directory/archive
 release_scopes                          := $(false)
 release_archive_scopes                  := $(false)
@@ -75,6 +79,9 @@ scopes_control_variables := \
   prefix_scopes_output_path \
   prefix_scopes_output_prefix \
   prefix_scopes_input_prefix \
+  \
+  ignore_scopes_include \
+  ignore_scopes_exclude \
   \
   release_scopes \
   release_archive_scopes \

@@ -476,15 +476,17 @@ ODIF::ODIF_Scanner::bif_openscad(void)
     // indent path to same indentation as 'args'
     string openscad = indent_line( get_openscad_path(), get_indent(args) );
 
-    if ( !tt.empty() ) result += indent_line(tt + "\n", ti);
-    if ( !po.empty() ) result += indent_line(po + "\n", ti);
-                       result += indent_text
-                                 (
-                                     (shbin?(openscad + " "):"")
-                                   + args
-                                   + (shfile?(" " + file):""), oi
-                                 );
-    if ( !oo.empty() ) result += indent_line(oo + "\n", ti);
+    if ( !tt.empty() ) { result += indent_line(tt + "\n", ti); }
+    if ( !po.empty() ) { result += indent_line(po + "\n", ti); }
+
+                         result += indent_text
+                                   (
+                                       (shbin?(openscad + " "):"")
+                                     + args
+                                     + (shfile?(" " + file):""), oi
+                                   );
+
+    if ( !oo.empty() ) { result += indent_line(oo + "\n", ti); }
   }
 
   // append in-line script to result
@@ -496,10 +498,12 @@ ODIF::ODIF_Scanner::bif_openscad(void)
     int    ti = atoi( get_field( 3, fmt_scr, fmt_scr_def ).c_str() );
     string tt =       get_field( 4, fmt_scr, fmt_scr_def );
 
-    if ( !tt.empty() ) result += indent_line(tt + "\n", ti);
-    if ( !po.empty() ) result += indent_line(po + "\n", ti);
-                       result += indent_text(fx_body_text, oi);
-    if ( !oo.empty() ) result += indent_line(oo + "\n", ti);
+    if ( !tt.empty() ) { result += indent_line(tt + "\n", ti); }
+    if ( !po.empty() ) { result += indent_line(po + "\n", ti); }
+
+                         result += indent_text(fx_body_text, oi);
+
+    if ( !oo.empty() ) { result += indent_line(oo + "\n", ti); }
   }
 
   // append script console output to result
@@ -511,10 +515,12 @@ ODIF::ODIF_Scanner::bif_openscad(void)
     int    ti = atoi( get_field( 3, fmt_con, fmt_con_def ).c_str() );
     string tt =       get_field( 4, fmt_con, fmt_con_def );
 
-    if ( !tt.empty() ) result += indent_line(tt + "\n", ti);
-    if ( !po.empty() ) result += indent_line(po + "\n", ti);
-                       result += indent_text(command_output, oi);
-    if ( !oo.empty() ) result += indent_line(oo + "\n", ti);
+    if ( !tt.empty() ) { result += indent_line(tt + "\n", ti); }
+    if ( !po.empty() ) { result += indent_line(po + "\n", ti); }
+
+                         result += indent_text(command_output, oi);
+
+    if ( !oo.empty() ) { result += indent_line(oo + "\n", ti); }
   }
 
   // end debug

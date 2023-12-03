@@ -1,18 +1,20 @@
 #/##############################################################################
   \mainpage Support Scripts
 
-  \dot "Compile-Scripting and Documentation-Generatation for OpenSCAD Designs."
+  \anchor scripts
+
+  \dot "Compile automation and source-based documentation for OpenSCAD designs."
     digraph example {
       node [shape=Mrecord, fontname=Helvetica, fontsize=10];
-      a [label="openscad-amu" URL="../../../lib/doxygen/html/index.html"];
+      a [label="openscad-amu" URL="../../../../doxygen/html/index.html"];
       b [label="C++ Programs" URL="../../../../src/doxygen/html/index.html"];
-      c [label="Makefile Script Library" URL="../../../lib/doxygen/html/mslibrary.html"];
+      c [label="Makefile Script Library" URL="../../../include/mfs_library/doxygen/html/index.html"];
       d [label="Support Scripts" URL="index.html" style="filled"];
       a->b; a->c; a->d;
     }
   \enddot
 
-  \section scripts Scripts
+  \section scripts_reference Reference
 
   \subsection setup-amu_bash setup-amu.bash
     \li \subpage setup-amu_bash_ht "Command line help"

@@ -1,12 +1,11 @@
 ##############################################################################
 #
-# top_srcdir/share/functions
+# top_srcdir/share/include/mfi
 #
 ##############################################################################
 
 files = \
-	amu_date \
-	amu_list
+	parallel_jobs.mk
 
 files_am =
 
@@ -15,7 +14,7 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/functions
+install_path = $(version_path)/include/mfi
 
 ##############################################################################
 # targets
@@ -28,7 +27,7 @@ install-data-local: $(files_am) | '$(install_path)'
 	( cd ${srcdir} && \
 		for f in $(files); \
 		do \
-			$(INSTALL_SCRIPT) $$f '$(install_path)' ; \
+			$(INSTALL_DATA) $$f '$(install_path)' ; \
 		done \
 	) && \
 	( cd ${builddir} && \

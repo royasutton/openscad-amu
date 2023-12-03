@@ -1,13 +1,13 @@
 ##############################################################################
 #
-# top_srcdir/share/lib
+# top_srcdir/share/include/mfs_library
 #
 ##############################################################################
 
 files = \
-	mainpage.bash \
+	docs_library.bash \
 	\
-	bootloader.bash \
+	amu_mfs_init.bash \
 	exception.bash \
 	make_makefile.bash \
 	openscad_opts.bash \
@@ -23,9 +23,9 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/lib
+install_path = $(version_path)/include/mfs_library
 
-install_path_doc = $(version_path)/doc/share/lib
+install_path_doc = $(version_path)/doc/share/include/mfs_library
 install_path_html = $(install_path_doc)/doxygen/html
 install_path_pdf = $(install_path_doc)/doxygen/latex
 install_path_man = $(install_path_doc)/doxygen/man
@@ -53,7 +53,7 @@ doxygen/latex/refman.pdf:
 doxygen.stamp: Doxyfile Makefile $(files) $(doxygen_stamp_other_dependacies)
 	( cat Doxyfile ; \
 		echo "INPUT=$(srcdir)" ; \
-		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: Makefile Script Library\"" ; \
+		echo "OUTPUT_DIRECTORY=doxygen" ; \
 	) | $(DOXYGEN_PATH) - \
 	&& touch doxygen.stamp
 
@@ -91,8 +91,8 @@ uninstall-local:
 	do \
 		rm -fv "$(install_path)/$$f" ; \
 	done
-	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
+	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 
 CLEANFILES = \
 	doxygen.stamp \

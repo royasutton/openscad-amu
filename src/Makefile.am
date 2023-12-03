@@ -70,7 +70,8 @@ openscad_seam_SOURCES = \
 
 # doxygen documentation
 DOXYGEN_DOXFILES = \
-	mainpage.dox \
+	docs_programs.dox \
+	\
 	bash_dif.dox \
 	openscad_dif.dox \
 	openscad_seam.dox
@@ -122,7 +123,7 @@ doxygen/latex/refman.pdf:
 doxygen.stamp: $(doxygen_stamp_dependacies)
 	( cat Doxyfile ; \
 		echo "INPUT=$(srcdir)" ; \
-		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: C++ Programs\"" ; \
+		echo "OUTPUT_DIRECTORY=doxygen" ; \
 	) | $(DOXYGEN_PATH) - \
 	&& touch doxygen.stamp
 
@@ -186,6 +187,7 @@ uninstall-local:
 		done \
 	)
 	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
+	-test -d '$(DESTDIR)$(bindir)' && rmdir -v '$(DESTDIR)$(bindir)'
 
 CLEANFILES = \
 	doxygen.stamp \
@@ -201,6 +203,7 @@ CLEANFILES = \
 
 clean-local:
 	-test -d doxygen && rm -rfv doxygen
+	-test -d .deps && rm -rfv .deps
 
 ##############################################################################
 # eof

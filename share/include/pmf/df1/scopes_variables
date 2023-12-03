@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2018 Roy Allen Sutton
+#  Copyright (C) 2016-2023 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -114,9 +114,10 @@ else
 endif
 
 # apply include and exclude filter
+# use default when configured to ignore filters
 scopes_scripts_selected := \
-  $(filter $(scopes_include_filter), \
-  $(filter-out $(scopes_exclude_filter), \
+  $(filter $(if $(call bool_decode,$(ignore_scopes_include)),%,$(scopes_include_filter)), \
+  $(filter-out $(if $(call bool_decode,$(ignore_scopes_exclude)),$(empty),$(scopes_exclude_filter)), \
     $(scopes_scripts_source) \
   ))
 
@@ -171,7 +172,7 @@ scopes_config_derived += \
 ifeq ($(version_checks),$(true))
 
 # openscad-seam v1.5 or later required to auto-extract scope names
-$(call check_version,amuseam,ge,1.5,$(true), \
+$(call check_version,amuseam,ge,2.7,$(true), \
 $(newline)# \
 $(newline)#$(space3)openscad-seam '--mode scopes' option required to auto-extract scope \
 $(newline)#$(space3)names. Option introduced in version v1.5. \

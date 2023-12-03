@@ -3,7 +3,7 @@
 # Process this file with autoconf to produce a configure script.
 #
 ##############################################################################
-AC_PREREQ(2.50)
+AC_PREREQ([2.71])
 
 # obtain source versions from git
 AC_REVISION([m4_esyscmd_s([git describe --tags --dirty --always])])
@@ -31,11 +31,11 @@ AM_INIT_AUTOMAKE([
 ##############################################################################
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_LIBTOOL
+LT_INIT
 
 # flex
 AC_MSG_CHECKING([fast lexical analyser generator (flex)])
-AC_PROG_LEX
+AC_PROG_LEX(yywrap)
 if test "x$LEX" != xflex; then
   LEX="$SHELL $missing_dir/missing flex"
   AC_SUBST([LEX_OUTPUT_ROOT], [lex.yy])
@@ -80,8 +80,8 @@ else
 fi
 
 # openscad path
-AC_MSG_CHECKING([OpenSCAD nightly])
-AC_PATH_PROG(OPENSCAD_PATH, openscad-nightly, false)
+AC_MSG_CHECKING([OpenSCAD])
+AC_PATH_PROG(OPENSCAD_PATH, openscad, false)
 if test "$OPENSCAD_PATH" = false ; then
   OPENSCAD_PATH="openscad"
   AC_MSG_WARN([openscad not found, using ${OPENSCAD_PATH}... no])
@@ -144,6 +144,7 @@ install-man
 ##############################################################################
 AC_CONFIG_FILES([
   Makefile
+  Doxyfile
 
   share/Makefile
 
@@ -153,19 +154,18 @@ AC_CONFIG_FILES([
   share/examples/log_segregate.bash
   share/examples/vehicle.doxyfile
 
-  share/functions/Makefile
+  share/dif_external/Makefile
 
   share/include/Makefile
-  share/include/mf/Makefile
+  share/include/mfi/Makefile
+  share/include/mfs_library/Makefile
+  share/include/mfs_library/Doxyfile
   share/include/pmf/Makefile
   share/include/pmf/df1/Makefile
 
-  share/lib/Makefile
-  share/lib/Doxyfile
-
   share/scripts/Makefile
   share/scripts/Doxyfile
-  share/scripts/mainpage.bash
+  share/scripts/docs_scripts.bash
   share/scripts/segregate.bash
 
   share/templates/Makefile

@@ -196,8 +196,8 @@ uninstall-local:
 	do \
 		rm -fv "$(install_path)/$$f" ; \
 	done
-	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
+	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 
 clean-local:
 	-for f in \

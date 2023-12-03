@@ -4,13 +4,12 @@
 #
 ##############################################################################
 
-# lib depends on: examples and scripts (build afterwards)
+# include/mfs_library depends on: examples and scripts,
+# build examples and scripts before include/mfs_library
 SUBDIRS = \
+	dif_external \
 	examples \
 	scripts \
-	lib \
-	\
-	functions \
 	include \
 	templates
 

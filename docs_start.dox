@@ -1,41 +1,48 @@
-#/##############################################################################
-  \mainpage OpenSCAD Automake Utilities
+/***************************************************************************//**
+  \mainpage Introduction
 
-  \dot "Compile-Scripting and Documentation-Generatation for OpenSCAD Designs."
+  \anchor intro
+
+  \dot "Compile automation and source-based documentation for OpenSCAD designs."
     digraph example {
       node [shape=Mrecord, fontname=Helvetica, fontsize=10];
-      a [label="openscad-amu" URL="\ref index" style="filled"];
+      a [label="openscad-amu" URL="\ref intro" style="filled"];
       b [label="C++ Programs" URL="\ref programs"];
-      c [label="Makefile Script Library" URL="\ref mslibrary"];
+      c [label="Makefile Script Library" URL="\ref library"];
       d [label="Support Scripts" URL="\ref scripts"];
       a->b; a->c; a->d;
     }
    \enddot
 
-    A _framework_ and tools for automating the compilation of
-    [OpenSCAD] designs with a _preprocessor_ that allows
-    <i><b>*.scad</b></i> to be documented using [Doxygen].
+  \section intro_what What is it?
 
+    The [openscad-amu] has been developed to support the construction
+    of automated design flows, using [GNU make], and documentation
+    generation, using [Doxygen], for [OpenSCAD] designs. It provides a
+    framework that allows for documentation and build-scripts to be
+    embedded in <i><b>*.scad</b></i> source along side the design. The
+    openscad-amu is composed of a collection of \ref programs
+    "programs", a makefile script \ref library "library", and support
+    \ref scripts "scripts" that work together to automate and document
+    OpenSCAD designs.
 
-  \section what_is_amu What is it?
+    The design documentation is generated using Doxygen and
+    openscad-amu includes a source-code _preprocessor_ for
+    <i><b>*.scad</b></i> (and <i><b>*.bash</b></i>). This preprocessor
+    provides additional Doxygen [special commands] and features useful
+    for OpenSCAD design documentation. The design automation
+    build-scripts, embedded in the source-code, are extracted by
+    openscad-amu and used to construct makefiles that manage the
+    generation of design targets.
 
-    [openscad-amu] is being developed to support the construction of
-    automated design flows with Doxygen generated documentation for
-    OpenSCAD language-based mechanical design. It provides a framework
-    that allows documentation and build-scripts to be embedded into
-    <i><b>*.scad</b></i> design source. It uses a collection of C++
-    \ref programs "programs", a makefile script \ref mslibrary
-    "library", and support \ref scripts "scripts" for automating the
-    compilation of [OpenSCAD] designs. It includes _preprocessor_
-    source code filters that allows <i><b>*.scad</b></i> (and
-    <i><b>*.bash</b></i>) to be documented using [Doxygen]. The
-    embedded build scripts are extracted during design compilation to
-    construct [Makefiles] that manage the generation of design targets.
-    The source code input-filters extend [Doxygen] and provide
-    additional [special commands] with features useful in mechanical
-    design.
+    By utilizing openscad-amu, OpenSCAD design documentation lives
+    close to to the source code and dependency-based targets generation
+    is scripted for use in code testing, code documentation and design
+    construction. Moreover, with GNU make, targets can be constructed
+    in parallel which drastically reduces compile times for larger
+    designs.
 
-  \section an_example Example
+  \section intro_design_flow The Design Flow
 
     See this source \ref vehicle.scad "file" which represents a trivial
     design library. It differs from a typical OpenSCAD design library
@@ -49,16 +56,16 @@
         node [fontname=Helvetica fontsize=10];
         edge [arrowhead=vee];
         a  [shape=note label="Annotated\nSource\n(vehicle.scad)" URL="\ref vehicle.scad"];
-        b  [shape=oval peripheries=2 label="Automated\nDesign\nFlow" URL="\ref design_flow"];
-        c  [shape=component label="Target (1)\n...\nTarget (96)" URL="../../../examples/build/html/stl/vehicle_test_car_17.stl"];
-        d  [shape=folder label="Design\nLibrary\nDocumentation" URL="../../../examples/build/html/index.html"];
+        b  [shape=oval peripheries=2 label="Automated\nDesign\nFlow" URL="\ref intro_design_flow"];
+        c  [shape=component label="Target (1)\n...\nTarget (96)" URL="../../share/examples/build/html/stl/vehicle_test_car_17.stl"];
+        d  [shape=folder label="Design\nLibrary\nDocumentation" URL="../../share/examples/build/html/index.html"];
         a->b; b->{c d};
       }
     \enddot
 
     When compiled, this simplified example generates over 750 targets
     <tt>(*.png, *.stl, etc.)</tt> and assembles the library
-    documentation (including two animated GIF images). [openscad-amu]
+    documentation (including two animated GIF images). The openscad-amu
     brings together several widely-used tools to automate the
     production of [OpenSCAD] design targets and the design
     documentation in various output formats ([HTML][html-example])
@@ -71,32 +78,32 @@
     <tt>"\usepackage{graphicx}"</tt> in \c refman.tex, and type \c make
     to build \c refman.pdf.
 
-  \section getting_started Getting Started
+  \section intro_getting_started Getting Started
 
-    [openscad-amu] incorporated two complementary but distinct features
-    that may be used together or independantly: (1) Scripted design
-    compilation and (2) design documentation generation. In either
-    case, the design <i><b>*.scad</b></i> source files are augmented
-    with auxiliary comments. If you are familiar with [Doxygen], adding
-    basic documentation to your [OpenSCAD] designs using [openscad-amu]
-    is straight forward. Markup each of your design files with the
-    [special commands], name each file in the project makefile, and
-    type \c make to generate your documentation. You can start from a
-    template created by the \c setup-amu.bash script, then customize as
-    needed.
+    The [openscad-amu] incorporated two complementary but distinct
+    features that may be used together or independantly: (1) Scripted
+    design compilation and (2) design documentation generation. In
+    either case, meta data is added to the design source files within
+    structured comment blocks. If you are familiar with [Doxygen],
+    adding documentation to your [OpenSCAD] designs using openscad-amu
+    is natural and somewhat straight forward. Markup each of your
+    design files with the [special commands], name each file in the
+    project makefile, and type \c make to generate your documentation.
+    You can start from a template created by the \c setup-amu.bash
+    script, then customize as needed.
 
-    \li \subpage source_annotate
-    \li \subpage design_flow
-    \li \subpage an_example_more "More on the example"
+    \li \subpage intro_source_annotate
+    \li \subpage intro_design_flow
+    \li \subpage intro_example_more "More on the example"
 
-  \section framework_components Framework Components
+  \section intro_framework Framework Components
 
     \li \subpage programs "C++ Programs"
-    \li \subpage mslibrary "Makefile Script Library"
+    \li \subpage library "Makefile Script Library"
     \li \subpage scripts "Support Scripts"
 
   [GNU General Public License]: https://www.gnu.org/licenses/gpl.html
-  [Makefiles]: https://www.gnu.org/software/make
+  [GNU make]: https://www.gnu.org/software/make
 
   [openscad-amu]: https://royasutton.github.io/openscad-amu
   [repository]: https://github.com/royasutton/openscad-amu
@@ -107,13 +114,12 @@
   [Doxygen]: http://www.doxygen.nl
   [special commands]: http://www.doxygen.nl/manual/commands.html
 
-  [html-example]: ../../../examples/build/html/index.html
-  [pdf-example]: ../../../examples/build/latex/refman.pdf
-###############################################################################/
+  [html-example]: ../../share/examples/build/html/index.html
+  [pdf-example]: ../../share/examples/build/latex/refman.pdf
+*******************************************************************************/
 
-
-#/##############################################################################
-  \page source_annotate Annotating the source
+/***************************************************************************//**
+  \page intro_source_annotate Annotating the source
 
     To avoid interfering with the primary OpenSCAD code, documentation
     is placed inside of comments sections in the source following the
@@ -137,11 +143,11 @@
     openscad_seam is used to identify and/or extract them as shown in
     \ref embedding_scheme.scripts "here." The utility \ref openscad_dif
     is used to pre-process the embedded special commands for Doxygen.
-###############################################################################/
+*******************************************************************************/
 
 
-#/##############################################################################
-  \page design_flow The Design flow
+/***************************************************************************//**
+  \page intro_design_flow The Design flow
 
     A project includes a Project Makefile, the project source files,
     and a documentation configuration file (Doxyfile). Any source file
@@ -151,7 +157,7 @@
     targets.
 
     [openscad-amu] brings together [OpenSCAD], [Doxygen], [GNU Make],
-    and \ref mslibrary "custom scripting" (based on [GNU Bash]) to
+    and \ref library "custom scripting" (based on [GNU Bash]) to
     automate the generation of the design documentation and design
     targets.
 
@@ -173,10 +179,10 @@
             c  [shape=note label="OpenSCAD\nModeling\nScript\n(*.scad)" URL="\ref vehicle_document.scad"];
             d  [shape=note label="MFScript\nBuild\nScript\n(*.bash)" URL="\ref vehicle_document.bash"];
             e  [shape=note label="Makefile" URL="\ref vehicle_document.makefile"];
-            f1 [shape=component label="Targets\n(png)" URL="../../../examples/build/html/png/vehicle_test_car_17_green_diag_320x240.png"];
-            f2 [shape=component label="Targets\n(stl)" URL="../../../examples/build/html/stl/vehicle_test_car_17.stl"];
+            f1 [shape=component label="Targets\n(png)" URL="../../share/examples/build/html/png/vehicle_test_car_17_green_diag_320x240.png"];
+            f2 [shape=component label="Targets\n(stl)" URL="../../share/examples/build/html/stl/vehicle_test_car_17.stl"];
             f3 [shape=none label="..."];
-            fn [shape=component label="Targets\n(n)" URL="../../../examples/build"];
+            fn [shape=component label="Targets\n(n)" URL="../../share/examples/build"];
 
             c->e; d->e;
             e->f1; e->f2; e->f3 [style=invis]; e->fn;
@@ -184,7 +190,7 @@
 
         g  [shape=box peripheries=2 style="filled" label="openscad-dif\n(Doxygen filter)" URL="\ref openscad_dif_ht"];
         h  [shape=box peripheries=2 label="Doxygen" URL="http://www.doxygen.nl"];
-        i  [shape=folder label="Generated\nDocumentation\nhtml, pdf, etc." URL="../../../examples/build/html/index.html"];
+        i  [shape=folder label="Generated\nDocumentation\nhtml, pdf, etc." URL="../../share/examples/build/html/index.html"];
 
         a2->{b g}; a3->h; b->{c d};
         g->h; h->i;
@@ -231,14 +237,14 @@
     [Doxygen]: http://www.doxygen.nl
     [GNU Make]: https://www.gnu.org/software/make
     [GNU Bash]: https://www.gnu.org/software/bash
-###############################################################################/
+*******************************************************************************/
 
 
-#/##############################################################################
-  \page an_example_more More on the example
+/***************************************************************************//**
+  \page intro_example_more More on the example
 
     Here is the design \ref vehicle.scad "example" that was introduced
-    in the section \ref an_example "\"An example\"".
+    in the section \ref intro_design_flow.
 
     As discussed, it includes structured documentation and build
     scripts added to the source in comments. This source file together
@@ -299,160 +305,12 @@
     Here is the resulting library documentation ([HTML][html-example])
     (PDF).
 
-  [html-example]: ../../../examples/build/html/index.html
-  [pdf-example]: ../../../examples/build/latex/refman.pdf
-###############################################################################/
+  [html-example]: ../../share/examples/build/html/index.html
+  [pdf-example]: ../../share/examples/build/latex/refman.pdf
+*******************************************************************************/
 
 
-#/##############################################################################
-  \page mslibrary Makefile script library
-
-  \dot "Compile-Scripting and Documentation-Generatation for OpenSCAD Designs."
-    digraph example {
-      node [shape=Mrecord, fontname=Helvetica, fontsize=10];
-      a [label="openscad-amu" URL="\ref index"];
-      b [label="C++ Programs" URL="\ref programs"];
-      c [label="Makefile Script Library" URL="\ref mslibrary" style="filled"];
-      d [label="Support Scripts" URL="\ref scripts"];
-      a->b; a->c; a->d;
-    }
-   \enddot
-
-  \section library_groups Groups
-
-    - \ref library_core "Core members"
-    - \ref library_support "Support members"
-
-  \section library_files Files
-
-    - bootloader.bash
-    - print.bash
-    - print_textbox.bash
-    - exception.bash
-    - table.bash
-    - openscad_opts.bash
-    - utility.bash
-    - make_makefile.bash
-
-    To use the library functions, a script must first set the environment
-    variable \c ${\__LIB_PATH\__}. Optionally, \c ${\__VERBOSE\__} can be
-    set to \c true to enable verbose output within the library functions.
-    Next, source the \c bootloader.bash file to initialize the library.
-    See the \ref hello_world example below for an example.
-
-  \section hello_world Hello World
-
-    \includelineno hello_world.bash
-
-    This script will create a makefile with four targets. Line 11
-    through 15 create two set tables, named \c view and \c size, that
-    contain command line option strings. Each entry has a table name, a
-    key name, and a key value string . Line 17 specified the basic
-    parameters of the makefile to be generated, including the two table
-    names that were created with the command line options. Line 25
-    begins the creation of the makefile.
-
-    When this script is run, it will generate a makefile named \c
-    hello_world.makefile with four targets. Each target will invoke
-    OpenSCAD once for the four resulting combinations of the two
-    entries in the options table. The commons OpenSCAD options set by
-    \c set_opts on line 22 will be used during the invocation all of
-    the generated targets.
-
-    Here is the resulting generated
-    \link hello_world.makefile makefile.\endlink
-###############################################################################/
-
-
-#/##############################################################################
-  \defgroup library_arguments Argument naming convention
-
-    The library is written using the Bourne Again SHell (bash)
-    scripting language. Bash variables are untyped and are all basically
-    character strings. Their use depends on the context. Bash function
-    parameters are passed as positional character strings with no type
-    checking. To use named function parameters, parameter parsing code
-    is required. This library makes use of both positional and named
-    parameters.
-
-    To help document the use of these functions, the following
-    conventions are made:
-
-    - Required vs. optional,
-    - Matching method,
-    - Type or use,
-    - Limits, and
-    - Dimension.
-
-    \b Required:
-    Some parameters are required and some are optional. When a parameters
-    is required, its type description begins with the word \c required.
-    When a parameter is optional, there is no need to label it such
-    unless this is desired just for clarification.
-
-    \b Method:
-    Two matching methods are used. Positional and named. Positional
-    arguments will have the description \c arg1, \c arg2, ..., \argn.
-    The description \c argv is used to identify the entire list of arguments.
-    When arguments are named, the description \c name is used. The parameter
-    name keyword will be identified by the final name after the type
-    description.
-
-    \b Type:
-    Although all type are essentially character strings, this is used to
-    give a better idea of how the parameter is used. Typical values are:
-    \c character, \c string, \c integer, \c file, \c path, \c function.
-
-    \b Limits:
-    This give guidance on what are acceptable values for the parameter.
-    It it often used to indicate that a preset value is expected. It may
-    also used to set the value ranges on integers, such as 1-10.
-
-    \b Dimension:
-    Parameter values may be either a single words or a list of words.
-    To assign a list of words to a parameter value, the list must be
-    enclosed in single or double quotation marks.
-###############################################################################/
-
-
-#/##############################################################################
-  \defgroup library_core Makefile script library core
-
-  \copydoc library_arguments
-
-  \warning  As in all bash scripts, long lines may be broken up into several
-            smaller lines and continued using the '\\' character at the end
-            of each preceding line. When writing scripts directly this must
-            be done explicitly. When writing embedded scripts that will be
-            extracted using \ref openscad_seam, long lines are explicitly
-            terminated using the ';' character. Therefore this is no need
-            to use the continuation character. Long lines will be joined
-            together and written to a single line when the line termination
-            character is encountered.
-
-    here is an example stand along script:
-
-    \include log_segregate.bash
-
-    here is an example of an embedded script:
-
-    \dontinclude vehicle.scad
-    \skipline Begin_Scope document
-    \until End_Scope
-
-  \note All script function names are case sensitive. The function argument
-        keywords are case insensitive.
-###############################################################################/
-
-
-#/##############################################################################
-  \defgroup library_support Makefile script library support
-
-  \copydoc library_arguments
-###############################################################################/
-
-
-#/##############################################################################
+/***************************************************************************//**
   \example convert.bash
     An example script that uses target output conversion.
   \example convert.makefile
@@ -506,9 +364,8 @@
     MFSript extracted from animate.scad.
   \example animate_rotate.makefile
     Makefile created by extracted MFSript animate_rotate.bash
-###############################################################################/
+*******************************************************************************/
 
-
-#
-# eof
-#
+//
+// eof
+//

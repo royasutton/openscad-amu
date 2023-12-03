@@ -3,7 +3,13 @@
 
 __VERBOSE__=true
 __LIB_PATH__="@top_srcdir@/share"
-source "${__LIB_PATH__}/lib/bootloader.bash"
+
+# load openscad-amu makefile script library
+source "${__LIB_PATH__}/include/mfs_library/amu_mfs_init.bash"
+
+#
+# Generate makefile using makefile script library constructs
+#
 
 views   Name "image_view" Translate "0,0,12" Distance "200" Views "all"
 
@@ -25,3 +31,7 @@ script \
     Summary   Tables   Targets \
     Menu_Ext  Menu_Src Menu_All \
   End_Makefile
+
+#
+# eof
+#

@@ -26,21 +26,21 @@
 # Rules
 ################################################################################
 
-# Instantiate rules for each makefile script form all source files.
+# Instantiate rules for each makefile script from all source files.
 #  * foreach source file
 #    * foreach makefile-script
 #      * selected makefile script
 #        = filter makefile-scripts
-#        + filter scopes-includes
-#        + filter-out scopes-excludes
+#        + filter scopes-includes (iff filter ignore is false, else default)
+#        + filter-out scopes-excludes (iff filter ignore is false, else default)
 #          + get list of all auxiliary scripts in file
 #      * evaluate ( instantiated target rules for scope name )
 $(foreach s,\
   $(src_files), \
   $(foreach c, \
     $(filter %$(mfs_ext), \
-    $(filter $(scopes_include_filter), \
-    $(filter-out $(scopes_exclude_filter), \
+    $(filter $(if $(call bool_decode,$(ignore_scopes_include)),%,$(scopes_include_filter)), \
+    $(filter-out $(if $(call bool_decode,$(ignore_scopes_exclude)),$(empty),$(scopes_exclude_filter)), \
       $(shell $(path_openscad_seam) --mode list --input $s $(openscad_seam_opts1)) \
     ))), \
     $(eval $(call scopes_targets,$s,$(basename $c))) \
@@ -69,7 +69,7 @@ clean-scopes: $(scopes_mf)
 	$(call target_begin)
 	-list='$^'; for i in $$list ; do $(path_gnumake) -f $$i clean ; done
 	-$(rm_f) $(scopes_clean_files)
-	-$(if $(scopes_output_directories),$(rmdir_p) $(scopes_output_directories))
+	-$(if $(scopes_output_directories),$(rmdir_p) $(call reverse_list,$(scopes_output_directories)))
 	$(call target_end)
 
 #------------------------------------------------------------------------------#

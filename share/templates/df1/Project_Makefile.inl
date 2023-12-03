@@ -21,6 +21,7 @@ AMU_LIB_PATH        := @__LIB_PATH__@
 AMU_PM_PREFIX       := $(AMU_LIB_PATH)/include/pmf/
 AMU_PM_INIT         := $(AMU_PM_PREFIX)amu_pm_init
 AMU_PM_RULES        := $(AMU_PM_PREFIX)amu_pm_rules
+AMU_PM_DESIGN_FLOW  := df1/
 
 # Uncomment for increased verbosity or debugging.
 #AMU_PM_VERBOSE     := defined
@@ -77,8 +78,8 @@ release_archive_scopes                  := $(false)
 #------------------------------------------------------------------------------#
 #ifeq ($(version_checks),$(true))
 #$(call check_version,doxygen,ge,1.8.12,$(false),designed for v1.8.12.)
-#$(call check_version,openscad,gt,2016.08,$(true),uses new feature.)
-#$(call check_version,amuseam,eq,1.5,$(true),works only with v1.5.)
+#$(call check_version,openscad,eq,2021.01,$(true),tested with v2021.01.)
+#$(call check_version,amuseam,eq,2.7,$(true),v2.7 or later required.)
 #$(call check_version,amudif,lt,1.5,$(true),depreciated feature required.)
 #endif
 
@@ -86,8 +87,8 @@ release_archive_scopes                  := $(false)
 # Project
 #------------------------------------------------------------------------------#
 project_name        := template
-project_version     := v1.1
-project_brief       := Project Makefile Template (openscad-amu df1).
+project_version     := v1.0
+project_brief       := PM Template (openscad-amu design flow $(AMU_PM_DESIGN_FLOW)).
 
 docs_group_id       := none
 #project_logo_prefix:= ./

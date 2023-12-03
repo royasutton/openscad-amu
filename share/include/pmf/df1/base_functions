@@ -482,6 +482,15 @@ unique = $(amu_pm_d1)$(strip \
   $(if $1,$(firstword $1) $(call unique,$(filter-out $(firstword $1),$1))) \
   )
 
+# reverse_list (arg1)
+# arg1: A list of space separated words.
+# returns the word list in reverse order.
+reverse_list = $(amu_pm_d1)$(strip \
+  $(if $(wordlist 2,2,$(1)), \
+    $(call reverse_list,$(wordlist 2,$(words $(1)),$(1))) $(firstword $(1)), \
+    $(1) \
+  ))
+
 # subst_list (arg1,arg2)
 # arg1: A list of space separated key words.
 # arg2: A replacement string.
