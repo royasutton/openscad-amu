@@ -131,7 +131,7 @@ viewed by:
 
 ```bash
 make html
-firefox share/include/mfs_library/doxygen/html/index.html
+firefox doxygen/html/index.html
 ```
 
 To manually install or uninstall, issue:

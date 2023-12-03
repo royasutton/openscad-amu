@@ -53,7 +53,7 @@ doxygen/latex/refman.pdf:
 doxygen.stamp: Doxyfile Makefile $(files_am) $(scripts_help)
 	( cat Doxyfile ; \
 		echo "INPUT=$(builddir)" ; \
-		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: Support Scripts\"" ; \
+		echo "OUTPUT_DIRECTORY=doxygen" ; \
 	) | $(DOXYGEN_PATH) - \
 	&& touch doxygen.stamp
 

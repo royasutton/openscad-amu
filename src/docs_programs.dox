@@ -1,19 +1,21 @@
 /***************************************************************************//**
   \mainpage C++ Programs
 
+  \anchor programs
+
   \dot "Compile-Scripting and Documentation-Generatation for OpenSCAD Designs."
     digraph example {
       node [shape=Mrecord, fontname=Helvetica, fontsize=10];
-      a [label="openscad-amu" URL="../../../share/include/mfs_library/doxygen/html/index.html"];
+      a [label="openscad-amu" URL="../../../doxygen/html/index.html"];
       b [label="C++ Programs" URL="index.html" style="filled"];
-      c [label="Makefile Script Library" URL="../../../share/include/mfs_library/doxygen/html/mslibrary.html"];
+      c [label="Makefile Script Library" URL="../../../share/include/mfs_library/doxygen/html/index.html"];
       d [label="Support Scripts" URL="../../../share/scripts/doxygen/html/index.html"];
       a->b; a->c; a->d;
     }
   \enddot
 
 
-  \section programs Programs
+  \section programs_reference Reference
 
 
   \subsection bash_dif bash-dif

@@ -144,6 +144,7 @@ install-man
 ##############################################################################
 AC_CONFIG_FILES([
   Makefile
+  Doxyfile
 
   share/Makefile
 

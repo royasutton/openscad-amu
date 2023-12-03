@@ -123,7 +123,7 @@ doxygen/latex/refman.pdf:
 doxygen.stamp: $(doxygen_stamp_dependacies)
 	( cat Doxyfile ; \
 		echo "INPUT=$(srcdir)" ; \
-		echo "PROJECT_BRIEF=\"OpenSCAD AutoMake Utilities: C++ Programs\"" ; \
+		echo "OUTPUT_DIRECTORY=doxygen" ; \
 	) | $(DOXYGEN_PATH) - \
 	&& touch doxygen.stamp
 
