@@ -1,14 +1,9 @@
 openscad-amu
 ============
 
-> Compile-Scripting and Documentation-Generatation for OpenSCAD Designs...
+> Compile automation and source-based documentation for OpenSCAD designs.
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
-
-
-It is a _framework_ and tools for automating the compilation of
-[OpenSCAD] designs with a _pre-processor_ that allows __\*.scad__ to be
-documented using [Doxygen].
 
 View live docs on [GitHib Pages](https://royasutton.github.io/openscad-amu).
 

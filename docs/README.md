@@ -1,34 +1,41 @@
-> Compile-Scripting and Documentation-Generatation for OpenSCAD Designs...
+> Compile automation and source-based documentation for OpenSCAD designs.
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
 
-It is a _framework_ and tools for automating the compilation of
-[OpenSCAD] designs with a _pre-processor_ that allows __\*.scad__ to be
-documented using [Doxygen].
+What is it?
+-----------
+
+The [openscad-amu] has been developed to support the construction of
+automated design flows, using [GNU make], and documentation generation,
+using [Doxygen], for [OpenSCAD] designs. It provides a framework that
+allows for documentation and build-scripts to be embedded in
+__\*.scad__ source along side the design. The openscad-amu is composed
+of a collection of programs, a makefile script library, and support
+scripts that work together to automate and document OpenSCAD designs.
+
+The design documentation is generated using Doxygen and openscad-amu
+includes a source-code _preprocessor_ for __\*.scad__ (and
+__\*.bash__). This preprocessor provides additional Doxygen [special
+commands] and features useful for OpenSCAD design documentation. The
+design automation build-scripts, embedded in the source-code, are
+extracted by openscad-amu and used to construct makefiles that manage
+the generation of design targets.
+
+By utilizing openscad-amu, OpenSCAD design documentation lives close to
+to the source code and dependency-based targets generation is scripted
+for use in code testing, code documentation and design construction.
+Moreover, with GNU make, targets can be constructed in parallel which
+drastically reduces compile times for larger designs.
 
 
-Introduction
-------------
+The Design Flow
+---------------
 
-[openscad-amu] is being developed to support the construction of
-automated design flows with Doxygen generated documentation for
-OpenSCAD language-based mechanical design. It provides a framework that
-allows documentation and build-scripts to be embedded into __\*.scad__
-source and incorporates two complementary but distinct features that
-may be used together or independently:
-
-    (1) Scripted Design Compilation, and
-    (2) Design Documentation Generation.
-
-Both the scripting and documentation is done in the design __\*.scad__
-source files using auxiliary structured comments. Subsequently, the
-build-scripts are extracted at compile-time to construct [Makefiles]
-that manage design compilation. As for documentation, [openscad-amu]
-provides source code prefilters that both extend [Doxygen] and provide
-additional [special commands] with features useful in mechanical
-design. The design flow automates documentation extraction and
-formatting for each __\*.scad__ source with embedded [Doxygen] content.
+Both the design flow automation scripting and documentation is done in
+the design __\*.scad__ source files using structured comments. This
+meta-data is extracted at compile-time to construct makefiles that
+manage design compilation and documentation.
 
 <p align="center">
 <img src="assets/flow_intro.svg" alt="" title="<active image map>"
@@ -54,11 +61,9 @@ formatting for each __\*.scad__ source with embedded [Doxygen] content.
       coords="330,84,440,139"/>
 </map>
 
-As the design part count increases, so does the benefit of using
-[openscad-amu]. The *targets* in the above diagram represent design
-components or part variations. Compiling design targets one-by-one is
-times consuming and error prone and discourages design optimization
-and/or exploration.
+As the design size increases, so does the benefit of using
+[openscad-amu]. Compiling design targets one-by-one is times consuming
+and error prone and discourages design optimization and/or exploration.
 
 > *For larger design projects, the increase in benefit is significant as
 > [openscad-amu] frees designers from mundane dependency and state
@@ -128,7 +133,7 @@ you can contact the maintainer of the project or file an [issue].
 
 
 [GNU General Public License]: https://www.gnu.org/licenses/gpl.html
-[Makefiles]: https://www.gnu.org/software/make
+[GNU Make]: https://www.gnu.org/software/make
 
 [openscad-amu]: https://royasutton.github.io/openscad-amu
 [repository]: https://github.com/royasutton/openscad-amu
