@@ -187,6 +187,7 @@ uninstall-local:
 		done \
 	)
 	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
+	-test -d '$(DESTDIR)$(bindir)' && rmdir -v '$(DESTDIR)$(bindir)'
 
 CLEANFILES = \
 	doxygen.stamp \

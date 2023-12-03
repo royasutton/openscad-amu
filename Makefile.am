@@ -36,7 +36,7 @@ doxygen_stamp_dependacies = \
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
 
-install_path_doc = $(version_path)/doc/share/scripts
+install_path_doc = $(version_path)/doc
 install_path_html = $(install_path_doc)/doxygen/html
 install_path_pdf = $(install_path_doc)/doxygen/latex
 install_path_man = $(install_path_doc)/doxygen/man
@@ -46,8 +46,6 @@ SUFFIXES =
 ##############################################################################
 # targets
 ##############################################################################
-
-all-local: $(files_am)
 
 docs-local: html-local
 
@@ -82,7 +80,12 @@ install-man-local: man-local | '$(install_path_man)'
 	( cd doxygen && cp -av man/* '$(install_path_man)' )
 
 uninstall-local:
-	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
+	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)/doxygen'
+	-test -d '$(install_path_doc)' && rmdir -v '$(install_path_doc)'
+	-test -d '$(version_path)' && rmdir -v '$(version_path)'
+	-test -d '$(root_path)' && rmdir -v '$(root_path)'
+	-test -d '$(pkgdatadir)' && rmdir -v '$(pkgdatadir)'
+	-test -d '$(DESTDIR)$(datadir)' && rmdir -v '$(DESTDIR)$(datadir)'
 
 CLEANFILES = \
 	doxygen.stamp \

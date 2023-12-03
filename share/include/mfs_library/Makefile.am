@@ -23,7 +23,7 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/lib
+install_path = $(version_path)/include/mfs_library
 
 install_path_doc = $(version_path)/doc/share/include/mfs_library
 install_path_html = $(install_path_doc)/doxygen/html
@@ -91,8 +91,8 @@ uninstall-local:
 	do \
 		rm -fv "$(install_path)/$$f" ; \
 	done
-	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 	-test -d '$(install_path_doc)' && rm -rfv '$(install_path_doc)'
+	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 
 CLEANFILES = \
 	doxygen.stamp \
