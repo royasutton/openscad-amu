@@ -26,21 +26,20 @@
     \ref scripts "scripts" that work together to automate and document
     OpenSCAD designs.
 
-    The design documentation is generated using Doxygen and
-    openscad-amu includes a source-code _preprocessor_ for
-    <i><b>*.scad</b></i> (and <i><b>*.bash</b></i>). This preprocessor
-    provides additional Doxygen [special commands] and features useful
-    for OpenSCAD design documentation. The design automation
-    build-scripts, embedded in the source-code, are extracted by
-    openscad-amu and used to construct makefiles that manage the
-    generation of design targets.
+    The design is generated using Doxygen and openscad-amu includes a
+    source-code _preprocessor_ for <i><b>*.scad</b></i> (and
+    <i><b>*.bash</b></i>). This preprocessor provides additional
+    Doxygen [special commands] and features useful for documenting
+    OpenSCAD designs. The design automation build-scripts, embedded in
+    the source-code, are extracted by openscad-amu and used to
+    construct makefiles that manage the generation of design targets.
 
     By utilizing openscad-amu, OpenSCAD design documentation lives
     close to to the source code and dependency-based targets generation
     is scripted for use in code testing, code documentation and design
     construction. Moreover, with GNU make, targets can be constructed
     in parallel which drastically reduces compile times for larger
-    designs.
+    design projects.
 
   \section intro_design_flow The Design Flow
 

@@ -14,19 +14,19 @@ __\*.scad__ source along side the design. The openscad-amu is composed
 of a collection of programs, a makefile script library, and support
 scripts that work together to automate and document OpenSCAD designs.
 
-The design documentation is generated using Doxygen and openscad-amu
-includes a source-code _preprocessor_ for __\*.scad__ (and
-__\*.bash__). This preprocessor provides additional Doxygen [special
-commands] and features useful for OpenSCAD design documentation. The
-design automation build-scripts, embedded in the source-code, are
-extracted by openscad-amu and used to construct makefiles that manage
-the generation of design targets.
+The documentation is generated using Doxygen and openscad-amu includes
+a source-code _preprocessor_ for __\*.scad__ (and __\*.bash__). This
+preprocessor provides additional Doxygen [special commands] and
+features useful for documenting OpenSCAD designs. The design automation
+build-scripts, embedded in the source-code, are extracted by
+openscad-amu and used to construct makefiles that manage the generation
+of design targets.
 
 By utilizing openscad-amu, OpenSCAD design documentation lives close to
 to the source code and dependency-based targets generation is scripted
 for use in code testing, code documentation and design construction.
 Moreover, with GNU make, targets can be constructed in parallel which
-drastically reduces compile times for larger designs.
+drastically reduces compile times for larger design projects.
 
 
 The Design Flow
