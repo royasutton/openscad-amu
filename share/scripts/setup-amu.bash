@@ -4,7 +4,7 @@
 #   \file   setup-amu.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2018
+#   \date   2016-2023
 #
 #   \copyright
 #
@@ -71,7 +71,7 @@ declare make_job_slots
 
 declare commands
 
-# ( "variable-key" "description" "example-value" ... )
+# variables map: ( "variable-key" "description" "example-value" )
 declare -i conf_file_vw=3
 declare -a conf_file_va=(
   "design_flow"
@@ -261,6 +261,7 @@ function update_prerequisite_list() {
     # df1 with latex
     df1t)
       packages_Common="
+        openscad
         doxygen
         texlive
         graphviz
@@ -269,13 +270,13 @@ function update_prerequisite_list() {
         automake
         libtool
         bash
+        time
         make
         flex
         zip
       "
 
       packages_Linux="
-        openscad
         g++
         libboost-all-dev
         imagemagick
@@ -284,7 +285,6 @@ function update_prerequisite_list() {
 
       packages_CYGWIN_NT="
         gcc-g++
-        time
         libboost-devel
         ImageMagick
         texlive-collection-basic
@@ -310,6 +310,7 @@ function update_prerequisite_list() {
     # df1 without latex
     df1)
       packages_Common="
+        openscad
         doxygen
         graphviz
         git
@@ -317,13 +318,13 @@ function update_prerequisite_list() {
         automake
         libtool
         bash
+        time
         make
         flex
         zip
       "
 
       packages_Linux="
-        openscad
         g++
         libboost-all-dev
         imagemagick
@@ -331,7 +332,6 @@ function update_prerequisite_list() {
 
       packages_CYGWIN_NT="
         gcc-g++
-        time
         libboost-devel
         ImageMagick
       "
