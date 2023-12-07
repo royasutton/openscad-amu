@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2019
+  \date   2016-2023
 
   \copyright
 
@@ -529,6 +529,7 @@ ODIF::ODIF_Scanner::def_init(void)
 
   def_var.clear();
   def_text.clear();
+  def_nest_level = 0;
 
   def_bline = lineno();
 }
