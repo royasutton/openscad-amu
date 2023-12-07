@@ -5,7 +5,7 @@
 /***************************************************************************//**
   \file   design.scad
   \author Designers' Name
-  \date   2016-2018
+  \date   2016-2023
 
   \copyright
     Copyright notice.
@@ -57,7 +57,7 @@
 
   \subsection inline In-line script
 
-    \amu_define file_path_stem (${DOXYGEN_OUTPUT}${HTML_OUTPUT}/${OUTPUT_PREFIX}/${ext}/${STEM_NAME}_${name})
+    \amu_define file_path_stem (${OUTPUT_PREFIX}/${ext}/${STEM_NAME}_${name})
     \amu_eval get_png_file_stem (name=test ext=png ${file_path_stem})
 
     \amu_openscad
@@ -99,7 +99,7 @@
       e="(Cone in [wikipedia])"
       f="${get_png_file_stem}.png"
       t="Base radius 4 top radius 1."
-      /+ u="${get_png_file_stem}.png" +/
+      u="${get_png_file_stem}.png"
     )
     /+ \endhtmlonly +/
 
