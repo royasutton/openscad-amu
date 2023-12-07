@@ -67,7 +67,7 @@ declare repo_cache_root="cache"
 declare force_reconfigure="no"
 declare configure_opts_add
 
-declare make_job_slots
+declare make_job_slots=1
 
 declare commands
 
@@ -118,7 +118,7 @@ declare -a conf_file_va=(
       "--with-boost=DIR --silent --prefix=${HOME}/openscad-amu"
   "make_job_slots"
       "maximum simultaneous make jobs"
-      "4"
+      "$make_job_slots"
   "commands"
       "commands to run with each invocation"
       "--branch master --install --template my_project"
@@ -217,7 +217,7 @@ function print_h2 () {
 ###############################################################################
 
 #------------------------------------------------------------------------------
-# update make job slots count
+# auto update make job slots count
 #------------------------------------------------------------------------------
 function update_make_job_slots() {
   print_m "${FUNCNAME} begin"
@@ -237,7 +237,7 @@ function update_make_job_slots() {
       ;;
     esac
   else
-    print_m "using preset limit."
+    print_m "using preset make jobs slots."
   fi
 
   print_m "make job slots = ${make_job_slots}"
