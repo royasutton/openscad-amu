@@ -52,6 +52,8 @@ namespace bfs = boost::filesystem;
     :------:|:--------------------------------
      -n     | text length is nonzero
      -z     | text length is zero
+     -w     | text word count is nonzero
+     -e     | text word count is zero
      -d     | variable has been defined
      -l     | locate file in include paths
 
@@ -78,6 +80,12 @@ ODIF::ODIF_Scanner::bif_if_exp_1a(string s)
 
   if ( op == "-z" )
     result = ( ag.size() == 0 );
+
+  if ( op == "-w" )
+    result = ( UTIL::word_count(ag) != 0 );
+
+  if ( op == "-e" )
+    result = ( UTIL::word_count(ag) == 0 );
 
   if ( op == "-d" )
     result = ( ag.compare( levm.get_report_message() ) != 0 );

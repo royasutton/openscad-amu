@@ -593,6 +593,19 @@ UTIL::get_word(const string& w, const int n)
   return rw;
 }
 
+size_t
+UTIL::word_count(const string& w)
+{
+  istringstream iss(w);
+  string iw;
+
+  size_t l = 0;
+  while( iss >> iw )
+    l++;
+
+  return l;
+}
+
 string
 UTIL::remove_chars(const string &s, const string &c)
 {

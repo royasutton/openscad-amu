@@ -116,7 +116,7 @@ if_opr_not                        "!"
 if_opr_and                        "&&"
 if_opr_or                         "\|\|"
 
-if_func_1a                        "-"[nzdl]
+if_func_1a                        "-"[nzwedl]
 if_func_2a                        ("=="|"!="|"<"|">"|"<="|">=")
 
 if_arg_uq                         ({id}|{id_var}|{path})

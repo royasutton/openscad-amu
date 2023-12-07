@@ -563,7 +563,7 @@ ODIF::ODIF_Scanner::bif_scope(void)
           if ( verbose )
           {
             if ( result.size() ) result.append( " " );
-            result.append( "<empty>" );
+            result.append( "<EMPTY>" );
           }
         }
         else
