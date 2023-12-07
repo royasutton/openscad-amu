@@ -600,8 +600,7 @@ UTIL::word_count(const string& w)
   string iw;
 
   size_t l = 0;
-  while( iss >> iw )
-    l++;
+  while( iss >> iw ) { l++; }
 
   return l;
 }
