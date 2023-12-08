@@ -54,6 +54,19 @@
     $ make info
     \endcode
 
+    Any variable of the project makefile can be \em echoed or \em
+    listed from make by adding \c echo- or \c list- to the variable
+    name. This can be used to get information from the project build
+    configuration for use with arbitrary programs. See the follow
+    example:
+    \code{bash}
+    $ make echo-src_files
+    $ make list-backup_files
+
+    $ vi $(make echo-src_files)
+    $ tar cvf backup.tar $(make echo-backup_files)
+    \endcode
+
     Build the project and install to local OpenSCAD library path:
     \code{bash}
     $ make all
