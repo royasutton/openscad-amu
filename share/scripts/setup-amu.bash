@@ -818,14 +818,15 @@ function repository_update() {
   print_m "source: [${gitrepo}]"
   print_m " cache: [${out_dir}]"
 
+  # assume 'git' is available, if not report and abort.
   local git=$(which 2>/dev/null git)
   if [[ ! -x "${git}" ]] ; then
     print_m "ERROR: please install git:"
 
     case "${sysname}" in
-      Linux)        print_m "ex: sudo apt-get install git" ;;
-      CYGWIN_NT)    print_m "ex: run Cygwin setup and select Devel/git." ;;
-      *)            print_m "ERROR: Configuration for [$sysname] required." ;;
+      Linux)        print_m "info: $ sudo apt-get install git" ;;
+      CYGWIN_NT)    print_m "info: run Cygwin setup and select Devel/git" ;;
+      *)            print_m "info: configuration does not exists for [$sysname]." ;;
     esac
 
     print_m "aborting..."
