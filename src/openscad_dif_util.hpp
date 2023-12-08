@@ -294,6 +294,9 @@ namespace UTIL{
   //! return word number n from string w.
   std::string get_word(const std::string& w, const int n);
 
+  //! return number of words in string w.
+  size_t word_count(const std::string& w);
+
   //! remove all characters in c from from string s.
   std::string remove_chars(const std::string &s, const std::string &c);
 
@@ -303,7 +306,7 @@ namespace UTIL{
   //! unquote outermost matching quotation characters, '' or "", from string.
   std::string unquote(const std::string &s);
 
-  //! unquote outermost matching quotation characters and trim whitespace.
+  //! unquote outermost matching quotation characters and trim white space.
   std::string unquote_trim(const std::string &s);
 
   //! convert a long integer to a string.

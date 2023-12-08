@@ -3,7 +3,7 @@
   \file   openscad_dif_lexer.ll
 
   \author Roy Allen Sutton
-  \date   2016-2019
+  \date   2016-2023
 
   \copyright
 
@@ -116,7 +116,7 @@ if_opr_not                        "!"
 if_opr_and                        "&&"
 if_opr_or                         "\|\|"
 
-if_func_1a                        "-"[nzdl]
+if_func_1a                        "-"[nzwedl]
 if_func_2a                        ("=="|"!="|"<"|">"|"<="|">=")
 
 if_arg_uq                         ({id}|{id_var}|{path})
@@ -264,12 +264,14 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
   */
 
 <AMUDEF>{id}                      { apt(); def_set_var(); }
-<AMUDEF>\(                        { apt(); BEGIN(AMUDEFARG); }
+<AMUDEF>\(                        { apt(); def_nest_level++; BEGIN(AMUDEFARG); }
 <AMUDEF>{ws}+                     { apt(); }
 <AMUDEF>{nr}                      { apt(); }
 <AMUDEF>.                         { error("in define variable name", lineno(), YYText()); }
 
-<AMUDEFARG>\)                     { apt(); def_end(); yy_pop_state(); }
+<AMUDEFARG>\)                     { apt(); if (--def_nest_level) { def_app(); }
+                                           else { def_end(); yy_pop_state(); } }
+<AMUDEFARG>\(                     { apt(); def_app();  }
 <AMUDEFARG>\\{nr}                 { apt(); def_app(""); }
 <AMUDEFARG>{nr}                   { apt(); def_app(); }
 <AMUDEFARG>.                      { apt(); def_app(); }

@@ -1,0 +1,386 @@
+
+
+/***************************************************************************//**
+  \page building Building and installing
+
+    A script is available to bootstrap the development environment.
+
+    Download the setup script:
+    \code{bash}
+    $ mkdir tmp && cd tmp
+    $ wget https://git.io/setup-amu.bash
+    $ chmod +x setup-amu.bash
+    \endcode
+
+    Fetch the latest source distribution:
+    \code{bash}
+    $ ./setup-amu.bash --fetch
+    \endcode
+
+    Build the latest release (without or with latex support):
+    \code{bash}
+    $ ./setup-amu.bash --branch-list tags1 --yes --build
+
+    $ ./setup-amu.bash --branch-list tags1 --flow df1-latex --yes --build
+    \endcode
+
+    Remove the \c --yes option if you wish to review and confirm the
+    installation of each dependent package individually.
+
+    Install openscad-amu to system:
+    \code{bash}
+    $ sudo ./setup-amu.bash --install
+    \endcode
+
+    To create a new project from a template, see \ref template.
+
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  \page template Using the project template
+
+    Install openscad-amu using the \ref building instructions.
+
+    Setup a new project using the project template:
+    \code{bash}
+    $ ./setup-amu.bash --template my_project
+    $ cd my_project
+    \endcode
+
+    Explore the basic make options:
+    \code{bash}
+    $ make help
+    $ make info
+    \endcode
+
+    Any variable of the project makefile can be \em echoed or \em
+    listed from make by adding \c echo- or \c list- to the variable
+    name. This can be used to get information from the project build
+    configuration for use with arbitrary programs. See the follow
+    example:
+    \code{bash}
+    $ make echo-src_files
+    $ make list-backup_files
+
+    $ vi $(make echo-src_files)
+    $ tar cvf backup.tar $(make echo-backup_files)
+    \endcode
+
+    Build the project and install to local OpenSCAD library path:
+    \code{bash}
+    $ make all
+    $ make install
+    \endcode
+
+    View documentation:
+    \code{bash}
+    $ firefox $(make echo-install_prefix_html)/index.html
+    \endcode
+
+    Remove from local OpenSCAD library path:
+    \code{bash}
+    $ make uninstall
+    \endcode
+
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  \page design_flow The design flow components
+
+    A project includes a project-makefile, the project source files,
+    and a documentation configuration file (Doxyfile). Any source file
+    may be annotated with documentation and/or one or more automation
+    scripts. Each script is extracted at compile time to generate a
+    _scope_ makefile that controls the generation of corresponding
+    targets.
+
+    [openscad-amu] brings together [OpenSCAD], [Doxygen], [GNU Make],
+    and \ref library "custom scripting" (based on [GNU Bash]) to
+    automate the generation of the design documentation and design
+    targets.
+
+    \dot "Components of the Design Flow."
+      digraph example {
+        rankdir="LR";
+        graph[fontname=Helvetica, fontsize=12, fontcolor=gray, color=gray, style=dashed];
+        node [fontname=Helvetica fontsize=12];
+        edge [arrowhead=vee];
+
+        l  [shape=folder peripheries=2 style="filled" label="Makefile\nScript\nLibrary" URL="\ref library"];
+
+        subgraph cluster_template {
+          label="Design\nProject";
+
+          a1 [shape=note label="Project\nMakefile" URL="\ref project_makefile"];
+          a2 [shape=note label="Source\n(*.scad)" URL="\ref vehicle.scad"];
+          a3 [shape=note label="Project\nDoxyfile" URL="\ref vehicle.doxyfile"];
+
+          { rank=same; a1; a2; a3; }
+        }
+
+        subgraph cluster_flow {
+          label="Automated Design Flow";
+
+          subgraph cluster_scope {
+          graph[fontname=Helvetica, fontsize=12, fontcolor=gray, color=gray style=dashed];
+          label="Source Scope";
+
+              c  [shape=note label="OpenSCAD\nModeling\nScript\n(*.scad)" URL="\ref vehicle_document.scad"];
+              d  [shape=note label="Makefile\nBuild\nScript\n(*.bash)" URL="\ref vehicle_document.bash"];
+              e  [shape=note label="Makefile" URL="\ref vehicle_document.makefile"];
+              f1 [shape=component label="Targets\n(png)" URL="../../share/examples/build/html/png/vehicle_test_car_17_green_diag_320x240.png"];
+              f2 [shape=component label="Targets\n(stl)" URL="../../share/examples/build/html/stl/vehicle_test_car_17.stl"];
+              f3 [shape=none label="..."];
+              fn [shape=component label="Targets\n(n)" URL="../../share/examples/build"];
+
+              c->e; d->e;
+              e->f1; e->f2; e->f3 [style=invis]; e->fn;
+          }
+
+          o  [shape=box peripheries=2 label="OpenSCAD" URL="http://www.openscad.org/"];
+
+          b  [shape=box peripheries=2 style="filled" label="openscad-seam\n(extractor)" URL="\ref openscad_seam_ht"];
+          g  [shape=box peripheries=2 style="filled" label="openscad-dif\n(Doxygen filter)" URL="\ref openscad_dif_ht"];
+          h  [shape=box peripheries=2 label="Doxygen" URL="http://www.doxygen.nl"];
+          i  [shape=folder label="Generated\nDocumentation\nhtml, pdf, etc." URL="../../share/examples/build/html/index.html"];
+
+          b->{c d};
+          g->h; h->i;
+        }
+
+        l->a2;
+
+        a2->{b g};
+        a3->h;
+      }
+    \enddot
+
+    The overall design flow is controlled using a root makefile for the
+    entire project. A basic project makefile example is shown below for
+    a simple project with two scopes.
+
+  \subsubsection project_makefile A minimal Project Makefile
+
+    \code{makefile}
+      \#
+      \# Project Makefile
+      \#
+
+      srcdir=./
+
+      all: doxygen.stamp
+
+      doxygen.stamp: vehicle.scad vehicle_test.stamp vehicle_document.stamp
+        doxygen vehicle.doxyfile
+
+      .makefile.stamp:
+        OPENSCADPATH="${srcdir}" \
+        make -f $< all
+        touch $@
+
+      vehicle_document.makefile \
+      vehicle_test.makefile: vehicle.scad | build
+        openscad_seam \
+          --input $< \
+          --prefix build --prefix-ipp 0 --prefix-scripts no \
+          --run yes --make no
+
+      build: ; mkdir -v build
+    \endcode
+
+    This is a rudimentary makefile that will generate and execute the
+    embedded makefile scripts and build the documentation. For a more
+    developed example create a project makefile using the openscad-amu
+    setup script as described in \ref template.
+
+    [openscad-amu]: https://royasutton.github.io/openscad-amu
+    [OpenSCAD]: http://www.openscad.org
+    [Doxygen]: http://www.doxygen.nl
+    [GNU Make]: https://www.gnu.org/software/make
+    [GNU Bash]: https://www.gnu.org/software/bash
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  \page source_annotate Annotating the sources
+
+    To avoid interfering with the primary OpenSCAD code, documentation
+    is placed inside of comments sections in the source following the
+    rules established by Doxygen. Auxiliary models and build scripts
+    are placed inside named nestable block sections within comments.
+    These auxiliary script are embedded in a hierarchical scoping
+    scheme as shown the following diagram:
+
+    \dotfile embedding_scheme.dot "Nestable Auxiliary Scripts."
+
+    Therefore, the documentation and build scripts coexists within a
+    design source file. They are subsequently extracted to generate the
+    design documentation and to automate the design target generation.
+    Here is an example: \ref vehicle.scad.
+
+    The source annotation structue looks like this:
+
+    \include embedding_scheme.scad
+
+    In this example, there are three modeling and three build scripts
+    embedded in the auxiliary scopes: A, A_1, and B. The utility \ref
+    openscad_seam is used to identify and/or extract them as shown in
+    \ref embedding_scheme.scripts "here." The utility \ref openscad_dif
+    is used to pre-process the embedded special commands for Doxygen.
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  \page intro_example A documented library design example
+
+    Here we discuss the simple library design example that was
+    introduced in the section \ref design_flow. This library shows how
+    the documentation and the build scripts are embedded into the \ref
+    vehicle.scad "design source code" in comment block sections. This
+    source, together with a \ref vehicle.doxyfile "configuration" file,
+    are used to generate the design documentation, render the
+    documentation images, and render the STL design targets. When there
+    is a need to change the source, all dependent targets can be
+    updated as required by the scope makefiles generated by
+    openscad-amu from the accompanying embedded build scripts. Each
+    step in the design flow process is typically invoked by the project
+    makefile.
+
+    In this example, there are four auxiliary scripts in two scopes:
+    namely \em test and \em document. The scripts are extracted with
+    the utility \ref openscad_seam and are used to create makefiles
+    that build the targets specified within each scope script.
+
+    These scripts and makefiles for this example are summarized in the
+    following table:
+
+    | Scope    | Makefile Script Model      | Makefile Script            | Makefile                       |
+    |:--------:|:--------------------------:|:--------------------------:|:------------------------------:|
+    | test     | \ref vehicle_test.scad     | \ref vehicle_test.bash     | \ref vehicle_test.makefile     |
+    | document | \ref vehicle_document.scad | \ref vehicle_document.bash | \ref vehicle_document.makefile |
+
+    The following command extracts the model and makefile scripts,
+    generates the makefiles, and builds the targets for all scopes of
+    the input source file:
+
+    \verbatim
+      $ openscad-seam \
+          --input vehicle.scad \
+          --prefix build \
+          --run yes \
+          --make yes \
+          --define __INCLUDE_PATH__="./" \
+          --verbose
+    \endverbatim
+
+    This is performed automatically by the project makefile. To format
+    the Doxygen special commands, the source file is pre-processed
+    using \ref openscad_dif and then passed to Doxygen. This is
+    specified using the \c INPUT_FILTER or \c FILTER_PATTERNS
+    configuration option as shown in the \ref vehicle.doxyfile.
+
+    The following command generates the documentation:
+
+    \code{bash}
+      $ doxygen vehicle.doxyfile
+    \endcode
+
+    Here is the resulting library documentation ([HTML][html-example])
+    ([PDF][pdf-example]).
+
+    The PDF version of this example is not built by default. To
+    build:
+
+    Add "\graphicspath{{png2eps/}}" to \c refman.tex
+    \code{bash}
+      \usepackage{graphicx}        # below this line
+      \graphicspath{{png2eps/}}    # locate the targets
+    \endcode
+
+    \code{bash}
+    $ cd  build/Linux/share/examples/build/latex
+
+    $ vi refman.tex   # add path to targets
+    $ make
+    \endcode
+
+    \todo
+      The Doxygen \c FILTER_PATTERNS [bug 504305] has been fixed in
+      Doxygen version 1.8.12. A workaround that had been used
+      ("*.ext=\"filter opts\\\"") no longer works after the fix. To
+      deal with this bug across doxygen versions, use \c INPUT_FILTER
+      to specify any filter that requires command line options until
+      version 1.8.12 reaches more repositories. The new way to specify
+      the filter pattern with command line options is (*.ext="filter
+      options").
+
+  [bug 504305]: https://bugzilla.gnome.org/show_bug.cgi?id=504305
+
+  [html-example]: ../../share/examples/build/html/index.html
+  [pdf-example]: ../../share/examples/build/latex/refman.pdf
+*******************************************************************************/
+
+
+/***************************************************************************//**
+  /+ examples +/
+
+  \example convert.bash
+    An example makefile script that uses target output conversion.
+  \example convert.makefile
+    Resulting makefile generated by convert.bash.
+
+  \example hello_world.bash
+    A simple hello world makefile script example.
+  \example hello_world.makefile
+    Resulting makefile generated by hello_world.bash.
+
+  \example log_segregate.bash
+    An example makefile script that segregates target output logs.
+  \example log_segregate.makefile
+    Resulting makefile generated by log_segregate.bash.
+
+  \example embedding_scheme.scad
+    OpenSCAD and makefile script hierarchical embedding scheme.
+  \example embedding_scheme.scripts
+    Parsed OpenSCAD and makefile script names in embedding_scheme.scad.
+
+  // complete example files
+  \example vehicle.scad
+    A complete working example using the openscad-amu framework.
+  \example vehicle.doxyfile
+    The doxygen configuration file used to create the documents for vehicle.scad.
+
+  \example vehicle_document.scad
+    OpenSCAD script extracted from vehicle.scad.
+  \example vehicle_document.bash
+    Makefile script extracted from vehicle.scad.
+  \example vehicle_document.makefile
+    Makefile created by extracted makefile script vehicle_document.bash
+
+  \example vehicle_test.scad
+    OpenSCAD script extracted from vehicle.scad.
+  \example vehicle_test.bash
+    Makefile script extracted from vehicle.scad.
+  \example vehicle_test.makefile
+    Makefile created by extracted makefile script vehicle_test.bash
+
+  \example animate_move.scad
+    OpenSCAD script extracted from animate.scad.
+  \example animate_move.bash
+    Makefile script extracted from animate.scad.
+  \example animate_move.makefile
+    Makefile created by extracted makefile script animate_move.bash
+
+  \example animate_rotate.scad
+    OpenSCAD script extracted from animate.scad.
+  \example animate_rotate.bash
+    Makefile script extracted from animate.scad.
+  \example animate_rotate.makefile
+    Makefile created by extracted makefile script animate_rotate.bash
+*******************************************************************************/
+
+//
+// eof
+//

@@ -4,7 +4,7 @@
 #   \file   setup-amu.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2018
+#   \date   2016-2023
 #
 #   \copyright
 #
@@ -67,11 +67,11 @@ declare repo_cache_root="cache"
 declare force_reconfigure="no"
 declare configure_opts_add
 
-declare make_job_slots
+declare make_job_slots=1
 
 declare commands
 
-# ( "variable-key" "description" "example-value" ... )
+# variables map: ( "variable-key" "description" "example-value" )
 declare -i conf_file_vw=3
 declare -a conf_file_va=(
   "design_flow"
@@ -118,7 +118,7 @@ declare -a conf_file_va=(
       "--with-boost=DIR --silent --prefix=${HOME}/openscad-amu"
   "make_job_slots"
       "maximum simultaneous make jobs"
-      "4"
+      "$make_job_slots"
   "commands"
       "commands to run with each invocation"
       "--branch master --install --template my_project"
@@ -217,7 +217,7 @@ function print_h2 () {
 ###############################################################################
 
 #------------------------------------------------------------------------------
-# update make job slots count
+# auto update make job slots count
 #------------------------------------------------------------------------------
 function update_make_job_slots() {
   print_m "${FUNCNAME} begin"
@@ -237,7 +237,7 @@ function update_make_job_slots() {
       ;;
     esac
   else
-    print_m "using preset limit."
+    print_m "using preset make jobs slots."
   fi
 
   print_m "make job slots = ${make_job_slots}"
@@ -259,23 +259,24 @@ function update_prerequisite_list() {
 
   case "${design_flow}" in
     # df1 with latex
-    df1t)
+    df1-latex)
       packages_Common="
+        openscad
         doxygen
-        texlive
         graphviz
         git
         autoconf
         automake
         libtool
         bash
+        time
         make
         flex
         zip
+        texlive
       "
 
       packages_Linux="
-        openscad
         g++
         libboost-all-dev
         imagemagick
@@ -284,7 +285,6 @@ function update_prerequisite_list() {
 
       packages_CYGWIN_NT="
         gcc-g++
-        time
         libboost-devel
         ImageMagick
         texlive-collection-basic
@@ -310,6 +310,7 @@ function update_prerequisite_list() {
     # df1 without latex
     df1)
       packages_Common="
+        openscad
         doxygen
         graphviz
         git
@@ -317,13 +318,13 @@ function update_prerequisite_list() {
         automake
         libtool
         bash
+        time
         make
         flex
         zip
       "
 
       packages_Linux="
-        openscad
         g++
         libboost-all-dev
         imagemagick
@@ -331,7 +332,6 @@ function update_prerequisite_list() {
 
       packages_CYGWIN_NT="
         gcc-g++
-        time
         libboost-devel
         ImageMagick
       "
@@ -371,7 +371,7 @@ function update_prerequisite_list() {
 #==============================================================================
 
 function prerequisites_check.Linux() {
-  dpkg-query --show --showformat='${Status}\n' $1 2>/dev/null |
+  dpkg-query --no-pager --show --showformat='${Status}\n' $1 2>/dev/null |
     grep -q "install ok installed" &&
       return 0
 
@@ -379,7 +379,7 @@ function prerequisites_check.Linux() {
 }
 
 function prerequisites_status.Linux() {
-  dpkg-query --list $*
+  dpkg-query --no-pager --show $*
 }
 
 function prerequisites_install.Linux() {
@@ -388,6 +388,8 @@ function prerequisites_install.Linux() {
     print_m "ERROR: install failed. aborting..."
     exit 1
   fi
+
+  return 0
 }
 
 #==============================================================================
@@ -413,6 +415,8 @@ function prerequisites_install.CYGWIN_NT() {
     print_m "ERROR: install failed. aborting..."
     exit 1
   fi
+
+  return 0
 }
 
 function set_apt_cyg_path() {
@@ -440,6 +444,8 @@ function set_apt_cyg_path() {
       fi
     fi
   fi
+
+  return 0
 }
 
 ###############################################################################
@@ -507,6 +513,8 @@ EOF
   fi
 
   print_m "${FUNCNAME} end"
+
+  return 0
 }
 
 #------------------------------------------------------------------------------
@@ -556,6 +564,8 @@ function parse_configuration_file() {
   print_m "read ${cv_r} key values"
 
   print_m "${FUNCNAME} end"
+
+  return 0
 }
 
 #------------------------------------------------------------------------------
@@ -589,6 +599,8 @@ function update_build_variables() {
 function prerequisites_list() {
   print_m "${FUNCNAME} begin"
 
+  update_prerequisite_list
+
   print_h2 "[ ${design_flow} prerequisites ]"
   for r in ${packages} ; do
     print_m -j $r
@@ -613,6 +625,7 @@ function prerequisites_check() {
   packages_missing=""
 
   update_prerequisite_list
+
   for r in ${packages} ; do
     if prerequisites_check.${sysname} $r
     then
@@ -631,6 +644,8 @@ function prerequisites_check() {
 function prerequisites_status() {
   print_m "${FUNCNAME} begin"
 
+  prerequisites_check
+
   print_h2 "[ Installed ]"
   if [[ -n "${packages_installed}" ]] ; then
     prerequisites_status.${sysname} $packages_installed
@@ -645,6 +660,9 @@ function prerequisites_status() {
     done
   else
     print_m -j "missing prerequisite list is empty."
+
+    print_h2 "[ Asserts ]"
+    prerequisites_assert
   fi
   print_hb "="
 
@@ -657,6 +675,8 @@ function prerequisites_status() {
 function prerequisites_install() {
   print_m "${FUNCNAME} begin"
 
+  prerequisites_check
+
   if [[ -n "${packages_missing}" ]] ; then
     print_h2 "[ Missing ]"
     for r in ${packages_missing} ; do
@@ -667,12 +687,121 @@ function prerequisites_install() {
     for r in ${packages_missing} ; do
       print_h2 "installing: [ $r ]"
       print_m -j $r
-      prerequisites_install.${sysname} $r
+
+      # exception handler
+      case "$r" in
+        *)
+          prerequisites_install.${sysname} $r ;;
+      esac
     done
     print_hb "="
   else
-    print_m -j "no missing prerequisites."
+    print_m "no missing prerequisites."
   fi
+
+  print_m "${FUNCNAME} end"
+
+  return 0
+}
+
+#------------------------------------------------------------------------------
+# assertions on prerequisite packages
+#------------------------------------------------------------------------------
+function prerequisites_assert() {
+  print_m "${FUNCNAME} begin"
+
+  function imagemagick_coder_rights_assert() {
+    local name="$1"
+    local rights="$2"
+
+    local coder_rights=$( \
+      identify -list policy |
+      sed -n "/pattern: ${name}/{x;p;d;}; x" |
+      sed -n 's/^.*rights:[[:space:]]*//p' \
+    )
+
+    # convert to lowercase
+    coder_rights=${coder_rights,,}
+
+    # rights defaults to all granted, so done if empty.
+    if [[ -n "${coder_rights}" ]] ; then
+      print_m "ImageMagick/convert ${name} coder rights = ${coder_rights}"
+
+      local failed_rights
+
+      for r in ${rights} ; do
+        [[ -n "${coder_rights##*${r}*}" ]] && failed_rights+="$r ";
+      done
+
+      if [[ -n "${failed_rights}" ]] ; then
+        print_m "--> failed rights = ${failed_rights}"
+
+        return 1
+      fi
+    else
+      print_m "ImageMagick/convert ${name} coder rights unlimited."
+    fi
+
+    return 0
+  }
+
+  function imagemagick_coder_rights_configure() {
+    local name="$1"
+    local rights="$2"
+
+    local policy_file=$( \
+      identify -list configure |
+      sed -n "/CONFIGURE_PATH/s/CONFIGURE_PATH[[:space:]]*//p" \
+    )policy.xml
+
+    print_m "Attempting to configure ImageMagick coder rights"
+    print_m "+ policy file = ${policy_file},"
+    print_m "+ coder = ${name},"
+    print_m "+ rights = ${rights}..."
+
+    local as_root="sudo"
+    local sed_edit="/\"${name}\"/s/rights=\"[^\"]*\"/rights=\"${rights}\"/"
+
+    print_m ${as_root} sed -i.orig \'${sed_edit}\' ${policy_file}
+
+    ( ${as_root} sed -i.orig ${sed_edit} ${policy_file} ) || return 1
+
+    return 0
+  }
+
+  #
+  # ImageMagick/convert coder rights policy
+  #
+  local imagemagick_coder_rights_list="
+    EPS=read|write
+  "
+
+  for icr in ${imagemagick_coder_rights_list} ; do
+    local name=${icr%=*}
+    local rights=${icr##*=}
+    local rlist=${rights//|/ }
+
+    print_m "Assert ImageMagick/convert coder rights ${name}=[${rlist}]"
+
+    if ! imagemagick_coder_rights_assert "${name}" "${rlist}" ; then
+      if ! imagemagick_coder_rights_configure "${name}" "${rights}" ; then
+        print_m "Attempt to configure ImageMagick/convert ${name} coder rights failed..."
+        print_m "Please correct before continuing."
+        print_m "See: http://imagemagick.org/script/security-policy.php"
+        exit 1
+      else
+        if imagemagick_coder_rights_assert "${name}" "${rlist}" ; then
+          print_m "--> Rights configured successfully..."
+        else
+          print_m "Unable to configure ImageMagick/convert ${name} coder rights..."
+          print_m "Please correct before continuing."
+          print_m "See: http://imagemagick.org/script/security-policy.php"
+          exit 1
+        fi
+      fi
+    fi
+
+  done
 
   print_m "${FUNCNAME} end"
 }
@@ -689,14 +818,15 @@ function repository_update() {
   print_m "source: [${gitrepo}]"
   print_m " cache: [${out_dir}]"
 
+  # assume 'git' is available, if not report and abort.
   local git=$(which 2>/dev/null git)
   if [[ ! -x "${git}" ]] ; then
     print_m "ERROR: please install git:"
 
     case "${sysname}" in
-      Linux)        print_m "ex: sudo apt-get install git" ;;
-      CYGWIN_NT)    print_m "ex: run Cygwin setup and select Devel/git." ;;
-      *)            print_m "ERROR: Configuration for [$sysname] required." ;;
+      Linux)        print_m "info: $ sudo apt-get install git" ;;
+      CYGWIN_NT)    print_m "info: run Cygwin setup and select Devel/git" ;;
+      *)            print_m "info: configuration does not exists for [$sysname]." ;;
     esac
 
     print_m "aborting..."
@@ -725,6 +855,8 @@ function repository_update() {
   fi
 
   print_m "${FUNCNAME} end"
+
+  return 0
 }
 
 #------------------------------------------------------------------------------
@@ -815,8 +947,14 @@ function source_make() {
     print_m "skipping system prerequisite checks."
   else
     print_m "checking system for prerequisites."
-    prerequisites_check
     prerequisites_install
+  fi
+
+  if [[ "${skip_check}" == "yes" ]] ; then
+    print_m "skipping system prerequisite asserts."
+  else
+    print_m "checking system for prerequisite asserts."
+    prerequisites_assert
   fi
 
   if [[ "${skip_prep}" == "yes" ]] ; then
@@ -831,6 +969,8 @@ function source_make() {
   ( cd ${build_dir} && make --jobs=${make_job_slots} $* )
 
   print_m "${FUNCNAME} end"
+
+  return 0
 }
 
 #------------------------------------------------------------------------------
@@ -925,18 +1065,14 @@ function parse_commands_branch() {
 
       --list)
         print_h1 "Listing prerequisites"
-        update_prerequisite_list
         prerequisites_list
       ;;
       --check)
         print_h1 "Checking for installed prerequisites"
-        prerequisites_check
         prerequisites_status
       ;;
       --required)
         print_h1 "Installing missing prerequisites"
-        update_build_variables
-        prerequisites_check
         prerequisites_install
       ;;
       --yes)
@@ -1114,7 +1250,7 @@ function parse_commands_repo() {
     if [[ ${repo_branch_list:0:4} == "tags" ]] ; then
       # obtain list of tagged releases from git repository
 
-      # force imediate clone/update of source repository (if needed)
+      # force immediate clone/update of source repository (if needed)
       update_build_variables
 
       # check for source
@@ -1170,7 +1306,7 @@ may also be used to start new design projects from a template.
 
  [ branch options ]
 
-      --flow <name>         : Use design flow 'name' default=(df1).
+      --flow <name>         : Use design flow 'name' current=(${design_flow}).
 
       --skip-check          : Skip system prerequisites check.
       --skip-prep           : Skip source preparation (use with care).

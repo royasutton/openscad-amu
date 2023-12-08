@@ -2,6 +2,7 @@
 ################################################################################
 #
 #  openscad-amu: Project Makefile Template
+#   rename this file to 'Makefile'
 #
 ################################################################################
 
@@ -48,14 +49,26 @@ endef
 # Design Flow Init (DO NO EDIT THIS SECTION)
 #------------------------------------------------------------------------------#
 ifeq ($(wildcard $(AMU_PM_INIT)),)
-$(info $(call AMU_SETUP_ANNOUNCE,Init file,$(AMU_PM_INIT)))
-$(error unable to continue.)
+  $(info $(call AMU_SETUP_ANNOUNCE,Init file,$(AMU_PM_INIT)))
+  $(error unable to continue.)
 else
-include $(AMU_PM_INIT)
+  include $(AMU_PM_INIT)
 endif
 
 #------------------------------------------------------------------------------#
-# Overrides to Design Flow Configuration Defaults
+# Design Flow Tools Assertions (examples)
+#------------------------------------------------------------------------------#
+#ifeq ($(version_checks),$(true))
+#$(call check_version,doxygen,ge,1.8.12,$(false),designed for v1.8.12.)
+#$(call check_version,openscad,eq,2021.01,$(true),tested with v2021.01.)
+#$(call check_version,amuseam,eq,2.8,$(true),v2.8 or later required.)
+#$(call check_version,amudif,lt,1.5,$(true),depreciated feature required.)
+#endif
+
+#------------------------------------------------------------------------------#
+# Overrides to Default Design Flow Configuration
+#   for for all configurable 'control' variables type:
+#    $ make info
 #------------------------------------------------------------------------------#
 # target_headings                       := $(false)
 # verbose_seam                          := $(false)
@@ -74,17 +87,7 @@ release_archive_doxygen                 := $(true)
 release_archive_scopes                  := $(false)
 
 #------------------------------------------------------------------------------#
-# Design Flow Tools Assertions (examples)
-#------------------------------------------------------------------------------#
-#ifeq ($(version_checks),$(true))
-#$(call check_version,doxygen,ge,1.8.12,$(false),designed for v1.8.12.)
-#$(call check_version,openscad,eq,2021.01,$(true),tested with v2021.01.)
-#$(call check_version,amuseam,eq,2.7,$(true),v2.7 or later required.)
-#$(call check_version,amudif,lt,1.5,$(true),depreciated feature required.)
-#endif
-
-#------------------------------------------------------------------------------#
-# Project
+# Project Configuration Variables
 #------------------------------------------------------------------------------#
 project_name        := template
 project_version     := v1.0
@@ -106,10 +109,10 @@ doxygen_config      := Doxyfile
 # Design Flow Rules (DO NO EDIT THIS SECTION)
 #------------------------------------------------------------------------------#
 ifeq ($(wildcard $(AMU_PM_RULES)),)
-$(info $(call AMU_SETUP_ANNOUNCE,Rules file,$(AMU_PM_RULES)))
-$(error unable to continue.)
+  $(info $(call AMU_SETUP_ANNOUNCE,Rules file,$(AMU_PM_RULES)))
+  $(error unable to continue.)
 else
-include $(AMU_PM_RULES)
+  include $(AMU_PM_RULES)
 endif
 
 ################################################################################

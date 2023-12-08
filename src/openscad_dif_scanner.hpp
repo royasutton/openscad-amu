@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.hpp
 
   \author Roy Allen Sutton
-  \date   2016-2019
+  \date   2016-2023
 
   \copyright
 
@@ -328,6 +328,8 @@ class ODIF_Scanner : public yyFlexLexer{
 
     size_t      def_bline;              //!< beginning line of parsed amu definition.
     size_t      def_eline;              //!< ending line of parsed amu definition.
+
+    size_t      def_nest_level;         //!< nested parenthesis pair level.
 
     //! begin amu_define handler
     void def_init(void);

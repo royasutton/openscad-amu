@@ -774,6 +774,7 @@ ODIF::ODIF_Scanner::bif_filename(void)
       rmecho   | o   | false   | remove OpenSCAD quoted [ECHO: "..."]
       rmnl     | r   | false   | remove line-feeds / carriage returns
       eval     | e   | false   | expand variables in text
+      quiet    | q   | false   | do not report file not found errors
 
     Flags that produce output
 
@@ -810,6 +811,7 @@ ODIF::ODIF_Scanner::bif_file(void)
   "rmecho",     "o",
   "rmnl",       "r",
   "eval",       "e",
+  "quiet",      "q",
 
   "read",       "rd",
   "lines",      "lc",
@@ -832,6 +834,7 @@ ODIF::ODIF_Scanner::bif_file(void)
   bool rmecho = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool rmnl   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool eval   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
+  bool quiet  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
 
   bool read   = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
   bool lines  = ( atoi( unquote_trim(fx_argv.arg_firstof("0",vana[ap],vana[ap+1])).c_str() ) > 0 ); ap+=2;
@@ -882,10 +885,10 @@ ODIF::ODIF_Scanner::bif_file(void)
       ifs.open( rl.c_str() );
       ids_ready = ifs.is_open();
 
-      if ( !ids_ready )
+      if ( !ids_ready && !quiet )
         result.append( amu_error_msg("unable to open: " + file) );
     }
-    else
+    else if ( !quiet )
       result.append( amu_error_msg("unable to find: " + file) );
   }
   else if ( !text.empty() )
@@ -895,7 +898,9 @@ ODIF::ODIF_Scanner::bif_file(void)
   }
   else
   { // error: no source
-    result.append( amu_error_msg("no source file or text.") );
+    if ( !quiet )
+      result.append( amu_error_msg("no source file or text.") );
+
     ids_ready = false;
   }
 

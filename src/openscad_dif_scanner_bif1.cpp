@@ -551,13 +551,28 @@ ODIF::ODIF_Scanner::bif_scope(void)
       { // index
         size_t index = atoi( v.c_str() );
 
+        // limit scope identifier index between [1, size]
         if ( index < 1 )                index = 1;
         if ( index > sid_copy.size() )  index = sid_copy.size();
 
-        if ( result.size() ) result.append( " " );
-        if ( verbose ) result.append( "index[" + to_string(index) + "] = " );
+        // handle when scope identifier list is 'empty'
+        if ( sid_copy.size() < 1 )
+        {
+          // output nothing
 
-        result.append( sid_copy[ index - 1 ] );
+          if ( verbose )
+          {
+            if ( result.size() ) result.append( " " );
+            result.append( "<EMPTY>" );
+          }
+        }
+        else
+        {
+          if ( result.size() ) result.append( " " );
+          if ( verbose ) result.append( "index[" + to_string(index) + "] = " );
+
+          result.append( sid_copy[ index - 1 ] );
+        }
       }
       else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
       { // count

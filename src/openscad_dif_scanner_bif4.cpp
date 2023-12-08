@@ -47,7 +47,7 @@ using namespace std;
   \details
 
 
-    Output a table formated from a list of text phrases. The options
+    Output a table formatted from a list of text phrases. The options
     and their short codes are summarized in the following table.
 
      options            | sc  | default  | tokenizer | description
