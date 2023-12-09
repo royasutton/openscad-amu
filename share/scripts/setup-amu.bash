@@ -370,7 +370,7 @@ function update_prerequisite_list() {
 # Linux
 #==============================================================================
 
-function prerequisites_check.Linux() {
+function prerequisite_check.Linux() {
   dpkg-query --no-pager --show --showformat='${Status}\n' $1 2>/dev/null |
     grep -q "install ok installed" &&
       return 0
@@ -396,7 +396,7 @@ function prerequisites_install.Linux() {
 # Cygwin
 #==============================================================================
 
-function prerequisites_check.CYGWIN_NT() {
+function prerequisite_check.CYGWIN_NT() {
   cygcheck --check-setup --dump-only $1 |
     tail -1 |
     grep -q $1 &&
@@ -627,7 +627,7 @@ function prerequisites_check() {
   update_prerequisite_list
 
   for r in ${packages} ; do
-    if prerequisites_check.${sysname} $r
+    if prerequisite_check.${sysname} $r
     then
       packages_installed+=" $r"
     else
