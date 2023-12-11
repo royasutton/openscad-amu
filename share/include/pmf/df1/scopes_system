@@ -85,6 +85,12 @@ openscadvs := openscad$(openscadvn)
 amuseamvn := $(subst v,$(empty),$(shell $(path_openscad_seam) 2>&1 --version))
 amuseamvs := amuseam$(amuseamvn)
 
+bashvn := $(word 4,$(shell $(path_bash) 2>&1 --version))
+bashvs := bash$(bashvn)
+
+gnumakevn := $(word 3,$(shell $(path_gnumake) 2>&1 --version))
+gnumakevs := gnumake$(gnumakevn)
+
 #------------------------------------------------------------------------------#
 # Configuration Variable List
 #------------------------------------------------------------------------------#
@@ -95,6 +101,12 @@ scopes_config_derived := \
   \
   amuseamvs \
   amuseamvn \
+  \
+  bashvs \
+  bashvn \
+  \
+  gnumakevs \
+  gnumakevn
 
 ################################################################################
 # eof
