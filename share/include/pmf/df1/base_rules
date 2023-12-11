@@ -30,6 +30,7 @@
 # Build Targets
 #------------------------------------------------------------------------------#
 
+# order: 'local' first, components in order of declaration
 .PHONY:	all
 all: $(addprefix all-,$(AMU_PM_COMPONENTS_LOCAL))
 all: $(addprefix all-,$(AMU_PM_COMPONENTS))
@@ -39,27 +40,31 @@ all: $(addprefix all-,$(AMU_PM_COMPONENTS))
 # Clean Targets
 #------------------------------------------------------------------------------#
 
+# reverse order: 'local' last, components in reverse order of declaration
 .PHONY: clean
-clean: $(addprefix clean-,$(AMU_PM_COMPONENTS_LOCAL))
-clean: $(addprefix clean-,$(AMU_PM_COMPONENTS))
+clean: $(addprefix clean-,$(call reverse_list,$(AMU_PM_COMPONENTS)))
+clean: $(addprefix clean-,$(call reverse_list,$(AMU_PM_COMPONENTS_LOCAL)))
 	$(call target_end)
 
 #------------------------------------------------------------------------------#
 # Install / Uninstall Targets
 #------------------------------------------------------------------------------#
 
+# order: 'local' first, components in order of declaration
 .PHONY: install
-install: $(addprefix install-,$(AMU_PM_COMPONENTS))
 install: $(addprefix install-,$(AMU_PM_COMPONENTS_LOCAL))
+install: $(addprefix install-,$(AMU_PM_COMPONENTS))
 install: $(addprefix install-,$(if $(strip $(library_files)),library))
 	$(call target_end)
 
+# reverse order: 'local' last, components in reverse order of declaration
 .PHONY: uninstall
-uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS))
-uninstall: $(addprefix uninstall-,$(AMU_PM_COMPONENTS_LOCAL))
+uninstall: $(addprefix uninstall-,$(call reverse_list,$(AMU_PM_COMPONENTS)))
+uninstall: $(addprefix uninstall-,$(call reverse_list,$(AMU_PM_COMPONENTS_LOCAL)))
 uninstall: $(addprefix uninstall-,$(if $(strip $(library_files)),library))
 	$(call target_end)
 
+# install library
 .PHONY: install-library
 install-library: | $(install_prefix_scad) $(install_prefix_scad)$(library_install_subdir)
 	$(call target_begin)
@@ -81,6 +86,7 @@ install-library: | $(install_prefix_scad) $(install_prefix_scad)$(library_instal
 	)
 	$(call target_end)
 
+# uninstall library
 .PHONY: uninstall-library
 uninstall-library:
 	$(call target_begin)
