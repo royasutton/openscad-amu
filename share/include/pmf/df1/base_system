@@ -54,6 +54,7 @@ path_sort   := $(call first_of,sort)
 path_grep   := $(call first_of,grep)
 path_cat    := $(call first_of,cat)
 path_sed    := $(call first_of,sed)
+path_head   := $(call first_of,head)
 path_tail   := $(call first_of,tail)
 path_touch  := $(call first_of,touch)
 path_chmod  := $(call first_of,chmod)
@@ -85,6 +86,7 @@ ifeq (${os},Linux)
   opts_grep_v   := --invert-match
   opts_cat      :=
   opts_sed      :=
+  opts_head     :=
   opts_tail     :=
   opts_touch    :=
   opts_chmod    := --verbose
@@ -127,6 +129,7 @@ ifeq ($(firstword $(strip $(subst -,$(space),$(os)))),CYGWIN_NT)
   opts_grep_v   := --invert-match
   opts_cat      :=
   opts_sed      :=
+  opts_head     :=
   opts_tail     :=
   opts_touch    :=
   opts_chmod    := --verbose
@@ -172,6 +175,7 @@ base_commands_required := \
   path_grep \
   path_cat \
   path_sed \
+  path_head \
   path_tail \
   path_touch \
   path_chmod \
@@ -202,6 +206,7 @@ grep    := $(path_grep) $(opts_grep)
 grep_v  := $(path_grep) $(opts_grep_v)
 cat     := $(path_cat) $(opts_cat)
 sed     := $(path_sed) $(opts_sed)
+head    := $(path_head) $(opts_head)
 tail    := $(path_tail) $(opts_tail)
 touch   := $(path_touch) $(opts_touch)
 chmod   := $(path_chmod) $(opts_chmod)
@@ -233,6 +238,7 @@ base_commands_configured := \
   grep_v \
   cat \
   sed \
+  head \
   tail \
   touch \
   chmod \

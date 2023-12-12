@@ -5,24 +5,18 @@ The Design Flow
 <img src="assets/flow.svg" alt="" border="0"/>
 </p>
 
-A project includes a makefile, the project source files, and a
-Doxygen configuration file (Doxyfile). Source files may be
-annotated with documentation and/or build automation scripts. Each
-script is extracted at compile time to generate a _scope_ makefile that
-controls the generation of corresponding targets.
+A project includes a makefile, the project source files, and a Doxygen
+configuration file (Doxyfile). Source files may be annotated with
+documentation and/or build automation scripts. Each script is extracted
+at compile time to generate a _scope_ makefile that controls the
+generation of corresponding targets.
 
 [openscad-amu] brings together [OpenSCAD], [Doxygen], [GNU Make], and
 _custom scripting_ (based on [GNU Bash]) to automate the generation of
 the design documentation and design targets.
-
-**Moreover**, with openscad-amu, a repository of OpenSCAD library
-documentation is maintained for each library it installs, as with this
-example [Library Documentation] index.
 
 [openscad-amu]: https://royasutton.github.io/openscad-amu
 [OpenSCAD]: http://www.openscad.org
 [Doxygen]: http://www.doxygen.nl
 [GNU Make]: https://www.gnu.org/software/make
 [GNU Bash]: https://www.gnu.org/software/bash
-
-[Library Documentation]: https://royasutton.github.io/omdl/api/html/index.html
