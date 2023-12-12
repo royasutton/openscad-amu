@@ -2,7 +2,6 @@
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
-
 What is it?
 -----------
 
@@ -27,7 +26,6 @@ to the source code and dependency-based targets generation is scripted
 for use in code testing, code documentation and design construction.
 Moreover, with GNU make, targets can be constructed in parallel which
 drastically reduces compile times for larger design projects.
-
 
 The Design Flow
 ---------------
@@ -65,91 +63,25 @@ As the design size increases, so does the benefit of using
 [openscad-amu]. Compiling design targets one-by-one is times consuming
 and error prone and discourages design optimization and/or exploration.
 
-> *For larger design projects, the increase in benefit is significant as
-> [openscad-amu] frees designers from mundane dependency and state
-> tracking and provides mechanisms for part compilation and coherent
-> design documentation.*
-
-A significant side effect is greatly reduce total project compile time
-on multi-processor systems via parallel invocations of the
+A windfall is a linear reduction, with processor thread count, in
+compile time on multi-processor systems via parallel invocations of the
 single-threaded [OpenSCAD] compiler. Once compilation flows are
-described, using the simple scripting scheme, each design target is
-kept current from source as needed via invocations of `make`.
+described, using the openscad-amu scripting scheme, each design target
+is kept current from source as needed during automatic build processing
+via [GNU make].
 
-> *For smaller projects, the ability to document a design or library using
-> [Doxygen] is a convenient way to both maintain and publish the design
-> interface or API.*
+To get started using [openscad-amu], please see the GitHub source
+[repository].
 
-
-Getting Started
----------------
-
-If you are already familiar with [Doxygen], adding basic documentation
-to your [OpenSCAD] designs using [openscad-amu] is straight forward.
-Simply markup each of your design files with the [special commands],
-name each file in the project makefile, and type `make` to generate
-your documentation.
-
-You can also start from a template created by the `setup-amu.bash`
-script, then customize as needed as described in the [evaluation]
-section of the repository home page.
-
-### Setup ###
-
-See the GitHub source [repository] for instructions on
-[evaluating][evaluation] and [installing].
-
-
-Example
--------
-
-* [A Portable solar panel tripod mount](http://www.thingiverse.com/thing:2051608):
-
-  This design took approximately 48 hours from concept to assembly and
-  documentation using [omdl] and [openscad-amu]. It demonstrates the
-  automated design flow. One can change a design parameter, then type
-  `make all` to recompile effected parts. In this design, parts are
-  engraved with a version and part identifier using a simple database
-  scheme available in [omdl].
-
-
-Contributing
-------------
-
-openscad-amu uses [git] for development tracking, and is hosted on
-[GitHub] following the usual practice of [forking] and submitting
-[pull requests] to the source [repository].
-
-As it is released under the [GNU General Public License], any file you
-change should bear your copyright notice alongside the original
-authors' copyright notices typically located at the top of each file.
-
-
-Contact and Support
--------------------
-
-In case you have any questions or would like to make feature requests,
-you can contact the maintainer of the project or file an [issue].
-
-
-[GNU General Public License]: https://www.gnu.org/licenses/gpl.html
-[GNU Make]: https://www.gnu.org/software/make
 
 [openscad-amu]: https://royasutton.github.io/openscad-amu
 [repository]: https://github.com/royasutton/openscad-amu
-[issue]: https://github.com/royasutton/openscad-amu/issues
 
-[evaluation]: https://github.com/royasutton/openscad-amu#evaluation
-[installing]: https://github.com/royasutton/openscad-amu#installing
-
-[omdl]: https://royasutton.github.io/omdl
-
-[OpenSCAD]: http://www.openscad.org/
+[GNU Make]: https://www.gnu.org/software/make
 
 [Doxygen]: http://www.doxygen.nl
 [special commands]: http://www.doxygen.nl/manual/commands.html
 
-[git]: http://git-scm.com/
-[GitHub]: http://github.com/
-[forking]: http://help.github.com/forking/
-[pull requests]: https://help.github.com/articles/about-pull-requests/
+[OpenSCAD]: http://www.openscad.org/
+
+[omdl]: https://royasutton.github.io/omdl

@@ -5,7 +5,7 @@ openscad-amu
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
-View live docs on [GitHib Pages](https://royasutton.github.io/openscad-amu).
+View live docs on [GitHub Pages](https://royasutton.github.io/openscad-amu).
 
 
 Evaluation

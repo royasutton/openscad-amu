@@ -32,11 +32,10 @@ Makefile.in
 /work/
 
 #
-# GitHub docs related
+# GitHub Pages
 #
 
-/docs/Gemfile
-/docs/Gemfile.lock
+/docs/.bundle/
 /docs/_site/
 /docs/_staging/
 
