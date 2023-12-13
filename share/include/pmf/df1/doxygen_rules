@@ -105,16 +105,21 @@ install-doxygen: install-doxygen-html
 uninstall-doxygen: uninstall-doxygen-html
 
 # install ordering
-install-doxygen-html: install-doxygen-html-files install-doxygen-update-html-index
+install-doxygen-html: install-doxygen-html-files install-doxygen-tag install-doxygen-update-html-index
 	$(call target_end)
 
-# copy files
+# copy html files
 install-doxygen-html-files: $(doxygen_stamp) | $(install_prefix_html) $(install_prefix_html)$(docs_install_id)
 	$(call target_begin)
 	( \
 		cd $(doxygen_output_path) && \
 		$(cp_a) $(html_output) $(install_prefix_html)$(docs_install_id) \
 	)
+
+# copy doxygen tag file
+install-doxygen-tag: $(doxygen_stamp) | $(install_prefix_html) $(install_prefix_html)$(docs_install_id)
+	$(call target_begin)
+	$(cp_a) $(doxygen_tag) $(install_prefix_html)$(docs_install_id)$(dir_level_sep)$(notdir $(doxygen_tag))
 
 # create toc entry and update index
 install-doxygen-update-html-index: | $(install_prefix_html)$(docs_install_id)
@@ -130,7 +135,7 @@ $(install_prefix_html)$(docs_install_id): ; $(mkdir_p) $@
 uninstall-doxygen-html: uninstall-doxygen-html-files doxygen-update-html-index
 	$(call target_end)
 
-# remove files
+# remove html files
 uninstall-doxygen-html-files:
 	$(call target_begin)
 	-( \
@@ -156,7 +161,7 @@ uninstall-doxygen: uninstall-doxygen-pdf
 install-doxygen-pdf: install-doxygen-pdf-files install-doxygen-update-pdf-index
 	$(call target_end)
 
-# copy files
+# copy pdf files
 install-doxygen-pdf-files: $(latex_stamp) | $(install_prefix_pdf) $(install_prefix_pdf)$(docs_install_id)
 	$(call target_begin)
 	( \
@@ -180,7 +185,7 @@ $(install_prefix_pdf)$(docs_install_id): ; $(mkdir_p) $@
 uninstall-doxygen-pdf: uninstall-doxygen-pdf-files doxygen-update-pdf-index
 	$(call target_end)
 
-# remove files
+# remove pdf files
 uninstall-doxygen-pdf-files:
 	$(call target_begin)
 	-( \
