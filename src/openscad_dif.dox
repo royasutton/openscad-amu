@@ -38,7 +38,7 @@
    "+"+"/"    | end nested comment block.
 
   As identified in the above table, the filter supports nested
-  comments, which are useful for documenting the bahavior of include
+  comments, which are useful for documenting the behavior of include
   files and macros. A single level of nesting is permitted and must
   exists within a normal comment block. The content of nested comment
   blocks is discarded by the filter. See the flex documentation for
