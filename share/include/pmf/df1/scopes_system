@@ -30,14 +30,15 @@
 # Commands
 #------------------------------------------------------------------------------#
 
-path_openscad := $(call first_of,openscad openscad-nightly)
+path_openscad := $(call first_of,$(path_openscad) openscad openscad-nightly)
 path_openscad_seam := \
   $(call first_of, \
+    $(path_openscad_seam) \
     $(AMU_TOOL_PREFIX)openscad-seam-$(AMU_TOOL_VERSION) \
     $(AMU_TOOL_PREFIX)openscad-seam \
   )
-path_bash := $(call first_of,bash)
-path_gnumake := $(call first_of,gnumake gmake make)
+path_bash := $(call first_of,$(path_bash) bash)
+path_gnumake := $(call first_of,$(path_gnumake) gnumake gmake make)
 
 #------------------------------------------------------------------------------#
 # OS Configuration
