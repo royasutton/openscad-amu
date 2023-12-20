@@ -157,12 +157,13 @@
    OPENSCAD_EXT       | openscad script extension
 
 
-  \subsection openscad_dif_sm_adc Doxygen Function Summary
+  \subsection openscad_dif_sm_adc Doxygen Input Filter Functions Summary
 
-  In addition to the normal Doxygen [special commands], here is a list
-  of additional filter-provided command functions that can be used for
-  document markup. The documentation for these functions may be found
-  in section the \ref openscad_dif_sm_afc "filter commands".
+  In addition to the standard Doxygen [special commands], here is a
+  list of additional commands provided by the input filter that can be
+  used within documentation. The description for these functions can be
+  found in the section \ref openscad_dif_sm_afc "filter commands"
+  below.
 
   | internal commands               | description
   |:--------------------------------|:------------------------------------
