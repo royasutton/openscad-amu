@@ -38,7 +38,7 @@
    "+"+"/"    | end nested comment block.
 
   As identified in the above table, the filter supports nested
-  comments, which are useful for documenting the bahavior of include
+  comments, which are useful for documenting the behavior of include
   files and macros. A single level of nesting is permitted and must
   exists within a normal comment block. The content of nested comment
   blocks is discarded by the filter. See the flex documentation for
@@ -157,12 +157,13 @@
    OPENSCAD_EXT       | openscad script extension
 
 
-  \subsection openscad_dif_sm_adc Doxygen Function Summary
+  \subsection openscad_dif_sm_adc Doxygen Input Filter Functions Summary
 
-  In addition to the normal Doxygen [special commands], here is a list
-  of additional filter-provided command functions that can be used for
-  document markup. The documentation for these functions may be found
-  in section the \ref openscad_dif_sm_afc "filter commands".
+  In addition to the standard Doxygen [special commands], here is a
+  list of additional commands provided by the input filter that can be
+  used within documentation. The description for these functions can be
+  found in the section \ref openscad_dif_sm_afc "filter commands"
+  below.
 
   | internal commands               | description
   |:--------------------------------|:------------------------------------

@@ -16,10 +16,27 @@
 
   OpenSCAD script extractor and auto-make tool (seam).
 
-  Extract makefile-generation- and OpenSCAD-build-scripts embedded into
-  comment blocks, of an OpenSCAD input file. These scripts may be used
-  to generate makefiles that automate the compilation of OpenSCAD
-  design targets.
+  This program extracts embedded scripts, makefile generation scripts
+  and OpenSCAD build scripts, from comment blocks, from ab OpenSCAD
+  source file. These scripts may be used to generate makefiles that
+  automate the compilation of OpenSCAD design targets.
+
+  \subsubsection openscad_seam_sm_av Automatic Variables
+
+  The following tables list variables predefined that may be used by
+  the extracted makefile scripts.
+
+  <b>Input File:</b>
+
+   name                   | description
+  :-----------------------|:----------------------------------------------
+   \__SOURCE_FILE\__      | input source file name
+   \__SCOPE_FILE\__       | file name assigned to the extracted script
+   \__MAKE_FILE\__        | file name assigned to the generated makefile
+   \__LIB_PATH\__         | makefile script library path
+   \__PREFIX\__           | makefile target output path prefix
+   \__AMU_INCLUDE_PATH\__ | path for optional makefile includes
+   sc_openscad            | path to the OpenSCAD installation to use
 
 *******************************************************************************/
 

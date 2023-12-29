@@ -323,7 +323,7 @@ function show_arg_list_status()
 # \returns void
 #
 # \details
-#   Output a makefile target recepie for the given input parameters.
+#   Output a makefile target recipe for the given input parameters.
 #
 # \private
 ###############################################################################/
@@ -396,11 +396,11 @@ function add_target()
 
   print_m -j
 
-  # include openscad generated depend file (use if it exsists "-")
+  # include openscad generated depend file (use if it exists "-")
   print_m -j
   print_m -j -include $filename_depend
 
-  # add target file directory dependancy
+  # add target file directory dependency
   print_m -j
   print_m -j $filename_out : \| $(file_utility --pathname $filename_out)
 
@@ -574,7 +574,7 @@ function generate_targets()
       generate_targets \
         --out_stem "$out_stem$i" \
         --tuple_list "$tuple_list [$i]" \
-        --opts_scad "$opts_scad $this_opt_val" \
+        --opts_scad "$opts_scad -D __mfs_$i=true $this_opt_val" \
         --opts_sets "$remain_opt_sets"
     done
   fi

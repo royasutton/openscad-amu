@@ -30,9 +30,10 @@
 # Commands
 #------------------------------------------------------------------------------#
 
-path_doxygen := $(call first_of,doxygen)
+path_doxygen := $(call first_of,$(path_doxygen) doxygen)
 path_openscad_dif := \
   $(call first_of, \
+    $(path_openscad_dif) \
     $(AMU_TOOL_PREFIX)openscad-dif-$(AMU_TOOL_VERSION) \
     $(AMU_TOOL_PREFIX)openscad-dif \
   )
