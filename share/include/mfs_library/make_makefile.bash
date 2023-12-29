@@ -574,7 +574,7 @@ function generate_targets()
       generate_targets \
         --out_stem "$out_stem$i" \
         --tuple_list "$tuple_list [$i]" \
-        --opts_scad "$opts_scad $this_opt_val" \
+        --opts_scad "$opts_scad -D __mfs_$i=true $this_opt_val" \
         --opts_sets "$remain_opt_sets"
     done
   fi
