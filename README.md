@@ -5,8 +5,6 @@ openscad-amu
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
-View live docs on [GitHub Pages](https://royasutton.github.io/openscad-amu).
-
 
 Evaluation
 ----------
@@ -18,9 +16,13 @@ temporary cache directory, and create an example project, type:
 
 ```bash
 mkdir tmp && cd tmp
-wget https://git.io/setup-amu.bash
-chmod +x setup-amu.bash
+```
 
+```bash
+wget https://git.io/setup-amu.bash && chmod +x setup-amu.bash
+```
+
+```bash
 ./setup-amu.bash --cache --branch-list tags1 --yes --install --template my_project
 ```
 
@@ -29,7 +31,7 @@ installation of each required package (see: `setup-amu.bash --help`).
 If you don't like shortened URLs, here is the full URL to
 [setup-amu.bash].
 
-If all goes well, you will end up with two new directories: *cache* and
+Once setup is complete, you will see two new directories: *cache* and
 *my_project*. The source will have been compiled and installed to
 *cache* and an example project, along with the *project makefile*, will
 have been copied to *my_project*.
@@ -54,7 +56,6 @@ The third `make` step will compile (via [OpenSCAD]) numerous targets
 guided by scripts embedded in source comments, process the embedded
 documentation (via [Doxygen]), and the last will install the library
 files to the system-dependent [OpenSCAD] user library path.
-
 
 To see the table of contents of installed libraries, type:
 
@@ -92,49 +93,6 @@ To uninstall everything that was installed by these step, rerun the
 step replacing `--install` with `--uninstall`. More help and examples
 are available (see: `setup-amu.bash --help` and `setup-amu.bash
 --examples`).
-
-
-Manual Compilation
-------------------
-
-The `setup-amu.bash` script is the easiest way to build and install the
-source. However, here are the steps to build it manually. Once all of
-the prerequisite packages exists (see: `setup-amu.bash --list` and
-`setup-amu.bash --required`), the development source can be compiled:
-
-```bash
-git clone https://github.com/royasutton/openscad-amu
-cd openscad-amu
-git tag
-git checkout <version>
-
-./autogen.sh
-mkdir -p build && cd build
-../configure
-
-make
-```
-
-To run post-build basic sanity checks:
-
-```bash
-make check
-```
-
-The openscad-amu html documentation is lean, but can be built and
-viewed by:
-
-```bash
-make html
-firefox doxygen/html/index.html
-```
-
-To manually install or uninstall, issue:
-
-```bash
-sudo make install
-sudo make uninstall
-```
 
 
 Contributing
