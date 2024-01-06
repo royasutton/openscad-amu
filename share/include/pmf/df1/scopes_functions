@@ -126,7 +126,7 @@ $(amu_pm_d2)
 # build-stamp
 $(call scopes_target_path,$1)$2$(stamp_ext): $(call scopes_target_path,$1)$2$(mf_ext)
 	$$(call target_begin)
-	OPENSCADPATH="$(scad_lib_path)" \
+	export OPENSCADPATH="$(scad_lib_path)" ; \
 	$(path_gnumake) --makefile=$(call scopes_target_path,$1)$2$(mf_ext) all \
 	&& $(touch) $(call scopes_target_path,$1)$2$(stamp_ext)
 
