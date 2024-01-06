@@ -70,7 +70,7 @@ openscad_seam_opts2 := \
     $(if $(seam_opts_add),$(seam_opts_add)) \
   )
 
-# user-defined library path
+# user-defined library path (add current directory)
 scad_lib_path := $(call join_with,$(env_field_sep), \
   . \
   $(if $(dir $1),$(dir $1)) \
