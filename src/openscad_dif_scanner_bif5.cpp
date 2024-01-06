@@ -313,6 +313,11 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
     scripts, it may be required to set the library path variable \c
     OPENSCADPATH in the shell environment prior to use.
 
+    \warning  The console output is not saved and, if not captured to
+              the documentation, this output is discarded. This may
+              result in unnoticed script errors and/or errors not
+              identified by other automatic validation methods.
+
     For more information on how to specify and use function arguments
     see \ref openscad_dif_sm_a.
 *******************************************************************************/
