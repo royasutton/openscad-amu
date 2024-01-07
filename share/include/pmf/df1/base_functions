@@ -502,7 +502,7 @@ subst_list = $(amu_pm_d3)$(if $1,$(subst $(firstword $1),$2,$(call subst_list,$(
 # arg1: A string that joins each member together.
 # arg2: A list of space separated members to join.
 # arg3: An encoded boolean; make resulting list members unique?
-# returns a string of joined terms connected together by the joiner string.
+# returns a unique string of joined terms connected together by the joiner string.
 join_with = $(amu_pm_d3)$(strip \
   $(if $(call bool_decode,$3), \
     $(subst $(space),$1,$(call unique,$(subst $1,$(space),$(strip $2)))), \

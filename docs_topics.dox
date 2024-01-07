@@ -3,6 +3,8 @@
 /***************************************************************************//**
   \page building Building and installing
 
+    \subsubsection setup_script Setup Script
+
     A script is available to bootstrap the development environment.
 
     Download the setup script:
@@ -33,6 +35,58 @@
     \endcode
 
     To create a new project from a template, see \ref template.
+
+
+    \subsubsection manual_compile Manual Compilation
+
+    The setup script is the easiest way to build and install the
+    source. However, there are times when manual compilation may be
+    preferred. Here are the required steps.
+
+    Once all of the prerequisite packages exists, the development
+    source can be compiled. To check the status of the prerequisite
+    type:
+
+    \code{bash}
+    $ setup-amu.bash --list
+    $ setup-amu.bash --required
+    \endcode
+
+    Update the source branch and checkout the desired version and
+    complete as follows:
+
+    \code{bash}
+    $ git clone https://github.com/royasutton/openscad-amu
+    $ cd openscad-amu
+    $ git tag
+    $ git checkout <version>
+
+    $ ./autogen.sh
+    $ mkdir -p build && cd build
+    $ ../configure
+
+    $ make
+    \endcode
+
+    To run post-build basic sanity checks:
+
+    \code{bash}
+    $ make check
+    \endcode
+
+    The openscad-amu html documentation can be built and viewed by:
+
+    \code{bash}
+    $ make html
+    $ firefox doxygen/html/index.html
+    \endcode
+
+    To install or uninstall, issue:
+
+    \code{bash}
+    $ sudo make install
+    $ sudo make uninstall
+    \endcode
 
 *******************************************************************************/
 

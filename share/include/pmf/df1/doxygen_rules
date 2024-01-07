@@ -45,9 +45,10 @@ ifeq ($(targets_depends_project),$(true))
 $(doxygen_config_auto): $(doxygen_config_src) $(MAKEFILE_LIST) $(project_files_add)
 endif
 
-# doxygen
+# run doxygen
 $(doxygen_stamp): $(doxygen_config_auto)
 	$(call target_begin)
+	export OPENSCADPATH="$(scad_lib_path)" ; \
 	$(cat) $(doxygen_config_auto) $(doxygen_config) | $(path_doxygen) - \
 	&& $(touch) $(doxygen_stamp)
 
