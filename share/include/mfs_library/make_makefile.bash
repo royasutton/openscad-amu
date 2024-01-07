@@ -784,9 +784,9 @@ function add_targets_menu()
     print_m -j
     print_m -j .PHONY : clean$suffix
     print_m -j clean$suffix :
-    print_m -j -e "\t" "-@test -z \"\${targets$suffix}\" || $sc_rm $sc_rm_opts \${targets$suffix}"
-    print_m -j -e "\t" "-@test -z \"\${cleanfiles$suffix}\" || $sc_rm $sc_rm_opts \${cleanfiles$suffix}"
-    print_m -j -e "\t" "-@test -z \"\${targetsdir$suffix}\" || $sc_rmdir $sc_rmdir_opts \${targetsdir$suffix}"
+    print_m -j -e "\t" "-\$(foreach v,\${targets$suffix}, $sc_rm $sc_rm_opts \${v};)"
+    print_m -j -e "\t" "-\$(foreach v,\${cleanfiles$suffix}, $sc_rm $sc_rm_opts \${v};)"
+    print_m -j -e "\t" "-\$(foreach v,\${targetsdir$suffix}, $sc_rmdir $sc_rmdir_opts \${v};)"
   }
 
  declare local srn="$(file_utility --rootname $source_name)"
