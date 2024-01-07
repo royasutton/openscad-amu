@@ -313,10 +313,20 @@ ODIF::ODIF_Scanner::bif_if_exp_2a(string s)
     scripts, it may be required to set the library path variable \c
     OPENSCADPATH in the shell environment prior to use.
 
-    \warning  The console output is not saved and, if not captured to
-              the documentation, this output is discarded. This may
-              result in unnoticed script errors and/or errors not
-              identified by other automatic validation methods.
+    \warning  The console output is not saved when in-line scripts are
+              processed. If the console output is not captured to the
+              documentation, this output is discarded. This may result
+              in unnoticed script errors and/or errors not identified
+              by other automatic validation methods. It should be noted
+              that in-line scripts are significantly less efficient
+              than embedding scripts into scope blocks of the source
+              file since in-line script are run each and every time the
+              documentation is updated by Doxygen. Scoped embedded
+              scripts, however, are extracted as needed and their
+              target generation is controlled by generated makefiles.
+              These makefiles, extracted scope scripts, and targets
+              will only be constructed or updated when their dependency
+              changes.
 
     For more information on how to specify and use function arguments
     see \ref openscad_dif_sm_a.
