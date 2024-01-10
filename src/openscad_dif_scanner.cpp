@@ -265,7 +265,7 @@ ODIF::ODIF_Scanner::amu_error_msg(const string& m)
 void
 ODIF::ODIF_Scanner::fx_init(void)
 {
-  // update local copy of global variable map (memberwise)
+  // update local copy of global variable map (member-wise)
   levm = gevm;
 
   apt_clear();
@@ -306,10 +306,10 @@ ODIF::ODIF_Scanner::fx_end(void)
 {
   fx_eline = lineno();
 
-  // prototype of build-in function: string functionname( void );
+  // prototype of build-in function: string function_name( void );
   typedef map< string, string (ODIF::ODIF_Scanner::*)(void) > function_table_type;
 
-  // function jump table
+  // internal functions map (bif_*)
   static function_table_type function_table = boost::assign::map_list_of
       ("combine",       &ODIF::ODIF_Scanner::bif_combine)
       ("copy",          &ODIF::ODIF_Scanner::bif_copy)
@@ -341,25 +341,27 @@ ODIF::ODIF_Scanner::fx_end(void)
   // locate and call named function
   //
 
+  // search internal functions
   function_table_type::iterator entry = function_table.find ( fx_name );
   if ( entry != function_table.end() )
-  { // found in function table
+  { // found in function map
     result = (this->*(entry->second))();
     success = true;
   }
   else
   {
-    /* not found in internalfunction table, check external functions */
+    // not found in internal functions map, check in external function path
     bfs::path exfx_path;
 
     exfx_path  = lib_path;
     exfx_path /= "dif_external";
     exfx_path /= "amu_" + fx_name;
 
+    // try file: <lib_path>/dif_external/amu_<fx_name>
     if ( bfs::exists( exfx_path ) )
     {
       if ( bfs::is_regular_file( exfx_path ) )
-      {
+      { // found and is a file
         string scmd = exfx_path.string();
 
         // append arguments
@@ -380,7 +382,7 @@ ODIF::ODIF_Scanner::fx_end(void)
     }
     else
     {
-      /* built-in not matched and external function does not exists */
+      // built-in not matched and external function does not exists
       result = "unknown function [amu_" + fx_name + "].";
     }
   }
@@ -521,7 +523,7 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
 void
 ODIF::ODIF_Scanner::def_init(void)
 {
-  // update local copy of global variable map (memberwise)
+  // update local copy of global variable map (member-wise)
   levm = gevm;
 
   apt_clear();
@@ -643,7 +645,7 @@ ODIF::ODIF_Scanner::def_set_var(void)
 void
 ODIF::ODIF_Scanner::if_init(void)
 {
-  // update local copy of global variable map (memberwise)
+  // update local copy of global variable map (member-wise)
   levm = gevm;
 
   apt_clear();
@@ -815,14 +817,14 @@ ODIF::ODIF_Scanner::if_set_var(void)
     \code
     \amu_include ( ${root}/path/file )
 
-    \amu_include copy no_switch ( ${root}/path/debuging )
+    \amu_include copy no_switch ( ${root}/path/debugging )
     \endcode
 
 *******************************************************************************/
 void
 ODIF::ODIF_Scanner::inc_init(void)
 {
-  // update local copy of global variable map (memberwise)
+  // update local copy of global variable map (member-wise)
   levm = gevm;
 
   apt_clear();
@@ -964,10 +966,10 @@ ODIF::ODIF_Scanner::filter_debug(
 /***************************************************************************//**
 
   \param file       file to locate.
-  \param subdir     destination subdirectory for file copy.
+  \param subdir     destination sub-directory for file copy.
   \param found      status of if the file was located.
   \param extension  return file name with file extension.
-  \param copy       copy the found file to the specified subdir.
+  \param copy       copy the found file to the specified sub-directory.
   \param rid        rename the copied file with an random identifier.
 
   \returns  a string with (a) \p file when not located, (b) path to the
@@ -1023,7 +1025,7 @@ ODIF::ODIF_Scanner::file_rl(
                                           it != include_path.rend() && !found;
                                         ++it )
     {
-      bfs::path p = *it / file_path;              // full filepath
+      bfs::path p = *it / file_path;              // full file-path
 
       filter_debug(" checking-path: " + p.string(), false, false, false);
       if ( exists(p) && is_regular_file(p) )
@@ -1109,7 +1111,7 @@ ODIF::ODIF_Scanner::file_rl(
           outname = source.filename();
         }
 
-        // target prefix path relative to outpath
+        // target prefix path relative to out-path
         bfs::path prefix = UTIL::get_relative_path(source.parent_path(), outpath, true);
 
         if ( ! prefix.empty() )
@@ -1147,7 +1149,7 @@ ODIF::ODIF_Scanner::file_rl(
           }
         }
 
-        // could skip copy when source path is subdirectory of output path
+        // could skip copy when source path is sub-directory of output path
         // ie: (outpath / get_relative_path(source, outpath) == source)
 
         if ( copy_needed )
