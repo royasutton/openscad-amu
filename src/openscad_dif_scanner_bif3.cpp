@@ -212,7 +212,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
       match_not_null      | mnn   | do not match against empty sequence
       match_continuous    | mcf   | must match a sub-sequence from first
       match_partial       | mpa   | on no match, partial is acceptable
-      match_prev_avail    | mpr   | --first is a valid iterator position
+      match_prev_avail    | mpr   | first is a valid iterator position flag
 
     Match [behavior flags][match_flag_type].
 
