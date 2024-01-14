@@ -598,11 +598,11 @@ ODIF::ODIF_Scanner::def_set_var(void)
 
     Expression value constants are case insensitive:
 
-     value true  | value false
-    :-----------:|:-----------:
-     true        | false
-     t           | f
-     1           | 0
+     true values   | false values
+    :-------------:|:-------------:
+     true          | false
+     t             | f
+     1             | 0
 
     Expressions may be combined as follows:
 
@@ -994,7 +994,7 @@ ODIF::ODIF_Scanner::filter_debug(
     When \p subdir == \p ODIF::NO_FORMAT_OUTPUT, a copy will not be
     performed for any located file regarded of the parameter \p copy.
 
-  \todo Only search for local files. Files that match the pattern of a
+  \todo only search for local files. Files that match the pattern of a
         remote URL should be returned immediately.
 
 *******************************************************************************/
