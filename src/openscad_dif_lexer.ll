@@ -274,7 +274,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 
 <AMUDEFARG>\)                     { apt(); if (--def_nest_level) { def_app(); }
                                            else { def_end(); yy_pop_state(); } }
-<AMUDEFARG>\(                     { apt(); def_app();  }
+<AMUDEFARG>\(                     { apt(); def_app(); def_nest_level++; }
 <AMUDEFARG>\\{nr}                 { apt(); def_app(""); }
 <AMUDEFARG>{nr}                   { apt(); def_app(); }
 <AMUDEFARG>.                      { apt(); def_app(); }
