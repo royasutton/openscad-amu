@@ -115,6 +115,9 @@ class env_var {
     //! store a variable name and value pair.
     void store(const std::string& n, const std::string& v) { map[ n ] = v; }
 
+    //! erase a named variable.
+    void erase(const std::string& n) { map.erase( n ); }
+
     //! \brief expand a variable.
     //! \param v  formatted variable name (prefix+name+suffix).
     //! \param r  report if non-existent.
