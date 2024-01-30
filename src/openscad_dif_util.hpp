@@ -3,7 +3,7 @@
   \file   openscad_dif_util.hpp
 
   \author Roy Allen Sutton
-  \date   2016-2019
+  \date   2016-2024
 
   \copyright
 
