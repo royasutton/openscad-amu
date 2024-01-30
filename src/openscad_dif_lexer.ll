@@ -3,7 +3,7 @@
   \file   openscad_dif_lexer.ll
 
   \author Roy Allen Sutton
-  \date   2016-2023
+  \date   2016-2024
 
   \copyright
 
@@ -64,6 +64,7 @@ using namespace std;
 %s AMUFN AMUFNARG AMUFNAQS AMUFNAQD AMUFNTEXTBLCK
 %s AMUINC AMUINCFILE
 %s AMUDEF AMUDEFARG
+%s AMUUNDEF AMUUNDEFARG
 %s AMUIF AMUIFEXPR AMUIFTEXT AMUIFTEXTBLCK AMUIFELSE
 
   /* comment lines, blocks, and nested blocks */
@@ -93,6 +94,7 @@ path                              [_./\-\\[:alnum:]]+
 amu_esc                           "\\"[\\@]
 amu_include                       [\\@](?i:amu_include)
 amu_define                        [\\@](?i:amu_define)
+amu_undefine                      [\\@](?i:amu_undefine)
 amu_if                            [\\@](?i:amu_if)
 amu_bif                           [\\@](?i:amu)_{id}
 
@@ -159,6 +161,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <COMBLCK,COMLINE>{amu_esc}        { fx_remove_esc(); }
 <COMBLCK,COMLINE>{amu_include}    { inc_init(); yy_push_state(AMUINC); }
 <COMBLCK,COMLINE>{amu_define}     { def_init(); yy_push_state(AMUDEF); }
+<COMBLCK,COMLINE>{amu_undefine}   { undef_init(); yy_push_state(AMUUNDEF); }
 <COMBLCK,COMLINE>{amu_if}         { if_init(); yy_push_state(AMUIF); }
 <COMBLCK,COMLINE>{amu_bif}        { fx_init(); yy_push_state(AMUFN); }
 <COMBLCK,COMLINE>.                { scanner_echo(); }
@@ -276,6 +279,22 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUDEFARG>{nr}                   { apt(); def_app(); }
 <AMUDEFARG>.                      { apt(); def_app(); }
 <AMUDEFARG><<EOF>>                { abort("unterminated define arguments", def_bline); }
+
+  /*
+    amu_undefine:
+    amu_undefine ( var1 var2 ... varn )
+  */
+
+<AMUUNDEF>\(                      { apt(); BEGIN(AMUUNDEFARG); }
+<AMUUNDEF>{ws}+                   { apt(); }
+<AMUUNDEF>{nr}                    { apt(); }
+<AMUUNDEF>.                       { error("in define variable name", lineno(), YYText()); }
+
+<AMUUNDEFARG>\)                   { apt(); undef_end(); yy_pop_state(); }
+<AMUUNDEFARG>\\{nr}               { apt(); undef_app(""); }
+<AMUUNDEFARG>{nr}                 { apt(); }
+<AMUUNDEFARG>.                    { apt(); undef_app(); }
+<AMUUNDEFARG><<EOF>>              { abort("unterminated define arguments", def_bline); }
 
   /*
     amu_if:

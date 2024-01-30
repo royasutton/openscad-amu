@@ -570,6 +570,66 @@ ODIF::ODIF_Scanner::def_set_var(void)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// amu_undefine
+////////////////////////////////////////////////////////////////////////////////
+
+/***************************************************************************//**
+
+  \details
+
+    Remove the definition for the named variable, or variables, from
+    the global environment variable map. When the argument is a list,
+    each named variable is removed in the order listed. This function
+    does not produce output and therefore does no accept a named
+    variable for results.
+
+*******************************************************************************/
+void
+ODIF::ODIF_Scanner::undef_init(void)
+{
+  // update local copy of global variable map (member-wise)
+  levm = gevm;
+
+  apt_clear();
+  apt();
+
+  undef_text.clear();
+
+  undef_bline = lineno();
+}
+
+void
+ODIF::ODIF_Scanner::undef_end(void)
+{
+  undef_eline = lineno();
+
+  string var_list = UTIL::unquote_trim( undef_text );
+  size_t var_count = UTIL::word_count( var_list );
+
+  // remove each named variable from the global map
+  // get_word: words are numbered starting from 1.
+  for (size_t i=1; i<=var_count; i++)
+  {
+    string v = UTIL::unquote_trim( UTIL::get_word( var_list, i ) );
+
+    if ( gevm.exists( v ) )
+    {
+      gevm.erase( v );
+
+      filter_debug( "global variable [" + v + "] deleted" );
+    }
+    else
+    {
+      filter_debug( "global variable [" + v + "] does not exists" );
+    }
+  }
+
+  // output blank lines to maintain file length when arguments are
+  // broken across multiple lines (don't begin and end on the same line).
+  for(size_t i=undef_bline; i<undef_eline; i++) scanner_output("\n");
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // amu_if
 ////////////////////////////////////////////////////////////////////////////////
 

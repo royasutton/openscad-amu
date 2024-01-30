@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.hpp
 
   \author Roy Allen Sutton
-  \date   2016-2023
+  \date   2016-2024
 
   \copyright
 
@@ -342,6 +342,24 @@ class ODIF_Scanner : public yyFlexLexer{
     void def_app(const std::string &s) { def_text+=s; }
     //! append the current parsed text to the definition text.
     void def_app(void) { def_text+=YYText(); }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // amu_undefine
+  //////////////////////////////////////////////////////////////////////////////
+    std::string undef_text;             //!< parsed amu undefine text.
+
+    size_t      undef_bline;            //!< beginning line of parsed amu undefine.
+    size_t      undef_eline;            //!< ending line of parsed amu undefine.
+
+    //! begin amu_define handler
+    void undef_init(void);
+    //! end amu_define handler.
+    void undef_end(void);
+
+    //! append the string s to the definition text.
+    void undef_app(const std::string &s) { undef_text+=s; }
+    //! append the current parsed text to the definition text.
+    void undef_app(void) { undef_text+=YYText(); }
 
   //////////////////////////////////////////////////////////////////////////////
   // amu_if
