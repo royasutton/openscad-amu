@@ -291,9 +291,6 @@
     \subsection dif_afc_amu_define \\amu_define
     \copydetails ODIF::ODIF_Scanner::def_init()
 
-    \subsection dif_afc_amu_undefine \\amu_undefine
-    \copydetails ODIF::ODIF_Scanner::undef_init()
-
     \subsection dif_afc_amu_eval \\amu_eval
     \copydetails ODIF::ODIF_Scanner::bif_eval()
 
@@ -352,6 +349,9 @@
 
     \subsection dif_afc_amu_table \\amu_table
     \copydetails ODIF::ODIF_Scanner::bif_table()
+
+    \subsection dif_afc_amu_undefine \\amu_undefine
+    \copydetails ODIF::ODIF_Scanner::undef_init()
 
     \subsection dif_afc_amu_viewer \\amu_viewer
     \copydetails ODIF::ODIF_Scanner::bif_viewer()
