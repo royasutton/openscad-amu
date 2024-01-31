@@ -351,14 +351,14 @@ class ODIF_Scanner : public yyFlexLexer{
     size_t      undef_bline;            //!< beginning line of parsed amu undefine.
     size_t      undef_eline;            //!< ending line of parsed amu undefine.
 
-    //! begin amu_define handler
+    //! begin amu_undefine handler
     void undef_init(void);
-    //! end amu_define handler.
+    //! end amu_undefine handler.
     void undef_end(void);
 
-    //! append the string s to the definition text.
+    //! append the string s to the argument text.
     void undef_app(const std::string &s) { undef_text+=s; }
-    //! append the current parsed text to the definition text.
+    //! append the current parsed text to the argument text.
     void undef_app(void) { undef_text+=YYText(); }
 
   //////////////////////////////////////////////////////////////////////////////
