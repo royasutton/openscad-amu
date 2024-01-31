@@ -630,6 +630,69 @@ ODIF::ODIF_Scanner::undef_end(void)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// amu_text
+////////////////////////////////////////////////////////////////////////////////
+
+/***************************************************************************//**
+
+  \details
+
+    The arguments of this function are copied to output with the
+    variables references expanded and replaced with the values stored
+    in the global environment variables. The expanded result is stored
+    globally to the named output variable. When no result variable is
+    specified, the text is copied to the output.
+
+*******************************************************************************/
+void
+ODIF::ODIF_Scanner::text_init(void)
+{
+  // update local copy of global variable map (member-wise)
+  levm = gevm;
+
+  apt_clear();
+  apt();
+
+  text_var.clear();
+  text_text.clear();
+  text_nest_level = 0;
+
+  text_bline = lineno();
+}
+
+void
+ODIF::ODIF_Scanner::text_end(void)
+{
+  text_eline = lineno();
+
+  // expand the variable values and update the output text
+  text_text = levm.expand_text( text_text );
+
+  // if variable name not specified, copy resulting text to output,
+  // otherwise store in global variable map.
+  if ( text_var.length() == 0 )
+    scanner_output( text_text );
+  else
+  {
+    gevm.store( text_var, text_text );
+
+    filter_debug( text_var + "=[" + text_text + "]" );
+  }
+
+  // output blank lines to maintain file length when definitions are
+  // broken across multiple lines (don't begin and end on the same line).
+  for(size_t i=text_bline; i<text_eline; i++) scanner_output("\n");
+}
+
+void
+ODIF::ODIF_Scanner::text_set_var(void)
+{
+  if ( text_var.length() )
+    error("previously defined var: " + text_var, lineno(), YYText());
+  text_var=YYText();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // amu_if
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -362,6 +362,29 @@ class ODIF_Scanner : public yyFlexLexer{
     void undef_app(void) { undef_text+=YYText(); }
 
   //////////////////////////////////////////////////////////////////////////////
+  // amu_text
+  //////////////////////////////////////////////////////////////////////////////
+    std::string text_var;               //!< parsed amu output variable name.
+    std::string text_text;              //!< parsed amu text-argument of amu text.
+
+    size_t      text_bline;             //!< beginning line of parsed amu text.
+    size_t      text_eline;             //!< ending line of parsed amu text.
+
+    size_t      text_nest_level;        //!< nested parenthesis pair level.
+
+    //! begin amu_text handler
+    void text_init(void);
+    //! end amu_text handler.
+    void text_end(void);
+
+    //! store parsed definition variable name.
+    void text_set_var(void);
+    //! append the string s to the output text of amu text.
+    void text_app(const std::string &s) { text_text+=s; }
+    //! append the current parsed text to the output text of amu text.
+    void text_app(void) { text_text+=YYText(); }
+
+  //////////////////////////////////////////////////////////////////////////////
   // amu_if
   //////////////////////////////////////////////////////////////////////////////
     std::string if_var;                 //!< parsed amu if variable name.

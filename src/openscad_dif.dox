@@ -350,6 +350,9 @@
     \subsection dif_afc_amu_table \\amu_table
     \copydetails ODIF::ODIF_Scanner::bif_table()
 
+    \subsection dif_afc_amu_text \\amu_text
+    \copydetails ODIF::ODIF_Scanner::text_init()
+
     \subsection dif_afc_amu_undefine \\amu_undefine
     \copydetails ODIF::ODIF_Scanner::undef_init()
 

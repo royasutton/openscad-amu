@@ -65,6 +65,7 @@ using namespace std;
 %s AMUINC AMUINCFILE
 %s AMUDEF AMUDEFARG
 %s AMUUNDEF AMUUNDEFARG
+%s AMUTEXT AMUTEXTARG
 %s AMUIF AMUIFEXPR AMUIFTEXT AMUIFTEXTBLCK AMUIFELSE
 
   /* comment lines, blocks, and nested blocks */
@@ -95,6 +96,7 @@ amu_esc                           "\\"[\\@]
 amu_include                       [\\@](?i:amu_include)
 amu_define                        [\\@](?i:amu_define)
 amu_undefine                      [\\@](?i:amu_undefine)
+amu_text                          [\\@](?i:amu_text)
 amu_if                            [\\@](?i:amu_if)
 amu_bif                           [\\@](?i:amu)_{id}
 
@@ -162,6 +164,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <COMBLCK,COMLINE>{amu_include}    { inc_init(); yy_push_state(AMUINC); }
 <COMBLCK,COMLINE>{amu_define}     { def_init(); yy_push_state(AMUDEF); }
 <COMBLCK,COMLINE>{amu_undefine}   { undef_init(); yy_push_state(AMUUNDEF); }
+<COMBLCK,COMLINE>{amu_text}       { text_init(); yy_push_state(AMUTEXT); }
 <COMBLCK,COMLINE>{amu_if}         { if_init(); yy_push_state(AMUIF); }
 <COMBLCK,COMLINE>{amu_bif}        { fx_init(); yy_push_state(AMUFN); }
 <COMBLCK,COMLINE>.                { scanner_echo(); }
@@ -288,13 +291,32 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUUNDEF>\(                      { apt(); BEGIN(AMUUNDEFARG); }
 <AMUUNDEF>{ws}+                   { apt(); }
 <AMUUNDEF>{nr}                    { apt(); }
-<AMUUNDEF>.                       { error("in define variable name", lineno(), YYText()); }
+<AMUUNDEF>.                       { error("in undefine variable name", lineno(), YYText()); }
 
 <AMUUNDEFARG>\)                   { apt(); undef_end(); yy_pop_state(); }
 <AMUUNDEFARG>\\{nr}               { apt(); undef_app(""); }
 <AMUUNDEFARG>{nr}                 { apt(); }
 <AMUUNDEFARG>.                    { apt(); undef_app(); }
-<AMUUNDEFARG><<EOF>>              { abort("unterminated define arguments", def_bline); }
+<AMUUNDEFARG><<EOF>>              { abort("unterminated undefine arguments", undef_bline); }
+
+  /*
+    amu_text:
+    amu_text var ( text with ${variables} )
+  */
+
+<AMUTEXT>{id}                     { apt(); text_set_var(); }
+<AMUTEXT>\(                       { apt(); text_nest_level++; BEGIN(AMUTEXTARG); }
+<AMUTEXT>{ws}+                    { apt(); }
+<AMUTEXT>{nr}                     { apt(); }
+<AMUTEXT>.                        { error("in text variable name", lineno(), YYText()); }
+
+<AMUTEXTARG>\)                    { apt(); if (--text_nest_level) { text_app(); }
+                                           else { text_end(); yy_pop_state(); } }
+<AMUTEXTARG>\(                    { apt(); text_app(); text_nest_level++; }
+<AMUTEXTARG>\\{nr}                { apt(); text_app(""); }
+<AMUTEXTARG>{nr}                  { apt(); text_app(); }
+<AMUTEXTARG>.                     { apt(); text_app(); }
+<AMUTEXTARG><<EOF>>               { abort("unterminated text arguments", text_bline); }
 
   /*
     amu_if:
