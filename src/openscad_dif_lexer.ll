@@ -203,7 +203,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUINC>.                         { error("in include", lineno(), YYText()); }
 
 <AMUINCFNM>\)                     { apt(); inc_end(); yy_pop_state(); }
-<AMUINCFNM>\\{nr}                 { apt(); inc_app(""); }
+<AMUINCFNM>\\{nr}                 { apt(); }
 <AMUINCFNM>{nr}                   { apt(); inc_app(); }
 <AMUINCFNM>.                      { apt(); inc_app(); }
 <AMUINCFNM><<EOF>>                { abort("unterminated include filename", inc_bline); }
@@ -222,7 +222,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUDEFARG>\)                     { apt(); if (--def_nest_level) { def_app(); }
                                            else { def_end(); yy_pop_state(); } }
 <AMUDEFARG>\(                     { apt(); def_app(); def_nest_level++; }
-<AMUDEFARG>\\{nr}                 { apt(); def_app(""); }
+<AMUDEFARG>\\{nr}                 { apt(); }
 <AMUDEFARG>{nr}                   { apt(); def_app(); }
 <AMUDEFARG>.                      { apt(); def_app(); }
 <AMUDEFARG><<EOF>>                { abort("unterminated define arguments", def_bline); }
@@ -238,7 +238,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUUND>.                         { error("in undefine variable name", lineno(), YYText()); }
 
 <AMUUNDARG>\)                     { apt(); undef_end(); yy_pop_state(); }
-<AMUUNDARG>\\{nr}                 { apt(); undef_app(""); }
+<AMUUNDARG>\\{nr}                 { apt(); }
 <AMUUNDARG>{nr}                   { apt(); }
 <AMUUNDARG>.                      { apt(); undef_app(); }
 <AMUUNDARG><<EOF>>                { abort("unterminated undefine arguments", undef_bline); }
@@ -257,7 +257,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUTXTARG>\)                     { apt(); if (--text_nest_level) { text_app(); }
                                            else { text_end(); yy_pop_state(); } }
 <AMUTXTARG>\(                     { apt(); text_app(); text_nest_level++; }
-<AMUTXTARG>\\{nr}                 { apt(); text_app(""); }
+<AMUTXTARG>\\{nr}                 { apt(); }
 <AMUTXTARG>{nr}                   { apt(); text_app(); }
 <AMUTXTARG>.                      { apt(); text_app(); }
 <AMUTXTARG><<EOF>>                { abort("unterminated text arguments", text_bline); }
@@ -297,7 +297,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUIFTEXTBLCK>\}                 { apt(); if (--if_case_level) { if_app(); }
                                            else { if_end_case(); BEGIN(AMUIFELSE); } }
 <AMUIFTEXTBLCK>\{                 { apt(); if_app(); if_case_level++; }
-<AMUIFTEXTBLCK>\\{nr}             { apt(); if_app(""); }
+<AMUIFTEXTBLCK>\\{nr}             { apt(); }
 <AMUIFTEXTBLCK>{nr}               { apt(); if_app(); }
 <AMUIFTEXTBLCK>.                  { apt(); if_app(); }
 <AMUIFTEXTBLCK><<EOF>>            { abort("unterminated if case body block", if_bline); }
@@ -349,7 +349,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUBIFAQS,AMUBIFAQD>\\\"         { apt(); fx_app_qarg_escaped(); }
 <AMUBIFAQS,AMUBIFAQD>\\{id_var}   { apt(); fx_app_qarg_escaped(); }
 <AMUBIFAQS,AMUBIFAQD>{id_var}     { apt(); fx_app_qarg_expanded(); }
-<AMUBIFAQS,AMUBIFAQD>\\{nr}       { apt(); fx_app_qarg(""); }
+<AMUBIFAQS,AMUBIFAQD>\\{nr}       { apt(); }
 <AMUBIFAQS,AMUBIFAQD>{nr}         { apt(); fx_app_qarg(); }
 <AMUBIFAQS,AMUBIFAQD>.            { apt(); fx_app_qarg(); }
 
@@ -361,7 +361,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 <AMUBIFTEXTBLCK>\}                { apt(); if (--fx_body_level) { fx_app_body(); }
                                            else { fx_end(); yy_pop_state(); } }
 <AMUBIFTEXTBLCK>\{                { apt(); fx_app_body(); fx_body_level++; }
-<AMUBIFTEXTBLCK>\\{nr}            { apt(); fx_app_body(""); }
+<AMUBIFTEXTBLCK>\\{nr}            { apt(); }
 <AMUBIFTEXTBLCK>{nr}              { apt(); fx_app_body(); }
 <AMUBIFTEXTBLCK>.                 { apt(); fx_app_body(); }
 <AMUBIFTEXTBLCK><<EOF>>           { abort("unterminated function body block", fx_bline); }
