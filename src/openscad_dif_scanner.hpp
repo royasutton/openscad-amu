@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.hpp
 
   \author Roy Allen Sutton
-  \date   2016-2023
+  \date   2016-2024
 
   \copyright
 
@@ -342,6 +342,47 @@ class ODIF_Scanner : public yyFlexLexer{
     void def_app(const std::string &s) { def_text+=s; }
     //! append the current parsed text to the definition text.
     void def_app(void) { def_text+=YYText(); }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // amu_undefine
+  //////////////////////////////////////////////////////////////////////////////
+    std::string undef_text;             //!< parsed amu undefine text.
+
+    size_t      undef_bline;            //!< beginning line of parsed amu undefine.
+    size_t      undef_eline;            //!< ending line of parsed amu undefine.
+
+    //! begin amu_undefine handler
+    void undef_init(void);
+    //! end amu_undefine handler.
+    void undef_end(void);
+
+    //! append the string s to the argument text.
+    void undef_app(const std::string &s) { undef_text+=s; }
+    //! append the current parsed text to the argument text.
+    void undef_app(void) { undef_text+=YYText(); }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // amu_text
+  //////////////////////////////////////////////////////////////////////////////
+    std::string text_var;               //!< parsed amu output variable name.
+    std::string text_text;              //!< parsed amu text-argument of amu text.
+
+    size_t      text_bline;             //!< beginning line of parsed amu text.
+    size_t      text_eline;             //!< ending line of parsed amu text.
+
+    size_t      text_nest_level;        //!< nested parenthesis pair level.
+
+    //! begin amu_text handler
+    void text_init(void);
+    //! end amu_text handler.
+    void text_end(void);
+
+    //! store parsed definition variable name.
+    void text_set_var(void);
+    //! append the string s to the output text of amu text.
+    void text_app(const std::string &s) { text_text+=s; }
+    //! append the current parsed text to the output text of amu text.
+    void text_app(void) { text_text+=YYText(); }
 
   //////////////////////////////////////////////////////////////////////////////
   // amu_if

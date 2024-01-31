@@ -430,6 +430,7 @@ ODIF::ODIF_Scanner::bif_image(void)
   // ----------------------------------------------------------------- //
   if ( type.compare("latex")==0 )
   {
+    //! \todo implement code for amu_image latex output
     result = amu_error_msg("unimplemented.");
   }
 

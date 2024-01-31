@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2023
+  \date   2016-2024
 
   \copyright
 
@@ -265,7 +265,7 @@ ODIF::ODIF_Scanner::amu_error_msg(const string& m)
 void
 ODIF::ODIF_Scanner::fx_init(void)
 {
-  // update local copy of global variable map (memberwise)
+  // update local copy of global variable map (member-wise)
   levm = gevm;
 
   apt_clear();
@@ -306,10 +306,10 @@ ODIF::ODIF_Scanner::fx_end(void)
 {
   fx_eline = lineno();
 
-  // prototype of build-in function: string functionname( void );
+  // prototype of build-in function: string function_name( void );
   typedef map< string, string (ODIF::ODIF_Scanner::*)(void) > function_table_type;
 
-  // function jump table
+  // internal functions map (bif_*)
   static function_table_type function_table = boost::assign::map_list_of
       ("combine",       &ODIF::ODIF_Scanner::bif_combine)
       ("copy",          &ODIF::ODIF_Scanner::bif_copy)
@@ -341,25 +341,27 @@ ODIF::ODIF_Scanner::fx_end(void)
   // locate and call named function
   //
 
+  // search internal functions
   function_table_type::iterator entry = function_table.find ( fx_name );
   if ( entry != function_table.end() )
-  { // found in function table
+  { // found in function map
     result = (this->*(entry->second))();
     success = true;
   }
   else
   {
-    /* not found in internalfunction table, check external functions */
+    // not found in internal functions map, check in external function path
     bfs::path exfx_path;
 
     exfx_path  = lib_path;
     exfx_path /= "dif_external";
     exfx_path /= "amu_" + fx_name;
 
+    // try file: <lib_path>/dif_external/amu_<fx_name>
     if ( bfs::exists( exfx_path ) )
     {
       if ( bfs::is_regular_file( exfx_path ) )
-      {
+      { // found and is a file
         string scmd = exfx_path.string();
 
         // append arguments
@@ -380,7 +382,7 @@ ODIF::ODIF_Scanner::fx_end(void)
     }
     else
     {
-      /* built-in not matched and external function does not exists */
+      // built-in not matched and external function does not exists
       result = "unknown function [amu_" + fx_name + "].";
     }
   }
@@ -513,15 +515,19 @@ ODIF::ODIF_Scanner::fx_incr_arg(bool post)
 
   \details
 
-    Define a macro that expands to the specified text when used in other amu
-    function arguments. The macro is stored to the named variable. When
-    no variable is given, the text is immediately copied to the output.
+    This function allows for text macro definitions since the variables
+    of the argument text are not dereferenced when the text is assigned
+    to the functions output variable. The referenced variables in the
+    defined text are dereferenced when used in other amu function
+    arguments. The defined text is stored to the named output variable
+    in the global environment variable map. When no variable is given,
+    the text is immediately copied to the output.
 
 *******************************************************************************/
 void
 ODIF::ODIF_Scanner::def_init(void)
 {
-  // update local copy of global variable map (memberwise)
+  // update local copy of global variable map (member-wise)
   levm = gevm;
 
   apt_clear();
@@ -564,6 +570,129 @@ ODIF::ODIF_Scanner::def_set_var(void)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// amu_undefine
+////////////////////////////////////////////////////////////////////////////////
+
+/***************************************************************************//**
+
+  \details
+
+    Remove the definition for the named variable, or variables, from
+    the global environment variable map. When the argument is a list,
+    each named variable is removed in the order listed. This function
+    does not produce output and therefore does no accept a named
+    variable for results.
+
+*******************************************************************************/
+void
+ODIF::ODIF_Scanner::undef_init(void)
+{
+  // update local copy of global variable map (member-wise)
+  levm = gevm;
+
+  apt_clear();
+  apt();
+
+  undef_text.clear();
+
+  undef_bline = lineno();
+}
+
+void
+ODIF::ODIF_Scanner::undef_end(void)
+{
+  undef_eline = lineno();
+
+  string var_list = UTIL::unquote_trim( undef_text );
+  size_t var_count = UTIL::word_count( var_list );
+
+  // remove each named variable from the global map
+  // get_word: words are numbered starting from 1.
+  for (size_t i=1; i<=var_count; i++)
+  {
+    string v = UTIL::unquote_trim( UTIL::get_word( var_list, i ) );
+
+    if ( gevm.exists( v ) )
+    {
+      gevm.erase( v );
+
+      filter_debug( "global variable [" + v + "] deleted" );
+    }
+    else
+    {
+      filter_debug( "global variable [" + v + "] does not exists" );
+    }
+  }
+
+  // output blank lines to maintain file length when arguments are
+  // broken across multiple lines (don't begin and end on the same line).
+  for(size_t i=undef_bline; i<undef_eline; i++) scanner_output("\n");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// amu_text
+////////////////////////////////////////////////////////////////////////////////
+
+/***************************************************************************//**
+
+  \details
+
+    The arguments of this function are copied to output with the
+    variables references expanded and replaced with the values stored
+    in the global environment variables. The expanded result is stored
+    globally to the named output variable. When no result variable is
+    specified, the text is copied to the output.
+
+*******************************************************************************/
+void
+ODIF::ODIF_Scanner::text_init(void)
+{
+  // update local copy of global variable map (member-wise)
+  levm = gevm;
+
+  apt_clear();
+  apt();
+
+  text_var.clear();
+  text_text.clear();
+  text_nest_level = 0;
+
+  text_bline = lineno();
+}
+
+void
+ODIF::ODIF_Scanner::text_end(void)
+{
+  text_eline = lineno();
+
+  // expand the variable values and update the output text
+  text_text = levm.expand_text( text_text );
+
+  // if variable name not specified, copy resulting text to output,
+  // otherwise store in global variable map.
+  if ( text_var.length() == 0 )
+    scanner_output( text_text );
+  else
+  {
+    gevm.store( text_var, text_text );
+
+    filter_debug( text_var + "=[" + text_text + "]" );
+  }
+
+  // output blank lines to maintain file length when definitions are
+  // broken across multiple lines (don't begin and end on the same line).
+  for(size_t i=text_bline; i<text_eline; i++) scanner_output("\n");
+}
+
+void
+ODIF::ODIF_Scanner::text_set_var(void)
+{
+  if ( text_var.length() )
+    error("previously defined var: " + text_var, lineno(), YYText());
+  text_var=YYText();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // amu_if
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -596,11 +725,11 @@ ODIF::ODIF_Scanner::def_set_var(void)
 
     Expression value constants are case insensitive:
 
-     value true  | value false
-    :-----------:|:-----------:
-     true        | false
-     t           | f
-     1           | 0
+     true values   | false values
+    :-------------:|:-------------:
+     true          | false
+     t             | f
+     1             | 0
 
     Expressions may be combined as follows:
 
@@ -643,7 +772,7 @@ ODIF::ODIF_Scanner::def_set_var(void)
 void
 ODIF::ODIF_Scanner::if_init(void)
 {
-  // update local copy of global variable map (memberwise)
+  // update local copy of global variable map (member-wise)
   levm = gevm;
 
   apt_clear();
@@ -815,14 +944,14 @@ ODIF::ODIF_Scanner::if_set_var(void)
     \code
     \amu_include ( ${root}/path/file )
 
-    \amu_include copy no_switch ( ${root}/path/debuging )
+    \amu_include copy no_switch ( ${root}/path/debugging )
     \endcode
 
 *******************************************************************************/
 void
 ODIF::ODIF_Scanner::inc_init(void)
 {
-  // update local copy of global variable map (memberwise)
+  // update local copy of global variable map (member-wise)
   levm = gevm;
 
   apt_clear();
@@ -964,10 +1093,10 @@ ODIF::ODIF_Scanner::filter_debug(
 /***************************************************************************//**
 
   \param file       file to locate.
-  \param subdir     destination subdirectory for file copy.
+  \param subdir     destination sub-directory for file copy.
   \param found      status of if the file was located.
   \param extension  return file name with file extension.
-  \param copy       copy the found file to the specified subdir.
+  \param copy       copy the found file to the specified sub-directory.
   \param rid        rename the copied file with an random identifier.
 
   \returns  a string with (a) \p file when not located, (b) path to the
@@ -992,7 +1121,7 @@ ODIF::ODIF_Scanner::filter_debug(
     When \p subdir == \p ODIF::NO_FORMAT_OUTPUT, a copy will not be
     performed for any located file regarded of the parameter \p copy.
 
-  \todo Only search for local files. Files that match the pattern of a
+  \todo only search for local files. Files that match the pattern of a
         remote URL should be returned immediately.
 
 *******************************************************************************/
@@ -1023,7 +1152,7 @@ ODIF::ODIF_Scanner::file_rl(
                                           it != include_path.rend() && !found;
                                         ++it )
     {
-      bfs::path p = *it / file_path;              // full filepath
+      bfs::path p = *it / file_path;              // full file-path
 
       filter_debug(" checking-path: " + p.string(), false, false, false);
       if ( exists(p) && is_regular_file(p) )
@@ -1109,7 +1238,7 @@ ODIF::ODIF_Scanner::file_rl(
           outname = source.filename();
         }
 
-        // target prefix path relative to outpath
+        // target prefix path relative to out-path
         bfs::path prefix = UTIL::get_relative_path(source.parent_path(), outpath, true);
 
         if ( ! prefix.empty() )
@@ -1147,7 +1276,7 @@ ODIF::ODIF_Scanner::file_rl(
           }
         }
 
-        // could skip copy when source path is subdirectory of output path
+        // could skip copy when source path is sub-directory of output path
         // ie: (outpath / get_relative_path(source, outpath) == source)
 
         if ( copy_needed )

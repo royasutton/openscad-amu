@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner_bif3.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2018
+  \date   2016-2024
 
   \copyright
 
@@ -212,7 +212,7 @@ ODIF::ODIF_Scanner::bif_combineR( string &r, vector<string> sv,
       match_not_null      | mnn   | do not match against empty sequence
       match_continuous    | mcf   | must match a sub-sequence from first
       match_partial       | mpa   | on no match, partial is acceptable
-      match_prev_avail    | mpr   | --first is a valid iterator position
+      match_prev_avail    | mpr   | first is a valid iterator position flag
 
     Match [behavior flags][match_flag_type].
 
@@ -430,6 +430,7 @@ ODIF::ODIF_Scanner::bif_replace(void)
     :------------:|:---:|:---------------:|:-------------------------------------
       words       | w   |                 | list of words
       index       | i   |                 | return word \p i in list
+      find        | n   |                 | list all positions of \p n in list
       tokenizer   | t   | [~^,[:space:]]  | tokenizer to separate words in list
       separator   | r   | [^]             | separator for resulting list
 
@@ -457,6 +458,7 @@ ODIF::ODIF_Scanner::bif_word(void)
   {
   "words",      "w",
   "index",      "i",
+  "find",       "n",
 
   "tokenizer",  "t",
   "separator",  "r",
@@ -527,10 +529,27 @@ ODIF::ODIF_Scanner::bif_word(void)
       }
 
       else if (!(n.compare(vana[4])&&n.compare(vana[5])))
+      { // find
+        string key = unquote( v );
+        size_t pos = 0;
+
+        for ( vector<string>::const_iterator wit=wl_v.begin(); wit!=wl_v.end(); ++wit )
+        {
+          pos++;
+
+          if ( *wit == key )
+          {
+            if ( result.size() ) result.append( wsep );
+            result.append( UTIL::to_string( pos ) );
+          }
+        }
+      }
+
+      else if (!(n.compare(vana[6])&&n.compare(vana[7])))
       { // tokenizer
         tokl = unquote( v );
       }
-      else if (!(n.compare(vana[6])&&n.compare(vana[7])))
+      else if (!(n.compare(vana[8])&&n.compare(vana[9])))
       { // separator
         wsep = unquote( v );
       }
@@ -538,12 +557,12 @@ ODIF::ODIF_Scanner::bif_word(void)
       //
       // flags
       //
-      else if (!(n.compare(vana[8])&&n.compare(vana[9])) && flag)
+      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
       { // count
         if ( result.size() ) result.append( wsep );
           result.append( UTIL::to_string(wl_v.size()) );
       }
-      else if (!(n.compare(vana[10])&&n.compare(vana[11])) && flag)
+      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
       { // first
         if ( ! wl_v.empty() )
         {
@@ -551,7 +570,7 @@ ODIF::ODIF_Scanner::bif_word(void)
             result.append( wl_v[ 0 ] );
         }
       }
-      else if (!(n.compare(vana[12])&&n.compare(vana[13])) && flag)
+      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
       { // last
         if ( ! wl_v.empty() )
         {
@@ -559,7 +578,7 @@ ODIF::ODIF_Scanner::bif_word(void)
             result.append( wl_v[ wl_v.size() -1 ] );
         }
       }
-      else if (!(n.compare(vana[14])&&n.compare(vana[15])) && flag)
+      else if (!(n.compare(vana[16])&&n.compare(vana[17])) && flag)
       { // list
         for ( vector<string>::const_iterator wit=wl_v.begin(); wit!=wl_v.end(); ++wit )
         {

@@ -169,6 +169,7 @@
   |:--------------------------------|:------------------------------------
   | \ref dif_afc_amu_include        | Include a file into input
   | \ref dif_afc_amu_define         | Define text macro
+  | \ref dif_afc_amu_undefine       | Remove global variable definition
   | \ref dif_afc_amu_if             | Conditional text output
   | \ref dif_afc_amu_foreach        | Enumerated textual substitution
   | \ref dif_afc_amu_eval           | Text variable expansion
@@ -348,6 +349,12 @@
 
     \subsection dif_afc_amu_table \\amu_table
     \copydetails ODIF::ODIF_Scanner::bif_table()
+
+    \subsection dif_afc_amu_text \\amu_text
+    \copydetails ODIF::ODIF_Scanner::text_init()
+
+    \subsection dif_afc_amu_undefine \\amu_undefine
+    \copydetails ODIF::ODIF_Scanner::undef_init()
 
     \subsection dif_afc_amu_viewer \\amu_viewer
     \copydetails ODIF::ODIF_Scanner::bif_viewer()
