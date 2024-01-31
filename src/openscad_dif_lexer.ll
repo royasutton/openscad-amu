@@ -204,7 +204,7 @@ if_expr_2a                        {if_arg}{wsnr}+{if_func_2a}{wsnr}+{if_arg}
 
 <AMUINCFNM>\)                     { apt(); inc_end(); yy_pop_state(); }
 <AMUINCFNM>\\{nr}                 { apt(); }
-<AMUINCFNM>{nr}                   { apt(); inc_app(); }
+<AMUINCFNM>{nr}                   { apt(); }
 <AMUINCFNM>.                      { apt(); inc_app(); }
 <AMUINCFNM><<EOF>>                { abort("unterminated include filename", inc_bline); }
 
