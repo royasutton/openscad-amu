@@ -20,8 +20,8 @@ BUILD_DATE="$(shell date)"
 BUILD_ARCH="$(shell uname -sr) ($(shell uname -m))"
 
 AM_CXXFLAGS = \
-	-W -Wall -Wextra -Wno-sign-compare \
-	-ansi -U__STRICT_ANSI__
+	-std=c++11 \
+	-Wall -Wextra
 
 AM_CPPFLAGS = \
 	$(BOOST_CPPFLAGS) \
