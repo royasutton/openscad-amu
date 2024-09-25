@@ -158,7 +158,7 @@ format_options(
   sout << ops << endl
        << ops << " " << title << endl;
 
-  int max_length=0;
+  long unsigned int max_length=0;
   for(vector<po_modes>::const_iterator it = ov.begin(); it != ov.end(); ++it)
     if ( it->description.length() > max_length )
       max_length = it->description.length();
