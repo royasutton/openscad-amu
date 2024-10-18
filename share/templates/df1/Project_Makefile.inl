@@ -24,6 +24,9 @@ AMU_PM_INIT         := $(AMU_PM_PREFIX)amu_pm_init
 AMU_PM_RULES        := $(AMU_PM_PREFIX)amu_pm_rules
 AMU_PM_DESIGN_FLOW  := df1/
 
+# remove design flow component from list to disable
+AMU_PM_COMPONENTS   := scopes doxygen
+
 # Uncomment for increased verbosity or debugging.
 #AMU_PM_VERBOSE     := defined
 #AMU_PM_DEBUG       := defined
