@@ -27,7 +27,7 @@ AMU_PM_DESIGN_FLOW  := df1/
 # remove design flow component from list to disable
 AMU_PM_COMPONENTS   := scopes doxygen
 
-# Uncomment for increased verbosity or debugging.
+# uncomment for increased verbosity or debugging.
 #AMU_PM_VERBOSE     := defined
 #AMU_PM_DEBUG       := defined
 
