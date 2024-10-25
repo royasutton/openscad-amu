@@ -6,13 +6,22 @@ openscad-amu
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
 
+Setup
+-----
+
+To use [openscad-amu], it needs to be installed to your development
+system. Although this can be done manually, it is recommended to use
+the provided setup script.
+
+
 Evaluation
 ----------
 
-A script is available to bootstrap the development environment and its
-dependencies. To install the prerequisites, fetch and compile the
-source, install the latest tagged version of [openscad-amu] to a
-temporary cache directory, and create an example project, type:
+The setup script can be used to bootstrap the development environment
+and its dependencies. For example, to install the prerequisites, fetch
+and compile the source, install the latest tagged version of
+[openscad-amu] to a temporary cache directory, and create an example
+project, type:
 
 ```bash
 mkdir tmp && cd tmp
@@ -53,16 +62,16 @@ make all
 make install
 ```
 
-The `make all` step will compile (via [OpenSCAD]) the example design
-targets, as specified by scripts embedded in the source comments, and
-process the comment-embedded documentation (via [Doxygen]). The `make
-install` step will install this example project to the system-dependent
-OpenSCAD user library path.
+The `make all` step will invoke [OpenSCAD] to compile the example
+design targets, as specified by scripts embedded in the source
+comments, and process the comment-embedded documentation (via
+[Doxygen]). The `make install` step will install this example project
+to the standard OpenSCAD user library path.
 
 To see a table of contents and this installed example, type:
 
 ```bash
-firefox `make echo-install_prefix_html`/index.html
+google-chrome `make echo-install_prefix_html`/index.html
 ```
 
 To remove the installed example project, type:
@@ -71,8 +80,8 @@ To remove the installed example project, type:
 make uninstall
 ```
 
-This example may be used as a *template* and is a good starting point
-for new designs using openscad-amu.
+This example provides a good staring point *template* for new designs
+using openscad-amu.
 
 
 Installing
