@@ -2,6 +2,13 @@
 
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
+
+Getting started
+---------------
+
+To get started using [openscad-amu], please see the GitHub source
+[repository].
+
 What is it?
 -----------
 
@@ -13,13 +20,13 @@ __\*.scad__ source along side the design. The openscad-amu is composed
 of a collection of programs, a makefile script library, and support
 scripts that work together to automate and document OpenSCAD designs.
 
-The documentation is generated using Doxygen and openscad-amu includes
+The documentation is converted using Doxygen and openscad-amu includes
 a source-code _preprocessor_ for __\*.scad__ (and __\*.bash__). This
 preprocessor provides additional Doxygen [special commands] and
 features useful for documenting OpenSCAD designs. The design automation
 build-scripts, embedded in the source-code, are extracted by
-openscad-amu and used to construct makefiles that manage the generation
-of design targets.
+openscad-amu and used to construct (always coherent) makefiles that
+manage the generation of design targets.
 
 By utilizing openscad-amu, OpenSCAD design documentation lives close to
 to the source code and dependency-based targets generation is scripted
@@ -27,8 +34,8 @@ for use in code testing, code documentation and design construction.
 Moreover, with GNU make, targets can be constructed in parallel which
 drastically reduces compile times for larger design projects.
 
-The Design Flow
----------------
+A bit more detail
+-----------------
 
 Both the design flow automation scripting and documentation is done in
 the design __\*.scad__ source files using structured comments. This
@@ -59,19 +66,18 @@ manage design compilation and documentation.
       coords="330,84,440,139"/>
 </map>
 
-As the design size increases, so does the benefit of using
-[openscad-amu]. Compiling design targets one-by-one is times consuming
-and error prone and discourages design optimization and/or exploration.
+As a designs size increases, so does the benefit of using
+[openscad-amu]. Compiling design targets one-by-one is times consuming,
+error prone and discourages design optimization and/or exploration.
 
-A windfall is a linear reduction, with processor thread count, in
-compile time on multi-processor systems via parallel invocations of the
-single-threaded [OpenSCAD] compiler. Once compilation flows are
-described, using the openscad-amu scripting scheme, each design target
-is kept current from source as needed during automatic build processing
-via [GNU make].
-
-To get started using [openscad-amu], please see the GitHub source
-[repository].
+A windfall is a linear reduction in compile time, with processor thread
+count, via parallel invocations of the single-threaded [OpenSCAD]
+compiler. Once compilation flows are described, using the openscad-amu
+scripting scheme, each design targets are kept current from source as
+needed during automatic build processing via [GNU make]. In other
+words, targets are reconstructed only when needed due to changes in
+dependent source, source libraries, or configurations in the makefile
+itself; just type make to update.
 
 
 [openscad-amu]: https://royasutton.github.io/openscad-amu

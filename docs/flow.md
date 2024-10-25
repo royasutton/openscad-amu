@@ -11,6 +11,10 @@ documentation and/or build automation scripts. Each script is extracted
 at compile time to generate a _scope_ makefile that controls the
 generation of corresponding targets.
 
+The documentation feature and build script automation feature may be
+used independently or together and is configured in the project
+makefile using the variable AMU_PM_COMPONENTS.
+
 [openscad-amu] brings together [OpenSCAD], [Doxygen], [GNU Make], and
 _custom scripting_ (based on [GNU Bash]) to automate the generation of
 the design documentation and design targets.
