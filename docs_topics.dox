@@ -420,6 +420,9 @@
   \example vehicle_test.makefile
     Makefile created by extracted makefile script vehicle_test.bash
 
+  \example animate.scad
+    OpenSCAD script move and rotate animation example.
+
   \example animate_move.scad
     OpenSCAD script extracted from animate.scad.
   \example animate_move.bash
