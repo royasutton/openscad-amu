@@ -1347,7 +1347,7 @@ function parse_commands_branch() {
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
-      --installdocs)
+      --install-docs)
         local targets="install-docs"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
@@ -1546,7 +1546,7 @@ may also be used to start new design projects from a template.
 
  -b | --build               : Build programs.
  -i | --install             : Install programs.
-      --installdocs         : Build and install documentation.
+      --install-docs        : Build and install documentation.
  -u | --uninstall           : Uninstall everything.
 
  -m | --make <list>         : Run make with target 'list'.
@@ -1649,7 +1649,7 @@ cat << EOF
 
     $ ./setup-amu.bash \\
         --fetch --reconfigure --cache --branch develop \\
-        --install --installdocs --template my_project
+        --install --install-docs --template my_project
 
 (8) Compile select tagged release versions, installing to local cache and
     creating project templates for each.
