@@ -4,7 +4,7 @@
 #   \file   setup-amu.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2023
+#   \date   2016-2025
 #
 #   \copyright
 #
@@ -210,6 +210,16 @@ function print_h2 () {
   print_hb "="
   print_m -j $*
   print_hb "="
+}
+
+function exit_vm () {
+  local ev=${1:-0}
+  shift 1
+
+  print_m $* "(" -j ${ev} -j ")"
+  print_m "exiting..."
+
+  exit ${ev}
 }
 
 ###############################################################################
