@@ -1129,8 +1129,8 @@ function source_prepare() {
     print_m "configure script exists."
   else
     print_m "generating configure script."
-    ( cd ${repo_cache} && ./autogen.sh )
-    [[ $? -ne 0 ]] && exit_vm 1 "autogen returned error."
+    ( cd ${repo_cache} && ./autogen.sh ) ||
+        exit_vm 1 "autogen returned error."
   fi
 
   # create build directory
@@ -1138,8 +1138,8 @@ function source_prepare() {
     print_m "source build directory exists."
   else
     print_m "creating source build directory."
-    mkdir -pv ${build_dir}
-    [[ $? -ne 0 ]] && exit_vm 1 "mkdir returned error."
+    mkdir -pv ${build_dir} ||
+        exit_vm 1 "mkdir returned error."
   fi
 
   # generate autotools makefile
@@ -1152,8 +1152,8 @@ function source_prepare() {
 
     # path to autotools configure script depends on structure of
     # ${build_dir}  set in function update_build_variables()
-    ( cd ${build_dir} && ../../../configure ${configure_opts} )
-    [[ $? -ne 0 ]] && exit_vm 1 "configure returned error."
+    ( cd ${build_dir} && ../../../configure ${configure_opts} ) ||
+        exit_vm 1 "configure returned error."
   fi
 
   print_m "${FUNCNAME} end"
@@ -1191,8 +1191,8 @@ function source_make() {
 
   print_m "building [$*]."
   print_m \( cd ${build_dir} \&\& make \-\-jobs=${make_job_slots} $* \)
-  ( cd ${build_dir} && make --jobs=${make_job_slots} $* )
-  [[ $? -ne 0 ]] && exit_vm 1 "make returned error."
+  ( cd ${build_dir} && make --jobs=${make_job_slots} $* ) ||
+      exit_vm 1 "make returned error."
 
   print_m "${FUNCNAME} end"
 
@@ -1237,24 +1237,24 @@ function create_template() {
       print_m "directory: [${dir_name}] exists. not creating..."
     else
       print_m "creating project directory: [${dir_name}]."
-      mkdir -pv ${dir_name}
-      [[ $? -ne 0 ]] && exit_vm 1 "mkdir returned error."
+      mkdir -pv ${dir_name} ||
+          exit_vm 1 "mkdir returned error."
 
       print_m "copying template files to: [${dir_name}]."
       for f in ${templates}
       do
         local file="${LIB_PATH}/templates/${design_flow}/$f"
         if [[ -e ${file} ]] ; then
-          cp -v ${file} ${dir_name}
-          [[ $? -ne 0 ]] && exit_vm 1 "cp returned error."
+          cp -v ${file} ${dir_name} ||
+              exit_vm 1 "cp returned error."
         else
           print_m "template file [${file}] does not exists."
         fi
       done
       if [[ -e ${dir_name}/Project_Makefile ]] ; then
         print_m "renaming project makefile."
-        mv -v ${dir_name}/Project_Makefile ${dir_name}/Makefile
-        [[ $? -ne 0 ]] && exit_vm 1 "mv returned error."
+        mv -v ${dir_name}/Project_Makefile ${dir_name}/Makefile ||
+            exit_vm 1 "mv returned error."
       fi
     fi
 
