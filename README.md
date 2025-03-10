@@ -20,7 +20,7 @@ Installing
 The setup script can be used to bootstrap the development environment
 and its dependencies. To install the prerequisites, fetch and compile
 the source, and install the latest tagged version of [openscad-amu],
-type:
+open a shell and type:
 
 ```bash
 mkdir tmp && cd tmp
@@ -31,27 +31,40 @@ wget https://git.io/setup-amu.bash && chmod +x setup-amu.bash
 ```
 
 ```bash
-./setup-amu.bash --branch-list tags1 --yes --sudo --install
+./setup-amu.bash --branch-list tags1 --yes --build --sudo --install
 ```
 
-Once the setup has completed, the *cache* directory can be removed.
-
 The option `--yes` can be omitted if you prefer to confirm the
-installation of each required package (see: `setup-amu.bash --help`).
-If you don't like shortened URLs, here is the full URL to
-[setup-amu.bash].
+installation of required packages. If you don't like shortened URLs,
+here is the full URL to [setup-amu.bash].
+
+Once setup has completed, the *cache* directory can be removed.
+
+### Options
 
 In some cases you may wish to install several versions of the
 development tools concurrently. For example, to install the last three
-release versions, replace `tags1` with `tags3` in the prior command.
+tagged versions, replace `tags1` with `tags3` in the prior command.
 
 To uninstall everything that was installed by these step, repeat the
 step above replacing `--install` with `--uninstall`. More help and
 examples are available (see: `setup-amu.bash --help` and
 `setup-amu.bash --examples`).
 
+To build and install the [openscad-amu] documentation, type:
 
-### Project Template
+```bash
+./setup-amu.bash --branch-list tags1 --yes --build-docs --sudo --install-docs
+```
+Subsequently, the compiled documentation can be viewed with:
+
+```bash
+google-chrome google-chrome /usr/local/share/openscad-amu/v3.4/doc/doxygen/html/index.html
+```
+
+
+Project Template
+----------------
 
 To create a new project from a template, type:
 
