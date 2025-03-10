@@ -6,13 +6,21 @@ openscad-amu
 [![GPL licensed](https://img.shields.io/badge/license-GPL-blue.svg?style=flat)](https://raw.githubusercontent.com/royasutton/openscad-amu/master/COPYING)
 
 
-Evaluation
+Setup
+-----
+
+To use [openscad-amu], it needs to be installed to your development
+system. Although this can be done manually, it is recommended to use
+the provided setup script.
+
+
+Installing
 ----------
 
-A script is available to bootstrap the development environment and its
-dependencies. To install the prerequisites, fetch and compile the
-source, install the latest tagged version of [openscad-amu] to a
-temporary cache directory, and create an example project, type:
+The setup script can be used to bootstrap the development environment
+and its dependencies. To install the prerequisites, fetch and compile
+the source, and install the latest tagged version of [openscad-amu],
+open a shell and type:
 
 ```bash
 mkdir tmp && cd tmp
@@ -23,25 +31,52 @@ wget https://git.io/setup-amu.bash && chmod +x setup-amu.bash
 ```
 
 ```bash
-./setup-amu.bash --cache --branch-list tags1 --yes --install --template my_project
+./setup-amu.bash --branch-list tags1 --yes --build --sudo --install
 ```
 
 The option `--yes` can be omitted if you prefer to confirm the
-installation of each required package (see: `setup-amu.bash --help`).
-If you don't like shortened URLs, here is the full URL to
-[setup-amu.bash].
+installation of required packages. If you don't like shortened URLs,
+here is the full URL to [setup-amu.bash].
 
-Once setup is complete, you will see two new directories: *cache* and
-*my_project*. The source will have been compiled and installed to
-*cache* and an example project, along with the *project makefile*, will
-have been copied to *my_project*.
+Once setup has completed, the *cache* directory can be removed.
+
+### Options
+
+In some cases you may wish to install several versions of the
+development tools concurrently. For example, to install the last three
+tagged versions, replace `tags1` with `tags3` in the prior command.
+
+To uninstall everything that was installed by these step, repeat the
+step above replacing `--install` with `--uninstall`. More help and
+examples are available (see: `setup-amu.bash --help` and
+`setup-amu.bash --examples`).
+
+To build and install the [openscad-amu] documentation, type:
+
+```bash
+./setup-amu.bash --branch-list tags1 --yes --build-docs --sudo --install-docs
+```
+Subsequently, the compiled documentation can be viewed with:
+
+```bash
+google-chrome /usr/local/share/openscad-amu/v3.4/doc/doxygen/html/index.html
+```
 
 
-### Example Project
+Project Template
+----------------
 
-The project *makefile* coordinates the design flow. All openscad-amu
-design flow configurations are set here. To see a menu of options,
-current configurations, and build and install this example:
+To create a new project from a template, type:
+
+```bash
+./setup-amu.bash --template my_project
+```
+
+This will create a folder name *my_project* with a basic design
+template and project *makefile*. The project *makefile* coordinates the
+design flow and invocation of [OpenSCAD]. All openscad-amu design flow
+configurations are set here. To see a menu of options, current
+configurations, build, and install this example project, type:
 
 ```bash
 cd my_project
@@ -53,52 +88,26 @@ make all
 make install
 ```
 
-The `make all` step will compile (via [OpenSCAD]) the example design
+The `make all` step will invoke OpenSCAD to compile the example design
 targets, as specified by scripts embedded in the source comments, and
 process the comment-embedded documentation (via [Doxygen]). The `make
-install` step will install this example project to the system-dependent
+install` step will install this example project to the standard
 OpenSCAD user library path.
 
-To see a table of contents and this installed example, type:
+To see this documentation, type:
 
 ```bash
-firefox `make echo-install_prefix_html`/index.html
+google-chrome `make echo-install_prefix_html`/index.html
 ```
 
-To remove the installed example project, type:
+To remove the installed example project documentation, type:
 
 ```bash
 make uninstall
 ```
 
-This example may be used as a *template* and is a good starting point
-for new designs using openscad-amu.
-
-
-Installing
-----------
-
-Download or update the source repository:
-
-```bash
-./setup-amu.bash --fetch
-```
-
-Install the latest release version of openscad-amu to a development
-system:
-
-```bash
-sudo ./setup-amu.bash --branch-list tags1 --reconfigure --install
-```
-
-In some cases you may wish to install several versions of the
-development tools concurrently. To install the last three (for example)
-release versions, replace `tags1` with `tags3` in the prior command.
-
-To uninstall everything that was installed by these step, repeat the
-step above replacing `--install` with `--uninstall`. More help and
-examples are available (see: `setup-amu.bash --help` and
-`setup-amu.bash --examples`).
+This template provides a basic staring point for new designs using
+openscad-amu.
 
 
 Contributing

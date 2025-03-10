@@ -4,7 +4,7 @@
 #   \file   setup-amu.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2023
+#   \date   2016-2025
 #
 #   \copyright
 #
@@ -51,6 +51,8 @@ declare design_flow="df1"
 declare skip_check="no"
 declare skip_prep="no"
 
+declare sudo_cmd
+
 declare apt_cyg_path
 declare apt_get_opts="--verbose-versions"
 declare git_fetch_opts="--verbose"
@@ -83,6 +85,9 @@ declare -a conf_file_va=(
   "skip_prep"
       "skip source preparation"
       "$skip_prep"
+  "sudo_cmd"
+      "command to run make as the superuser"
+      "$sudo_cmd"
   "apt_cyg_path"
       "path to apt-cyg"
       "/usr/local/bin/apt-cyg"
@@ -212,6 +217,16 @@ function print_h2 () {
   print_hb "="
 }
 
+function exit_vm () {
+  local ev=${1:-0}
+  shift 1
+
+  print_m $* "(" -j ${ev} -j ")"
+  print_m "exiting..."
+
+  exit ${ev}
+}
+
 ###############################################################################
 # os dependent functions
 ###############################################################################
@@ -232,8 +247,7 @@ function update_make_job_slots() {
         make_job_slots=$(nproc)
       ;;
       *)
-        print_m "ERROR: Configuration for [$sysname] required. aborting..."
-        exit 1
+        exit_vm 1 "Configuration for [$sysname] required."
       ;;
     esac
   else
@@ -345,8 +359,7 @@ function update_prerequisite_list() {
     ;;
 
     *)
-      print_m "ERROR: Design flow [$design_flow] not supported. aborting..."
-      exit 1
+      exit_vm 1 "Design flow [$design_flow] not supported."
     ;;
   esac
 
@@ -358,8 +371,7 @@ function update_prerequisite_list() {
       packages="${packages_Common} ${packages_CYGWIN_NT}"
     ;;
     *)
-      print_m "ERROR: Configuration for [$sysname] required. aborting..."
-      exit 1
+      exit_vm 1 "Configuration for [$sysname] required."
     ;;
   esac
 
@@ -385,8 +397,7 @@ function prerequisites_status.Linux() {
 function prerequisites_install.Linux() {
   print_m "apt-get install options: [${apt_get_opts}]"
   if ! sudo apt-get install ${apt_get_opts} $* ; then
-    print_m "ERROR: install failed. aborting..."
-    exit 1
+    exit_vm 1 "Install failed."
   fi
 
   return 0
@@ -404,8 +415,7 @@ function prerequisite_install_openscad.Linux() {
         local repo="deb https://download.opensuse.org/repositories/home:/t-paul/$(lsb_release -si)_$(lsb_release -sr)/ ./"
       ;;
       *)
-        print_m "ERROR: Configuration for [$(lsb_release -si)] required. aborting..."
-        exit 1
+        exit_vm 1 "Configuration for [$(lsb_release -si)] required."
       ;;
     esac
 
@@ -483,8 +493,7 @@ function prerequisites_status.CYGWIN_NT() {
 function prerequisites_install.CYGWIN_NT() {
   set_apt_cyg_path
   if ! ${apt_cyg_path} install $* ; then
-    print_m "ERROR: install failed. aborting..."
-    exit 1
+    exit_vm 1 "Install failed."
   fi
 
   return 0
@@ -522,8 +531,7 @@ function prerequisite_install_openscad.CYGWIN_NT() {
         fpat="OpenSCAD-....\...\...-${arch}${fext}"
       ;;
       *)
-        print_m "ERROR: invalid package name [${pkg}]. aborting..."
-        exit 1
+        exit_vm 1 "Invalid package name [${pkg}]."
       ;;
     esac
 
@@ -565,8 +573,7 @@ function prerequisite_install_openscad.CYGWIN_NT() {
       inst=$(cd ${path} && ls -1d {OpenSCAD-*,openscad-*} 2>/dev/null | head -1)
 
       if [[ -z "${inst}" ]] ; then
-        print_m "ERROR: unable to locate unpacked OpenSCAD distribution. aborting..."
-        exit 1
+        exit_vm 1 "Unable to locate unpacked OpenSCAD distribution."
       fi
 
       # create path symbolic links
@@ -597,8 +604,7 @@ function prerequisite_install_openscad.CYGWIN_NT() {
     export PATH="${work_path}/${path}/${ldir}:${PATH}"
 
     if [[ -z $(which 2>/dev/null ${lcmd}) ]] ; then
-      print_m "ERROR: unable to locate or setup requirement: [${lcmd}]. aborting..."
-      exit 1
+      exit_vm 1 "Unable to locate or setup requirement: [${lcmd}]."
     else
       print_m "confirmed ${lcmd} added to shell path"
     fi
@@ -663,8 +669,7 @@ function set_apt_cyg_path() {
         print_m "adding [${apt_cyg_path%/*}] to shell path"
         PATH=${apt_cyg_path%/*}:${PATH}
       else
-        print_m "ERROR: unable to locate or cache ${cmd_name}. aborting..."
-        exit 1
+        exit_vm 1 "Unable to locate or cache ${cmd_name}."
       fi
     fi
   fi
@@ -1014,7 +1019,7 @@ function prerequisites_assert() {
         print_m "Attempt to configure ImageMagick/convert ${name} coder rights failed..."
         print_m "Please correct before continuing."
         print_m "See: https://imagemagick.org/script/security-policy.php"
-        exit 1
+        exit_vm 1
       else
         if imagemagick_coder_rights_assert "${name}" "${rlist}" ; then
           print_m "--> Rights configured successfully..."
@@ -1022,7 +1027,7 @@ function prerequisites_assert() {
           print_m "Unable to configure ImageMagick/convert ${name} coder rights..."
           print_m "Please correct before continuing."
           print_m "See: https://imagemagick.org/script/security-policy.php"
-          exit 1
+          exit_vm 1
         fi
       fi
     fi
@@ -1055,8 +1060,7 @@ function repository_update() {
       *)            print_m "info: configuration does not exists for [$sysname]." ;;
     esac
 
-    print_m "aborting..."
-    exit 1
+    exit_vm 1
   fi
 
   if [[ -d ${out_dir} ]] ; then
@@ -1064,8 +1068,7 @@ function repository_update() {
       print_m "updating: Git repository cache"
       ( cd ${out_dir} && ${git} pull ${git_fetch_opts} )
     else
-      print_m "ERROR: directory [${out_dir}] exists and is not a repository. aborting..."
-      exit 1
+      exit_vm 1 "Directory [${out_dir}] exists and is not a repository."
     fi
   else
     print_m "cloning: Git repository to cache"
@@ -1076,8 +1079,7 @@ function repository_update() {
     print_m -n "repository description: "
     ( cd ${out_dir} && git describe --tags --long --dirty )
   else
-    print_m "ERROR: repository update failed. aborting..."
-    exit 1
+    exit_vm 1 "Repository update failed."
   fi
 
   print_m "${FUNCNAME} end"
@@ -1120,8 +1122,7 @@ function source_prepare() {
 
   # checkout branch
   if ! ( cd ${repo_cache} && git checkout ${repo_branch} ) ; then
-    print_m "ERROR: failed to checkout branch [${repo_branch}]. aborting..."
-    exit 1
+    exit_vm 1 "Failed to checkout branch [${repo_branch}]."
   else
     print_m -n "repository branch description: "
     ( cd ${repo_cache} && git describe --tags --long --dirty )
@@ -1133,7 +1134,8 @@ function source_prepare() {
     print_m "configure script exists."
   else
     print_m "generating configure script."
-    ( cd ${repo_cache} && ./autogen.sh )
+    ( cd ${repo_cache} && ./autogen.sh ) ||
+        exit_vm 1 "autogen returned error."
   fi
 
   # create build directory
@@ -1141,7 +1143,8 @@ function source_prepare() {
     print_m "source build directory exists."
   else
     print_m "creating source build directory."
-    mkdir -pv ${build_dir}
+    mkdir -pv ${build_dir} ||
+        exit_vm 1 "mkdir returned error."
   fi
 
   # generate autotools makefile
@@ -1154,7 +1157,8 @@ function source_prepare() {
 
     # path to autotools configure script depends on structure of
     # ${build_dir}  set in function update_build_variables()
-    ( cd ${build_dir} && ../../../configure ${configure_opts} )
+    ( cd ${build_dir} && ../../../configure ${configure_opts} ) ||
+        exit_vm 1 "configure returned error."
   fi
 
   print_m "${FUNCNAME} end"
@@ -1191,8 +1195,9 @@ function source_make() {
   fi
 
   print_m "building [$*]."
-  print_m \( cd ${build_dir} \&\& make \-\-jobs=${make_job_slots} $* \)
-  ( cd ${build_dir} && make --jobs=${make_job_slots} $* )
+  print_m \( cd ${build_dir} \&\& ${sudo_cmd} make \-\-jobs=${make_job_slots} $* \)
+  ( cd ${build_dir} && ${sudo_cmd} make --jobs=${make_job_slots} $* ) ||
+      exit_vm 1 "make returned error."
 
   print_m "${FUNCNAME} end"
 
@@ -1237,21 +1242,24 @@ function create_template() {
       print_m "directory: [${dir_name}] exists. not creating..."
     else
       print_m "creating project directory: [${dir_name}]."
-      mkdir -pv ${dir_name}
+      mkdir -pv ${dir_name} ||
+          exit_vm 1 "mkdir returned error."
 
       print_m "copying template files to: [${dir_name}]."
       for f in ${templates}
       do
         local file="${LIB_PATH}/templates/${design_flow}/$f"
         if [[ -e ${file} ]] ; then
-          cp -v ${file} ${dir_name}
+          cp -v ${file} ${dir_name} ||
+              exit_vm 1 "cp returned error."
         else
           print_m "template file [${file}] does not exists."
         fi
       done
       if [[ -e ${dir_name}/Project_Makefile ]] ; then
         print_m "renaming project makefile."
-        mv -v ${dir_name}/Project_Makefile ${dir_name}/Makefile
+        mv -v ${dir_name}/Project_Makefile ${dir_name}/Makefile ||
+            exit_vm 1 "mv returned error."
       fi
     fi
 
@@ -1268,13 +1276,15 @@ function create_template() {
 function parse_commands_branch() {
   print_m "${FUNCNAME} begin"
 
+  print_m "Initializing branch options..."
+  unset sudo_cmd
+
   while [[ $# -gt 0 ]]; do
       case $1 in
       --flow)
         if [[ -z "$2" ]] ; then
           print_m "syntax: ${base_name} $1 <name>"
-          print_m "missing design flow name. aborting..."
-          exit 1
+          exit_vm 1 "Missing design flow name."
         fi
         design_flow="$2" ; shift 1
         print_h2 "setting: design flow [${design_flow}]"
@@ -1287,6 +1297,22 @@ function parse_commands_branch() {
       --skip-prep)
         print_h2 "setting: skip source preparation"
         skip_prep="yes"
+      ;;
+
+      --sudo)
+        print_h2 "setting: make to run as the superuser"
+
+        case "${sysname}" in
+          Linux)
+            sudo_cmd=sudo
+          ;;
+          CYGWIN_NT)
+            unset sudo_cmd
+          ;;
+          *)
+            exit_vm 1 "Configuration for [$sysname] required."
+          ;;
+        esac
       ;;
 
       --list)
@@ -1315,8 +1341,7 @@ function parse_commands_branch() {
       --cache-root)
         if [[ -z "$2" ]] ; then
           print_m "syntax: ${base_name} $1 <path>"
-          print_m "missing cache root path. aborting..."
-          exit 1
+          exit_vm 1 "Missing cache root path."
         fi
         repo_cache_root="$2" ; shift 1
         print_h2 "setting: cache root path [${repo_cache_root}]"
@@ -1330,8 +1355,7 @@ function parse_commands_branch() {
       -v|--branch)
         if [[ -z "$2" ]] ; then
           print_m "syntax: ${base_name} $1 <name>"
-          print_m "missing repository branch name. aborting..."
-          exit 1
+          exit_vm 1 "Missing repository branch name."
         fi
         repo_branch="$2" ; shift 1
         print_h2 "setting: source branch [${repo_branch}]"
@@ -1347,13 +1371,18 @@ function parse_commands_branch() {
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
-      --installdocs)
-        local targets="install-docs"
+      -u|--uninstall)
+        local targets="uninstall"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
-      -u|--uninstall)
-        local targets="uninstall"
+      --build-docs)
+        local targets="docs"
+        print_h1 "Building openscad-amu: make target=[${targets}]"
+        source_make ${targets}
+      ;;
+      --install-docs)
+        local targets="install-docs"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
@@ -1361,8 +1390,7 @@ function parse_commands_branch() {
       -m|--make)
         if [[ -z "$2" ]] ; then
           print_m "syntax: ${base_name} $1 <name1,name2,...>"
-          print_m "missing make target list. aborting..."
-          exit 1
+          exit_vm 1 "Missing make target list."
         fi
         # get list and tokenize with [,]
         local targets="${2//,/ }" ; shift 1
@@ -1373,8 +1401,7 @@ function parse_commands_branch() {
       -t|--template)
         if [[ -z "$2" ]] ; then
           print_m "syntax: ${base_name} $1 <dir>"
-          print_m "missing project directory name. aborting..."
-          exit 1
+          exit_vm 1 "Missing project directory name."
         fi
         local dir_name="$2" ; shift 1
         print_h1 "Creating new project template in [${dir_name}]"
@@ -1392,8 +1419,7 @@ function parse_commands_branch() {
       ;;
 
       *)
-        print_m "invalid command [$1]. aborting..."
-        exit 1
+        exit_vm 1 "Invalid command [$1]."
       ;;
       esac
       shift 1
@@ -1421,8 +1447,7 @@ function parse_commands_repo() {
       -l|--branch-list)
         if [[ -z "$2" ]] ; then
           print_m "syntax: ${base_name} $1 <name1,name2,...>"
-          print_m "missing repository branch list. aborting..."
-          exit 1
+          exit_vm 1 "Missing repository branch list."
         fi
 
         # get list and tokenize with [,]
@@ -1432,28 +1457,27 @@ function parse_commands_repo() {
 
       -h|--help)
         print_help
-        exit 0
+        exit_vm 0
       ;;
       --examples)
         print_examples
-        exit 0
+        exit_vm 0
       ;;
       --info)
         print_info
-        exit 0
+        exit_vm 0
       ;;
       --jobs)
         if [[ -z "$2" ]] ; then
           print_m "syntax: ${base_name} $1 <int>"
-          print_m "missing job slots limit. aborting..."
-          exit 1
+          exit_vm 1 "Missing job slots limit."
         fi
         make_job_slots="$2" ; shift 1
         print_h2 "setting: make job slots [${make_job_slots}]"
       ;;
       --write-conf)
         write_configuration_file "${conf_file}" "${conf_file_vw}" "${conf_file_va[@]}"
-        exit 0
+        exit_vm 0
       ;;
 
       # add to command argument list
@@ -1499,7 +1523,10 @@ function parse_commands_repo() {
       print_m using tag list = [${repo_branch_list}]
     fi
 
+    #
     # handle command set for each branch
+    #
+
     print_m "${FUNCNAME}.branch-list begin"
     for tag in ${repo_branch_list} ; do
       repo_branch="$tag"
@@ -1537,6 +1564,8 @@ may also be used to start new design projects from a template.
       --skip-check          : Skip system prerequisites check.
       --skip-prep           : Skip source preparation (use with care).
 
+      --sudo                : Run make as the superuser.
+
       --list                : List prerequisites.
       --check               : Check system for prerequisites.
       --required            : Install missing prerequisites.
@@ -1551,8 +1580,9 @@ may also be used to start new design projects from a template.
 
  -b | --build               : Build programs.
  -i | --install             : Install programs.
-      --installdocs         : Build and install documentation.
  -u | --uninstall           : Uninstall everything.
+      --build-docs          : Build documentation.
+      --install-docs        : Install documentation.
 
  -m | --make <list>         : Run make with target 'list'.
 
@@ -1615,12 +1645,12 @@ cat << EOF
     location (--fetch will update an existing source cache prior to building).
 
     $ ./setup-amu.bash --fetch --build
-    $ sudo ./setup-amu.bash --install
+    $ ./setup-amu.bash --sudo --install
 
     To uninstall from the default system location and remove the local
     source cache.
 
-    $ sudo ./setup-amu.bash --uninstall
+    $ ./setup-amu.bash --sudo --uninstall
     $ rm -rf cache
 
 (3) Build both the 'master' and 'develop' branch and install to the local
@@ -1642,7 +1672,7 @@ cat << EOF
 (5) Build release 'v1.6' and install to the default system location.
 
     $ ./setup-amu.bash --branch v1.6 --build
-    $ sudo ./setup-amu.bash --branch v1.6 --install
+    $ ./setup-amu.bash --branch v1.6 --sudo --install
 
 (6) Create a new project using the most recently install version.
 
@@ -1654,7 +1684,7 @@ cat << EOF
 
     $ ./setup-amu.bash \\
         --fetch --reconfigure --cache --branch develop \\
-        --install --installdocs --template my_project
+        --install --install-docs --template my_project
 
 (8) Compile select tagged release versions, installing to local cache and
     creating project templates for each.
@@ -1667,16 +1697,16 @@ cat << EOF
     location.
 
     $ ./setup-amu.bash --required
-    $ sudo ./setup-amu.bash \\
-        --branch-list tags6 --skip-check --reconfigure --install
+    $ ./setup-amu.bash \\
+        --branch-list tags6 --skip-check --reconfigure --sudo --install
 
     or in a single step:
 
-    $ sudo ./setup-amu.bash --branch-list tags6 --reconfigure --install
+    $ ./setup-amu.bash --branch-list tags6 --reconfigure --sudo --install
 
     to remove everything installed in the previous step, use:
 
-    $ sudo ./setup-amu.bash --branch-list tags6 --reconfigure --uninstall
+    $ ./setup-amu.bash --branch-list tags6 --reconfigure --sudo --uninstall
 
 EOF
 }
@@ -1726,7 +1756,7 @@ fi
 # show help if no command line arguments or configuration file commands
 if [[ $# == 0 && -z "${commands}" ]] ; then
   print_help
-  exit 0
+  exit_vm 0
 fi
 
 print_m "done."
