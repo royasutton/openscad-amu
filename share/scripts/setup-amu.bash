@@ -1368,13 +1368,18 @@ function parse_commands_branch() {
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
-      --install-docs)
-        local targets="install-docs"
+      -u|--uninstall)
+        local targets="uninstall"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
-      -u|--uninstall)
-        local targets="uninstall"
+      --build-docs)
+        local targets="docs"
+        print_h1 "Building openscad-amu: make target=[${targets}]"
+        source_make ${targets}
+      ;;
+      --install-docs)
+        local targets="install-docs"
         print_h1 "Building openscad-amu: make target=[${targets}]"
         source_make ${targets}
       ;;
@@ -1569,8 +1574,9 @@ may also be used to start new design projects from a template.
 
  -b | --build               : Build programs.
  -i | --install             : Install programs.
-      --install-docs        : Build and install documentation.
  -u | --uninstall           : Uninstall everything.
+      --build-docs          : Build documentation.
+      --install-docs        : Install documentation.
 
  -m | --make <list>         : Run make with target 'list'.
 
