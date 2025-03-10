@@ -63,7 +63,7 @@ This will create a folder name *my_project* with a basic design
 template and project *makefile*. The project *makefile* coordinates the
 design flow and invocation of [OpenSCAD]. All openscad-amu design flow
 configurations are set here. To see a menu of options, current
-configurations, and build and install this example:
+configurations, build, and install this example project, type:
 
 ```bash
 cd my_project
@@ -81,13 +81,13 @@ process the comment-embedded documentation (via [Doxygen]). The `make
 install` step will install this example project to the standard
 OpenSCAD user library path.
 
-To see a table of contents and this installed example, type:
+To see this documentation, type:
 
 ```bash
 google-chrome `make echo-install_prefix_html`/index.html
 ```
 
-To remove the installed example project, type:
+To remove the installed example project documentation, type:
 
 ```bash
 make uninstall
