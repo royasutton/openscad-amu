@@ -34,20 +34,12 @@ wget https://git.io/setup-amu.bash && chmod +x setup-amu.bash
 ./setup-amu.bash --branch-list tags1 --yes --sudo --install
 ```
 
-```bash
-./setup-amu.bash --template my_project
-```
+Once the setup has completed, the *cache* directory can be removed.
 
 The option `--yes` can be omitted if you prefer to confirm the
 installation of each required package (see: `setup-amu.bash --help`).
 If you don't like shortened URLs, here is the full URL to
 [setup-amu.bash].
-
-Once setup is complete, you will see two new directories: *cache* and
-*my_project*. The source will have been compiled and installed to your
-system and an example project, along with the *project makefile*, will
-have been copied to *my_project*. The *cache* directory can be removed
-after the installation.
 
 In some cases you may wish to install several versions of the
 development tools concurrently. For example, to install the last three
@@ -61,10 +53,17 @@ examples are available (see: `setup-amu.bash --help` and
 
 ### Example Project
 
-The project *makefile* coordinates the design flow and invocation of
-[OpenSCAD]. All openscad-amu design flow configurations are set here. To
-see a menu of options, current configurations, and build and install
-this example:
+To create a new project from a template, type:
+
+```bash
+./setup-amu.bash --template my_project
+```
+
+This will create a folder name *my_project* with a basic design
+template and project *makefile*. The project *makefile* coordinates the
+design flow and invocation of [OpenSCAD]. All openscad-amu design flow
+configurations are set here. To see a menu of options, current
+configurations, and build and install this example:
 
 ```bash
 cd my_project
