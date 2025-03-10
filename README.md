@@ -19,8 +19,8 @@ Installing
 
 The setup script can be used to bootstrap the development environment
 and its dependencies. To install the prerequisites, fetch and compile
-the source, install the latest tagged version of [openscad-amu], and
-create an example project, type:
+the source, and install the latest tagged version of [openscad-amu],
+type:
 
 ```bash
 mkdir tmp && cd tmp
