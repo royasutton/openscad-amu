@@ -51,6 +51,8 @@ declare design_flow="df1"
 declare skip_check="no"
 declare skip_prep="no"
 
+declare sudo_cmd
+
 declare apt_cyg_path
 declare apt_get_opts="--verbose-versions"
 declare git_fetch_opts="--verbose"
@@ -83,6 +85,9 @@ declare -a conf_file_va=(
   "skip_prep"
       "skip source preparation"
       "$skip_prep"
+  "sudo_cmd"
+      "command to run make as the superuser"
+      "$sudo_cmd"
   "apt_cyg_path"
       "path to apt-cyg"
       "/usr/local/bin/apt-cyg"
@@ -1190,8 +1195,8 @@ function source_make() {
   fi
 
   print_m "building [$*]."
-  print_m \( cd ${build_dir} \&\& make \-\-jobs=${make_job_slots} $* \)
-  ( cd ${build_dir} && make --jobs=${make_job_slots} $* ) ||
+  print_m \( cd ${build_dir} \&\& ${sudo_cmd} make \-\-jobs=${make_job_slots} $* \)
+  ( cd ${build_dir} && ${sudo_cmd} make --jobs=${make_job_slots} $* ) ||
       exit_vm 1 "make returned error."
 
   print_m "${FUNCNAME} end"
@@ -1289,6 +1294,22 @@ function parse_commands_branch() {
       --skip-prep)
         print_h2 "setting: skip source preparation"
         skip_prep="yes"
+      ;;
+
+      --sudo)
+        print_h2 "setting: make to run as the superuser"
+
+        case "${sysname}" in
+          Linux)
+            sudo_cmd=sudo
+          ;;
+          CYGWIN_NT)
+            unset sudo_cmd
+          ;;
+          *)
+            exit_vm 1 "Configuration for [$sysname] required."
+          ;;
+        esac
       ;;
 
       --list)
@@ -1532,6 +1553,8 @@ may also be used to start new design projects from a template.
       --skip-check          : Skip system prerequisites check.
       --skip-prep           : Skip source preparation (use with care).
 
+      --sudo                : Run make as the superuser.
+
       --list                : List prerequisites.
       --check               : Check system for prerequisites.
       --required            : Install missing prerequisites.
@@ -1610,12 +1633,12 @@ cat << EOF
     location (--fetch will update an existing source cache prior to building).
 
     $ ./setup-amu.bash --fetch --build
-    $ sudo ./setup-amu.bash --install
+    $ ./setup-amu.bash --sudo --install
 
     To uninstall from the default system location and remove the local
     source cache.
 
-    $ sudo ./setup-amu.bash --uninstall
+    $ ./setup-amu.bash --sudo --uninstall
     $ rm -rf cache
 
 (3) Build both the 'master' and 'develop' branch and install to the local
@@ -1637,7 +1660,7 @@ cat << EOF
 (5) Build release 'v1.6' and install to the default system location.
 
     $ ./setup-amu.bash --branch v1.6 --build
-    $ sudo ./setup-amu.bash --branch v1.6 --install
+    $ ./setup-amu.bash --branch v1.6 --sudo --install
 
 (6) Create a new project using the most recently install version.
 
@@ -1662,16 +1685,16 @@ cat << EOF
     location.
 
     $ ./setup-amu.bash --required
-    $ sudo ./setup-amu.bash \\
-        --branch-list tags6 --skip-check --reconfigure --install
+    $ ./setup-amu.bash \\
+        --branch-list tags6 --skip-check --reconfigure --sudo --install
 
     or in a single step:
 
-    $ sudo ./setup-amu.bash --branch-list tags6 --reconfigure --install
+    $ ./setup-amu.bash --branch-list tags6 --reconfigure --sudo --install
 
     to remove everything installed in the previous step, use:
 
-    $ sudo ./setup-amu.bash --branch-list tags6 --reconfigure --uninstall
+    $ ./setup-amu.bash --branch-list tags6 --reconfigure --sudo --uninstall
 
 EOF
 }
