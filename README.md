@@ -59,7 +59,7 @@ To build and install the [openscad-amu] documentation, type:
 Subsequently, the compiled documentation can be viewed with:
 
 ```bash
-google-chrome google-chrome /usr/local/share/openscad-amu/v3.4/doc/doxygen/html/index.html
+google-chrome /usr/local/share/openscad-amu/v3.4/doc/doxygen/html/index.html
 ```
 
 
