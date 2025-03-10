@@ -51,7 +51,7 @@ examples are available (see: `setup-amu.bash --help` and
 `setup-amu.bash --examples`).
 
 
-### Example Project
+### Project Template
 
 To create a new project from a template, type:
 
@@ -93,7 +93,7 @@ To remove the installed example project, type:
 make uninstall
 ```
 
-This example provides a staring point *template* for new designs using
+This template provides a basic staring point for new designs using
 openscad-amu.
 
 
