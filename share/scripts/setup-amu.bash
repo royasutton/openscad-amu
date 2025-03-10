@@ -1520,11 +1520,17 @@ function parse_commands_repo() {
       print_m using tag list = [${repo_branch_list}]
     fi
 
+    #
     # handle command set for each branch
+    #
+
     print_m "${FUNCNAME}.branch-list begin"
     for tag in ${repo_branch_list} ; do
       repo_branch="$tag"
       print_h2 "setting: source branch [${repo_branch}]"
+
+      # clear sudo configuration (if set for prior branch)
+      unset sudo_cmd
 
       print_m $args
       parse_commands_branch $args
