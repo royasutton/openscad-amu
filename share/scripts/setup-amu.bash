@@ -1276,6 +1276,9 @@ function create_template() {
 function parse_commands_branch() {
   print_m "${FUNCNAME} begin"
 
+  print_m "Initializing branch options..."
+  unset sudo_cmd
+
   while [[ $# -gt 0 ]]; do
       case $1 in
       --flow)
@@ -1528,9 +1531,6 @@ function parse_commands_repo() {
     for tag in ${repo_branch_list} ; do
       repo_branch="$tag"
       print_h2 "setting: source branch [${repo_branch}]"
-
-      # clear sudo configuration (if set for prior branch)
-      unset sudo_cmd
 
       print_m $args
       parse_commands_branch $args
