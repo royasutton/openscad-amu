@@ -31,7 +31,7 @@
 
     Install openscad-amu to system:
     \code{bash}
-    $ sudo ./setup-amu.bash --install
+    $ ./setup-amu.bash --sudo --install
     \endcode
 
     To create a new project from a template, see \ref template.
