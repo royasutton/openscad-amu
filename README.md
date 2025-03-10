@@ -50,7 +50,7 @@ have been copied to *my_project*. The *cache* directory can be removed
 after the installation.
 
 In some cases you may wish to install several versions of the
-development tools concurrently. To install the last three (for example)
+development tools concurrently. For example, to install the last three
 release versions, replace `tags1` with `tags3` in the prior command.
 
 To uninstall everything that was installed by these step, repeat the
@@ -61,9 +61,10 @@ examples are available (see: `setup-amu.bash --help` and
 
 ### Example Project
 
-The project *makefile* coordinates the design flow. All openscad-amu
-design flow configurations are set here. To see a menu of options,
-current configurations, and build and install this example:
+The project *makefile* coordinates the design flow and invocation of
+[OpenSCAD]. All openscad-amu design flow configurations are set here. To
+see a menu of options, current configurations, and build and install
+this example:
 
 ```bash
 cd my_project
@@ -75,11 +76,11 @@ make all
 make install
 ```
 
-The `make all` step will invoke [OpenSCAD] to compile the example
-design targets, as specified by scripts embedded in the source
-comments, and process the comment-embedded documentation (via
-[Doxygen]). The `make install` step will install this example project
-to the standard OpenSCAD user library path.
+The `make all` step will invoke OpenSCAD to compile the example design
+targets, as specified by scripts embedded in the source comments, and
+process the comment-embedded documentation (via [Doxygen]). The `make
+install` step will install this example project to the standard
+OpenSCAD user library path.
 
 To see a table of contents and this installed example, type:
 
@@ -93,8 +94,8 @@ To remove the installed example project, type:
 make uninstall
 ```
 
-This example provides a good staring point *template* for new designs
-using openscad-amu.
+This example provides a staring point *template* for new designs using
+openscad-amu.
 
 
 Contributing
