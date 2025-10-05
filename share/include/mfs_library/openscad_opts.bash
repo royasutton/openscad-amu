@@ -4,7 +4,7 @@
 #   \file   openscad_opts.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2018
+#   \date   2016-2025
 #
 #   \copyright
 #     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
@@ -502,7 +502,7 @@ function images()
 # \aparami <named string> define
 #           String that sets the defined variable name.
 # \aparami <named string list> strings
-#           List of string values to assign to the variable name.
+#           List of string word values to assign to the variable name.
 # \aparami <named integer list> integers
 #           List of integer values to assign to the variable name.
 # \aparami <named integer first increment last> sequence
