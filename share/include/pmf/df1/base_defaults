@@ -142,7 +142,7 @@ output_path_spec := \
 #
 
 # root directory
-backup_root                             := backups
+backup_root                             := backup
 
 # directory term separator
 backup_file_term_joiner                 := _
