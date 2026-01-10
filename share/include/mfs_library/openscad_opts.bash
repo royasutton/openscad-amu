@@ -4,7 +4,7 @@
 #   \file   openscad_opts.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2025
+#   \date   2016-2026
 #
 #   \copyright
 #     This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
@@ -517,13 +517,11 @@ function images()
 #   This function provides an abstracted way to create option set tables
 #   for arbitrary OpenSCAD -D variable=value pairs.
 #
-#   Example:
-#   \dontinclude vehicle_document.bash
-#   \skipline defines
-#
-#   Example:
+#   Examples:
 #   \code{.sh}
-#   defines name "joint" define "possition" sequence -100 1 125
+#   defines name "part"  define "p_id" strings  "part1 part2 part3"
+#   defines name "wheel" define "size" integers "12 17"
+#   defines name "joint" define "move" sequence -100 +1 +125
 #   \endcode
 #
 ###############################################################################/
