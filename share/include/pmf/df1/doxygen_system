@@ -76,7 +76,8 @@ $(call variable_list_check, \
 #------------------------------------------------------------------------------#
 
 # design flow tool versions
-doxygenvn := $(shell $(path_doxygen) 2>&1 --version)
+# ignore build id after version number
+doxygenvn := $(word 1,$(shell $(path_doxygen) 2>&1 --version))
 doxygenvs := doxygen$(doxygenvn)
 
 amudifvn := $(subst v,$(empty),$(shell $(path_openscad_dif) 2>&1 --version))
