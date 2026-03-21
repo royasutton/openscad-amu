@@ -4,7 +4,7 @@
 #   \file   setup-amu.bash
 #
 #   \author Roy Allen Sutton <royasutton@hotmail.com>.
-#   \date   2016-2025
+#   \date   2016-2025-2026
 #
 #   \copyright
 #
@@ -33,7 +33,9 @@ declare root_name="${base_name%.*}"
 declare work_path="${PWD}"
 declare conf_file="${root_name}.conf"
 
-declare kernel=$(uname -s)
+# assign after declare to preserve exit status
+declare kernel
+kernel=$(uname -s)
 declare sysname=${kernel%%-*}
 
 # verify minimum bash version
@@ -54,7 +56,7 @@ declare skip_prep="no"
 declare sudo_cmd
 
 declare apt_cyg_path
-declare apt_get_opts="--verbose-versions"
+declare apt_get_opts=""
 declare git_fetch_opts="--verbose"
 
 declare repo_url_apt_cyg="https://github.com/transcode-open/apt-cyg"
@@ -69,7 +71,7 @@ declare repo_cache_root="cache"
 declare force_reconfigure="no"
 declare configure_opts_add
 
-declare make_job_slots=1
+declare make_job_slots=""
 
 declare commands
 
@@ -181,7 +183,7 @@ function print_m() {
         fi
 
         ns=''
-        let rn--
+        (( rn-- ))
       done
       ns="${ws}"
       rn=1
@@ -197,7 +199,8 @@ function print_m() {
 }
 
 function print_hb () {
-  local tput=$(which tput 2>/dev/null)
+  local tput
+  tput=$(command -v tput 2>/dev/null)
   local cols=80
 
   [[ -n "$tput" ]] && cols=$(${tput} cols)
@@ -240,11 +243,11 @@ function update_make_job_slots() {
   # when not set, use system processor/thread count
   if [[ -z "${make_job_slots}" ]] ; then
     case "${sysname}" in
-      Linux)
+      Linux|CYGWIN_NT)
         make_job_slots=$(nproc)
       ;;
-      CYGWIN_NT)
-        make_job_slots=$(nproc)
+      Darwin)
+        make_job_slots=$(sysctl -n hw.logicalcpu)
       ;;
       *)
         exit_vm 1 "Configuration for [$sysname] required."
@@ -313,6 +316,24 @@ function update_prerequisite_list() {
         texlive-collection-pictures
       "
 
+      # On macOS: openscad is a cask handled by prerequisite_install_openscad.Darwin;
+      # 'time' is a shell built-in; 'flex' and standard tools come via Xcode CLT.
+      # GNU make is installed as 'gmake'; see note in toolchain section.
+      packages_Darwin="
+        doxygen
+        graphviz
+        git
+        autoconf
+        automake
+        libtool
+        bash
+        make
+        flex
+        zip
+        imagemagick
+        mactex
+      "
+
       templates="
         Project_Makefile
         Doxyfile
@@ -350,6 +371,21 @@ function update_prerequisite_list() {
         ImageMagick
       "
 
+      # Same macOS notes as above apply; no LaTeX here.
+      packages_Darwin="
+        doxygen
+        graphviz
+        git
+        autoconf
+        automake
+        libtool
+        bash
+        make
+        flex
+        zip
+        imagemagick
+      "
+
       templates="
         Project_Makefile
         Doxyfile
@@ -369,6 +405,11 @@ function update_prerequisite_list() {
     ;;
     CYGWIN_NT)
       packages="${packages_Common} ${packages_CYGWIN_NT}"
+    ;;
+    Darwin)
+      # openscad is intentionally absent from packages_Darwin; it is handled
+      # as an exception by prerequisite_install_openscad.Darwin below.
+      packages="${packages_Darwin}"
     ;;
     *)
       exit_vm 1 "Configuration for [$sysname] required."
@@ -403,68 +444,69 @@ function prerequisites_install.Linux() {
   return 0
 }
 
+function setup_openscad_repository_Linux() {
+  case "$(lsb_release -si)" in
+    Ubuntu)
+      local repo="deb [signed-by=/usr/share/keyrings/openscad-snapshots.gpg] https://download.opensuse.org/repositories/home:/t-paul/x$(lsb_release -si)_$(lsb_release -sr)/ ./"
+    ;;
+    Debian)
+      local repo="deb [signed-by=/usr/share/keyrings/openscad-snapshots.gpg] https://download.opensuse.org/repositories/home:/t-paul/$(lsb_release -si)_$(lsb_release -sr)/ ./"
+    ;;
+    *)
+      exit_vm 1 "Configuration for [$(lsb_release -si)] required."
+    ;;
+  esac
+
+  local name="openscad-development-snapshots"
+  local desc="OpenSCAD development snapshots"
+  local rkey="https://files.openscad.org/OBS-Repository-Key.pub"
+  local keyring="/usr/share/keyrings/openscad-snapshots.gpg"
+
+  local list="/etc/apt/sources.list.d/${name}.list"
+  local update
+
+  # Setup repository key using modern signed-by approach (apt-key is deprecated).
+  print_m "repository: [${desc}]"
+  print_m "checking for repository keyring: [${keyring}]..."
+  if [[ -f "${keyring}" ]] ; then
+    print_m "keyring found."
+  else
+    print_m "keyring not found, fetching..."
+    wget --quiet --output-document - "$rkey" | \
+      gpg --dearmor | sudo tee "${keyring}" > /dev/null
+
+    update="true"
+  fi
+
+  # setup repository source file
+  print_m "checking for source file: [$list]..."
+  if [[ -f $list ]] ; then
+    print_m "source file exists."
+  else
+    print_m "source file not found, adding..."
+    echo "$repo" | sudo tee $list
+
+    update="true"
+  fi
+
+  # resynchronize package index files
+  if [[ "$update" == "true" ]] ; then
+    print_m "resynchronizing package index files..."
+    sudo apt-get --quiet update
+  else
+    print_m "package index resynchronization not required."
+  fi
+}
+
 function prerequisite_install_openscad.Linux() {
   local pkg="$1"
-
-  function setup_repository(){
-    case "$(lsb_release -si)" in
-      Ubuntu)
-        local repo="deb https://download.opensuse.org/repositories/home:/t-paul/x$(lsb_release -si)_$(lsb_release -sr)/ ./"
-      ;;
-      Debian)
-        local repo="deb https://download.opensuse.org/repositories/home:/t-paul/$(lsb_release -si)_$(lsb_release -sr)/ ./"
-      ;;
-      *)
-        exit_vm 1 "Configuration for [$(lsb_release -si)] required."
-      ;;
-    esac
-
-    local name="openscad-development-snapshots"
-    local desc="OpenSCAD development snapshots"
-    local rkey="https://files.openscad.org/OBS-Repository-Key.pub"
-    local keyf="5F4A 8A2C 8BB1 1716 F294  82BB 75F3 214F 30EB 8E08"
-
-    local list="/etc/apt/sources.list.d/${name}.list"
-    local update
-
-    # setup repository key
-    print_m "repository: [${desc}]"
-    print_m "checking for repository source key..."
-    if [[ -n $(apt-key finger | grep "$keyf") ]] ; then
-      print_m "key found."
-    else
-      print_m "key not found, retreaving..."
-      wget --quiet --output-document - "$rkey" | sudo apt-key add -
-
-      update="true"
-    fi
-
-    # setup repository source file
-    print_m "checking for source file: [$list]..."
-    if [[ -f $list ]] ; then
-      print_m "source file exists."
-    else
-      print_m "source file not found, adding..."
-      echo "$repo" | sudo tee $list
-
-      update="true"
-    fi
-
-    # resynchronize package index files
-    if [[ "$update" == "true" ]] ; then
-      print_m "resynchronizing package index files..."
-      sudo apt-get --quiet update
-    else
-      print_m "package index resynchronization not required."
-    fi
-  }
 
   print_m "exception install: [${pkg}]..."
 
   # development snapshots repository only required for openscad-nightly
   if [[ "${pkg}" == "openscad-nightly" ]] ; then
     print_m "setting up repository for ${pkg}"
-    setup_repository
+    setup_openscad_repository_Linux
   fi
 
   # install package
@@ -499,124 +541,121 @@ function prerequisites_install.CYGWIN_NT() {
   return 0
 }
 
-function prerequisite_install_openscad.CYGWIN_NT() {
+function install_openscad_CYGWIN_NT() {
   local    pkg="$1"
 
-  function install_openscad(){
-    local    pkg="$1"
+  local    ldir="openscad"
+  local    lcmd="${pkg}"
 
-    local    ldir="openscad"
-    local    lcmd="${pkg}"
+  local    arch="x86-32"
+  local    fext=".zip"
+  local    fpat
+  local    surl
 
-    local    arch="x86-32"
-    local    fext=".zip"
-    local    fpat
-    local    surl
+  local    path="${repo_cache_root}"
+  local    dist="${repo_cache_root}/distrib"
 
-    local    path="${repo_cache_root}"
-    local    dist="${repo_cache_root}/distrib"
+  local    list
+  local -i lcnt=1
+  local    pick
+  local    inst
 
-    local    list
-    local -i lcnt=1
-    local    pick
-    local    inst
+  case "${pkg}" in
+    openscad)
+      surl="https://files.openscad.org"
+      fpat="OpenSCAD-....\...-${arch}${fext}"
+    ;;
+    openscad-nightly)
+      surl="https://files.openscad.org/snapshots"
+      fpat="OpenSCAD-....\...\...-${arch}${fext}"
+    ;;
+    *)
+      exit_vm 1 "Invalid package name [${pkg}]."
+    ;;
+  esac
 
-    case "${pkg}" in
-      openscad)
-        surl="https://files.openscad.org"
-        fpat="OpenSCAD-....\...-${arch}${fext}"
-      ;;
-      openscad-nightly)
-        surl="https://files.openscad.org/snapshots"
-        fpat="OpenSCAD-....\...\...-${arch}${fext}"
-      ;;
-      *)
-        exit_vm 1 "Invalid package name [${pkg}]."
-      ;;
-    esac
+  # download, unpack, create symbolic links, and add to $PATH
+  if [[ -x ${path}/${ldir}/${lcmd}.exe ]] ; then
+    print_m "using ${lcmd} installed in cache."
+  else
+    # determine machine hardware
+    [[ $(arch) == "x86_64" ]] && arch="x86-64"
 
-    # download, unpack, create symbolic links, and add to $PATH
-    if [[ -x ${path}/${ldir}/${lcmd}.exe ]] ; then
-      print_m "using ${lcmd} installed in cache."
-    else
-      # determine machine hardware
-      [[ $(arch) == "x86_64" ]] && arch="x86-64"
+    # get list of development snapshots
+    list=$( \
+      wget --quiet --output-document - ${surl} |
+      grep --only-matching "${fpat}" |
+      sort --uniq |
+      tail --lines=${lcnt} \
+    )
 
-      # get list of development snapshots
-      list=$( \
-        wget --quiet --output-document - ${surl} |
-        grep --only-matching "${fpat}" |
-        sort --uniq |
-        tail --lines=${lcnt} \
-      )
-
-      # downloads distribution(s)
-      print_m "downloading latest [$lcnt] distribution(s):"
-      for f in ${list} ; do
-        print_m "--> $f"
-        if [[ -e "${dist}/${f}" ]] ; then
-          print_m "[${dist}/${f}] exists."
-        else
-          wget --quiet --show-progress --directory-prefix=${dist} "${surl}/${f}"
-        fi
-
-        pick="$f"
-      done
-
-      # unpack distribution
-      print_m "unpacking: [$pick]..."
-      unzip -q -u -d ${path} ${dist}/${pick}
-
-      # set install path for 'picked' snapshot
-      # assumes  unpacked directory named: OpenSCAD-* or openscad-*
-      # using head -1 should choose the newest version from the list
-      inst=$(cd ${path} && ls -1d {OpenSCAD-*,openscad-*} 2>/dev/null | head -1)
-
-      if [[ -z "${inst}" ]] ; then
-        exit_vm 1 "Unable to locate unpacked OpenSCAD distribution."
+    # downloads distribution(s)
+    print_m "downloading latest [$lcnt] distribution(s):"
+    for f in ${list} ; do
+      print_m "--> $f"
+      if [[ -e "${dist}/${f}" ]] ; then
+        print_m "[${dist}/${f}] exists."
+      else
+        wget --quiet --show-progress --directory-prefix=${dist} "${surl}/${f}"
       fi
 
-      # create path symbolic links
-      print_m "creating symbolic links..."
+      pick="$f"
+    done
+
+    # unpack distribution
+    print_m "unpacking: [$pick]..."
+    unzip -q -u -d ${path} ${dist}/${pick}
+
+    # set install path for 'picked' snapshot
+    # assumes  unpacked directory named: OpenSCAD-* or openscad-*
+    # using head -1 should choose the newest version from the list
+    inst=$(cd ${path} && ls -1d {OpenSCAD-*,openscad-*} 2>/dev/null | head -1)
+
+    if [[ -z "${inst}" ]] ; then
+      exit_vm 1 "Unable to locate unpacked OpenSCAD distribution."
+    fi
+
+    # create path symbolic links
+    print_m "creating symbolic links..."
+    (
+      cd ${path} &&
+      ln --force --symbolic --verbose --no-target-directory \
+        ${inst} ${ldir}
+    )
+
+    # iff: openscad-nightly, create command symbolic links
+    if [[ "${lcmd}" == "openscad-nightly" ]] ; then
       (
-        cd ${path} &&
+        cd ${path}/${inst} &&
         ln --force --symbolic --verbose --no-target-directory \
-          ${inst} ${ldir}
+          openscad.exe ${lcmd}.exe
       )
-
-      # iff: openscad-nightly, create command symbolic links
-      if [[ "${lcmd}" == "openscad-nightly" ]] ; then
-        (
-          cd ${path}/${inst} &&
-          ln --force --symbolic --verbose --no-target-directory \
-            openscad.exe ${lcmd}.exe
-        )
-        (
-          cd ${path}/${inst} &&
-          ln --force --symbolic --verbose --no-target-directory \
-            openscad.com ${lcmd}.com
-        )
-      fi
+      (
+        cd ${path}/${inst} &&
+        ln --force --symbolic --verbose --no-target-directory \
+          openscad.com ${lcmd}.com
+      )
     fi
+  fi
 
-    # add to path (temporary)
-    print_m "adding (temporary) shell path [${work_path}/${path}/${ldir}]."
-    export PATH="${work_path}/${path}/${ldir}:${PATH}"
+  # add to path (temporary)
+  print_m "adding (temporary) shell path [${work_path}/${path}/${ldir}]."
+  export PATH="${work_path}/${path}/${ldir}:${PATH}"
 
-    if [[ -z $(which 2>/dev/null ${lcmd}) ]] ; then
-      exit_vm 1 "Unable to locate or setup requirement: [${lcmd}]."
-    else
-      print_m "confirmed ${lcmd} added to shell path"
-    fi
+  if [[ -z $(command -v "${lcmd}" 2>/dev/null) ]] ; then
+    exit_vm 1 "Unable to locate or setup requirement: [${lcmd}]."
+  else
+    print_m "confirmed ${lcmd} added to shell path"
+  fi
 
-    # output and record install note
-    local note="${path}/${lcmd}.readme"
+  # output and record install note
+  local note="${path}/${lcmd}.readme"
 
-    if [[ -e ${note} ]] ; then
-      print_m "install note exists: [${note}]."
-    else
-      print_m -j
-      cat << EOF | tee ${note}
+  if [[ -e ${note} ]] ; then
+    print_m "install note exists: [${note}]."
+  else
+    print_m -j
+    cat << EOF | tee ${note}
       #####################################################################
       #####################################################################
       ##                                                                 ##
@@ -633,19 +672,67 @@ function prerequisite_install_openscad.CYGWIN_NT() {
       #####################################################################
       #####################################################################
 EOF
-      print_m -j
-      sleep 10
-    fi
-  }
+    print_m -j
+    read -rp "      Press Enter to continue..."
+  fi
+}
 
-  # check to see if ${lcmd} already exists in ${PATH}
-  if [[ -z $(which 2>/dev/null ${lcmd}) ]] ; then
+function prerequisite_install_openscad.CYGWIN_NT() {
+  local pkg="$1"
+
+  # check to see if ${pkg} already exists in ${PATH}
+  if [[ -z $(command -v "${pkg}" 2>/dev/null) ]] ; then
     print_m "exception install: [${pkg}]..."
-    install_openscad "${pkg}"
+    install_openscad_CYGWIN_NT "${pkg}"
   else
-    print_m "${lcmd} exists in shell path"
+    print_m "${pkg} exists in shell path"
   fi
 
+  return 0
+}
+
+#==============================================================================
+# macOS (Darwin) – requires Homebrew (https://brew.sh)
+#==============================================================================
+
+function prerequisite_check.Darwin() {
+  # Returns 0 if the brew formula or cask is already installed.
+  brew list --formula "$1" &>/dev/null || brew list --cask "$1" &>/dev/null
+}
+
+function prerequisites_status.Darwin() {
+  brew info "$@"
+}
+
+function prerequisites_install.Darwin() {
+  if ! command -v brew &>/dev/null ; then
+    exit_vm 1 "Homebrew is required on macOS. Install it from https://brew.sh then re-run."
+  fi
+  # C++ compiler on macOS comes from Xcode Command Line Tools, not brew.
+  # Boost is available as a formula; imagemagick and mactex are brew formulae/casks.
+  if ! brew install "$@" ; then
+    exit_vm 1 "Install failed."
+  fi
+  return 0
+}
+
+function prerequisite_install_openscad.Darwin() {
+  local pkg="$1"
+  print_m "exception install: [${pkg}] via Homebrew cask..."
+  if ! command -v brew &>/dev/null ; then
+    exit_vm 1 "Homebrew is required on macOS. Install it from https://brew.sh then re-run."
+  fi
+  case "${pkg}" in
+    openscad)
+      brew install --cask openscad ;;
+    openscad-nightly)
+      print_m "WARNING: openscad-nightly cask is not available via Homebrew."
+      print_m "         Installing stable 'openscad' cask instead."
+      print_m "         For nightly builds, download manually from https://files.openscad.org/snapshots/"
+      brew install --cask openscad ;;
+    *)
+      exit_vm 1 "Unknown openscad package [${pkg}] for macOS." ;;
+  esac
   return 0
 }
 
@@ -654,7 +741,9 @@ function set_apt_cyg_path() {
   local cmd_cache=${repo_cache_apt_cyg}/${cmd_name}
 
   if [[ -z "${apt_cyg_path}" ]] ; then
-    apt_cyg_path=$(which 2>/dev/null ${cmd_name} ${cmd_cache} | head -1)
+    # Search PATH first, then the cached copy.
+    apt_cyg_path=$(command -v "${cmd_name}" 2>/dev/null)
+    [[ -z "${apt_cyg_path}" && -x "${cmd_cache}" ]] && apt_cyg_path="${cmd_cache}"
 
     if [[ -x "${apt_cyg_path}" ]] ; then
       print_m "found: ${cmd_name}=${apt_cyg_path}"
@@ -664,7 +753,8 @@ function set_apt_cyg_path() {
 
       if [[ -e "${cmd_cache}" ]] ; then
         [[ ! -x "${cmd_cache}" ]] && chmod --verbose +x ${cmd_cache}
-        apt_cyg_path=$(which 2>/dev/null ${cmd_name} ${cmd_cache} | head -1)
+        apt_cyg_path=$(command -v "${cmd_name}" 2>/dev/null)
+        [[ -z "${apt_cyg_path}" ]] && apt_cyg_path="${cmd_cache}"
         print_m "using cached: ${cmd_name}=${apt_cyg_path}"
         print_m "adding [${apt_cyg_path%/*}] to shell path"
         PATH=${apt_cyg_path%/*}:${PATH}
@@ -701,7 +791,7 @@ function write_configuration_file() {
 
   if [[ -e ${file} ]]
   then
-    print_m "configuration file ${file} exists... not writting."
+    print_m "configuration file ${file} exists... not writing."
   else
     print_m "writing ${cv_s} keys to ${file}"
 
@@ -713,7 +803,7 @@ function write_configuration_file() {
 # note:
 #  - Do not quote variable names or values.
 #  - Tokenize multi-value lists with ' ' (space-character).
-#  - 'commands' options are specified as they are on the commnad line,
+#  - 'commands' options are specified as they are on the command line,
 #    with multi-value lists Tokenized by ',' (comma-character).
 #  - Values can be split across lines using '\\':
 #      commands=\\
@@ -749,6 +839,24 @@ EOF
 #------------------------------------------------------------------------------
 # parse configuration file
 #------------------------------------------------------------------------------
+
+# helper
+function conf_read_key() {
+  local file="$1"
+  local key="$2"
+
+  # support line gobbling
+  while IFS= read line || [[ -n "$line" ]]; do
+    echo "$line"
+  done < "${file}" |
+  sed -e '/^[[:space:]]*$/d' \
+      -e '/^[[:space:]]*#/d' \
+      -e 's/^[[:space:]\t]*//' |
+  grep "${key}=" |
+  tail -1 |
+  sed -e "s/${key}=//"
+}
+
 function parse_configuration_file() {
   print_m "${FUNCNAME} begin"
 
@@ -759,30 +867,13 @@ function parse_configuration_file() {
   local -i cv_s=$(( ${#cv_a[@]} / ${cv_w} ))
   local -i cv_r=0
 
-  function read_key()
-  {
-    local file="$1"
-    local key="$2"
-
-    # support line gobbling
-    while IFS= read line || [[ -n "$line" ]]; do
-      echo "$line"
-    done < "${file}" |
-    sed -e '/^[[:space:]]*$/d' \
-        -e '/^[[:space:]]*#/d' \
-        -e 's/^[[:space:]\t]*//' |
-    grep "${key}=" |
-    tail -1 |
-    sed -e "s/${key}=//"
-  }
-
   print_m "checking for ${cv_s} configuration keys"
   for ((i = 0; i < $cv_s; i++))
   do
     local key=${cv_a[$(( $i*$cv_w + 0 ))]}
     local cfv
 
-    printf -v cfv '%s' "$(read_key ${file} $key)"
+    printf -v cfv '%s' "$(conf_read_key "${file}" "$key")"
     if [[ -n "$cfv" ]] ; then
       printf -v $key '%s' "$cfv"
       print_m "setting $key=$cfv"
@@ -912,19 +1003,36 @@ function prerequisites_install() {
       print_m -j $r
     done
 
-    print_h2 "[ Installing ]"
+    # Separate exception packages from regular ones so that regular packages
+    # can be installed in a single package-manager invocation.
+    local regular_missing=""
+    local exception_missing=""
     for r in ${packages_missing} ; do
-      print_h2 "installing: [ $r ]"
-      print_m -j $r
-
-      # exception handler
       case "$r" in
         openscad|openscad-nightly)
-          prerequisite_install_openscad.${sysname} $r ;;
+          exception_missing+=" $r" ;;
         *)
-          prerequisites_install.${sysname} $r ;;
+          regular_missing+=" $r" ;;
       esac
     done
+
+    # Install all regular packages in one batch call.
+    if [[ -n "${regular_missing}" ]] ; then
+      print_h2 "[ Installing (batch) ]"
+      print_m -j ${regular_missing}
+      # shellcheck disable=SC2086
+      prerequisites_install.${sysname} ${regular_missing}
+    fi
+
+    # Install exception packages individually (each may need special handling).
+    if [[ -n "${exception_missing}" ]] ; then
+      print_h2 "[ Installing (exceptions) ]"
+      for r in ${exception_missing} ; do
+        print_h2 "installing exception: [ $r ]"
+        prerequisite_install_openscad.${sysname} $r
+      done
+    fi
+
     print_hb "="
   else
     print_m "no missing prerequisites."
@@ -938,67 +1046,76 @@ function prerequisites_install() {
 #------------------------------------------------------------------------------
 # assertions on prerequisite packages
 #------------------------------------------------------------------------------
+
+# helper
+function imagemagick_coder_rights_assert() {
+  local name="$1"
+  local rights="$2"
+
+  local coder_rights
+  coder_rights=$( \
+    identify -list policy |
+    sed -n "/pattern: ${name}/{x;p;d;}; x" |
+    sed -n 's/^.*rights:[[:space:]]*//p' \
+  )
+
+  # convert to lowercase
+  coder_rights=${coder_rights,,}
+
+  # rights defaults to all granted, so done if empty.
+  if [[ -n "${coder_rights}" ]] ; then
+    print_m "ImageMagick/convert ${name} coder rights = ${coder_rights}"
+
+    local failed_rights
+
+    for r in ${rights} ; do
+      [[ -n "${coder_rights##*${r}*}" ]] && failed_rights+="$r ";
+    done
+
+    if [[ -n "${failed_rights}" ]] ; then
+      print_m "--> failed rights = ${failed_rights}"
+
+      return 1
+    fi
+  else
+    print_m "ImageMagick/convert ${name} coder rights unlimited."
+  fi
+
+  return 0
+}
+
+# helper
+function imagemagick_coder_rights_configure() {
+  local name="$1"
+  local rights="$2"
+
+  local policy_file
+  policy_file=$( \
+    identify -list configure |
+    sed -n "/CONFIGURE_PATH/s/CONFIGURE_PATH[[:space:]]*//p" \
+  )policy.xml
+
+  print_m "Attempting to configure ImageMagick coder rights"
+  print_m "+ policy file = ${policy_file},"
+  print_m "+ coder = ${name},"
+  print_m "+ rights = ${rights}..."
+
+  local as_root="sudo"
+  local sed_edit="/\"${name}\"/s/rights=\"[^\"]*\"/rights=\"${rights}\"/"
+
+  print_m ${as_root} sed -i.orig \'${sed_edit}\' ${policy_file}
+
+  if [[ "${sysname}" == "Darwin" ]] ; then
+    ( ${as_root} sed -i '' "${sed_edit}" "${policy_file}" ) || return 1
+  else
+    ( ${as_root} sed -i.orig "${sed_edit}" "${policy_file}" ) || return 1
+  fi
+
+  return 0
+}
+
 function prerequisites_assert() {
   print_m "${FUNCNAME} begin"
-
-  function imagemagick_coder_rights_assert() {
-    local name="$1"
-    local rights="$2"
-
-    local coder_rights=$( \
-      identify -list policy |
-      sed -n "/pattern: ${name}/{x;p;d;}; x" |
-      sed -n 's/^.*rights:[[:space:]]*//p' \
-    )
-
-    # convert to lowercase
-    coder_rights=${coder_rights,,}
-
-    # rights defaults to all granted, so done if empty.
-    if [[ -n "${coder_rights}" ]] ; then
-      print_m "ImageMagick/convert ${name} coder rights = ${coder_rights}"
-
-      local failed_rights
-
-      for r in ${rights} ; do
-        [[ -n "${coder_rights##*${r}*}" ]] && failed_rights+="$r ";
-      done
-
-      if [[ -n "${failed_rights}" ]] ; then
-        print_m "--> failed rights = ${failed_rights}"
-
-        return 1
-      fi
-    else
-      print_m "ImageMagick/convert ${name} coder rights unlimited."
-    fi
-
-    return 0
-  }
-
-  function imagemagick_coder_rights_configure() {
-    local name="$1"
-    local rights="$2"
-
-    local policy_file=$( \
-      identify -list configure |
-      sed -n "/CONFIGURE_PATH/s/CONFIGURE_PATH[[:space:]]*//p" \
-    )policy.xml
-
-    print_m "Attempting to configure ImageMagick coder rights"
-    print_m "+ policy file = ${policy_file},"
-    print_m "+ coder = ${name},"
-    print_m "+ rights = ${rights}..."
-
-    local as_root="sudo"
-    local sed_edit="/\"${name}\"/s/rights=\"[^\"]*\"/rights=\"${rights}\"/"
-
-    print_m ${as_root} sed -i.orig \'${sed_edit}\' ${policy_file}
-
-    ( ${as_root} sed -i.orig ${sed_edit} ${policy_file} ) || return 1
-
-    return 0
-  }
 
   #
   # ImageMagick/convert coder rights policy
@@ -1050,14 +1167,16 @@ function repository_update() {
   print_m " cache: [${out_dir}]"
 
   # assume 'git' is available, if not report and abort.
-  local git=$(which 2>/dev/null git)
+  local git
+  git=$(command -v git 2>/dev/null)
   if [[ ! -x "${git}" ]] ; then
     print_m "ERROR: please install git:"
 
     case "${sysname}" in
       Linux)        print_m "info: $ sudo apt-get install git" ;;
       CYGWIN_NT)    print_m "info: run Cygwin setup and select Devel/git" ;;
-      *)            print_m "info: configuration does not exists for [$sysname]." ;;
+      Darwin)       print_m "info: $ brew install git  (or install Xcode Command Line Tools)" ;;
+      *)            print_m "info: configuration does not exist for [$sysname]." ;;
     esac
 
     exit_vm 1
@@ -1102,7 +1221,7 @@ function remove_directory() {
     print_m "removing ${dir_desc}directory [${dir_path}]."
     rm -rfv ${dir_path}
   else
-    print_m "${dir_desc}directory [${dir_path}] does not exists."
+    print_m "${dir_desc}directory [${dir_path}] does not exist."
   fi
 
   print_m "${FUNCNAME} end"
@@ -1155,9 +1274,14 @@ function source_prepare() {
     print_m "generating Makefiles and configuring source."
     print_m configure_opts: [${configure_opts}]
 
-    # path to autotools configure script depends on structure of
-    # ${build_dir}  set in function update_build_variables()
-    ( cd ${build_dir} && ../../../configure ${configure_opts} ) ||
+    # Use the absolute path to the configure script so this call is not
+    # coupled to the depth of build_dir beneath repo_cache.
+    local configure_script
+    configure_script=$(realpath "${repo_cache}/configure") ||
+        exit_vm 1 "Unable to resolve configure script path."
+
+    print_m configure_script: [${configure_script}]
+    ( cd "${build_dir}" && "${configure_script}" ${configure_opts} ) ||
         exit_vm 1 "configure returned error."
   fi
 
@@ -1225,7 +1349,11 @@ function create_template() {
   #   (1) cache, and then
   #   (2) system;
   # use the first one located.
-  cmd_path=$(which 2>/dev/null ${cmd_cache} ${cmd_name} | head -1)
+  if [[ -x "${cmd_cache}" ]] ; then
+    cmd_path="${cmd_cache}"
+  else
+    cmd_path=$(command -v "${cmd_name}" 2>/dev/null)
+  fi
 
   if [[ -x "${cmd_path}" ]] ; then
     local LIB_PATH=$(${cmd_path} --version --verbose  | grep "lib path" | awk '{print $4}')
@@ -1253,7 +1381,7 @@ function create_template() {
           cp -v ${file} ${dir_name} ||
               exit_vm 1 "cp returned error."
         else
-          print_m "template file [${file}] does not exists."
+          print_m "template file [${file}] does not exist."
         fi
       done
       if [[ -e ${dir_name}/Project_Makefile ]] ; then
@@ -1303,7 +1431,7 @@ function parse_commands_branch() {
         print_h2 "setting: make to run as the superuser"
 
         case "${sysname}" in
-          Linux)
+          Linux|Darwin)
             sudo_cmd=sudo
           ;;
           CYGWIN_NT)
@@ -1434,7 +1562,7 @@ function parse_commands_branch() {
 function parse_commands_repo() {
   print_m "${FUNCNAME} begin"
 
-  local args
+  local -a args=()
 
   while [[ $# -gt 0 ]]; do
       case $1 in
@@ -1482,8 +1610,7 @@ function parse_commands_repo() {
 
       # add to command argument list
       *)
-        [[ -n $args ]] && args+=" $1"
-        [[ -z $args ]] && args=$1
+        args+=( "$1" )
       ;;
       esac
       shift 1
@@ -1492,7 +1619,7 @@ function parse_commands_repo() {
   if [[ -z ${repo_branch_list} ]] ; then
     # empty list, single branch for command arguments
 
-    parse_commands_branch $args
+    parse_commands_branch "${args[@]}"
   else
     # list specified, process command arguments for each branch
 
@@ -1532,8 +1659,8 @@ function parse_commands_repo() {
       repo_branch="$tag"
       print_h2 "setting: source branch [${repo_branch}]"
 
-      print_m $args
-      parse_commands_branch $args
+      print_m "${args[@]}"
+      parse_commands_branch "${args[@]}"
     done
     print_m "${FUNCNAME}.branch-list end"
   fi
@@ -1738,7 +1865,7 @@ if [[ -e ${conf_file} ]] ; then
   print_m "reading configuration file: ${conf_file}"
   parse_configuration_file "${conf_file}" "${conf_file_vw}" "${conf_file_va[@]}"
 else
-  print_m "configuration file ${conf_file} does not exists."
+  print_m "configuration file ${conf_file} does not exist."
 fi
 
 # parse configuration file commands
@@ -1750,7 +1877,7 @@ fi
 # parse command line arguments
 if [[ $# -ne 0 ]] ; then
   print_m "processing command line arguments."
-  parse_commands_repo $*
+  parse_commands_repo "$@"
 fi
 
 # show help if no command line arguments or configuration file commands
