@@ -10,7 +10,9 @@
     Download the setup script:
     \code{bash}
     $ mkdir tmp && cd tmp
-    $ wget https://git.io/setup-amu.bash
+
+    $ wget https://raw.githubusercontent.com/royasutton/openscad-amu/master/share/scripts/setup-amu.bash
+
     $ chmod +x setup-amu.bash
     \endcode
 
@@ -78,7 +80,7 @@
 
     \code{bash}
     $ make html
-    $ firefox doxygen/html/index.html
+    $ google-chrome doxygen/html/index.html
     \endcode
 
     To install or uninstall, issue:
@@ -129,7 +131,7 @@
 
     View documentation:
     \code{bash}
-    $ firefox $(make echo-install_prefix_html)/index.html
+    $ google-chrome $(make echo-install_prefix_html)/index.html
     \endcode
 
     Remove from local OpenSCAD library path:

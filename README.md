@@ -27,7 +27,11 @@ mkdir tmp && cd tmp
 ```
 
 ```bash
-wget https://git.io/setup-amu.bash && chmod +x setup-amu.bash
+wget https://raw.githubusercontent.com/royasutton/openscad-amu/master/share/scripts/setup-amu.bash
+```
+
+```bash
+chmod +x setup-amu.bash
 ```
 
 ```bash
