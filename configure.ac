@@ -154,7 +154,7 @@ AC_CONFIG_FILES([
   share/examples/log_segregate.bash
   share/examples/vehicle.doxyfile
 
-  share/dif_external/Makefile
+  share/amu_ext/Makefile
 
   share/include/Makefile
   share/include/mfi/Makefile

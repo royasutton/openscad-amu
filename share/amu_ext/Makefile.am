@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# top_srcdir/share/dif_external
+# top_srcdir/share/amu_ext
 #
 ##############################################################################
 
@@ -15,7 +15,7 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/dif_external
+install_path = $(version_path)/amu_ext
 
 ##############################################################################
 # targets

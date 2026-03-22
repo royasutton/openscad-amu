@@ -7,7 +7,7 @@
 # include/mfs_library depends on: examples and scripts,
 # build examples and scripts before include/mfs_library
 SUBDIRS = \
-	dif_external \
+	amu_ext \
 	examples \
 	scripts \
 	include \

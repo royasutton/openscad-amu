@@ -296,7 +296,7 @@ ODIF::ODIF_Scanner::fx_init(void)
   \details
 
     Compare name with each of the built-in functions. If does not match one
-    of the built-in functions, check for function in ${lib_path}/dif_external.
+    of the built-in functions, check for function in ${lib_path}/amu_ext.
     If matched is found, call and obtain result. Copy result to output
     or store to named results variable.
 
@@ -354,10 +354,10 @@ ODIF::ODIF_Scanner::fx_end(void)
     bfs::path exfx_path;
 
     exfx_path  = lib_path;
-    exfx_path /= "dif_external";
+    exfx_path /= "amu_ext";
     exfx_path /= "amu_" + fx_name;
 
-    // try file: <lib_path>/dif_external/amu_<fx_name>
+    // try file: <lib_path>/amu_ext/amu_<fx_name>
     if ( bfs::exists( exfx_path ) )
     {
       if ( bfs::is_regular_file( exfx_path ) )
