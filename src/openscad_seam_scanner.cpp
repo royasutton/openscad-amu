@@ -342,7 +342,7 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
 
   include_path  = lib_path;
   include_path /= "include";
-  include_path /= "mfi";
+  include_path /= "mf";
 
   switch_output( mfscript_ext );
 
@@ -430,7 +430,7 @@ SEAM::SEAM_Scanner::end_mfscript(void)
 
     include_path  = lib_path;
     include_path /= "include";
-    include_path /= "mfi";
+    include_path /= "mf";
 
     string scmd = make_path
                 + " --include-dir=" + include_path.string()

@@ -157,7 +157,7 @@ AC_CONFIG_FILES([
   share/amu_ext/Makefile
 
   share/include/Makefile
-  share/include/mfi/Makefile
+  share/include/mf/Makefile
   share/include/mfs_library/Makefile
   share/include/mfs_library/Doxyfile
   share/include/pmf/Makefile
