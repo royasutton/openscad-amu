@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# top_srcdir/share/examples
+# top_srcdir/examples
 #
 ##############################################################################
 
@@ -26,7 +26,7 @@ root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
 install_path = $(version_path)/examples
 
-install_path_doc = $(version_path)/doc/share/examples
+install_path_doc = $(version_path)/doc/examples
 install_path_html = $(install_path_doc)/build/html
 install_path_pdf = $(install_path_doc)/build/latex
 install_path_man = $(install_path_doc)/build/man

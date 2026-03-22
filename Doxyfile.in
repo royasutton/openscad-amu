@@ -23,9 +23,9 @@ WARN_LOGFILE           = doxygen.warn
 INPUT                  =
 FILE_PATTERNS          = *.dox
 RECURSIVE              = NO
-EXAMPLE_PATH           = "@top_srcdir@/share/examples" \
-                         "@top_builddir@/share/examples" \
-                         "@top_builddir@/share/examples/build"
+EXAMPLE_PATH           = "@top_srcdir@/examples" \
+                         "@top_builddir@/examples" \
+                         "@top_builddir@/examples/build"
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
 INCLUDE_PATH           = "@top_builddir@"
@@ -45,5 +45,5 @@ TAGFILES               = src/doxygen.tagfile=../../src/doxygen/html \
                          share/scripts/doxygen.tagfile=../../share/scripts/doxygen/html
 
 HAVE_DOT               = YES
-DOTFILE_DIRS           = "@top_srcdir@/share/examples"
+DOTFILE_DIRS           = "@top_srcdir@/examples"
 GENERATE_LEGEND        = YES

@@ -4,11 +4,10 @@
 #
 ##############################################################################
 
-# include/mfs_library depends on: examples and scripts,
-# build examples and scripts before include/mfs_library
+# include/mfs_library depends on: ../examples and ./scripts,
+# build ../examples and ./scripts before include/mfs_library
 SUBDIRS = \
 	amu_ext \
-	examples \
 	scripts \
 	include \
 	templates

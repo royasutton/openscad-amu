@@ -17,6 +17,7 @@ files_am =
 # build src first
 SUBDIRS = \
 	src \
+	examples \
 	share \
 	tests
 

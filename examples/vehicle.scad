@@ -227,7 +227,7 @@
     scripted tests and documentation.
 
   \note UNIX man page documentation has been generated and can be found at:
-        <tt><source-build-dir>/share/examples/build/man</tt>.
+        <tt><source-build-dir>/examples/build/man</tt>.
 
   \todo Improve the vehicle window detail.
   \todo Fix all the typos and spelling mistakes.

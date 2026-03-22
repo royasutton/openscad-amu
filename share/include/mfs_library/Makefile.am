@@ -31,7 +31,7 @@ install_path_pdf = $(install_path_doc)/doxygen/latex
 install_path_man = $(install_path_doc)/doxygen/man
 
 doxygen_stamp_other_dependacies = \
-	$(top_builddir)/share/examples/examples.stamp \
+	$(top_builddir)/examples/examples.stamp \
 	$(top_builddir)/share/scripts/doxygen.tagfile \
 	$(top_builddir)/src/doxygen.tagfile
 

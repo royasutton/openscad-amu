@@ -58,8 +58,8 @@
         edge [arrowhead=vee];
         a  [shape=note label="Annotated\nSource\n(vehicle.scad)" URL="\ref source_annotate"];
         b  [shape=oval peripheries=2 label="Automated\nDesign\nFlow" URL="\ref design_flow"];
-        c  [shape=component label="Target (1)\n...\nTarget (96)" URL="../../share/examples/build/html/stl/vehicle_test_car_17.stl"];
-        d  [shape=folder label="Design\nLibrary\nDocumentation" URL="../../share/examples/build/html/index.html"];
+        c  [shape=component label="Target (1)\n...\nTarget (96)" URL="../../examples/build/html/stl/vehicle_test_car_17.stl"];
+        d  [shape=folder label="Design\nLibrary\nDocumentation" URL="../../examples/build/html/index.html"];
         a->b; b->{c d};
       }
     \enddot
@@ -110,8 +110,8 @@
   [Doxygen]: http://www.doxygen.nl
   [special commands]: http://www.doxygen.nl/manual/commands.html
 
-  [html-example]: ../../share/examples/build/html/index.html
-  [pdf-example]: ../../share/examples/build/latex/refman.pdf
+  [html-example]: ../../examples/build/html/index.html
+  [pdf-example]: ../../examples/build/latex/refman.pdf
 *******************************************************************************/
 
 //

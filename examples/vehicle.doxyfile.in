@@ -1,4 +1,4 @@
-# share/examples/vehicle.doxyfile
+# examples/vehicle.doxyfile
 PROJECT_NAME           = "VehicleLibrary"
 PROJECT_NUMBER         = "1.0"
 PROJECT_BRIEF          = "OpenSCAD Example Design Library Documentation."

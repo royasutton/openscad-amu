@@ -148,12 +148,6 @@ AC_CONFIG_FILES([
 
   share/Makefile
 
-  share/examples/Makefile
-  share/examples/convert.bash
-  share/examples/hello_world.bash
-  share/examples/log_segregate.bash
-  share/examples/vehicle.doxyfile
-
   share/amu_ext/Makefile
 
   share/include/Makefile
@@ -175,6 +169,12 @@ AC_CONFIG_FILES([
   src/Doxyfile
 
   tests/Makefile
+
+  examples/Makefile
+  examples/convert.bash
+  examples/hello_world.bash
+  examples/log_segregate.bash
+  examples/vehicle.doxyfile
 ])
 
 AC_OUTPUT

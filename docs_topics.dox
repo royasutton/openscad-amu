@@ -186,10 +186,10 @@
               c  [shape=note label="OpenSCAD\nModeling\nScript\n(*.scad)" URL="\ref vehicle_document.scad"];
               d  [shape=note label="Makefile\nBuild\nScript\n(*.bash)" URL="\ref vehicle_document.bash"];
               e  [shape=note label="Makefile" URL="\ref vehicle_document.makefile"];
-              f1 [shape=component label="Targets\n(png)" URL="../../share/examples/build/html/png/vehicle_test_car_17_green_diag_320x240.png"];
-              f2 [shape=component label="Targets\n(stl)" URL="../../share/examples/build/html/stl/vehicle_test_car_17.stl"];
+              f1 [shape=component label="Targets\n(png)" URL="../../examples/build/html/png/vehicle_test_car_17_green_diag_320x240.png"];
+              f2 [shape=component label="Targets\n(stl)" URL="../../examples/build/html/stl/vehicle_test_car_17.stl"];
               f3 [shape=none label="..."];
-              fn [shape=component label="Targets\n(n)" URL="../../share/examples/build"];
+              fn [shape=component label="Targets\n(n)" URL="../../examples/build"];
 
               c->e; d->e;
               e->f1; e->f2; e->f3 [style=invis]; e->fn;
@@ -200,7 +200,7 @@
           b  [shape=box peripheries=2 style="filled" label="openscad-seam\n(extractor)" URL="\ref openscad_seam_ht"];
           g  [shape=box peripheries=2 style="filled" label="openscad-dif\n(Doxygen filter)" URL="\ref openscad_dif_ht"];
           h  [shape=box peripheries=2 label="Doxygen" URL="http://www.doxygen.nl"];
-          i  [shape=folder label="Generated\nDocumentation\nhtml, pdf, etc." URL="../../share/examples/build/html/index.html"];
+          i  [shape=folder label="Generated\nDocumentation\nhtml, pdf, etc." URL="../../examples/build/html/index.html"];
 
           b->{c d};
           g->h; h->i;
@@ -356,7 +356,7 @@
     \endcode
 
     \code{bash}
-    $ cd  build/Linux/share/examples/build/latex
+    $ cd  build/Linux/examples/build/latex
 
     $ vi refman.tex   # add path to targets
     $ make
@@ -374,8 +374,8 @@
 
   [bug 504305]: https://bugzilla.gnome.org/show_bug.cgi?id=504305
 
-  [html-example]: ../../share/examples/build/html/index.html
-  [pdf-example]: ../../share/examples/build/latex/refman.pdf
+  [html-example]: ../../examples/build/html/index.html
+  [pdf-example]: ../../examples/build/latex/refman.pdf
 *******************************************************************************/
 
 
