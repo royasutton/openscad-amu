@@ -1,28 +1,15 @@
 ##############################################################################
 #
-# top_srcdir/share/include/pmf/df1
+# top_srcdir/share/include/mf/df
 #
 ##############################################################################
 
+SUBDIRS = \
+	df1
+
 files = \
-	base_constants \
-	base_defaults \
-	base_functions \
-	base_rules \
-	base_system \
-	base_variables \
-	\
-	doxygen_defaults \
-	doxygen_functions \
-	doxygen_rules \
-	doxygen_system \
-	doxygen_variables \
-	\
-	scopes_defaults \
-	scopes_functions \
-	scopes_rules \
-	scopes_system \
-	scopes_variables
+	amu_pm_init \
+	amu_pm_rules
 
 files_am =
 
@@ -31,7 +18,7 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/include/pmf/df1
+install_path = $(version_path)/include/mf/df
 
 ##############################################################################
 # targets

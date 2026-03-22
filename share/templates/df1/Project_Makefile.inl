@@ -19,7 +19,7 @@ AMU_LIB_PATH        := @__LIB_PATH__@
 #AMU_TOOL_PREFIX    := @abs_top_builddir@/src/
 #AMU_LIB_PATH       := @abs_top_srcdir@/share
 
-AMU_PM_PREFIX       := $(AMU_LIB_PATH)/include/pmf/
+AMU_PM_PREFIX       := $(AMU_LIB_PATH)/include/mf/df/
 AMU_PM_INIT         := $(AMU_PM_PREFIX)amu_pm_init
 AMU_PM_RULES        := $(AMU_PM_PREFIX)amu_pm_rules
 AMU_PM_DESIGN_FLOW  := df1/
