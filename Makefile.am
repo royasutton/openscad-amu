@@ -22,7 +22,7 @@ SUBDIRS = \
 
 # doxygen documentation
 DOXYGEN_DOXFILES = \
-	docs_start.dox \
+	docs_home.dox \
 	docs_topics.dox
 
 EXTRA_DIST = \

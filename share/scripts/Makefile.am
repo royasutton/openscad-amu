@@ -10,7 +10,7 @@ files_src = \
 files_data =
 
 files_am = \
-	docs_scripts.bash \
+	docs_home.bash \
 	\
 	segregate.bash
 

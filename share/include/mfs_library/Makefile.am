@@ -5,7 +5,7 @@
 ##############################################################################
 
 files = \
-	docs_library.bash \
+	docs_home.bash \
 	\
 	amu_mfs_init.bash \
 	exception.bash \
