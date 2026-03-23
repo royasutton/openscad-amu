@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# top_srcdir/share/include/mf/df
+# top_srcdir/share/include/mk/df
 #
 ##############################################################################
 
@@ -18,7 +18,7 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/include/mf/df
+install_path = $(version_path)/include/mk/df
 
 ##############################################################################
 # targets

@@ -4,7 +4,7 @@
 #
 ##############################################################################
 
-# build include last, depends on ../examples and ./scripts
+# build ./include last, depends on ../examples and ./scripts
 SUBDIRS = \
 	amu_ext \
 	scripts \

@@ -1,14 +1,28 @@
 ##############################################################################
 #
-# top_srcdir/share/include/mf
+# top_srcdir/share/include/mk/df/df1
 #
 ##############################################################################
 
-SUBDIRS = \
-	df
-
 files = \
-	parallel_jobs.mk
+	base_constants \
+	base_defaults \
+	base_functions \
+	base_rules \
+	base_system \
+	base_variables \
+	\
+	doxygen_defaults \
+	doxygen_functions \
+	doxygen_rules \
+	doxygen_system \
+	doxygen_variables \
+	\
+	scopes_defaults \
+	scopes_functions \
+	scopes_rules \
+	scopes_system \
+	scopes_variables
 
 files_am =
 
@@ -17,7 +31,7 @@ EXTRA_DIST = \
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/include/mf
+install_path = $(version_path)/include/mk/df/df1
 
 ##############################################################################
 # targets

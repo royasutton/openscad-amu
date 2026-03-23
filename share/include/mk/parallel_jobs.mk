@@ -1,5 +1,5 @@
 ################################################################################
-# share/include/mf/parallel_jobs.mf
+# share/include/mk/parallel_jobs.mk
 ################################################################################
 
 undefine os_defined
@@ -42,7 +42,7 @@ ifdef os_configured
   undefine os_configured
 else
   $(warning OS [$(os)] not configured;)
-  $(warning see file [$${__LIB_PATH__}/include/mf/parallel_jobs.mf])
+  $(warning see file [$${__LIB_PATH__}/include/mk/parallel_jobs.mk])
 endif
 
 ifdef os_defined

@@ -151,12 +151,12 @@ AC_CONFIG_FILES([
   share/amu_ext/Makefile
 
   share/include/Makefile
-  share/include/mf/Makefile
-  share/include/mf/df/Makefile
-  share/include/mf/df/df1/Makefile
   share/include/mfs/Makefile
   share/include/mfs/lib/Makefile
   share/include/mfs/lib/Doxyfile
+  share/include/mk/Makefile
+  share/include/mk/df/Makefile
+  share/include/mk/df/df1/Makefile
 
   share/scripts/Makefile
   share/scripts/Doxyfile
