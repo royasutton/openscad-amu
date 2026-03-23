@@ -79,7 +79,7 @@ $(this_guard) := $(notdir $(this_file))
   endif
 
 	#------------------------------------------------------------------------------#
-	# AMU_PM_GET_COMPONENTS (arg1,arg2,arg3)
+	# AMU_PM_GET_COMPONENTS (arg1,arg2,arg3,arg4)
 	# arg1: include path prefix.
 	# arg2: design flow path prefix.
 	# arg3: list of component type names.
