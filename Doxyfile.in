@@ -41,7 +41,7 @@ GENERATE_MAN           = YES
 MAN_OUTPUT             = man
 GENERATE_TAGFILE       = doxygen.tagfile
 TAGFILES               = src/doxygen.tagfile=../../src/doxygen/html \
-                         share/include/mfs_library/doxygen.tagfile=../../share/include/mfs_library/doxygen/html \
+                         share/include/mfs/lib/doxygen.tagfile=../../share/include/mfs/lib/doxygen/html \
                          share/scripts/doxygen.tagfile=../../share/scripts/doxygen/html
 
 HAVE_DOT               = YES

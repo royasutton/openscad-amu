@@ -4,13 +4,12 @@
 #
 ##############################################################################
 
-# include/mfs_library depends on: ../examples and ./scripts,
-# build ../examples and ./scripts before include/mfs_library
+# build include last, depends on ../examples and ./scripts
 SUBDIRS = \
 	amu_ext \
 	scripts \
-	include \
-	templates
+	templates \
+	include
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)

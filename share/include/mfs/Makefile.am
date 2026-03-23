@@ -1,19 +1,18 @@
 ##############################################################################
 #
-# top_srcdir/share/include
+# top_srcdir/share/include/mfs
 #
 ##############################################################################
 
 SUBDIRS = \
-	mf \
-	mfs
+	lib
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/include
+install_path = $(version_path)/include/mfs
 
 root_path_doc = $(version_path)/doc
-install_path_doc = $(root_path_doc)/share/include
+install_path_doc = $(root_path_doc)/share/include/mfs
 
 ##############################################################################
 # targets

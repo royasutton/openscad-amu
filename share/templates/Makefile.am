@@ -4,7 +4,6 @@
 #
 ##############################################################################
 
-# lib depends on: examples and scripts (build afterwards)
 SUBDIRS = \
 	df1
 

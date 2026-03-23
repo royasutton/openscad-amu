@@ -14,7 +14,7 @@ files_data = \
 
 files_am =
 
-# build src first
+# build src first and examples before share
 SUBDIRS = \
 	src \
 	examples \

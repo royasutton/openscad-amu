@@ -6,10 +6,10 @@
   \dot "Compile automation and source-based documentation for OpenSCAD designs."
     digraph example {
       node [shape=Mrecord, fontname=Helvetica, fontsize=10];
-      a [label="openscad-amu" URL="../../../../../doxygen/html/index.html"];
-      b [label="C++ Programs" URL="../../../../../src/doxygen/html/index.html"];
+      a [label="openscad-amu" URL="../../../../../../doxygen/html/index.html"];
+      b [label="C++ Programs" URL="../../../../../../src/doxygen/html/index.html"];
       c [label="Makefile Script Library" URL="index.html" style="filled"];
-      d [label="Support Scripts" URL="../../../../scripts/doxygen/html/index.html"];
+      d [label="Support Scripts" URL="../../../../../scripts/doxygen/html/index.html"];
       a->b; a->c; a->d;
     }
    \enddot

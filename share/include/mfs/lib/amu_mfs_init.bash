@@ -55,10 +55,10 @@ if [[ -z "${__LIB_PATH__}" ]] ; then
   exit 1
 fi
 
-# ${__LIB_PATH__}/include/mfs_library must exist.
-if [[ ! -d "${__LIB_PATH__}/include/mfs_library" ]] ; then
+# ${__LIB_PATH__}/include/mfs/lib must exist.
+if [[ ! -d "${__LIB_PATH__}/include/mfs/lib" ]] ; then
   echo >&2 "\${__LIB_PATH__}=[${__LIB_PATH__}] and" \
-           "[${__LIB_PATH__}/include/mfs_library] directory does not exist, aborting."
+           "[${__LIB_PATH__}/include/mfs/lib] directory does not exist, aborting."
   return 1 2>/dev/null
   exit 1
 fi
@@ -98,9 +98,9 @@ echo "loading openscad-amu makefile script library functions:"
 
 for lib in $lib_list ; do
   [[ -n $__VERBOSE__ ]] && \
-  echo " " source ${__LIB_PATH__}/include/mfs_library/$lib
+  echo " " source ${__LIB_PATH__}/include/mfs/lib/$lib
 
-  source ${__LIB_PATH__}/include/mfs_library/$lib
+  source ${__LIB_PATH__}/include/mfs/lib/$lib
 done
 
 

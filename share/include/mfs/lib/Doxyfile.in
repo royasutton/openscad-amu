@@ -1,5 +1,5 @@
 #
-# share/include/mfs_library/Doxyfile.in
+# share/include/mfs/lib/Doxyfile.in
 #
 
 PROJECT_NAME           = "@PACKAGE_NAME@"
