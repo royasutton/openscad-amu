@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2018 Roy Allen Sutton
+#  Copyright (C) 2016-2018,2026 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -41,18 +41,18 @@ $(this_guard) := $(notdir $(this_file))
 
 	# components
 	amu_pm_rules_components := \
-		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX),$(AMU_PM_DESIGN_FLOW), \
+		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX)$(AMU_PM_DESIGN_FLOW)/,$(AMU_PM_SUFFIX), \
 			base $(AMU_PM_COMPONENTS), \
 			variables rules))
 
   $(foreach x, $(amu_pm_rules_components), \
 			$(call amu_pm_m,include [$x]) \
-			$(eval include $(AMU_PM_PREFIX)$x) \
+			$(eval include $x) \
 	)
 
 	# local components
 	amu_pm_rules_components_local := \
-		$(strip $(call AMU_PM_GET_COMPONENTS,,$(AMU_PM_PREFIX_LOCAL), \
+		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX_LOCAL),$(AMU_PM_SUFFIX_LOCAL), \
 			base $(AMU_PM_COMPONENTS_LOCAL), \
 			variables rules))
 

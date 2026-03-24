@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  Copyright (C) 2016-2023 Roy Allen Sutton
+#  Copyright (C) 2016-2023,2026 Roy Allen Sutton
 #
 #  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
 #  (https://royasutton.github.io/openscad-amu)).
@@ -80,16 +80,17 @@ $(this_guard) := $(notdir $(this_file))
 
 	#------------------------------------------------------------------------------#
 	# AMU_PM_GET_COMPONENTS (arg1,arg2,arg3,arg4)
-	# arg1: include path prefix.
-	# arg2: design flow path prefix.
-	# arg3: list of component type names.
-	# arg4: list of component section names.
+	# arg1: components path prefix.
+	# arg2: components file suffix.
+	# arg3: list of component types.
+	# arg4: list of component sub-section/groups.
 	# returns list of existing makefile components.
 	#------------------------------------------------------------------------------#
   define AMU_PM_GET_COMPONENTS
     $(amu_pm_d4)$(foreach p,$3,$(foreach s,$4,
-      $(if $(wildcard $(strip $1)$(strip $2)$p_$s),$(strip $2)$p_$s,
-        $(call amu_pm_dm,skipping [$(strip $1)$(strip $2)$p_$s], does not exists.)
+      $(if $(wildcard $(strip $1)$p_$s$(strip $2)),
+        $(strip $1)$p_$s$(strip $2),
+        $(call amu_pm_dm,skipping [$(strip $1)$p_$s$(strip $2)], does not exists.)
       )
     ))
   endef
@@ -98,14 +99,14 @@ $(this_guard) := $(notdir $(this_file))
   # Assign defaults when not predefined.
 	#---------------------------------------------------------------------------#
 
-	# openscad-amu lib-path (leave blank to use default)
-	# AMU_LIB_PATH
+	# preferred tool version (leave blank to use default)
+	# AMU_TOOL_VERSION
 
 	# where to search for amu tools (leave blank to use default)
 	# AMU_TOOL_PREFIX
 
-	# preferred tool version (leave blank to use default)
-	# AMU_TOOL_VERSION
+	# openscad-amu lib-path (leave blank to use default)
+	# AMU_LIB_PATH
 
 	# Default include file directory prefix.
   ifndef AMU_PM_PREFIX
@@ -113,9 +114,15 @@ $(this_guard) := $(notdir $(this_file))
     $(call amu_pm_m,setting: AMU_PM_PREFIX=$(AMU_PM_PREFIX))
   endif
 
+	# Default include file suffix (update iff not defined; use ?=)
+  ifndef AMU_PM_SUFFIX
+    AMU_PM_SUFFIX	?= $(suffix $(this_file))
+    $(call amu_pm_m,setting: AMU_PM_SUFFIX=$(AMU_PM_SUFFIX))
+  endif
+
 	# Default design flow sub-directory (end with slash).
   ifndef AMU_PM_DESIGN_FLOW
-    AMU_PM_DESIGN_FLOW := df1/
+    AMU_PM_DESIGN_FLOW := df1
     $(call amu_pm_m,setting: AMU_PM_DESIGN_FLOW=$(AMU_PM_DESIGN_FLOW))
   endif
 
@@ -132,6 +139,15 @@ $(this_guard) := $(notdir $(this_file))
     $(call amu_pm_m,setting: AMU_PM_COMPONENTS=$(AMU_PM_COMPONENTS))
   endif
 
+	# Defaults for local components
+	# AMU_PM_PREFIX_LOCAL
+	# AMU_PM_COMPONENTS_LOCAL
+
+  ifndef AMU_PM_SUFFIX_LOCAL
+    AMU_PM_SUFFIX_LOCAL	?= $(AMU_PM_SUFFIX)
+    $(call amu_pm_m,setting: AMU_PM_SUFFIX_LOCAL=$(AMU_PM_SUFFIX_LOCAL))
+  endif
+
 	#---------------------------------------------------------------------------#
   # Include Init Components
 	#---------------------------------------------------------------------------#
@@ -140,18 +156,18 @@ $(this_guard) := $(notdir $(this_file))
 
 	# Design flow Components
 	amu_pm_init_components := \
-		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX),$(AMU_PM_DESIGN_FLOW), \
+		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX)$(AMU_PM_DESIGN_FLOW)/,$(AMU_PM_SUFFIX), \
 			base $(AMU_PM_COMPONENTS), \
 			constants functions system defaults))
 
   $(foreach x, $(amu_pm_init_components), \
       $(call amu_pm_m,include [$x]) \
-      $(eval include $(AMU_PM_PREFIX)$x) \
+      $(eval include $x) \
   )
 
 	# Local design flow components
 	amu_pm_init_components_local := \
-		$(strip $(call AMU_PM_GET_COMPONENTS,,$(AMU_PM_PREFIX_LOCAL), \
+		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX_LOCAL),$(AMU_PM_SUFFIX_LOCAL), \
 			$(AMU_PM_COMPONENTS_LOCAL), \
 			constants functions system defaults))
 
@@ -169,6 +185,7 @@ $(this_guard) := $(notdir $(this_file))
 		AMU_TOOL_PREFIX \
 		AMU_LIB_PATH \
 		AMU_PM_PREFIX \
+		AMU_PM_SUFFIX \
 		\
 		AMU_PM_INIT \
 		AMU_PM_RULES \
@@ -178,6 +195,7 @@ $(this_guard) := $(notdir $(this_file))
 		AMU_PM_COMPONENTS_ADD \
 		\
 		AMU_PM_PREFIX_LOCAL \
+		AMU_PM_SUFFIX_LOCAL \
 		AMU_PM_COMPONENTS_LOCAL \
 		\
 		AMU_PM_VERBOSE \
