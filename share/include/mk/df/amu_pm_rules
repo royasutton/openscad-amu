@@ -52,7 +52,7 @@ $(this_guard) := $(notdir $(this_file))
 
 	# local components
 	amu_pm_rules_components_local := \
-		$(strip $(call AMU_PM_GET_COMPONENTS,,$(AMU_PM_COMPONENTS_LOCAL_PATH)/, \
+		$(strip $(call AMU_PM_GET_COMPONENTS,,$(AMU_PM_PREFIX_LOCAL), \
 			base $(AMU_PM_COMPONENTS_LOCAL), \
 			variables rules))
 

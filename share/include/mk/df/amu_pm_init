@@ -149,9 +149,9 @@ $(this_guard) := $(notdir $(this_file))
       $(eval include $(AMU_PM_PREFIX)$x) \
   )
 
-	# Local components
+	# Local design flow components
 	amu_pm_init_components_local := \
-		$(strip $(call AMU_PM_GET_COMPONENTS,,$(AMU_PM_COMPONENTS_LOCAL_PATH)/, \
+		$(strip $(call AMU_PM_GET_COMPONENTS,,$(AMU_PM_PREFIX_LOCAL), \
 			$(AMU_PM_COMPONENTS_LOCAL), \
 			constants functions system defaults))
 
@@ -177,8 +177,8 @@ $(this_guard) := $(notdir $(this_file))
 		AMU_PM_COMPONENTS \
 		AMU_PM_COMPONENTS_ADD \
 		\
+		AMU_PM_PREFIX_LOCAL \
 		AMU_PM_COMPONENTS_LOCAL \
-		AMU_PM_COMPONENTS_LOCAL_PATH \
 		\
 		AMU_PM_VERBOSE \
 		AMU_PM_DEBUG
