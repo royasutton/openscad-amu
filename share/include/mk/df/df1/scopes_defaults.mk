@@ -27,7 +27,7 @@
 ################################################################################
 
 # preferred openscad-amu tools version to use (if available).
-# must be specified in Makefile prior to including amu_pm_init.
+# must be specified in Makefile prior to including amu_pm_init.mk.
 # AMU_TOOL_VERSION := v1.0
 
 # prefix output path to auxiliary scope scripts

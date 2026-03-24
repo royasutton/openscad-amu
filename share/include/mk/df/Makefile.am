@@ -8,8 +8,8 @@ SUBDIRS = \
 	df1
 
 files = \
-	amu_pm_init \
-	amu_pm_rules
+	amu_pm_init.mk \
+	amu_pm_rules.mk
 
 files_am =
 

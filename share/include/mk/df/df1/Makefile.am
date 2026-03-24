@@ -5,24 +5,24 @@
 ##############################################################################
 
 files = \
-	base_constants \
-	base_defaults \
-	base_functions \
-	base_rules \
-	base_system \
-	base_variables \
+	base_constants.mk \
+	base_defaults.mk \
+	base_functions.mk \
+	base_rules.mk \
+	base_system.mk \
+	base_variables.mk \
 	\
-	doxygen_defaults \
-	doxygen_functions \
-	doxygen_rules \
-	doxygen_system \
-	doxygen_variables \
+	doxygen_defaults.mk \
+	doxygen_functions.mk \
+	doxygen_rules.mk \
+	doxygen_system.mk \
+	doxygen_variables.mk \
 	\
-	scopes_defaults \
-	scopes_functions \
-	scopes_rules \
-	scopes_system \
-	scopes_variables
+	scopes_defaults.mk \
+	scopes_functions.mk \
+	scopes_rules.mk \
+	scopes_system.mk \
+	scopes_variables.mk
 
 files_am =
 
