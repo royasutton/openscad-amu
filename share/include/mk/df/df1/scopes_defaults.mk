@@ -1,0 +1,96 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016-2018 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://royasutton.github.io/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# Defaults
+################################################################################
+
+# preferred openscad-amu tools version to use (if available).
+# must be specified in Makefile prior to including amu_pm_init.mk.
+# AMU_TOOL_VERSION := v1.0
+
+# prefix output path to auxiliary scope scripts
+prefix_scopes_output_path               := $(true)
+prefix_scopes_output_prefix             := $(true)
+prefix_scopes_input_prefix              := $(false)
+
+# control for scopes script selection
+ignore_scopes_include                   := $(false)
+ignore_scopes_exclude                   := $(false)
+
+# add scope output to release directory/archive
+release_scopes                          := $(false)
+release_archive_scopes                  := $(false)
+
+# verbosity
+verbose_seam                            := $(true)
+verbose_seam_show                       := $(false)
+
+# debugging
+debug_seam_scanner                      := $(false)
+
+# output prefix
+scopes_output_prefix                    := scopes/
+
+# scope joiner
+scopes_joiner                           := _
+
+# scopes include filter
+scopes_include                          :=
+
+# scopes exclude filter
+scopes_exclude                          :=
+
+# list of definitions to format and pass to openscad-seam
+seam_defines                            :=
+
+# addition options for openscad-seam
+seam_opts_add                           :=
+
+# addition to user-defined library path
+scad_lib_path_add                       :=
+
+#------------------------------------------------------------------------------#
+# Control Variable List
+#------------------------------------------------------------------------------#
+
+scopes_control_variables := \
+  prefix_scopes_output_path \
+  prefix_scopes_output_prefix \
+  prefix_scopes_input_prefix \
+  \
+  ignore_scopes_include \
+  ignore_scopes_exclude \
+  \
+  release_scopes \
+  release_archive_scopes \
+  \
+  verbose_seam \
+  verbose_seam_show \
+  \
+  debug_seam_scanner
+
+################################################################################
+# eof
+################################################################################

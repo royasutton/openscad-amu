@@ -148,24 +148,19 @@ AC_CONFIG_FILES([
 
   share/Makefile
 
-  share/examples/Makefile
-  share/examples/convert.bash
-  share/examples/hello_world.bash
-  share/examples/log_segregate.bash
-  share/examples/vehicle.doxyfile
-
-  share/dif_external/Makefile
+  share/amu_ext/Makefile
 
   share/include/Makefile
-  share/include/mfi/Makefile
-  share/include/mfs_library/Makefile
-  share/include/mfs_library/Doxyfile
-  share/include/pmf/Makefile
-  share/include/pmf/df1/Makefile
+  share/include/mfs/Makefile
+  share/include/mfs/lib/Makefile
+  share/include/mfs/lib/Doxyfile
+  share/include/mk/Makefile
+  share/include/mk/df/Makefile
+  share/include/mk/df/df1/Makefile
 
   share/scripts/Makefile
   share/scripts/Doxyfile
-  share/scripts/docs_scripts.bash
+  share/scripts/docs_home.bash
   share/scripts/segregate.bash
 
   share/templates/Makefile
@@ -175,6 +170,12 @@ AC_CONFIG_FILES([
   src/Doxyfile
 
   tests/Makefile
+
+  examples/Makefile
+  examples/convert.bash
+  examples/hello_world.bash
+  examples/log_segregate.bash
+  examples/vehicle.doxyfile
 ])
 
 AC_OUTPUT

@@ -1,17 +1,15 @@
 #
-# src/Doxyfile.in
+# share/include/mfs/lib/Doxyfile.in
 #
 
 PROJECT_NAME           = "@PACKAGE_NAME@"
 PROJECT_NUMBER         = "@PACKAGE_VERSION@"
-PROJECT_BRIEF          = "OpenSCAD AutoMake Utilities: C++ Programs"
+PROJECT_BRIEF          = "OpenSCAD AutoMake Utilities: Makefile Script Library"
 OUTPUT_DIRECTORY       =
-STRIP_FROM_PATH        = "@abs_top_srcdir@"
-STRIP_FROM_INC_PATH    = "@abs_top_srcdir@"
-JAVADOC_AUTOBRIEF      = NO
-OPTIMIZE_OUTPUT_FOR_C  = NO
-EXTENSION_MAPPING      = ll=c++
-BUILTIN_STL_SUPPORT    = NO
+STRIP_FROM_PATH        = "@abs_top_builddir@"
+STRIP_FROM_INC_PATH    =
+OPTIMIZE_OUTPUT_FOR_C  = YES
+EXTENSION_MAPPING      = bash=C
 DISTRIBUTE_GROUP_DOC   = NO
 EXTRACT_PRIVATE        = YES
 EXTRACT_PACKAGE        = NO
@@ -22,13 +20,15 @@ GENERATE_BUGLIST       = YES
 GENERATE_DEPRECATEDLIST= YES
 WARN_LOGFILE           = doxygen.warn
 INPUT                  =
-FILE_PATTERNS          = *.ll *.cpp *.hpp *.dox
+FILE_PATTERNS          = *.bash
 RECURSIVE              = NO
-EXAMPLE_PATH           = "@builddir@"
+EXAMPLE_PATH           = "@top_srcdir@/examples" \
+                         "@top_builddir@/examples" \
+                         "@top_builddir@/examples/build"
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             =
-INCLUDE_PATH           = "@top_builddir@"
-FILTER_PATTERNS        =
+INCLUDE_PATH           =
+FILTER_PATTERNS        = *.bash=@top_builddir@/src/bash-dif
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 GENERATE_TREEVIEW      = YES
@@ -38,7 +38,6 @@ COMPACT_LATEX          = NO
 PAPER_TYPE             = letter
 GENERATE_MAN           = YES
 MAN_OUTPUT             = man
-PREDEFINED             = DOXYGEN_SHOULD_SKIP_THIS
 GENERATE_TAGFILE       = doxygen.tagfile
 TAGFILES               =
 HAVE_DOT               = YES

@@ -336,13 +336,13 @@ SEAM::SEAM_Scanner::begin_mfscript(void)
 
   string scope_makefile = get_filename( makefile_ext );
   string scope_openscad = get_filename( openscad_ext );
-  string mfscript_init = "include/mfs_library/amu_mfs_init.bash";
+  string mfscript_init = "include/mfs/lib/amu_mfs_init.bash";
 
   boost::filesystem::path include_path;
 
   include_path  = lib_path;
   include_path /= "include";
-  include_path /= "mfi";
+  include_path /= "mk";
 
   switch_output( mfscript_ext );
 
@@ -430,7 +430,7 @@ SEAM::SEAM_Scanner::end_mfscript(void)
 
     include_path  = lib_path;
     include_path /= "include";
-    include_path /= "mfi";
+    include_path /= "mk";
 
     string scmd = make_path
                 + " --include-dir=" + include_path.string()

@@ -5,9 +5,8 @@
 ##############################################################################
 
 SUBDIRS = \
-	mfi \
-	mfs_library \
-	pmf
+	mk \
+	mfs
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)

@@ -27,7 +27,11 @@ mkdir tmp && cd tmp
 ```
 
 ```bash
-wget https://git.io/setup-amu.bash && chmod +x setup-amu.bash
+wget https://raw.githubusercontent.com/royasutton/openscad-amu/master/share/scripts/setup-amu.bash
+```
+
+```bash
+chmod +x setup-amu.bash
 ```
 
 ```bash
@@ -59,8 +63,11 @@ To build and install the [openscad-amu] documentation, type:
 Subsequently, the compiled documentation can be viewed with:
 
 ```bash
-google-chrome /usr/local/share/openscad-amu/v3.4/doc/doxygen/html/index.html
+google-chrome /usr/local/share/openscad-amu/*v3.4*/doc/doxygen/html/index.html
 ```
+
+You will need to replace the version path with that installed (ie:
+replace *v3.4* as needed).
 
 
 Project Template

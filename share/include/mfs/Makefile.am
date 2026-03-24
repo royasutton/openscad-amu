@@ -1,21 +1,25 @@
 ##############################################################################
 #
-# top_srcdir/share/templates
+# top_srcdir/share/include/mfs
 #
 ##############################################################################
 
 SUBDIRS = \
-	df1
+	lib
 
 root_path = $(DESTDIR)$(pkgdatadir)
 version_path = $(root_path)/$(PACKAGE_VERSION)
-install_path = $(version_path)/templates
+install_path = $(version_path)/include/mfs
+
+root_path_doc = $(version_path)/doc
+install_path_doc = $(root_path_doc)/share/include/mfs
 
 ##############################################################################
 # targets
 ##############################################################################
 
 uninstall-local:
+	-test -d '$(install_path_doc)'&& rmdir -v '$(install_path_doc)'
 	-test -d '$(install_path)' && rmdir -v '$(install_path)'
 
 ##############################################################################

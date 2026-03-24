@@ -1,0 +1,99 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016-2018 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://royasutton.github.io/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+################################################################################
+# System
+################################################################################
+
+#------------------------------------------------------------------------------#
+# Commands
+#------------------------------------------------------------------------------#
+
+path_doxygen := $(call first_of,$(path_doxygen) doxygen)
+path_openscad_dif := \
+  $(call first_of, \
+    $(path_openscad_dif) \
+    $(AMU_TOOL_PREFIX)openscad-dif-$(AMU_TOOL_VERSION) \
+    $(AMU_TOOL_PREFIX)openscad-dif \
+  )
+
+#------------------------------------------------------------------------------#
+# OS Configuration
+#------------------------------------------------------------------------------#
+
+#------------------------------------------------------------------------------#
+# Configuration Check
+#------------------------------------------------------------------------------#
+
+# commands
+doxygen_commands_required := \
+  path_doxygen \
+  path_openscad_dif
+
+# warning list first, then error.
+$(call variable_list_check, \
+  $(doxygen_commands_required),found,$(false),$(true))
+$(call variable_list_check, \
+  $(doxygen_commands_required),found,$(false),$(false))
+
+#------------------------------------------------------------------------------#
+# References
+#------------------------------------------------------------------------------#
+
+#------------------------------------------------------------------------------#
+# Reference Check
+#------------------------------------------------------------------------------#
+
+doxygen_commands_configured := \
+  $(doxygen_commands_required)
+
+$(call variable_list_check, \
+  $(doxygen_commands_configured),configured,$(true),$(false))
+
+#------------------------------------------------------------------------------#
+# System Constants
+#------------------------------------------------------------------------------#
+
+# design flow tool versions
+# ignore build id after version number
+doxygenvn := $(word 1,$(shell $(path_doxygen) 2>&1 --version))
+doxygenvs := doxygen$(doxygenvn)
+
+amudifvn := $(subst v,$(empty),$(shell $(path_openscad_dif) 2>&1 --version))
+amudifvs := amudif$(amudifvn)
+
+#------------------------------------------------------------------------------#
+# Configuration Variable List
+#------------------------------------------------------------------------------#
+
+doxygen_config_derived := \
+  doxygenvs \
+  doxygenvn \
+  \
+  amudifvs \
+  amudifvn \
+
+################################################################################
+# eof
+################################################################################

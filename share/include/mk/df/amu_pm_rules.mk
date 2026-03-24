@@ -1,0 +1,70 @@
+#!/usr/bin/make -f
+################################################################################
+#
+#  Copyright (C) 2016-2018,2026 Roy Allen Sutton
+#
+#  This file is part of OpenSCAD AutoMake Utilities ([openscad-amu]
+#  (https://royasutton.github.io/openscad-amu)).
+#
+#  openscad-amu is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  openscad-amu is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  [GNU General Public License] (https://www.gnu.org/licenses/gpl.html)
+#  for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with openscad-amu.  If not, see <http://www.gnu.org/licenses/>.
+#
+################################################################################
+
+this_guard := __amu_pm_rules__
+this_file  := $(lastword $(MAKEFILE_LIST))
+
+# Enforce include order dependency.
+ifndef $(subst rules,init,$(this_guard))
+  $(error Must include $(subst rules,init,$(this_file)) prior to $(this_file))
+endif
+
+ifndef $(this_guard)
+$(this_guard) := $(notdir $(this_file))
+
+	#---------------------------------------------------------------------------#
+  # Include Rule Components
+	#---------------------------------------------------------------------------#
+
+  $(call amu_pm_m,include [$($(this_guard))])
+
+	# components
+	amu_pm_rules_components := \
+		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX)$(AMU_PM_DESIGN_FLOW)/,$(AMU_PM_SUFFIX), \
+			base $(AMU_PM_COMPONENTS), \
+			variables rules))
+
+  $(foreach x, $(amu_pm_rules_components), \
+			$(call amu_pm_m,include [$x]) \
+			$(eval include $x) \
+	)
+
+	# local components
+	amu_pm_rules_components_local := \
+		$(strip $(call AMU_PM_GET_COMPONENTS,$(AMU_PM_PREFIX_LOCAL),$(AMU_PM_SUFFIX_LOCAL), \
+			base $(AMU_PM_COMPONENTS_LOCAL), \
+			variables rules))
+
+  $(foreach x, $(amu_pm_rules_components_local), \
+			$(call amu_pm_m,include [$x]) \
+			$(eval include $x) \
+	)
+
+else
+  $(call amu_pm_dm,This makefile [$($(this_guard))] has already been included.)
+endif
+
+###############################################################################
+# eof
+###############################################################################
