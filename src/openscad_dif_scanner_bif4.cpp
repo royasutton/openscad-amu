@@ -3,7 +3,7 @@
   \file   openscad_dif_scanner_bif4.cpp
 
   \author Roy Allen Sutton
-  \date   2016-2019
+  \date   2016-2019,2026
 
   \copyright
 
@@ -55,7 +55,7 @@ using namespace std;
       id                | i   |          |           |  table id
       table_caption     | t   |          |           |  table caption
       columns           | c   |    6     |           |  number of columns
-      table_class       | sc  | doxtable |           |  table css class
+      table_class       | sc  | amuTable |           |  table css class
       column_headings   | chl |          |  titles   |  column headings list
       cell_texts        | cdl |          |  titles   |  cell text list
       cell_captions     | ccl |          |  titles   |  cell caption list
@@ -136,7 +136,7 @@ ODIF::ODIF_Scanner::bif_table(void)
   }
 
   // apply default: table_class
-  if ( table_class.empty() ) table_class = "doxtable";
+  if ( table_class.empty() ) table_class = "amuTable";
 
   //
   // tokenize arguments with list members to vectors
@@ -443,22 +443,22 @@ ODIF::ODIF_Scanner::bif_image(void)
     Output a table of images in \c html or \c latex format. The options
     and their short codes are summarized in the following table.
 
-     options            | sc  | default  | tokenizer | description
-    :------------------:|:---:|:--------:|:---------:|:----------------------------
-      type              | f   |          |           |  table type (html or latex)
-      id                | i   |          |           |  table id
-      table_caption     | t   |          |           |  table caption
-      columns           | c   |    3     |           |  number of columns
-      table_class       | sc  | doxtable |           |  table css class
-      image_width       | iw  |          |           |  width for each image
-      image_height      | ih  |          |           |  height for each image
-      column_headings   | chl |          |  titles   |  column headings list
-      cell_begin        | cdb |          |  titles   |  initial text for each cell
-      cell_end          | cde |          |  titles   |  final text for each cell
-      cell_files        | cdl |          |  files    |  cell image list
-      cell_titles       | ctl |          |  titles   |  cell title list
-      cell_captions     | ccl |          |  titles   |  cell caption list
-      cell_urls         | cul |          |  urls     |  cell URL list
+     options            | sc  | default       | tokenizer | description
+    :------------------:|:---:|:-------------:|:---------:|:----------------------------
+      type              | f   |               |           |  table type (html or latex)
+      id                | i   |               |           |  table id
+      table_caption     | t   |               |           |  table caption
+      columns           | c   |    3          |           |  number of columns
+      table_class       | sc  | amuImageTable |           |  table css class
+      image_width       | iw  |               |           |  width for each image
+      image_height      | ih  |               |           |  height for each image
+      column_headings   | chl |               |  titles   |  column headings list
+      cell_begin        | cdb |               |  titles   |  initial text for each cell
+      cell_end          | cde |               |  titles   |  final text for each cell
+      cell_files        | cdl |               |  files    |  cell image list
+      cell_titles       | ctl |               |  titles   |  cell title list
+      cell_captions     | ccl |               |  titles   |  cell caption list
+      cell_urls         | cul |               |  urls     |  cell URL list
 
     The tokenizer character that separates list members are summarized in the
     following table.
@@ -570,7 +570,7 @@ ODIF::ODIF_Scanner::bif_image_table(void)
   }
 
   // apply default: table_class
-  if ( table_class.empty() ) table_class = "doxtable";
+  if ( table_class.empty() ) table_class = "amuImageTable";
 
   //
   // tokenize arguments with list members to vectors
