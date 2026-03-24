@@ -22,7 +22,13 @@ files = \
 	scopes_functions.mk \
 	scopes_rules.mk \
 	scopes_system.mk \
-	scopes_variables.mk
+	scopes_variables.mk \
+	\
+	groups_defaults.mk \
+	groups_functions.mk \
+	groups_rules.mk \
+	groups_system.mk \
+	groups_variables.mk
 
 files_am =
 
