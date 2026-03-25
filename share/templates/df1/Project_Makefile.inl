@@ -1,8 +1,7 @@
 #!/usr/bin/make -f
 ################################################################################
 #
-#  openscad-amu: Project Makefile Template
-#   rename this file to 'Makefile'
+#  openscad-amu: Project Makefile Template (rename to 'Makefile' before use)
 #
 ################################################################################
 
@@ -19,13 +18,13 @@ AMU_LIB_PATH        := @__LIB_PATH__@
 #AMU_TOOL_PREFIX    := @abs_top_builddir@/src/
 #AMU_LIB_PATH       := @abs_top_srcdir@/share
 
+# design flow and components
+AMU_PM_DESIGN_FLOW  := df1
+AMU_PM_COMPONENTS   := scopes doxygen
+
 AMU_PM_PREFIX       := $(AMU_LIB_PATH)/include/mk/df/
 AMU_PM_INIT         := $(AMU_PM_PREFIX)amu_pm_init.mk
 AMU_PM_RULES        := $(AMU_PM_PREFIX)amu_pm_rules.mk
-AMU_PM_DESIGN_FLOW  := df1/
-
-# remove design flow component from list to disable
-AMU_PM_COMPONENTS   := scopes doxygen
 
 # uncomment for increased verbosity or debugging.
 #AMU_PM_VERBOSE     := defined
