@@ -7,7 +7,8 @@
 files = \
 	Doxyfile \
 	design.scad \
-	library.scad
+	library.scad \
+	group.mk
 
 files_am =
 

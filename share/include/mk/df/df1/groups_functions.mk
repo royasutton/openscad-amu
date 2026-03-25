@@ -30,7 +30,7 @@
 #------------------------------------------------------------------------------#
 # macro: add-group (arg1,arg2,arg3,arg4,arg5,arg6)
 #------------------------------------------------------------------------------#
-# arg1: directory path
+# arg1: directory prefix (with trailing '/')
 # arg2: design files
 # arg3: library files
 # arg4: (sub)group list
@@ -42,12 +42,12 @@ define add-group
 
   # $2: design
   ifneq ($(strip $2),$(empty))
-    design += $(addprefix $(if $(strip $1),$1/),$2)
+    design += $(addprefix $(if $(strip $1),$1),$2)
   endif
 
   # $3: library
   ifneq ($(strip $3),$(empty))
-    library += $(addprefix $(if $(strip $1),$1/),$3)
+    library += $(addprefix $(if $(strip $1),$1),$3)
   endif
 
   # $5: groups_release_add
@@ -57,16 +57,16 @@ define add-group
   # (a) add to local $(groups_release_add)
   # (b) add to project $(release_files_add)
   ifneq ($(strip $5),$(empty))
-    groups_release_add += $(addprefix $$(call scopes_target_path,$(if $(strip $1),$1/)),$5)
-    release_files_add += $(addprefix $$(call scopes_target_path,$(if $(strip $1),$1/)),$5)
+    groups_release_add += $(addprefix $$(call scopes_target_path,$(if $(strip $1),$1)),$5)
+    release_files_add += $(addprefix $$(call scopes_target_path,$(if $(strip $1),$1)),$5)
   endif
 
   # $6: groups_backup_add
   # (a) add to local $(groups_backup_add)
   # (b) add to project $(backup_files_add)
   ifneq ($(strip $6),$(empty))
-    groups_backup_add += $(addprefix $(if $(strip $1),$1/),$6)
-    backup_files_add += $(addprefix $(if $(strip $1),$1/),$6)
+    groups_backup_add += $(addprefix $(if $(strip $1),$1),$6)
+    backup_files_add += $(addprefix $(if $(strip $1),$1),$6)
   endif
 
   # auto-record caller makefile as project file
@@ -84,7 +84,7 @@ define add-group
       $(addsuffix /$(groups_name)$(AMU_PM_SUFFIX),
         $(filter-out
           $(if $(call bool_decode,$(ignore_groups_exclude)),$(empty),$(groups_exclude)),
-          $(addprefix $(if $(strip $1),$1/),$4)
+          $(addprefix $(if $(strip $1),$1),$4)
         )
       )
 
@@ -93,19 +93,19 @@ define add-group
       $(addsuffix /$(groups_name)$(AMU_PM_SUFFIX),
         $(filter-out
           $(if $(call bool_decode,$(ignore_groups_exclude)),$(empty),$(groups_exclude)),
-          $(addprefix $(if $(strip $1),$1/),$4)
+          $(addprefix $(if $(strip $1),$1),$4)
         )
       )
   endif
 endef
 
-# simplified group addition using assumed local variable names
+# macro: local group addition
 #------------------------------------------------------------------------------#
 # macro: add-local-group ()
 #------------------------------------------------------------------------------#
 define add-local-group
   $(call add-group, \
-    $(local_path), \
+    $(local_path_prefix), \
     $(local_design), \
     $(local_library), \
     $(local_subgroups), \
@@ -114,12 +114,28 @@ define add-local-group
   )
 endef
 
-# simplified group cleanup using assumed local variable names
+# macro: local group addition (auto)
+# local_path_prefix = group makefile path prefix
+#------------------------------------------------------------------------------#
+# macro: add-local-group-auto ()
+#------------------------------------------------------------------------------#
+define add-local-group-auto
+  $(call add-group, \
+    $(dir $(lastword $(MAKEFILE_LIST))), \
+    $(local_design), \
+    $(local_library), \
+    $(local_subgroups), \
+    $(local_release_add), \
+    $(local_backup_add) \
+  )
+endef
+
+# macro: local group variable cleanup
 #------------------------------------------------------------------------------#
 # macro: clear-local-group ()
 #------------------------------------------------------------------------------#
 define clear-local-group
-  undefine local_path
+  undefine local_path_prefix
 
   undefine local_design
   undefine local_library
