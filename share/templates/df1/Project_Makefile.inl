@@ -42,7 +42,8 @@ define AMU_SETUP_ANNOUNCE
  as needed for your installation or setup openscad-amu ($(AMU_TOOL_VERSION))
  using the following:
 
- $$ wget http://git.io/setup-amu.bash && chmod +x setup-amu.bash
+ $$ wget https://raw.githubusercontent.com/royasutton/openscad-amu/master/share/scripts/setup-amu.bash
+ $$ chmod +x setup-amu.bash
  $$ sudo ./setup-amu.bash --branch $(AMU_TOOL_VERSION) --yes --install
 
 endef
