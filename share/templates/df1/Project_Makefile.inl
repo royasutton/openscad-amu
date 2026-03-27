@@ -30,6 +30,9 @@ AMU_PM_RULES        := $(AMU_PM_PREFIX)amu_pm_rules.mk
 #AMU_PM_VERBOSE     := defined
 #AMU_PM_DEBUG       := defined
 
+openscad_nightly    := defined
+stl_viewer          := meshlab
+
 #------------------------------------------------------------------------------#
 # Project Announcements
 #------------------------------------------------------------------------------#
@@ -51,6 +54,10 @@ endef
 #------------------------------------------------------------------------------#
 # Design Flow Init (DO NO EDIT THIS SECTION)
 #------------------------------------------------------------------------------#
+ifeq ($(openscad_nightly),defined)
+  path_openscad := openscad-nightly
+endif
+
 ifeq ($(wildcard $(AMU_PM_INIT)),)
   $(info $(call AMU_SETUP_ANNOUNCE,Init file,$(AMU_PM_INIT)))
   $(error unable to continue.)
@@ -59,14 +66,35 @@ else
 endif
 
 #------------------------------------------------------------------------------#
-# Design Flow Tools Assertions (examples)
+# Design Flow Tools Assertions
 #------------------------------------------------------------------------------#
+# when version_checks=$(true); update or comment out unneeded version checks
+
+ifeq ($(openscad_nightly),defined)
+  ifeq ($(version_checks),$(true))
+ $(call check_version,openscad,gt,2026.01,$(true), use nightly build after v2026.01.)
+  endif
+else
+  ifeq ($(version_checks),$(true))
+  $(call check_version,openscad,eq,2021.01,$(true),tested with release v2021.01.)
+  endif
+endif
+
 #ifeq ($(version_checks),$(true))
-#$(call check_version,doxygen,ge,1.8.12,$(false),designed for v1.8.12.)
-#$(call check_version,openscad,eq,2021.01,$(true),tested with v2021.01.)
+#$(call check_version,doxygen,eq,1.8.12,$(false),designed for v1.8.12.)
 #$(call check_version,amuseam,eq,2.8,$(true),v2.8 or later required.)
 #$(call check_version,amudif,lt,1.5,$(true),depreciated feature required.)
 #endif
+
+#------------------------------------------------------------------------------#
+# View .stl targets
+#------------------------------------------------------------------------------#
+.PHONY : view-stl-all
+view-stl-all : all
+	$(stl_viewer) \
+	$(foreach m,${scopes_mf}, \
+		$(shell make --no-print-directory --makefile=${m} echo_targets) \
+	)
 
 #------------------------------------------------------------------------------#
 # Overrides to Default Design Flow Configuration
