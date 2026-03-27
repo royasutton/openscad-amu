@@ -142,7 +142,8 @@ output_path_spec := \
 #
 
 # root directory
-backup_root                             := backup
+# do not use 'backup' to avoid recipe collision with make target 'backup'
+backup_root                             := backups
 
 # directory term separator
 backup_file_term_joiner                 := _
